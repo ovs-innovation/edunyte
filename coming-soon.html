@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coming Soon - Edupath</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        #particles-snow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        .snowflake {
+            position: absolute;
+            top: -10px;
+            color: white;
+            font-size: 1em;
+            font-family: Arial;
+            text-shadow: 0 0 1px #000;
+            animation: snowfall linear infinite;
+            opacity: 0.7;
+        }
+        
+        @keyframes snowfall {
+            0% {
+                transform: translateY(0vh) translateX(0);
+            }
+            100% {
+                transform: translateY(100vh) translateX(20px);
+            }
+        }
+        
+    </style>
+</head>
+<body>
+    <div>
+        <section class="md:h-screen py-6 flex items-center justify-center relative bg-no-repeat bg-center bg-cover" 
+                 style="background-image: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2071&q=80');">
+            
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black z-10" id="particles-snow"></div>
+            
+            <div class="container mx-auto px-4 relative z-20">
+                <div class="grid grid-cols-1">
+                    <div class="flex flex-col min-h-screen justify-center md:px-10 py-10 px-4">
+                        <!-- <div class="text-center">
+                            <a href="/">
+                                <img src="https://via.placeholder.com/200x50/ffffff/000000?text=LOGO" 
+                                     class="mx-auto h-10" 
+                                     alt="Logo" 
+                                     id="logo"/>
+                            </a>
+                        </div> -->
+                        
+                        <div class="title-heading text-center my-auto">
+                            <h1 class="text-white mt-3 mb-6 md:text-5xl text-3xl font-bold">We Are Coming Soon...</h1>
+                            <p class="text-white/70 text-lg max-w-xl mx-auto">
+                                Discover a world of knowledge and opportunities with our online education platform pursue a new career.
+                            </p>
+                        </div>
+                        
+                        <div class="text-center">
+                            <p class="mb-0 text-slate-400">
+                                © <span id="year"></span> . Design & Develop with 
+                                <i class="mdi mdi-heart text-red-600">❤️</i> by 
+                                <a href="https://vastoratech.com/" target="_blank" class="text-reset hover:text-white">VastoraTech</a>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Set current year
+        document.getElementById('year').textContent = new Date().getFullYear();
+        
+        // Snow particles effect
+        function createSnowflake() {
+            const snowflake = document.createElement('div');
+            snowflake.className = 'snowflake';
+            snowflake.innerHTML = '❄';
+            snowflake.style.left = Math.random() * 100 + '%';
+            snowflake.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            snowflake.style.opacity = Math.random();
+            snowflake.style.fontSize = (Math.random() * 10 + 10) + 'px';
+            
+            document.getElementById('particles-snow').appendChild(snowflake);
+            
+            setTimeout(() => {
+                snowflake.remove();
+            }, 5000);
+        }
+        
+        // Create snowflakes periodically
+        setInterval(createSnowflake, 300);
+        
+        // Create initial snowflakes
+        for (let i = 0; i < 20; i++) {
+            setTimeout(() => createSnowflake(), i * 100);
+        }
+    </script>
+</body>
+</html>
