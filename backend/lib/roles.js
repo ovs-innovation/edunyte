@@ -1,4 +1,4 @@
-export const roles = ['super_admin', 'admin', 'teacher'];
+export const roles = ['super_admin'];
 
 export const permissions = [
   'dashboard.view',
@@ -13,31 +13,18 @@ export const permissions = [
   'analytics.view',
   'reports.view',
   'reports.export',
+  'courses.view',
+  'courses.create',
+  'courses.edit',
+  'courses.delete',
+  'students.view',
+  'students.create',
+  'students.edit',
+  'students.delete',
 ];
 
 export const rolePermissions = {
   super_admin: [...permissions],
-  admin: [
-    'dashboard.view',
-    'users.view',
-    'users.create',
-    'users.edit',
-    'roles.view',
-    'settings.view',
-    'settings.edit',
-    'analytics.view',
-    'reports.view',
-    'reports.export',
-  ],
-  teacher: [
-    'dashboard.view',
-    'users.view',
-    'users.create',
-    'users.edit',
-    'analytics.view',
-    'reports.view',
-    'reports.export',
-  ],
 };
 
 export const hasPermission = (role, permission) => rolePermissions[role]?.includes(permission) || false;

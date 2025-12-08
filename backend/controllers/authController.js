@@ -1,13 +1,21 @@
 import User from "../models/userModel.js";
 import { generateToken } from "../utils/generateToken.js";
 import { rolePermissions, roles } from "../lib/roles.js";
+import Role from "../models/roleModel.js";
+import { resolveRoleKey } from "../lib/validateRole.js";
 
-const formatUser = (user) => ({
+const resolvePermissions = async (roleKey) => {
+  const role = await Role.findOne({ key: roleKey });
+  if (role) return role.permissions || [];
+  return rolePermissions[roleKey] || [];
+};
+
+const formatUser = (user, perms) => ({
   id: user._id.toString(),
   name: user.name,
   email: user.email,
   role: user.role,
-  permissions: rolePermissions[user.role] || [],
+  permissions: perms,
   status: user.status,
   lastLogin: user.lastLogin,
   createdAt: user.createdAt,
@@ -23,10 +31,11 @@ export const register = async (req, res, next) => {
     if (exists) {
       return res.status(409).json({ message: "Email already registered" });
     }
-    const userRole = roles.includes(role) ? role : "admin";
+    const userRole = await resolveRoleKey(role || "admin");
     const user = await User.create({ name, email, password, role: userRole });
+    const perms = await resolvePermissions(user.role);
     const token = generateToken(user);
-    res.status(201).json({ token, user: formatUser(user) });
+    res.status(201).json({ token, user: formatUser(user, perms) });
   } catch (err) {
     next(err);
   }
@@ -48,8 +57,9 @@ export const login = async (req, res, next) => {
     }
     user.lastLogin = new Date();
     await user.save();
+    const perms = await resolvePermissions(user.role);
     const token = generateToken(user);
-    res.json({ token, user: formatUser(user) });
+    res.json({ token, user: formatUser(user, perms) });
   } catch (err) {
     next(err);
   }
@@ -61,7 +71,8 @@ export const me = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    res.json({ user: formatUser(user) });
+    const perms = await resolvePermissions(user.role);
+    res.json({ user: formatUser(user, perms) });
   } catch (err) {
     next(err);
   }
