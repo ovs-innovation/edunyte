@@ -1,6 +1,6 @@
 import User from "../models/userModel.js";
 import { generateToken } from "../utils/generateToken.js";
-import { rolePermissions, roles } from "../lib/roles.js";
+import { rolePermissions } from "../lib/roles.js";
 import Role from "../models/roleModel.js";
 import { resolveRoleKey } from "../lib/validateRole.js";
 
@@ -31,7 +31,7 @@ export const register = async (req, res, next) => {
     if (exists) {
       return res.status(409).json({ message: "Email already registered" });
     }
-    const userRole = await resolveRoleKey(role || "admin");
+    const userRole = await resolveRoleKey(role || "super_admin");
     const user = await User.create({ name, email, password, role: userRole });
     const perms = await resolvePermissions(user.role);
     const token = generateToken(user);

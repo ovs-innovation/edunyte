@@ -1,5 +1,5 @@
 import User from "../models/userModel.js";
-import { rolePermissions, roles } from "../lib/roles.js";
+import { rolePermissions } from "../lib/roles.js";
 import Role from "../models/roleModel.js";
 import { resolveRoleKey } from "../lib/validateRole.js";
 
@@ -47,6 +47,43 @@ export const createUser = async (req, res, next) => {
     const user = await User.create({ name, email, password, role: userRole, status: userStatus });
     const perms = await resolvePermissions(user.role);
     res.status(201).json({ user: toUserDto(user, perms) });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updateUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { name, email, password, role, status } = req.body;
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    if (email && email !== user.email) {
+      const exists = await User.findOne({ email });
+      if (exists) return res.status(409).json({ message: "Email already registered" });
+      user.email = email;
+    }
+    if (name) user.name = name;
+    if (password) user.password = password;
+    if (role) user.role = await resolveRoleKey(role);
+    if (status && ["active", "inactive", "pending"].includes(status)) user.status = status;
+    await user.save();
+    const perms = await resolvePermissions(user.role);
+    res.json({ user: toUserDto(user, perms) });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const deleteUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    await user.deleteOne();
+    res.json({ success: true });
   } catch (err) {
     next(err);
   }

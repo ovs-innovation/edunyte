@@ -1,4 +1,3 @@
-export const roles = ['super_admin'];
 
 export const permissions = [
   'dashboard.view',

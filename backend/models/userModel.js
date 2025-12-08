@@ -1,13 +1,28 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-import { roles } from "../lib/roles.js";
-
+import Role from "../models/roleModel.js";
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     password: { type: String, required: true, minlength: 6 },
-    role: { type: String, enum: roles, default: "super_admin" },
+    role: {
+      type: String,
+      lowercase: true,
+      trim: true,
+      default: "super_admin",
+      validate: [
+        {
+          validator: async function (value) {
+            if (!value) return false;
+            const key = value.toLowerCase();
+            const dbRole = await Role.findOne({ key });
+            return Boolean(dbRole);
+          },
+          message: (props) => `${props.value} is not a valid role`,
+        },
+      ],
+    },
     status: { type: String, enum: ["active", "inactive", "pending"], default: "active" },
     lastLogin: { type: Date },
   },
