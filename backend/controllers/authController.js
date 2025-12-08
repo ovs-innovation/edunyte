@@ -55,6 +55,9 @@ export const login = async (req, res, next) => {
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
+    if (user.status === "inactive" || user.status === "pending") {
+      return res.status(403).json({ message: "Account is not active" });
+    }
     user.lastLogin = new Date();
     await user.save();
     const perms = await resolvePermissions(user.role);
