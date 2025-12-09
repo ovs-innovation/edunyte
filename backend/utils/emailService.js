@@ -226,3 +226,41 @@ export const sendFeedbackRequestEmail = async (booking, guest, linkUrl) => {
     console.error('Error sending feedback request email:', error);
   }
 };
+
+export const sendOTPEmail = async (email, otp, userName) => {
+  try {
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Your Login Verification Code",
+      html: `
+        <div style="font-family: Arial, sans-serif; color: #333; background: #f7f7f7; padding: 32px 0;">
+          <div style="max-width: 600px; margin: 0 auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); padding: 32px;">
+            <div style="text-align: center; margin-bottom: 32px;">
+              <h1 style="color: #1a73e8; margin-bottom: 8px;">🔐 Verification Code</h1>
+              <p style="color: #666; font-size: 16px;">Your login verification code</p>
+            </div>
+            <p style="font-size: 16px; margin-bottom: 24px;">Dear <strong>${userName || email}</strong>,</p>
+            <p style="font-size: 15px; margin-bottom: 24px;">You have requested to log in to your account. Please use the following verification code:</p>
+            <div style="background: #f8f9fa; padding: 24px; border-radius: 8px; margin-bottom: 24px; border-left: 4px solid #1a73e8; text-align: center;">
+              <div style="font-size: 32px; font-weight: bold; color: #1a73e8; letter-spacing: 8px; margin: 16px 0;">
+                ${otp}
+              </div>
+            </div>
+            <p style="font-size: 14px; color: #666; margin-bottom: 8px;">This code will expire in 10 minutes.</p>
+            <p style="font-size: 14px; color: #666;">If you didn't request this code, please ignore this email.</p>
+            <hr style="border: none; border-top: 1px solid #eee; margin: 32px 0;">
+            <div style="font-size: 14px; color: #555; text-align: center;">
+              <p style="margin: 0;">This is an automated message. Please do not reply.</p>
+            </div>
+          </div>
+        </div>
+      `,
+    };
+    await transporter.sendMail(mailOptions);
+    console.log(`OTP email sent successfully to ${email}`);
+  } catch (error) {
+    console.error("Error sending OTP email:", error);
+    throw error;
+  }
+};

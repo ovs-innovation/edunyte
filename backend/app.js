@@ -8,6 +8,7 @@ import { fileURLToPath } from "url";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import roleRoutes from "./routes/roleRoutes.js";
+import settingsRoutes from "./routes/settingsRoutes.js";
 import { ensureDefaultRoles } from "./controllers/roleController.js";
 
 
@@ -32,6 +33,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/roles", roleRoutes);
+app.use("/api/settings", settingsRoutes);
 app.use(errorHandler);
 
 export default app;

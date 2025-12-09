@@ -1,8 +1,12 @@
 import User from "../models/userModel.js";
+import OTP from "../models/otpModel.js";
+import Settings from "../models/settingsModel.js";
 import { generateToken } from "../utils/generateToken.js";
 import { rolePermissions } from "../lib/roles.js";
 import Role from "../models/roleModel.js";
 import { resolveRoleKey } from "../lib/validateRole.js";
+import { sendOTPEmail } from "../utils/emailService.js";
+import crypto from "crypto";
 
 const resolvePermissions = async (roleKey) => {
   const role = await Role.findOne({ key: roleKey });
@@ -43,7 +47,7 @@ export const register = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, otp } = req.body;
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password are required" });
     }
@@ -57,6 +61,22 @@ export const login = async (req, res, next) => {
     }
     if (user.status === "inactive" || user.status === "pending") {
       return res.status(403).json({ message: "Account is not active" });
+    }
+    const settings = await Settings.getSettings();
+    if (settings.twoFactorAuth) {
+      if (!otp) {
+        const otpCode = crypto.randomInt(100000, 999999).toString();
+        const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+        await OTP.deleteMany({ email });
+        await OTP.create({ email, otp: otpCode, expiresAt });
+        await sendOTPEmail(email, otpCode, user.name);
+        return res.json({ requiresOTP: true, message: "OTP sent to your email" });
+      }
+      const otpRecord = await OTP.findOne({ email, otp });
+      if (!otpRecord || otpRecord.expiresAt < new Date()) {
+        return res.status(401).json({ message: "Invalid or expired OTP" });
+      }
+      await OTP.deleteOne({ _id: otpRecord._id });
     }
     user.lastLogin = new Date();
     await user.save();
