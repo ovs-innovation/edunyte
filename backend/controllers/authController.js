@@ -5,7 +5,7 @@ import { generateToken } from "../utils/generateToken.js";
 import { rolePermissions } from "../lib/roles.js";
 import Role from "../models/roleModel.js";
 import { resolveRoleKey } from "../lib/validateRole.js";
-import { sendOTPEmail } from "../utils/emailService.js";
+import { sendOTPEmail, sendResetPasswordEmail } from "../utils/emailService.js";
 import crypto from "crypto";
 
 const resolvePermissions = async (roleKey) => {
@@ -67,12 +67,12 @@ export const login = async (req, res, next) => {
       if (!otp) {
         const otpCode = crypto.randomInt(100000, 999999).toString();
         const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-        await OTP.deleteMany({ email });
-        await OTP.create({ email, otp: otpCode, expiresAt });
+        await OTP.deleteMany({ email, purpose: "login" });
+        await OTP.create({ email, otp: otpCode, purpose: "login", expiresAt });
         await sendOTPEmail(email, otpCode, user.name);
         return res.json({ requiresOTP: true, message: "OTP sent to your email" });
       }
-      const otpRecord = await OTP.findOne({ email, otp });
+      const otpRecord = await OTP.findOne({ email, otp, purpose: "login" });
       if (!otpRecord) {
         return res.status(401).json({ message: "Invalid OTP. Please check your email and try again." });
       }
@@ -87,6 +87,45 @@ export const login = async (req, res, next) => {
     const perms = await resolvePermissions(user.role);
     const token = generateToken(user);
     res.json({ token, user: formatUser(user, perms) });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: "Email is required" });
+    const user = await User.findOne({ email });
+    if (!user) return res.status(200).json({ message: "If that account exists, a code has been sent" });
+    const otpCode = crypto.randomInt(100000, 999999).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    await OTP.deleteMany({ email, purpose: "reset" });
+    await OTP.create({ email, otp: otpCode, purpose: "reset", expiresAt });
+    await sendResetPasswordEmail(email, otpCode, user.name);
+    res.json({ message: "Password reset code sent to your email" });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const resetPassword = async (req, res, next) => {
+  try {
+    const { email, otp, password } = req.body;
+    if (!email || !otp || !password) {
+      return res.status(400).json({ message: "Email, code, and new password are required" });
+    }
+    const otpRecord = await OTP.findOne({ email, otp, purpose: "reset" });
+    if (!otpRecord || otpRecord.expiresAt < new Date()) {
+      if (otpRecord) await OTP.deleteOne({ _id: otpRecord._id });
+      return res.status(401).json({ message: "Invalid or expired code" });
+    }
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+    user.password = password;
+    await user.save();
+    await OTP.deleteMany({ email, purpose: "reset" });
+    res.json({ success: true, message: "Password updated successfully" });
   } catch (err) {
     next(err);
   }
