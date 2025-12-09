@@ -73,8 +73,12 @@ export const login = async (req, res, next) => {
         return res.json({ requiresOTP: true, message: "OTP sent to your email" });
       }
       const otpRecord = await OTP.findOne({ email, otp });
-      if (!otpRecord || otpRecord.expiresAt < new Date()) {
-        return res.status(401).json({ message: "Invalid or expired OTP" });
+      if (!otpRecord) {
+        return res.status(401).json({ message: "Invalid OTP. Please check your email and try again." });
+      }
+      if (otpRecord.expiresAt < new Date()) {
+        await OTP.deleteOne({ _id: otpRecord._id });
+        return res.status(401).json({ message: "OTP has expired. Please request a new one." });
       }
       await OTP.deleteOne({ _id: otpRecord._id });
     }
