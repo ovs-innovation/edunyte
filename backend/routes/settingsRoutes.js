@@ -5,7 +5,7 @@ import { requirePermission } from "../middlewares/permissionMiddleware.js";
 
 const router = express.Router();
 
-router.get("/", verifyToken, requirePermission("settings.view"), getSettings);
+router.get("/", verifyToken, getSettings);
 router.patch("/", verifyToken, requirePermission("settings.edit"), updateSettings);
 
 export default router;
