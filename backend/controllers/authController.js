@@ -6,6 +6,7 @@ import { rolePermissions } from "../lib/roles.js";
 import Role from "../models/roleModel.js";
 import { resolveRoleKey } from "../lib/validateRole.js";
 import { sendOTPEmail, sendResetPasswordEmail } from "../utils/emailService.js";
+import TeacherProfile from "../models/teacherProfileModel.js";
 import crypto from "crypto";
 
 const resolvePermissions = async (roleKey) => {
@@ -48,6 +49,8 @@ export const register = async (req, res, next) => {
 export const login = async (req, res, next) => {
   try {
     const { email, password, otp } = req.body;
+    const { appType } = req.query;
+    
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password are required" });
     }
@@ -59,6 +62,19 @@ export const login = async (req, res, next) => {
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
+    
+    if (appType === "admin" && user.role === "student") {
+      return res.status(403).json({ 
+        message: "Students cannot login to admin panel. Please use the student app." 
+      });
+    }
+    
+    if (appType === "student" && ["super_admin", "admin", "teacher"].includes(user.role)) {
+      return res.status(403).json({ 
+        message: "Please use the admin panel to login." 
+      });
+    }
+    
     if (user.status === "inactive" || user.status === "pending") {
       return res.status(403).json({ message: "Account is not active" });
     }
@@ -138,9 +154,18 @@ export const me = async (req, res, next) => {
       return res.status(404).json({ message: "User not found" });
     }
     const perms = await resolvePermissions(user.role);
-    res.json({ user: formatUser(user, perms) });
+    const userData = formatUser(user, perms);
+    
+    if (user.role === "teacher") {
+      let teacherProfile = await TeacherProfile.findOne({ userId: user._id });
+      if (!teacherProfile) {
+        teacherProfile = await TeacherProfile.create({ userId: user._id });
+      }
+      userData.profile = teacherProfile;
+    }
+    
+    res.json({ user: userData });
   } catch (err) {
     next(err);
   }
 };
-

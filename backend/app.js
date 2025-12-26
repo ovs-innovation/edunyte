@@ -9,6 +9,8 @@ import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import roleRoutes from "./routes/roleRoutes.js";
 import settingsRoutes from "./routes/settingsRoutes.js";
+import teacherProfileRoutes from "./routes/teacherProfileRoutes.js";
+import studentProfileRoutes from "./routes/studentProfileRoutes.js";
 import { ensureDefaultRoles } from "./controllers/roleController.js";
 
 
@@ -34,6 +36,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/roles", roleRoutes);
 app.use("/api/settings", settingsRoutes);
+app.use("/api/teacher-profiles", teacherProfileRoutes);
+app.use("/api/student-profiles", studentProfileRoutes);
 app.use(errorHandler);
 
 export default app;

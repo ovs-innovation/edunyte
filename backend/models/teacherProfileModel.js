@@ -1,0 +1,101 @@
+import mongoose from "mongoose";
+
+const teacherProfileSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      unique: true,
+    },
+    bio: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    photo: {
+      type: String,
+      default: "",
+    },
+    expertise: {
+      type: [String],
+      default: [],
+    },
+    experience: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    socialLinks: {
+      website: { type: String, default: "" },
+      linkedin: { type: String, default: "" },
+      twitter: { type: String, default: "" },
+      youtube: { type: String, default: "" },
+      facebook: { type: String, default: "" },
+    },
+    kycStatus: {
+      type: String,
+      enum: ["pending", "verified", "rejected"],
+      default: "pending",
+    },
+    kycDocuments: {
+      idProof: { type: String, default: "" },
+      addressProof: { type: String, default: "" },
+      bankStatement: { type: String, default: "" },
+    },
+    payoutInfo: {
+      bankName: { type: String, trim: true, default: "" },
+      accountNumber: { type: String, trim: true, default: "" },
+      ifscCode: { type: String, trim: true, default: "" },
+      accountHolderName: { type: String, trim: true, default: "" },
+      upiId: { type: String, trim: true, default: "" },
+    },
+    totalEarnings: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    pendingPayout: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    paidAmount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    rating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5,
+    },
+    totalReviews: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    totalCourses: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    publishedCourses: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    totalStudents: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+  },
+  { timestamps: true }
+);
+
+teacherProfileSchema.index({ userId: 1 });
+teacherProfileSchema.index({ kycStatus: 1 });
+
+export default mongoose.model("TeacherProfile", teacherProfileSchema);

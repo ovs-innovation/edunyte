@@ -1,0 +1,197 @@
+import TeacherProfile from "../models/teacherProfileModel.js";
+import User from "../models/userModel.js";
+
+export const getTeacherProfile = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    if (user.role !== "teacher") {
+      return res.status(400).json({ message: "User is not a teacher" });
+    }
+    let profile = await TeacherProfile.findOne({ userId }).populate("userId", "name email status");
+    if (!profile) {
+      profile = await TeacherProfile.create({ userId });
+      profile = await TeacherProfile.findById(profile._id).populate("userId", "name email status");
+    }
+    res.json({ profile });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getMyTeacherProfile = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const user = await User.findById(userId);
+    if (!user || user.role !== "teacher") {
+      return res.status(403).json({ message: "User is not a teacher" });
+    }
+    let profile = await TeacherProfile.findOne({ userId }).populate("userId", "name email status");
+    if (!profile) {
+      profile = await TeacherProfile.create({ userId });
+      profile = await TeacherProfile.findById(profile._id).populate("userId", "name email status");
+    }
+    res.json({ profile });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updateTeacherProfile = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const requestingUserId = req.user.id;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    if (user.role !== "teacher") {
+      return res.status(400).json({ message: "User is not a teacher" });
+    }
+    const {
+      bio,
+      photo,
+      expertise,
+      experience,
+      socialLinks,
+      payoutInfo,
+      rating,
+    } = req.body;
+    let profile = await TeacherProfile.findOne({ userId });
+    if (!profile) {
+      profile = await TeacherProfile.create({ userId });
+    }
+    if (bio !== undefined) profile.bio = bio;
+    if (photo !== undefined) profile.photo = photo;
+    if (expertise !== undefined) profile.expertise = Array.isArray(expertise) ? expertise : [];
+    if (experience !== undefined) profile.experience = experience;
+    if (socialLinks !== undefined) {
+      profile.socialLinks = {
+        ...profile.socialLinks,
+        ...socialLinks,
+      };
+    }
+    if (payoutInfo !== undefined) {
+      profile.payoutInfo = {
+        ...profile.payoutInfo,
+        ...payoutInfo,
+      };
+    }
+    const canUpdateRating = userId !== requestingUserId;
+    if (rating !== undefined && canUpdateRating) {
+      profile.rating = rating;
+    }
+    await profile.save();
+    await profile.populate("userId", "name email status");
+    res.json({ profile });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const listTeacherProfiles = async (req, res, next) => {
+  try {
+    const { status, kycStatus, search } = req.query;
+    const query = {};
+    if (kycStatus) {
+      query.kycStatus = kycStatus;
+    }
+    let profiles = await TeacherProfile.find(query)
+      .populate("userId", "name email status")
+      .sort({ createdAt: -1 });
+    if (status) {
+      profiles = profiles.filter((p) => p.userId?.status === status);
+    }
+    if (search) {
+      const searchLower = search.toLowerCase();
+      profiles = profiles.filter(
+        (p) =>
+          p.userId?.name?.toLowerCase().includes(searchLower) ||
+          p.userId?.email?.toLowerCase().includes(searchLower)
+      );
+    }
+    res.json({ profiles, count: profiles.length });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updateKycStatus = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const { kycStatus, kycDocuments } = req.body;
+    if (!["pending", "verified", "rejected"].includes(kycStatus)) {
+      return res.status(400).json({ message: "Invalid KYC status" });
+    }
+    const profile = await TeacherProfile.findOne({ userId });
+    if (!profile) {
+      return res.status(404).json({ message: "Teacher profile not found" });
+    }
+    profile.kycStatus = kycStatus;
+    if (kycDocuments) {
+      profile.kycDocuments = {
+        ...profile.kycDocuments,
+        ...kycDocuments,
+      };
+    }
+    await profile.save();
+    await profile.populate("userId", "name email status");
+    res.json({ profile });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updateEarnings = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const { amount, operation = "add" } = req.body;
+    if (typeof amount !== "number" || amount < 0) {
+      return res.status(400).json({ message: "Invalid amount" });
+    }
+    const profile = await TeacherProfile.findOne({ userId });
+    if (!profile) {
+      return res.status(404).json({ message: "Teacher profile not found" });
+    }
+    if (operation === "add") {
+      profile.totalEarnings += amount;
+      profile.pendingPayout += amount;
+    } else if (operation === "set") {
+      profile.totalEarnings = amount;
+    } else {
+      return res.status(400).json({ message: "Invalid operation" });
+    }
+    await profile.save();
+    await profile.populate("userId", "name email status");
+    res.json({ profile });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const processPayout = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const { amount } = req.body;
+    if (typeof amount !== "number" || amount < 0) {
+      return res.status(400).json({ message: "Invalid amount" });
+    }
+    const profile = await TeacherProfile.findOne({ userId });
+    if (!profile) {
+      return res.status(404).json({ message: "Teacher profile not found" });
+    }
+    if (amount > profile.pendingPayout) {
+      return res.status(400).json({ message: "Amount exceeds pending payout" });
+    }
+    profile.pendingPayout -= amount;
+    profile.paidAmount += amount;
+    await profile.save();
+    await profile.populate("userId", "name email status");
+    res.json({ profile });
+  } catch (err) {
+    next(err);
+  }
+};
