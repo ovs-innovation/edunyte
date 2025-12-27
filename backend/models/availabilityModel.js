@@ -13,12 +13,13 @@ const availabilitySchema = new mongoose.Schema(
       required: true,
       index: true,
     },
-    teacherCourseId: {
+    courseId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "TeacherCourse",
+      ref: "Course",
       required: true,
       index: true,
     },
+    // Removed teacherCourseId - availability is now based on course only, not course+language
     date: {
       type: Date,
       required: true,
@@ -78,7 +79,8 @@ const availabilitySchema = new mongoose.Schema(
 
 // Indexes for efficient querying
 availabilitySchema.index({ teacherId: 1, date: 1, status: 1 });
-availabilitySchema.index({ teacherCourseId: 1, date: 1 });
+availabilitySchema.index({ courseId: 1, date: 1 });
+availabilitySchema.index({ teacherId: 1, courseId: 1, date: 1 });
 availabilitySchema.index({ date: 1, status: 1 });
 availabilitySchema.index({ bookingId: 1 });
 

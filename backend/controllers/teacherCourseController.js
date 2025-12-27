@@ -15,7 +15,7 @@ import mongoose from "mongoose";
 export const joinCourse = async (req, res, next) => {
   try {
     const teacherId = req.user.id;
-    const { courseId, languageId, price, currency, timezone } = req.body;
+    const { courseId, languageIds, price, currency, timezone, introductionVideo, experience, bio } = req.body;
 
     // Verify user is a teacher
     const user = await User.findById(teacherId);
@@ -32,59 +32,71 @@ export const joinCourse = async (req, res, next) => {
       return res.status(400).json({ message: "Course is not active" });
     }
 
-    // Verify language exists and is active
-    const language = await Language.findById(languageId);
-    if (!language) {
-      return res.status(404).json({ message: "Language not found" });
-    }
-    if (language.status !== "active") {
-      return res.status(400).json({ message: "Language is not active" });
+    // Verify all languages exist and are active
+    if (!Array.isArray(languageIds) || languageIds.length === 0) {
+      return res.status(400).json({ message: "At least one language is required" });
     }
 
-    // Check for duplicate request
+    const languages = await Language.find({ _id: { $in: languageIds } });
+    if (languages.length !== languageIds.length) {
+      return res.status(404).json({ message: "One or more languages not found" });
+    }
+
+    const inactiveLanguages = languages.filter((lang) => lang.status !== "active");
+    if (inactiveLanguages.length > 0) {
+      return res.status(400).json({ message: "One or more languages are not active" });
+    }
+
+    // Check for existing request for this teacher-course combination
     const existing = await TeacherCourse.findOne({
       teacherId,
       courseId,
-      languageId,
     });
 
     if (existing) {
       if (existing.status === "pending") {
-        return res.status(409).json({ message: "Request already pending for this course-language combination" });
+        return res.status(409).json({ message: "Request already pending for this course" });
       }
       if (existing.status === "approved") {
-        return res.status(409).json({ message: "You are already approved for this course-language combination" });
+        return res.status(409).json({ message: "You are already approved for this course" });
       }
       // If rejected, allow re-application
       existing.status = "pending";
+      existing.languageIds = languageIds;
       existing.price = price;
       existing.currency = (currency || "USD").toUpperCase();
       existing.timezone = timezone || "UTC";
+      existing.introductionVideo = introductionVideo || "";
+      existing.experience = experience || "";
+      existing.bio = bio || "";
       existing.rejectionReason = "";
       await existing.save();
       await existing.populate([
         { path: "teacherId", select: "name email" },
         { path: "courseId", select: "name description" },
-        { path: "languageId", select: "name code" },
+        { path: "languageIds", select: "name code" },
       ]);
       return res.json({ teacherCourse: existing, message: "Request resubmitted successfully" });
     }
 
-    // Create new request
+    // Create new request with multiple languages
     const teacherCourse = await TeacherCourse.create({
       teacherId,
       courseId,
-      languageId,
+      languageIds,
       price,
       currency: (currency || "USD").toUpperCase(),
       timezone: timezone || "UTC",
+      introductionVideo: introductionVideo || "",
+      experience: experience || "",
+      bio: bio || "",
       status: "pending",
     });
 
     await teacherCourse.populate([
       { path: "teacherId", select: "name email" },
       { path: "courseId", select: "name description" },
-      { path: "languageId", select: "name code" },
+      { path: "languageIds", select: "name code" },
     ]);
 
     res.status(201).json({ teacherCourse });
@@ -111,7 +123,7 @@ export const getMyCourses = async (req, res, next) => {
 
     const teacherCourses = await TeacherCourse.find(query)
       .populate("courseId", "name description category image status")
-      .populate("languageId", "name code nativeName")
+      .populate("languageIds", "name code nativeName")
       .sort({ createdAt: -1 });
 
     res.json({ teacherCourses, count: teacherCourses.length });
@@ -135,7 +147,7 @@ export const getTeacherCourseRequests = async (req, res, next) => {
       query.courseId = courseId;
     }
     if (languageId) {
-      query.languageId = languageId;
+      query.languageIds = { $in: [languageId] }; // Find courses that include this language
     }
     if (teacherId) {
       query.teacherId = teacherId;
@@ -144,7 +156,7 @@ export const getTeacherCourseRequests = async (req, res, next) => {
     const teacherCourses = await TeacherCourse.find(query)
       .populate("teacherId", "name email status")
       .populate("courseId", "name description category status")
-      .populate("languageId", "name code nativeName")
+      .populate("languageIds", "name code nativeName")
       .populate("reviewedBy", "name email")
       .sort({ createdAt: -1 });
 
@@ -182,7 +194,7 @@ export const approveTeacherCourse = async (req, res, next) => {
     await teacherCourse.populate([
       { path: "teacherId", select: "name email" },
       { path: "courseId", select: "name description" },
-      { path: "languageId", select: "name code" },
+      { path: "languageIds", select: "name code" },
       { path: "reviewedBy", select: "name email" },
     ]);
 
@@ -222,7 +234,7 @@ export const rejectTeacherCourse = async (req, res, next) => {
     await teacherCourse.populate([
       { path: "teacherId", select: "name email" },
       { path: "courseId", select: "name description" },
-      { path: "languageId", select: "name code" },
+      { path: "languageIds", select: "name code" },
       { path: "reviewedBy", select: "name email" },
     ]);
 
@@ -261,10 +273,22 @@ export const getCourseLanguages = async (req, res, next) => {
     const teacherCourses = await TeacherCourse.find({
       courseId,
       status: "approved",
-    }).distinct("languageId");
+    });
+
+    // Extract all unique language IDs from all teacher courses
+    const allLanguageIds = teacherCourses.reduce((acc, tc) => {
+      if (Array.isArray(tc.languageIds)) {
+        tc.languageIds.forEach(langId => {
+          if (!acc.includes(langId.toString())) {
+            acc.push(langId.toString());
+          }
+        });
+      }
+      return acc;
+    }, []);
 
     const languages = await Language.find({
-      _id: { $in: teacherCourses },
+      _id: { $in: allLanguageIds },
       status: "active",
     }).sort({ name: 1 });
 
@@ -290,15 +314,15 @@ export const getCourseTeachers = async (req, res, next) => {
       return res.status(400).json({ message: "Valid languageId query parameter is required" });
     }
 
-    // Get all approved teacher-course mappings
+    // Get all approved teacher-course mappings that include this language
     const teacherCourses = await TeacherCourse.find({
       courseId,
-      languageId,
+      languageIds: { $in: [languageId] }, // Find courses where languageIds array includes this languageId
       status: "approved",
     })
       .populate("teacherId", "name email")
       .populate("courseId", "name description")
-      .populate("languageId", "name code nativeName")
+      .populate("languageIds", "name code nativeName")
       .sort({ price: 1 });
 
     res.json({ teacherCourses, count: teacherCourses.length });

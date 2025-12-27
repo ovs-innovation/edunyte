@@ -22,11 +22,11 @@ const teacherCourseSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
-    languageId: {
-      type: mongoose.Schema.Types.ObjectId,
+    languageIds: {
+      type: [mongoose.Schema.Types.ObjectId],
       ref: "Language",
       required: true,
-      index: true,
+      default: [],
     },
     price: {
       type: Number,
@@ -38,7 +38,19 @@ const teacherCourseSchema = new mongoose.Schema(
       default: "USD",
       uppercase: true,
     },
-    // Experience and bio will come from teacher profile
+    // Course-specific experience and bio (not from profile)
+    experience: {
+      type: String,
+      trim: true,
+      default: "",
+      // Teacher's experience/qualifications specific to this course
+    },
+    bio: {
+      type: String,
+      trim: true,
+      default: "",
+      // Teacher's bio specific to this course
+    },
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],
@@ -50,6 +62,13 @@ const teacherCourseSchema = new mongoose.Schema(
       type: String,
       trim: true,
       default: "UTC",
+    },
+    // Introduction video link - teacher explains what they will teach
+    introductionVideo: {
+      type: String,
+      trim: true,
+      default: "",
+      // Can be YouTube, Vimeo, or any video URL
     },
     // Availability schedule (stored as JSON or separate collection in future)
     availability: {
@@ -73,16 +92,17 @@ const teacherCourseSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Compound unique index to prevent duplicate teacher-course-language combinations
+// Compound unique index to prevent duplicate teacher-course combinations
 teacherCourseSchema.index(
-  { teacherId: 1, courseId: 1, languageId: 1 },
+  { teacherId: 1, courseId: 1 },
   { unique: true }
 );
 
 // Indexes for querying
 teacherCourseSchema.index({ status: 1, createdAt: -1 });
-teacherCourseSchema.index({ courseId: 1, languageId: 1, status: 1 });
+teacherCourseSchema.index({ courseId: 1, status: 1 });
 teacherCourseSchema.index({ teacherId: 1, status: 1 });
+teacherCourseSchema.index({ languageIds: 1 }); // For querying by language
 
 export default mongoose.model("TeacherCourse", teacherCourseSchema);
 

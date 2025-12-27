@@ -1,5 +1,6 @@
 import Availability from "../models/availabilityModel.js";
 import TeacherCourse from "../models/teacherCourseModel.js";
+import Course from "../models/courseModel.js";
 import Booking from "../models/bookingModel.js";
 import User from "../models/userModel.js";
 import mongoose from "mongoose";
@@ -15,24 +16,28 @@ import mongoose from "mongoose";
 export const createAvailability = async (req, res, next) => {
   try {
     const teacherId = req.user.id;
-    const { teacherCourseId, date, startTime, endTime, duration, timezone, isRecurring, recurringPattern, recurringEndDate } = req.body;
+    const { courseId, date, startTime, endTime, duration, timezone, isRecurring, recurringPattern, recurringEndDate } = req.body;
 
-    // Verify teacher owns this teacherCourse
-    const teacherCourse = await TeacherCourse.findById(teacherCourseId);
+    // Verify course exists
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    // Verify teacher has at least one approved teacherCourse for this course
+    const teacherCourse = await TeacherCourse.findOne({
+      teacherId,
+      courseId,
+      status: "approved",
+    });
     if (!teacherCourse) {
-      return res.status(404).json({ message: "Teacher course not found" });
-    }
-    if (teacherCourse.teacherId.toString() !== teacherId) {
-      return res.status(403).json({ message: "You don't have permission to manage this course" });
-    }
-    if (teacherCourse.status !== "approved") {
-      return res.status(400).json({ message: "Course must be approved before setting availability" });
+      return res.status(403).json({ message: "You must have at least one approved language for this course before setting availability" });
     }
 
     const slotDate = new Date(date);
     const slot = await Availability.create({
       teacherId,
-      teacherCourseId,
+      courseId,
       date: slotDate,
       startTime,
       endTime,
@@ -56,18 +61,22 @@ export const createAvailability = async (req, res, next) => {
 export const bulkCreateAvailability = async (req, res, next) => {
   try {
     const teacherId = req.user.id;
-    const { teacherCourseId, slots } = req.body;
+    const { courseId, slots } = req.body;
 
-    // Verify teacher owns this teacherCourse
-    const teacherCourse = await TeacherCourse.findById(teacherCourseId);
+    // Verify course exists
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    // Verify teacher has at least one approved teacherCourse for this course
+    const teacherCourse = await TeacherCourse.findOne({
+      teacherId,
+      courseId,
+      status: "approved",
+    });
     if (!teacherCourse) {
-      return res.status(404).json({ message: "Teacher course not found" });
-    }
-    if (teacherCourse.teacherId.toString() !== teacherId) {
-      return res.status(403).json({ message: "You don't have permission to manage this course" });
-    }
-    if (teacherCourse.status !== "approved") {
-      return res.status(400).json({ message: "Course must be approved before setting availability" });
+      return res.status(403).json({ message: "You must have at least one approved language for this course before setting availability" });
     }
 
     const createdSlots = [];
@@ -75,7 +84,7 @@ export const bulkCreateAvailability = async (req, res, next) => {
       const slotDate = new Date(slotData.date);
       const slot = await Availability.create({
         teacherId,
-        teacherCourseId,
+        courseId,
         date: slotDate,
         startTime: slotData.startTime,
         endTime: slotData.endTime,
@@ -101,11 +110,11 @@ export const bulkCreateAvailability = async (req, res, next) => {
 export const getMyAvailability = async (req, res, next) => {
   try {
     const teacherId = req.user.id;
-    const { teacherCourseId, startDate, endDate, status } = req.query;
+    const { courseId, startDate, endDate, status } = req.query;
 
     const query = { teacherId };
-    if (teacherCourseId) {
-      query.teacherCourseId = teacherCourseId;
+    if (courseId) {
+      query.courseId = courseId;
     }
     if (startDate || endDate) {
       query.date = {};
@@ -117,7 +126,7 @@ export const getMyAvailability = async (req, res, next) => {
     }
 
     const availabilities = await Availability.find(query)
-      .populate("teacherCourseId", "courseId languageId price currency")
+      .populate("courseId", "name description")
       .populate("bookingId", "studentId status")
       .sort({ date: 1, startTime: 1 });
 
@@ -145,8 +154,10 @@ export const getAvailableSlots = async (req, res, next) => {
       return res.status(404).json({ message: "Teacher course not found or not approved" });
     }
 
+    // Get availability slots for the course (not specific to language)
     const query = {
-      teacherCourseId,
+      teacherId: teacherCourse.teacherId,
+      courseId: teacherCourse.courseId,
       status: "available",
       date: { $gte: new Date() }, // Only future dates
     };
@@ -159,7 +170,7 @@ export const getAvailableSlots = async (req, res, next) => {
     }
 
     const availabilities = await Availability.find(query)
-      .populate("teacherCourseId", "courseId languageId price currency timezone")
+      .populate("courseId", "name description")
       .sort({ date: 1, startTime: 1 });
 
     res.json({ availabilities, count: availabilities.length });
@@ -199,7 +210,7 @@ export const updateAvailability = async (req, res, next) => {
     if (timezone !== undefined) availability.timezone = timezone;
 
     await availability.save();
-    await availability.populate("teacherCourseId", "courseId languageId price currency");
+    await availability.populate("courseId", "name description");
 
     res.json({ availability });
   } catch (err) {

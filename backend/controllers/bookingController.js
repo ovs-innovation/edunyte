@@ -29,7 +29,7 @@ export const createBooking = async (req, res, next) => {
     }
 
     // Get availability slot
-    const availability = await Availability.findById(availabilityId).populate("teacherCourseId");
+    const availability = await Availability.findById(availabilityId).populate("courseId");
     if (!availability) {
       return res.status(404).json({ message: "Availability slot not found" });
     }
@@ -40,9 +40,22 @@ export const createBooking = async (req, res, next) => {
       return res.status(400).json({ message: "Cannot book past slots" });
     }
 
-    const teacherCourse = availability.teacherCourseId;
-    if (!teacherCourse || teacherCourse.status !== "approved") {
-      return res.status(400).json({ message: "Teacher course is not approved" });
+    // Get teacherCourse - we need courseId and languageId from request
+    // For now, we'll need languageId in the request body
+    const { languageId } = req.body;
+    if (!languageId) {
+      return res.status(400).json({ message: "Language ID is required for booking" });
+    }
+
+    const teacherCourse = await TeacherCourse.findOne({
+      teacherId: availability.teacherId,
+      courseId: availability.courseId,
+      languageIds: { $in: [languageId] },
+      status: "approved",
+    });
+
+    if (!teacherCourse) {
+      return res.status(400).json({ message: "Teacher course is not approved for this language" });
     }
 
     // Check if slot is already booked
@@ -71,7 +84,7 @@ export const createBooking = async (req, res, next) => {
       teacherCourseId: teacherCourse._id,
       availabilityId,
       courseId: teacherCourse.courseId,
-      languageId: teacherCourse.languageId,
+      languageId: languageId, // Use the languageId from request
       sessionDate: availability.date,
       startTime: availability.startTime,
       endTime: availability.endTime,
@@ -82,7 +95,9 @@ export const createBooking = async (req, res, next) => {
       studentNotes: studentNotes || "",
       status: "scheduled",
       paymentStatus: "pending",
-      ...meetingDetails,
+      meetingUrl: meetingDetails.joinUrl || "",
+      meetingId: meetingDetails.meetingId || "",
+      meetingPassword: meetingDetails.password || "",
     });
 
     // Update availability status

@@ -5,6 +5,7 @@ import { z } from "zod";
  */
 export const createBookingSchema = z.object({
   availabilityId: z.string().min(1, "Availability ID is required"),
+  languageId: z.string().min(1, "Language ID is required"), // Required to identify which language the student wants
   studentNotes: z.string().optional().default(""),
 });
 
