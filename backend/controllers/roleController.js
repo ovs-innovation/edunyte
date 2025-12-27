@@ -67,11 +67,14 @@ export const ensureDefaultRoles = async () => {
     const exists = await Role.findOne({ key });
     if (!exists) {
       await Role.create({
-        name: key.replace(/_/g, " "),
+        name: key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
         key,
         permissions: rolePermissions[key],
       });
+    } else {
+      const latestPermissions = rolePermissions[key] || [];
+      exists.permissions = sanitizePermissions(latestPermissions);
+      await exists.save();
     }
   }
 };
-

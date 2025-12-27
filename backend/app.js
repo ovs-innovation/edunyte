@@ -11,6 +11,14 @@ import roleRoutes from "./routes/roleRoutes.js";
 import settingsRoutes from "./routes/settingsRoutes.js";
 import teacherProfileRoutes from "./routes/teacherProfileRoutes.js";
 import studentProfileRoutes from "./routes/studentProfileRoutes.js";
+import adminCourseRoutes from "./routes/admin/courseRoutes.js";
+import adminLanguageRoutes from "./routes/admin/languageRoutes.js";
+import adminTeacherCourseRoutes from "./routes/admin/teacherCourseRoutes.js";
+import teacherCourseRoutes from "./routes/teacher/teacherCourseRoutes.js";
+import teacherAvailabilityRoutes from "./routes/teacher/availabilityRoutes.js";
+import teacherBookingRoutes from "./routes/teacher/bookingRoutes.js";
+import studentCourseRoutes from "./routes/student/courseRoutes.js";
+import studentBookingRoutes from "./routes/student/bookingRoutes.js";
 import { ensureDefaultRoles } from "./controllers/roleController.js";
 
 
@@ -38,6 +46,15 @@ app.use("/api/roles", roleRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/teacher-profiles", teacherProfileRoutes);
 app.use("/api/student-profiles", studentProfileRoutes);
+// Course management routes
+app.use("/api/admin/courses", adminCourseRoutes);
+app.use("/api/admin/languages", adminLanguageRoutes);
+app.use("/api/admin/teacher-course", adminTeacherCourseRoutes);
+app.use("/api/teacher", teacherCourseRoutes);
+app.use("/api/teacher/availability", teacherAvailabilityRoutes);
+app.use("/api/teacher/bookings", teacherBookingRoutes);
+app.use("/api/courses", studentCourseRoutes);
+app.use("/api/bookings", studentBookingRoutes);
 app.use(errorHandler);
 
 export default app;
