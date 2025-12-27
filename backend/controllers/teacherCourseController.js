@@ -73,7 +73,7 @@ export const joinCourse = async (req, res, next) => {
       await existing.save();
       await existing.populate([
         { path: "teacherId", select: "name email" },
-        { path: "courseId", select: "name description" },
+        { path: "courseId", select: "name description category image status" },
         { path: "languageIds", select: "name code" },
       ]);
       return res.json({ teacherCourse: existing, message: "Request resubmitted successfully" });
@@ -95,7 +95,7 @@ export const joinCourse = async (req, res, next) => {
 
     await teacherCourse.populate([
       { path: "teacherId", select: "name email" },
-      { path: "courseId", select: "name description" },
+      { path: "courseId", select: "name description category image status" },
       { path: "languageIds", select: "name code" },
     ]);
 
@@ -155,7 +155,7 @@ export const getTeacherCourseRequests = async (req, res, next) => {
 
     const teacherCourses = await TeacherCourse.find(query)
       .populate("teacherId", "name email status")
-      .populate("courseId", "name description category status")
+      .populate("courseId", "name description category image status")
       .populate("languageIds", "name code nativeName")
       .populate("reviewedBy", "name email")
       .sort({ createdAt: -1 });
@@ -193,7 +193,7 @@ export const approveTeacherCourse = async (req, res, next) => {
     await teacherCourse.save();
     await teacherCourse.populate([
       { path: "teacherId", select: "name email" },
-      { path: "courseId", select: "name description" },
+      { path: "courseId", select: "name description category image status" },
       { path: "languageIds", select: "name code" },
       { path: "reviewedBy", select: "name email" },
     ]);
@@ -233,7 +233,7 @@ export const rejectTeacherCourse = async (req, res, next) => {
     await teacherCourse.save();
     await teacherCourse.populate([
       { path: "teacherId", select: "name email" },
-      { path: "courseId", select: "name description" },
+      { path: "courseId", select: "name description category image status" },
       { path: "languageIds", select: "name code" },
       { path: "reviewedBy", select: "name email" },
     ]);
