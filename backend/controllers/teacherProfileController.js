@@ -42,7 +42,8 @@ export const getMyTeacherProfile = async (req, res, next) => {
 
 export const updateTeacherProfile = async (req, res, next) => {
   try {
-    const { userId } = req.params;
+    // Handle /me route - use authenticated user's ID when userId param is not present
+    const userId = req.params.userId || req.user.id;
     const requestingUserId = req.user.id;
     const user = await User.findById(userId);
     if (!user) {
@@ -56,6 +57,8 @@ export const updateTeacherProfile = async (req, res, next) => {
       photo,
       expertise,
       experience,
+      country,
+      countryCode,
       socialLinks,
       payoutInfo,
       rating,
@@ -68,6 +71,8 @@ export const updateTeacherProfile = async (req, res, next) => {
     if (photo !== undefined) profile.photo = photo;
     if (expertise !== undefined) profile.expertise = Array.isArray(expertise) ? expertise : [];
     if (experience !== undefined) profile.experience = experience;
+    if (country !== undefined) profile.country = country;
+    if (countryCode !== undefined) profile.countryCode = countryCode ? countryCode.toUpperCase() : "";
     if (socialLinks !== undefined) {
       profile.socialLinks = {
         ...profile.socialLinks,

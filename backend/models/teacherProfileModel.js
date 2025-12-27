@@ -26,6 +26,17 @@ const teacherProfileSchema = new mongoose.Schema(
       default: 0,
       min: 0,
     },
+    country: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    countryCode: {
+      type: String,
+      trim: true,
+      default: "",
+      uppercase: true,
+    },
     socialLinks: {
       website: { type: String, default: "" },
       linkedin: { type: String, default: "" },
