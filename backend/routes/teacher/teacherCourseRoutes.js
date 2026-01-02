@@ -1,5 +1,5 @@
 import express from "express";
-import { joinCourse, getMyCourses } from "../../controllers/teacherCourseController.js";
+import { joinCourse, getMyCourses, exitCourse } from "../../controllers/teacherCourseController.js";
 import { verifyToken } from "../../middlewares/authMiddleware.js";
 import { requirePermission } from "../../middlewares/permissionMiddleware.js";
 import { validateRequest } from "../../middlewares/validateRequest.js";
@@ -50,6 +50,9 @@ router.post(
 
 // Get my course requests
 router.get("/my-courses", requirePermission("teacher_courses.view"), getMyCourses);
+
+// Exit/Leave a course
+router.delete("/my-courses/:id", requirePermission("teacher_courses.delete"), exitCourse);
 
 export default router;
 

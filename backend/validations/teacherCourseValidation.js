@@ -12,6 +12,7 @@ export const createTeacherCourseSchema = z.object({
   introductionVideo: z.string().url("Invalid video URL").optional().or(z.literal("")),
   experience: z.string().optional().default(""),
   bio: z.string().optional().default(""),
+  aboutCourse: z.string().optional().default(""),
 });
 
 export const updateTeacherCourseStatusSchema = z.object({

@@ -15,7 +15,7 @@ import mongoose from "mongoose";
 export const joinCourse = async (req, res, next) => {
   try {
     const teacherId = req.user.id;
-    const { courseId, languageIds, price, currency, timezone, introductionVideo, experience, bio } = req.body;
+    const { courseId, languageIds, price, currency, timezone, introductionVideo, experience, bio, aboutCourse } = req.body;
 
     // Verify user is a teacher
     const user = await User.findById(teacherId);
@@ -69,6 +69,7 @@ export const joinCourse = async (req, res, next) => {
       existing.introductionVideo = introductionVideo || "";
       existing.experience = experience || "";
       existing.bio = bio || "";
+      existing.aboutCourse = aboutCourse || "";
       existing.rejectionReason = "";
       await existing.save();
       await existing.populate([
@@ -90,6 +91,7 @@ export const joinCourse = async (req, res, next) => {
       introductionVideo: introductionVideo || "",
       experience: experience || "",
       bio: bio || "",
+      aboutCourse: aboutCourse || "",
       status: "pending",
     });
 
@@ -127,6 +129,57 @@ export const getMyCourses = async (req, res, next) => {
       .sort({ createdAt: -1 });
 
     res.json({ teacherCourses, count: teacherCourses.length });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * Teacher: Exit/Leave a course
+ */
+export const exitCourse = async (req, res, next) => {
+  try {
+    const teacherId = req.user.id;
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid course request ID" });
+    }
+
+    // Verify user is a teacher
+    const user = await User.findById(teacherId);
+    if (!user || user.role !== "teacher") {
+      return res.status(403).json({ message: "Only teachers can exit courses" });
+    }
+
+    const teacherCourse = await TeacherCourse.findById(id);
+    if (!teacherCourse) {
+      return res.status(404).json({ message: "Course request not found" });
+    }
+
+    // Verify the teacher owns this request
+    if (teacherCourse.teacherId.toString() !== teacherId) {
+      return res.status(403).json({ message: "You can only exit your own course requests" });
+    }
+
+    // Check for upcoming bookings (optional - you may want to prevent exit if there are bookings)
+    // For now, we'll allow exit regardless, but you can add this check if needed
+    // const Booking = (await import("../models/bookingModel.js")).default;
+    // const upcomingBookings = await Booking.find({
+    //   teacherCourseId: id,
+    //   sessionDate: { $gte: new Date() },
+    //   status: { $in: ["pending", "confirmed"] }
+    // });
+    // if (upcomingBookings.length > 0) {
+    //   return res.status(400).json({ 
+    //     message: `Cannot exit course. You have ${upcomingBookings.length} upcoming booking(s). Please cancel them first.` 
+    //   });
+    // }
+
+    // Delete the teacher course entry
+    await TeacherCourse.findByIdAndDelete(id);
+
+    res.json({ message: "Successfully exited from the course" });
   } catch (err) {
     next(err);
   }

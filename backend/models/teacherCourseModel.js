@@ -70,6 +70,13 @@ const teacherCourseSchema = new mongoose.Schema(
       default: "",
       // Can be YouTube, Vimeo, or any video URL
     },
+    // About course - detailed description of what teacher will teach in this course
+    aboutCourse: {
+      type: String,
+      trim: true,
+      default: "",
+      // Detailed description about the course content, teaching approach, etc.
+    },
     // Availability schedule (stored as JSON or separate collection in future)
     availability: {
       type: mongoose.Schema.Types.Mixed,
