@@ -12,6 +12,7 @@ import settingsRoutes from "./routes/settingsRoutes.js";
 import teacherProfileRoutes from "./routes/teacherProfileRoutes.js";
 import studentProfileRoutes from "./routes/studentProfileRoutes.js";
 import adminCourseRoutes from "./routes/admin/courseRoutes.js";
+import adminCategoryRoutes from "./routes/admin/categoryRoutes.js";
 import adminLanguageRoutes from "./routes/admin/languageRoutes.js";
 import adminTeacherCourseRoutes from "./routes/admin/teacherCourseRoutes.js";
 import teacherCourseRoutes from "./routes/teacher/teacherCourseRoutes.js";
@@ -48,6 +49,7 @@ app.use("/api/teacher-profiles", teacherProfileRoutes);
 app.use("/api/student-profiles", studentProfileRoutes);
 // Course management routes
 app.use("/api/admin/courses", adminCourseRoutes);
+app.use("/api/admin/categories", adminCategoryRoutes);
 app.use("/api/admin/languages", adminLanguageRoutes);
 app.use("/api/admin/teacher-course", adminTeacherCourseRoutes);
 app.use("/api/teacher", teacherCourseRoutes);
