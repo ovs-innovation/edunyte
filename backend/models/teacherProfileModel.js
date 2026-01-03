@@ -13,6 +13,11 @@ const teacherProfileSchema = new mongoose.Schema(
       trim: true,
       default: "",
     },
+    aboutUs: {
+      type: String,
+      trim: true,
+      default: "",
+    },
     photo: {
       type: String,
       default: "",

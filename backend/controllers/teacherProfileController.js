@@ -54,6 +54,7 @@ export const updateTeacherProfile = async (req, res, next) => {
     }
     const {
       bio,
+      aboutUs,
       photo,
       expertise,
       experience,
@@ -68,6 +69,7 @@ export const updateTeacherProfile = async (req, res, next) => {
       profile = await TeacherProfile.create({ userId });
     }
     if (bio !== undefined) profile.bio = bio;
+    if (aboutUs !== undefined) profile.aboutUs = aboutUs;
     if (photo !== undefined) profile.photo = photo;
     if (expertise !== undefined) profile.expertise = Array.isArray(expertise) ? expertise : [];
     if (experience !== undefined) profile.experience = experience;
