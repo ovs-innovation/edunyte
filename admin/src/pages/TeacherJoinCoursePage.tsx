@@ -43,6 +43,7 @@ import { cn } from '@/lib/utils';
 import { useRole } from '@/contexts/RoleContext';
 import { useNavigate } from 'react-router-dom';
 import { getCurrencies, getLanguages } from '@/utils/countryData';
+import { getAllTimezones, getUserTimezone } from '@/utils/timezoneData';
 
 const TeacherJoinCoursePage = () => {
   const { currentRole } = useRole();
@@ -61,7 +62,7 @@ const TeacherJoinCoursePage = () => {
     languageCodes: [] as string[],
     price: '',
     currency: 'INR',
-    timezone: 'UTC',
+    timezone: getUserTimezone(),
     introductionVideo: '',
     experience: '',
     bio: '',
@@ -101,7 +102,7 @@ const TeacherJoinCoursePage = () => {
       languageCodes: [],
       price: '',
       currency: 'INR',
-      timezone: 'UTC',
+      timezone: getUserTimezone(),
       introductionVideo: '',
       experience: '',
       bio: '',
@@ -118,7 +119,7 @@ const TeacherJoinCoursePage = () => {
       languageCodes: [],
       price: '',
       currency: 'INR',
-      timezone: 'UTC',
+      timezone: getUserTimezone(),
       introductionVideo: '',
       experience: '',
       bio: '',
@@ -450,23 +451,51 @@ const TeacherJoinCoursePage = () => {
 
             <div className="space-y-2">
               <Label htmlFor="timezone">Timezone</Label>
-              <Select
-                value={formData.timezone}
-                onValueChange={(value) => setFormData({ ...formData, timezone: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="UTC">UTC</SelectItem>
-                  <SelectItem value="America/New_York">America/New_York (EST)</SelectItem>
-                  <SelectItem value="America/Los_Angeles">America/Los_Angeles (PST)</SelectItem>
-                  <SelectItem value="Europe/London">Europe/London (GMT)</SelectItem>
-                  <SelectItem value="Asia/Kolkata">Asia/Kolkata (IST)</SelectItem>
-                  <SelectItem value="Asia/Tokyo">Asia/Tokyo (JST)</SelectItem>
-                  <SelectItem value="Australia/Sydney">Australia/Sydney (AEST)</SelectItem>
-                </SelectContent>
-              </Select>
+              <Popover open={timezoneOpen} onOpenChange={setTimezoneOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={timezoneOpen}
+                    className="w-full justify-between"
+                  >
+                    <span>
+                      {formData.timezone
+                        ? timezones.find((tz) => tz.value === formData.timezone)?.label || formData.timezone
+                        : 'Select timezone...'}
+                    </span>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search timezone..." />
+                    <CommandList>
+                      <CommandEmpty>No timezone found.</CommandEmpty>
+                      <CommandGroup>
+                        {timezones.map((tz) => (
+                          <CommandItem
+                            key={tz.value}
+                            value={`${tz.value} ${tz.label}`}
+                            onSelect={() => {
+                              setFormData({ ...formData, timezone: tz.value });
+                              setTimezoneOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                'mr-2 h-4 w-4',
+                                formData.timezone === tz.value ? 'opacity-100' : 'opacity-0'
+                              )}
+                            />
+                            <span>{tz.label}</span>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div className="space-y-2">

@@ -30,6 +30,21 @@ import { useConfirmDialog } from '@/hooks/use-confirm-dialog';
 import { useRole } from '@/contexts/RoleContext';
 import { useNavigate } from 'react-router-dom';
 import { format, startOfWeek, addDays, isSameDay } from 'date-fns';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { getAllTimezones, getUserTimezone } from '@/utils/timezoneData';
 
 const TeacherAvailabilityPage = () => {
   const { currentRole } = useRole();
@@ -42,12 +57,14 @@ const TeacherAvailabilityPage = () => {
   const [selectedCourseId, setSelectedCourseId] = useState<string>('');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
+  const [timezones] = useState(() => getAllTimezones());
+  const [timezoneOpen, setTimezoneOpen] = useState(false);
   const [formData, setFormData] = useState({
     date: '',
     startTime: '',
     endTime: '',
     duration: 50,
-    timezone: 'UTC',
+    timezone: getUserTimezone(),
   });
   const { toast } = useToast();
   const { confirm, ConfirmDialog } = useConfirmDialog();
@@ -109,7 +126,7 @@ const TeacherAvailabilityPage = () => {
       startTime: '',
       endTime: '',
       duration: 50,
-      timezone: 'UTC',
+      timezone: getUserTimezone(),
     });
     setDialogOpen(true);
   };
@@ -121,7 +138,7 @@ const TeacherAvailabilityPage = () => {
       startTime: '',
       endTime: '',
       duration: 50,
-      timezone: 'UTC',
+      timezone: getUserTimezone(),
     });
   };
 
@@ -549,23 +566,51 @@ const TeacherAvailabilityPage = () => {
 
             <div className="space-y-2">
               <Label htmlFor="timezone">Timezone</Label>
-              <Select
-                value={formData.timezone}
-                onValueChange={(value) => setFormData({ ...formData, timezone: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="UTC">UTC</SelectItem>
-                  <SelectItem value="America/New_York">America/New_York (EST)</SelectItem>
-                  <SelectItem value="America/Los_Angeles">America/Los_Angeles (PST)</SelectItem>
-                  <SelectItem value="Europe/London">Europe/London (GMT)</SelectItem>
-                  <SelectItem value="Asia/Kolkata">Asia/Kolkata (IST)</SelectItem>
-                  <SelectItem value="Asia/Tokyo">Asia/Tokyo (JST)</SelectItem>
-                  <SelectItem value="Australia/Sydney">Australia/Sydney (AEST)</SelectItem>
-                </SelectContent>
-              </Select>
+              <Popover open={timezoneOpen} onOpenChange={setTimezoneOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={timezoneOpen}
+                    className="w-full justify-between"
+                  >
+                    <span>
+                      {formData.timezone
+                        ? timezones.find((tz) => tz.value === formData.timezone)?.label || formData.timezone
+                        : 'Select timezone...'}
+                    </span>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search timezone..." />
+                    <CommandList>
+                      <CommandEmpty>No timezone found.</CommandEmpty>
+                      <CommandGroup>
+                        {timezones.map((tz) => (
+                          <CommandItem
+                            key={tz.value}
+                            value={`${tz.value} ${tz.label}`}
+                            onSelect={() => {
+                              setFormData({ ...formData, timezone: tz.value });
+                              setTimezoneOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                'mr-2 h-4 w-4',
+                                formData.timezone === tz.value ? 'opacity-100' : 'opacity-0'
+                              )}
+                            />
+                            <span>{tz.label}</span>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
           <DialogFooter>
