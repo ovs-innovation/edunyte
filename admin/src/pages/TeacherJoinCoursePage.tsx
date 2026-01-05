@@ -43,7 +43,24 @@ import { cn } from '@/lib/utils';
 import { useRole } from '@/contexts/RoleContext';
 import { useNavigate } from 'react-router-dom';
 import { getCurrencies, getLanguages } from '@/utils/countryData';
-import { getAllTimezones, getUserTimezone } from '@/utils/timezoneData';
+
+// Proficiency levels
+const PROFICIENCY_LEVELS = [
+  { value: 'native', label: 'Native', color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' },
+  { value: 'c2', label: 'Proficient C2', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' },
+  { value: 'c1', label: 'Advanced C1', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' },
+  { value: 'b2', label: 'Upper Intermediate B2', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' },
+  { value: 'b1', label: 'Intermediate B1', color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' },
+  { value: 'a2', label: 'Elementary A2', color: 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200' },
+  { value: 'a1', label: 'Beginner A1', color: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200' },
+] as const;
+
+type ProficiencyLevel = typeof PROFICIENCY_LEVELS[number]['value'];
+
+interface LanguageWithProficiency {
+  code: string;
+  proficiency: ProficiencyLevel;
+}
 
 const TeacherJoinCoursePage = () => {
   const { currentRole } = useRole();
@@ -57,12 +74,13 @@ const TeacherJoinCoursePage = () => {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<ApiCourse | null>(null);
+  const [proficiencyDialogOpen, setProficiencyDialogOpen] = useState(false);
+  const [selectedLanguageForProficiency, setSelectedLanguageForProficiency] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     courseId: '',
-    languageCodes: [] as string[],
+    languages: [] as LanguageWithProficiency[],
     price: '',
     currency: 'INR',
-    timezone: getUserTimezone(),
     introductionVideo: '',
     experience: '',
     bio: '',
@@ -99,10 +117,9 @@ const TeacherJoinCoursePage = () => {
     setSelectedCourse(course);
     setFormData({
       courseId: course._id,
-      languageCodes: [],
+      languages: [],
       price: '',
       currency: 'INR',
-      timezone: getUserTimezone(),
       introductionVideo: '',
       experience: '',
       bio: '',
@@ -116,10 +133,9 @@ const TeacherJoinCoursePage = () => {
     setSelectedCourse(null);
     setFormData({
       courseId: '',
-      languageCodes: [],
+      languages: [],
       price: '',
       currency: 'INR',
-      timezone: getUserTimezone(),
       introductionVideo: '',
       experience: '',
       bio: '',
@@ -128,7 +144,7 @@ const TeacherJoinCoursePage = () => {
   };
 
   const handleSubmit = async () => {
-    if (!formData.courseId || formData.languageCodes.length === 0 || !formData.price || !formData.experience || !formData.bio || !formData.aboutCourse) {
+    if (!formData.courseId || formData.languages.length === 0 || !formData.price || !formData.experience || !formData.bio || !formData.aboutCourse) {
       toast({
         title: 'Validation Error',
         description: 'Please fill in all required fields (Course, at least one Language, Price, Experience, Bio, and About Course)',
@@ -142,7 +158,7 @@ const TeacherJoinCoursePage = () => {
     setSubmitting(true);
     try {
       // Map language codes to language IDs from API
-      const languageIds = formData.languageCodes
+      const languageIds = formData.languages.map(l => l.code)
         .map((code) => {
           // Try to match by code first (case-insensitive)
           let apiLang = languages.find((l) => l.code?.toLowerCase() === code.toLowerCase());
@@ -175,7 +191,6 @@ const TeacherJoinCoursePage = () => {
         languageIds: languageIds,
         price: parseFloat(formData.price),
         currency: formData.currency,
-        timezone: formData.timezone,
         introductionVideo: formData.introductionVideo,
         experience: formData.experience,
         bio: formData.bio,
@@ -311,9 +326,9 @@ const TeacherJoinCoursePage = () => {
                     className="w-full justify-between"
                   >
                     <span>
-                      {formData.languageCodes.length === 0
+                      {formData.languages.length === 0
                         ? 'Select languages...'
-                        : `${formData.languageCodes.length} language${formData.languageCodes.length > 1 ? 's' : ''} selected`}
+                        : `${formData.languages.length} language${formData.languages.length > 1 ? 's' : ''} selected`}
                     </span>
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
@@ -325,17 +340,18 @@ const TeacherJoinCoursePage = () => {
                       <CommandEmpty>No language found.</CommandEmpty>
                       <CommandGroup>
                         {libraryLanguages.map((lang) => {
-                          const isSelected = formData.languageCodes.includes(lang.code);
+                          const isSelected = formData.languages.some((l) => l.code === lang.code);
                           return (
                             <CommandItem
                               key={lang.code}
                               value={`${lang.code} ${lang.name} ${lang.nativeName || ''}`}
-                              onSelect={(e) => {
-                                e.preventDefault();
+                              onSelect={() => {
                                 if (isSelected) {
-                                  setFormData({ ...formData, languageCodes: formData.languageCodes.filter(code => code !== lang.code) });
+                                  setFormData({ ...formData, languages: formData.languages.filter(l => l.code !== lang.code) });
                                 } else {
-                                  setFormData({ ...formData, languageCodes: [...formData.languageCodes, lang.code] });
+                                  setLanguagesOpen(false);
+                                  setSelectedLanguageForProficiency(lang.code);
+                                  setProficiencyDialogOpen(true);
                                 }
                               }}
                               className="cursor-pointer"
@@ -360,23 +376,30 @@ const TeacherJoinCoursePage = () => {
                   </Command>
                 </PopoverContent>
               </Popover>
-              {formData.languageCodes.length > 0 && (
+              {formData.languages.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {formData.languageCodes.map((code) => {
-                    const lang = libraryLanguages.find((l) => l.code === code);
+                  {formData.languages.map((langWithProf) => {
+                    const lang = libraryLanguages.find((l) => l.code === langWithProf.code);
+                    const proficiency = PROFICIENCY_LEVELS.find((p) => p.value === langWithProf.proficiency);
                     return lang ? (
-                      <Badge key={code} variant="secondary" className="text-xs">
-                        {lang.name}
+                      <div key={langWithProf.code} className="flex items-center gap-1">
+                        <span className="text-sm font-medium">{lang.name}</span>
+                        <Badge 
+                          className={cn("text-xs", proficiency?.color)}
+                          variant="secondary"
+                        >
+                          {proficiency?.label}
+                        </Badge>
                         <button
                           type="button"
                           onClick={() => {
-                            setFormData({ ...formData, languageCodes: formData.languageCodes.filter(c => c !== code) });
+                            setFormData({ ...formData, languages: formData.languages.filter(l => l.code !== langWithProf.code) });
                           }}
-                          className="ml-2 hover:text-destructive"
+                          className="ml-1 hover:text-destructive text-sm"
                         >
                           ×
                         </button>
-                      </Badge>
+                      </div>
                     ) : null;
                   })}
                 </div>
@@ -450,55 +473,6 @@ const TeacherJoinCoursePage = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="timezone">Timezone</Label>
-              <Popover open={timezoneOpen} onOpenChange={setTimezoneOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={timezoneOpen}
-                    className="w-full justify-between"
-                  >
-                    <span>
-                      {formData.timezone
-                        ? timezones.find((tz) => tz.value === formData.timezone)?.label || formData.timezone
-                        : 'Select timezone...'}
-                    </span>
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-full p-0" align="start">
-                  <Command>
-                    <CommandInput placeholder="Search timezone..." />
-                    <CommandList>
-                      <CommandEmpty>No timezone found.</CommandEmpty>
-                      <CommandGroup>
-                        {timezones.map((tz) => (
-                          <CommandItem
-                            key={tz.value}
-                            value={`${tz.value} ${tz.label}`}
-                            onSelect={() => {
-                              setFormData({ ...formData, timezone: tz.value });
-                              setTimezoneOpen(false);
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                'mr-2 h-4 w-4',
-                                formData.timezone === tz.value ? 'opacity-100' : 'opacity-0'
-                              )}
-                            />
-                            <span>{tz.label}</span>
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            <div className="space-y-2">
               <Label htmlFor="experience">Experience / Qualifications *</Label>
               <Textarea
                 id="experience"
@@ -558,8 +532,63 @@ const TeacherJoinCoursePage = () => {
             <Button variant="outline" onClick={handleCloseDialog} disabled={submitting}>
               Cancel
             </Button>
-            <Button onClick={handleSubmit} disabled={submitting || formData.languageCodes.length === 0 || !formData.price || !formData.experience || !formData.bio || !formData.aboutCourse}>
+            <Button onClick={handleSubmit} disabled={submitting || formData.languages.length === 0 || !formData.price || !formData.experience || !formData.bio || !formData.aboutCourse}>
               {submitting ? 'Submitting...' : 'Submit Request'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Proficiency Selection Dialog */}
+      <Dialog open={proficiencyDialogOpen} onOpenChange={setProficiencyDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Select Proficiency Level</DialogTitle>
+            <DialogDescription>
+              Choose your proficiency level for {selectedLanguageForProficiency && libraryLanguages.find(l => l.code === selectedLanguageForProficiency)?.name}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 py-4">
+            {PROFICIENCY_LEVELS.map((level) => (
+              <button
+                key={level.value}
+                type="button"
+                onClick={() => {
+                  if (selectedLanguageForProficiency) {
+                    setFormData({
+                      ...formData,
+                      languages: [
+                        ...formData.languages.filter(l => l.code !== selectedLanguageForProficiency),
+                        { code: selectedLanguageForProficiency, proficiency: level.value }
+                      ]
+                    });
+                    setProficiencyDialogOpen(false);
+                    setSelectedLanguageForProficiency(null);
+                  }
+                }}
+                className={cn(
+                  "w-full text-left p-3 rounded-md border-2 transition-colors",
+                  "hover:bg-accent",
+                  formData.languages.find(l => l.code === selectedLanguageForProficiency)?.proficiency === level.value
+                    ? "border-primary bg-accent"
+                    : "border-border"
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">{level.label}</span>
+                  <Badge className={cn("text-xs", level.color)} variant="secondary">
+                    {level.label}
+                  </Badge>
+                </div>
+              </button>
+            ))}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setProficiencyDialogOpen(false);
+              setSelectedLanguageForProficiency(null);
+            }}>
+              Cancel
             </Button>
           </DialogFooter>
         </DialogContent>
