@@ -157,9 +157,9 @@ const TeacherAvailabilityPage = () => {
     );
     if (!teacherCourse) return null;
 
-    const PLATFORM_MARGIN_PERCENT = 20; // Default 20% (can be from env/config)
-    const MEETING_PLATFORM_COST_PER_MINUTE = 0.01; // Default $0.01 per minute (can be from env/config)
-    const MEETING_PLATFORM_BASE_COST = 0.10; // Base cost per session (can be from env/config)  
+    const PLATFORM_MARGIN_PERCENT = 20; 
+    const MEETING_PLATFORM_COST_PER_MINUTE = 0.01; 
+    const MEETING_PLATFORM_BASE_COST = 0.10;  
     
     const durationInHours = formData.duration / 60;
     const teacherPricePerHour = teacherCourse.price;
