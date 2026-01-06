@@ -34,6 +34,29 @@ export const createAvailability = async (req, res, next) => {
       return res.status(403).json({ message: "You must have at least one approved language for this course before setting availability" });
     }
 
+    // Calculate price for this session slot
+    // Price = (Teacher price per hour * duration in hours) + Platform margin + Meeting platform cost (dynamic based on duration)
+    const PLATFORM_MARGIN_PERCENT = parseFloat(process.env.PLATFORM_MARGIN_PERCENT || "20"); // Default 20%
+    const MEETING_PLATFORM_COST_PER_MINUTE = parseFloat(process.env.MEETING_PLATFORM_COST_PER_MINUTE || "0.01"); // Default $0.01 per minute
+    const MEETING_PLATFORM_BASE_COST = parseFloat(process.env.MEETING_PLATFORM_BASE_COST || "0.10"); // Base cost per session
+    
+    const durationInHours = duration / 60; // Convert minutes to hours
+    const teacherPricePerHour = teacherCourse.price;
+    const teacherPriceForSession = teacherPricePerHour * durationInHours;
+    const platformMargin = (teacherPriceForSession * PLATFORM_MARGIN_PERCENT) / 100;
+    // Dynamic meeting platform cost: base cost + (cost per minute * duration)
+    const meetingPlatformCost = MEETING_PLATFORM_BASE_COST + (MEETING_PLATFORM_COST_PER_MINUTE * duration);
+    const totalPrice = teacherPriceForSession + platformMargin + meetingPlatformCost;
+
+    const priceBreakdown = {
+      teacherPrice: parseFloat(teacherPriceForSession.toFixed(2)),
+      platformMargin: parseFloat(platformMargin.toFixed(2)),
+      platformMarginPercent: PLATFORM_MARGIN_PERCENT,
+      meetingPlatformCost: parseFloat(meetingPlatformCost.toFixed(2)),
+      meetingPlatformCostPerMinute: MEETING_PLATFORM_COST_PER_MINUTE,
+      meetingPlatformBaseCost: MEETING_PLATFORM_BASE_COST,
+    };
+
     const slotDate = new Date(date);
     const slot = await Availability.create({
       teacherId,
@@ -42,6 +65,9 @@ export const createAvailability = async (req, res, next) => {
       startTime,
       endTime,
       duration,
+      price: parseFloat(totalPrice.toFixed(2)),
+      currency: teacherCourse.currency || "USD",
+      priceBreakdown,
       timezone: timezone || teacherCourse.timezone || "UTC",
       isRecurring: isRecurring || false,
       recurringPattern: isRecurring ? recurringPattern : null,
@@ -79,8 +105,31 @@ export const bulkCreateAvailability = async (req, res, next) => {
       return res.status(403).json({ message: "You must have at least one approved language for this course before setting availability" });
     }
 
+    // Calculate price configuration
+    const PLATFORM_MARGIN_PERCENT = parseFloat(process.env.PLATFORM_MARGIN_PERCENT || "20"); // Default 20%
+    const MEETING_PLATFORM_COST_PER_MINUTE = parseFloat(process.env.MEETING_PLATFORM_COST_PER_MINUTE || "0.01"); // Default $0.01 per minute
+    const MEETING_PLATFORM_BASE_COST = parseFloat(process.env.MEETING_PLATFORM_BASE_COST || "0.10"); // Base cost per session
+
     const createdSlots = [];
     for (const slotData of slots) {
+      // Calculate price for this session slot
+      const durationInHours = slotData.duration / 60; // Convert minutes to hours
+      const teacherPricePerHour = teacherCourse.price;
+      const teacherPriceForSession = teacherPricePerHour * durationInHours;
+      const platformMargin = (teacherPriceForSession * PLATFORM_MARGIN_PERCENT) / 100;
+      // Dynamic meeting platform cost: base cost + (cost per minute * duration)
+      const meetingPlatformCost = MEETING_PLATFORM_BASE_COST + (MEETING_PLATFORM_COST_PER_MINUTE * slotData.duration);
+      const totalPrice = teacherPriceForSession + platformMargin + meetingPlatformCost;
+
+      const priceBreakdown = {
+        teacherPrice: parseFloat(teacherPriceForSession.toFixed(2)),
+        platformMargin: parseFloat(platformMargin.toFixed(2)),
+        platformMarginPercent: PLATFORM_MARGIN_PERCENT,
+        meetingPlatformCost: parseFloat(meetingPlatformCost.toFixed(2)),
+        meetingPlatformCostPerMinute: MEETING_PLATFORM_COST_PER_MINUTE,
+        meetingPlatformBaseCost: MEETING_PLATFORM_BASE_COST,
+      };
+
       const slotDate = new Date(slotData.date);
       const slot = await Availability.create({
         teacherId,
@@ -89,6 +138,9 @@ export const bulkCreateAvailability = async (req, res, next) => {
         startTime: slotData.startTime,
         endTime: slotData.endTime,
         duration: slotData.duration,
+        price: parseFloat(totalPrice.toFixed(2)),
+        currency: teacherCourse.currency || "USD",
+        priceBreakdown,
         timezone: slotData.timezone || teacherCourse.timezone || "UTC",
         isRecurring: slotData.isRecurring || false,
         recurringPattern: slotData.isRecurring ? slotData.recurringPattern : null,
@@ -205,9 +257,45 @@ export const updateAvailability = async (req, res, next) => {
 
     if (startTime !== undefined) availability.startTime = startTime;
     if (endTime !== undefined) availability.endTime = endTime;
-    if (duration !== undefined) availability.duration = duration;
-    if (status !== undefined) availability.status = status;
     if (timezone !== undefined) availability.timezone = timezone;
+    if (status !== undefined) availability.status = status;
+    
+    // Recalculate price if duration changes
+    if (duration !== undefined && duration !== availability.duration) {
+      const teacherCourse = await TeacherCourse.findOne({
+        teacherId: availability.teacherId,
+        courseId: availability.courseId,
+        status: "approved",
+      });
+      
+      if (teacherCourse) {
+        const PLATFORM_MARGIN_PERCENT = parseFloat(process.env.PLATFORM_MARGIN_PERCENT || "20");
+        const MEETING_PLATFORM_COST_PER_MINUTE = parseFloat(process.env.MEETING_PLATFORM_COST_PER_MINUTE || "0.01");
+        const MEETING_PLATFORM_BASE_COST = parseFloat(process.env.MEETING_PLATFORM_BASE_COST || "0.10");
+        
+        const durationInHours = duration / 60;
+        const teacherPricePerHour = teacherCourse.price;
+        const teacherPriceForSession = teacherPricePerHour * durationInHours;
+        const platformMargin = (teacherPriceForSession * PLATFORM_MARGIN_PERCENT) / 100;
+        // Dynamic meeting platform cost: base cost + (cost per minute * duration)
+        const meetingPlatformCost = MEETING_PLATFORM_BASE_COST + (MEETING_PLATFORM_COST_PER_MINUTE * duration);
+        const totalPrice = teacherPriceForSession + platformMargin + meetingPlatformCost;
+
+        availability.duration = duration;
+        availability.price = parseFloat(totalPrice.toFixed(2));
+        availability.currency = teacherCourse.currency || "USD";
+        availability.priceBreakdown = {
+          teacherPrice: parseFloat(teacherPriceForSession.toFixed(2)),
+          platformMargin: parseFloat(platformMargin.toFixed(2)),
+          platformMarginPercent: PLATFORM_MARGIN_PERCENT,
+          meetingPlatformCost: parseFloat(meetingPlatformCost.toFixed(2)),
+          meetingPlatformCostPerMinute: MEETING_PLATFORM_COST_PER_MINUTE,
+          meetingPlatformBaseCost: MEETING_PLATFORM_BASE_COST,
+        };
+      } else {
+        availability.duration = duration;
+      }
+    }
 
     await availability.save();
     await availability.populate("courseId", "name description");

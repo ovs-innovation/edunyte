@@ -41,6 +41,38 @@ const availabilitySchema = new mongoose.Schema(
       // Duration in minutes (e.g., 25, 50, 60)
       enum: [15, 25, 30, 45, 50, 60, 90, 120],
     },
+    // Calculated price for this session slot
+    price: {
+      type: Number,
+      required: true,
+      min: 0,
+      // Price includes: (teacher price per hour * duration) + platform margin + meeting platform cost
+    },
+    currency: {
+      type: String,
+      required: true,
+      default: "USD",
+      uppercase: true,
+    },
+    // Breakdown of price calculation (for transparency)
+    priceBreakdown: {
+      teacherPrice: {
+        type: Number,
+        // Teacher's price per hour * (duration / 60)
+      },
+      platformMargin: {
+        type: Number,
+        // Platform margin amount
+      },
+      platformMarginPercent: {
+        type: Number,
+        // Platform margin percentage (e.g., 20 for 20%)
+      },
+      meetingPlatformCost: {
+        type: Number,
+        // Meeting platform cost per session (Zoom, Google Meet, WebRTC, etc.)
+      },
+    },
     timezone: {
       type: String,
       required: true,

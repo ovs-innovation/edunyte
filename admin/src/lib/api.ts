@@ -524,6 +524,16 @@ export interface ApiAvailability {
   startTime: string;
   endTime: string;
   duration: number;
+  price: number;
+  currency: string;
+  priceBreakdown?: {
+    teacherPrice: number;
+    platformMargin: number;
+    platformMarginPercent: number;
+    meetingPlatformCost: number;
+    meetingPlatformCostPerMinute?: number;
+    meetingPlatformBaseCost?: number;
+  };
   timezone: string;
   status: "available" | "booked" | "blocked" | "cancelled";
   bookingId?: string;
