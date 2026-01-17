@@ -509,9 +509,6 @@ const TeacherJoinCoursePage = () => {
                 onChange={(e) => setFormData({ ...formData, introductionVideo: e.target.value })}
                 placeholder="https://youtube.com/watch?v=... or https://vimeo.com/..."
               />
-              <p className="text-xs text-muted-foreground">
-                Add a video link (YouTube, Vimeo, etc.) explaining what you will teach in this course. This helps students understand your teaching style.
-              </p>
             </div>
 
             <div className="space-y-2">
@@ -523,9 +520,6 @@ const TeacherJoinCoursePage = () => {
                 placeholder="Describe in detail what you will teach in this course, your teaching approach, course structure, topics covered, learning outcomes, etc..."
                 rows={5}
               />
-              <p className="text-xs text-muted-foreground">
-                Provide a detailed description of what students will learn, how you will teach, course structure, and what makes your teaching unique for this course.
-              </p>
             </div>
           </div>
           <DialogFooter>
