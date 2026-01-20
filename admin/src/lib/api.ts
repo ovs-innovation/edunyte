@@ -291,8 +291,8 @@ export const clearToken = () => {
 
 export interface ApiCourse {
   _id: string;
-  name: string;
-  description: string;
+  name: string | { en: string };
+  description: string | { en: string };
   category: string;
   image: string;
   status: "active" | "inactive";
@@ -336,8 +336,8 @@ export const CoursesAPI = {
 
 export interface ApiCategory {
   _id: string;
-  name: string;
-  description?: string;
+  name: string | { en: string };
+  description?: string | { en: string };
   image?: string;
   status: "active" | "inactive";
   createdBy: ApiUser | string;
@@ -381,9 +381,9 @@ export const CategoriesAPI = {
 
 export interface ApiLanguage {
   _id: string;
-  name: string;
+  name: string | { en: string };
   code: string;
-  nativeName: string;
+  nativeName: string | { en: string };
   flag: string;
   status: "active" | "inactive";
   createdAt?: string;

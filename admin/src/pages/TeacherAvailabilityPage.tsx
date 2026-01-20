@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, Calendar, Clock, Trash2, Edit, BookOpen, Languages } from 'lucide-react';
 import { AvailabilityAPI, TeacherCourseJoinAPI, ApiAvailability, ApiTeacherCourse, ApiCourse } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
+import { getLanguageValue } from '@/lib/languageHelper';
 import {
   Dialog,
   DialogContent,
@@ -230,14 +231,14 @@ const TeacherAvailabilityPage = () => {
 
   const getCourseName = (course: ApiTeacherCourse['courseId']) => {
     if (typeof course === 'string') return 'Unknown';
-    return course.name || 'Unknown';
+    return getLanguageValue(course.name) || 'Unknown';
   };
 
   const getLanguageNames = (languages: ApiTeacherCourse['languageIds']) => {
     if (!Array.isArray(languages)) return 'Unknown';
     return languages.map(lang => {
       if (typeof lang === 'string') return 'Unknown';
-      return lang.name || lang.code || 'Unknown';
+      return getLanguageValue(lang.name) || lang.code || 'Unknown';
     }).join(', ');
   };
 
@@ -318,14 +319,14 @@ const TeacherAvailabilityPage = () => {
                     // Get all languages for this course
                     const courseLanguages = teacherCourses
                       .filter(tc => typeof tc.courseId !== 'string' && tc.courseId._id === course._id)
-                      .flatMap(tc => Array.isArray(tc.languageIds) ? tc.languageIds.map(l => typeof l === 'string' ? 'Unknown' : (l.name || l.code || 'Unknown')) : []);
+                      .flatMap(tc => Array.isArray(tc.languageIds) ? tc.languageIds.map(l => typeof l === 'string' ? 'Unknown' : (getLanguageValue(l.name) || l.code || 'Unknown')) : []);
                     const uniqueLanguages = Array.from(new Set(courseLanguages));
                     
                     return (
                       <SelectItem key={course._id} value={course._id}>
                         <div className="flex items-center gap-2">
                           <BookOpen className="h-4 w-4" />
-                          <span className="font-medium">{course.name}</span>
+                          <span className="font-medium">{getLanguageValue(course.name)}</span>
                           {uniqueLanguages.length > 0 && (
                             <Badge variant="outline" className="ml-2">
                               {uniqueLanguages.length} language{uniqueLanguages.length > 1 ? 's' : ''}
@@ -344,7 +345,7 @@ const TeacherAvailabilityPage = () => {
                       <BookOpen className="h-4 w-4 text-primary" />
                       <span className="font-semibold text-foreground">Course:</span>
                       <span className="text-muted-foreground">
-                        {courses.find(c => c._id === selectedCourseId)?.name || 'Unknown'}
+                        {courses.find(c => c._id === selectedCourseId) ? getLanguageValue(courses.find(c => c._id === selectedCourseId)!.name) : 'Unknown'}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
@@ -353,7 +354,7 @@ const TeacherAvailabilityPage = () => {
                       <div className="flex items-center gap-1 flex-wrap">
                         {teacherCourses
                           .filter(tc => typeof tc.courseId !== 'string' && tc.courseId._id === selectedCourseId)
-                          .flatMap(tc => Array.isArray(tc.languageIds) ? tc.languageIds.map(l => typeof l === 'string' ? 'Unknown' : (l.name || l.code || 'Unknown')) : [])
+                          .flatMap(tc => Array.isArray(tc.languageIds) ? tc.languageIds.map(l => typeof l === 'string' ? 'Unknown' : (getLanguageValue(l.name) || l.code || 'Unknown')) : [])
                           .filter((v, i, a) => a.indexOf(v) === i)
                           .map((lang, idx) => (
                             <Badge key={idx} variant="secondary" className="text-xs">

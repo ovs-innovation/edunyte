@@ -36,6 +36,7 @@ import {
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { getAllCountries, getCountryByCode } from '@/utils/countryData';
 import * as Flags from 'country-flag-icons/react/3x2';
+import { getLanguageValue, normalizeLanguageValue } from '@/lib/languageHelper';
 
 // Helper component to render country flag
 const CountryFlag = ({ code, className = 'w-5 h-4' }: { code: string; className?: string }) => {
@@ -96,8 +97,8 @@ const TeacherProfilePage = () => {
     try {
       const data = await TeacherProfileAPI.getMyProfile();
       setProfile(data.profile);
-      setBio(data.profile.bio || '');
-      setAboutUs(data.profile.aboutUs || '');
+      setBio(getLanguageValue(data.profile.bio) || '');
+      setAboutUs(getLanguageValue(data.profile.aboutUs) || '');
       setPhoto(data.profile.photo || '');
       setExpertise(data.profile.expertise || []);
       setExperience(data.profile.experience || 0);
@@ -149,8 +150,8 @@ const TeacherProfilePage = () => {
     setSaving(true);
     try {
       const res = await TeacherProfileAPI.updateMyProfile({
-        bio,
-        aboutUs,
+        bio: normalizeLanguageValue(bio),
+        aboutUs: normalizeLanguageValue(aboutUs),
         photo,
         expertise,
         experience,

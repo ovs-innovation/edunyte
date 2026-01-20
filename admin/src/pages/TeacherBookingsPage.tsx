@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Calendar, Clock, Video, User, CheckCircle2, XCircle, ExternalLink } from 'lucide-react';
 import { BookingAPI, ApiBooking } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
+import { getLanguageValue } from '@/lib/languageHelper';
 import {
   Table,
   TableBody,
@@ -114,7 +115,7 @@ const TeacherBookingsPage = () => {
 
   const getCourseName = (course: ApiBooking['courseId']) => {
     if (typeof course === 'string') return 'Unknown';
-    return course.name || 'Unknown';
+    return getLanguageValue(course.name) || 'Unknown';
   };
 
   const statusStyles: Record<string, string> = {

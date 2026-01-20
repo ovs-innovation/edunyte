@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Download, Filter, CheckCircle2, XCircle, Video, ExternalLink } from 'lucide-react';
 import { TeacherCoursesAPI, ApiTeacherCourse, CoursesAPI, LanguagesAPI } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
+import { getLanguageValue } from '@/lib/languageHelper';
 import {
   Table,
   TableBody,
@@ -109,14 +110,14 @@ const TeacherApprovalPage = () => {
 
   const getCourseName = (course: ApiTeacherCourse['courseId']) => {
     if (typeof course === 'string') return 'Unknown';
-    return course.name || 'Unknown';
+    return getLanguageValue(course.name) || 'Unknown';
   };
 
   const getLanguageNames = (languages: ApiTeacherCourse['languageIds']) => {
     if (!Array.isArray(languages)) return 'Unknown';
     return languages.map(lang => {
       if (typeof lang === 'string') return 'Unknown';
-      return lang.name || lang.code || 'Unknown';
+      return getLanguageValue(lang.name) || lang.code || 'Unknown';
     }).join(', ');
   };
 
@@ -228,12 +229,12 @@ const TeacherApprovalPage = () => {
                         </p>
                         {request.experience && (
                           <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
-                            <strong>Experience:</strong> {request.experience}
+                            <strong>Experience:</strong> {getLanguageValue(request.experience)}
                           </p>
                         )}
                         {request.bio && (
                           <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                            <strong>Bio:</strong> {request.bio}
+                            <strong>Bio:</strong> {getLanguageValue(request.bio)}
                           </p>
                         )}
                         {request.introductionVideo && (
@@ -268,7 +269,7 @@ const TeacherApprovalPage = () => {
                           <p className="font-medium text-foreground">{getCourseName(request.courseId)}</p>
                           {typeof request.courseId !== 'string' && request.courseId?.description && (
                             <p className="text-sm text-muted-foreground line-clamp-1 mt-1">
-                              {request.courseId.description}
+                              {getLanguageValue(request.courseId.description)}
                             </p>
                           )}
                         </div>
@@ -278,7 +279,7 @@ const TeacherApprovalPage = () => {
                       <div className="flex flex-wrap gap-1">
                         {Array.isArray(request.languageIds) ? (
                           request.languageIds.map((lang, idx) => {
-                            const langName = typeof lang === 'string' ? 'Unknown' : (lang.name || lang.code || 'Unknown');
+                            const langName = typeof lang === 'string' ? 'Unknown' : (getLanguageValue(lang.name) || lang.code || 'Unknown');
                             return (
                               <Badge key={idx} variant="outline">{langName}</Badge>
                             );

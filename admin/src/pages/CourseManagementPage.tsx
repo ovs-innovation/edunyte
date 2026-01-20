@@ -4,6 +4,7 @@ import { PermissionGate } from '@/components/PermissionGate';
 import { Button } from '@/components/ui/button';
 import { Plus, Download, Filter } from 'lucide-react';
 import { CoursesAPI, ApiCourse, CategoriesAPI, ApiCategory } from '@/lib/api';
+import { getLanguageValue, normalizeLanguageValue } from '@/lib/languageHelper';
 import { useToast } from '@/hooks/use-toast';
 import {
   Table,
@@ -94,8 +95,8 @@ const CourseManagementPage = () => {
     if (course) {
       setEditCourse(course);
       setFormData({
-        name: course.name,
-        description: course.description || '',
+        name: getLanguageValue(course.name),
+        description: getLanguageValue(course.description),
         category: course.category || '',
         image: course.image || '',
         status: course.status,
@@ -127,11 +128,16 @@ const CourseManagementPage = () => {
 
   const handleSubmit = async () => {
     try {
+      const payload = {
+        ...formData,
+        name: normalizeLanguageValue(formData.name),
+        description: normalizeLanguageValue(formData.description),
+      };
       if (editCourse) {
-        await CoursesAPI.update(editCourse._id, formData);
+        await CoursesAPI.update(editCourse._id, payload);
         toast({ title: 'Course updated successfully' });
       } else {
-        await CoursesAPI.create(formData);
+        await CoursesAPI.create(payload);
         toast({ title: 'Course created successfully' });
       }
       handleCloseDialog();
@@ -155,7 +161,36 @@ const CourseManagementPage = () => {
       toast({ title: 'Course deleted successfully' });
       loadCourses();
     } catch (err: any) {
-      toast({ title: 'Delete failed', description: err?.message, variant: 'destructive' });
+      const errorMessage = err?.message || 'Delete failed';
+      if (errorMessage.includes('teacher mappings')) {
+        const deactivateConfirmed = await confirm({
+          title: 'Cannot Delete Course',
+          description: 'This course has teacher mappings. Would you like to deactivate it instead?',
+          confirmText: 'Deactivate',
+          cancelText: 'Cancel',
+          variant: 'default',
+        });
+        if (deactivateConfirmed) {
+          try {
+            const course = courses.find(c => c._id === id);
+            if (course) {
+              await CoursesAPI.update(id, {
+                name: course.name,
+                description: course.description,
+                category: course.category,
+                image: course.image,
+                status: 'inactive',
+              });
+              toast({ title: 'Course deactivated successfully' });
+              loadCourses();
+            }
+          } catch (updateErr: any) {
+            toast({ title: 'Deactivation failed', description: updateErr?.message, variant: 'destructive' });
+          }
+        }
+      } else {
+        toast({ title: 'Delete failed', description: errorMessage, variant: 'destructive' });
+      }
     }
   };
 
@@ -244,7 +279,7 @@ const CourseManagementPage = () => {
                           <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
                             <img
                               src={course.image}
-                              alt={course.name}
+                              alt={getLanguageValue(course.name)}
                               className="w-full h-full object-cover"
                               onError={(e) => {
                                 e.currentTarget.style.display = 'none';
@@ -253,9 +288,9 @@ const CourseManagementPage = () => {
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-foreground">{course.name}</p>
+                          <p className="font-medium text-foreground">{getLanguageValue(course.name)}</p>
                           {course.description && (
-                            <p className="text-sm text-muted-foreground line-clamp-1">{course.description}</p>
+                            <p className="text-sm text-muted-foreground line-clamp-1">{getLanguageValue(course.description)}</p>
                           )}
                         </div>
                       </div>
@@ -356,11 +391,14 @@ const CourseManagementPage = () => {
                   <SelectValue placeholder="Select a category..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category._id} value={category.name}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
+                  {categories.map((category) => {
+                    const categoryName = getLanguageValue(category.name);
+                    return (
+                      <SelectItem key={category._id} value={categoryName}>
+                        {categoryName}
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
               {formData.category && (

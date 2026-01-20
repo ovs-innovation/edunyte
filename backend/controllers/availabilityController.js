@@ -4,6 +4,7 @@ import Course from "../models/courseModel.js";
 import Booking from "../models/bookingModel.js";
 import User from "../models/userModel.js";
 import mongoose from "mongoose";
+import { convertCurrency, getBaseCurrency } from "../utils/currencyHelper.js";
 
 /**
  * Availability Controller
@@ -66,7 +67,7 @@ export const createAvailability = async (req, res, next) => {
       endTime,
       duration,
       price: parseFloat(totalPrice.toFixed(2)),
-      currency: teacherCourse.currency || "USD",
+      currency: teacherCourse.currency || getBaseCurrency(),
       priceBreakdown,
       timezone: timezone || teacherCourse.timezone || "UTC",
       isRecurring: isRecurring || false,
@@ -139,7 +140,7 @@ export const bulkCreateAvailability = async (req, res, next) => {
         endTime: slotData.endTime,
         duration: slotData.duration,
         price: parseFloat(totalPrice.toFixed(2)),
-        currency: teacherCourse.currency || "USD",
+        currency: teacherCourse.currency || getBaseCurrency(),
         priceBreakdown,
         timezone: slotData.timezone || teacherCourse.timezone || "UTC",
         isRecurring: slotData.isRecurring || false,
@@ -283,7 +284,7 @@ export const updateAvailability = async (req, res, next) => {
 
         availability.duration = duration;
         availability.price = parseFloat(totalPrice.toFixed(2));
-        availability.currency = teacherCourse.currency || "USD";
+        availability.currency = teacherCourse.currency || getBaseCurrency();
         availability.priceBreakdown = {
           teacherPrice: parseFloat(teacherPriceForSession.toFixed(2)),
           platformMargin: parseFloat(platformMargin.toFixed(2)),

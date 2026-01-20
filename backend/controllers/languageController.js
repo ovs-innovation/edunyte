@@ -1,5 +1,6 @@
 import Language from "../models/languageModel.js";
 import mongoose from "mongoose";
+import { normalizeLanguageValue, getLanguageValue } from "../utils/languageHelper.js";
 
 /**
  * Language Controller
@@ -13,10 +14,14 @@ export const createLanguage = async (req, res, next) => {
   try {
     const { name, code, nativeName, flag, status } = req.body;
 
-    // Check if language with same name or code already exists
+    const normalizedName = normalizeLanguageValue(name);
+    const normalizedNativeName = normalizeLanguageValue(nativeName);
+    const nameValue = getLanguageValue(normalizedName);
+
     const existing = await Language.findOne({
       $or: [
-        { name: { $regex: new RegExp(`^${name}$`, "i") } },
+        { "name.en": { $regex: new RegExp(`^${nameValue}$`, "i") } },
+        { name: { $regex: new RegExp(`^${nameValue}$`, "i") } },
         { code: code.toUpperCase() },
       ],
     });
@@ -26,14 +31,17 @@ export const createLanguage = async (req, res, next) => {
     }
 
     const language = await Language.create({
-      name,
+      name: normalizedName,
       code: code.toUpperCase(),
-      nativeName,
+      nativeName: normalizedNativeName,
       flag,
       status: status || "active",
     });
 
-    res.status(201).json({ language });
+    const languageObj = language.toObject();
+    languageObj.name = getLanguageValue(languageObj.name);
+    languageObj.nativeName = getLanguageValue(languageObj.nativeName);
+    res.status(201).json({ language: languageObj });
   } catch (err) {
     if (err.code === 11000) {
       return res.status(409).json({ message: "Language with this name or code already exists" });
@@ -56,14 +64,22 @@ export const getLanguages = async (req, res, next) => {
 
     if (search) {
       query.$or = [
-        { name: { $regex: search, $options: "i" } },
+        { "name.en": { $regex: search, $options: "i" } },
+        { "nativeName.en": { $regex: search, $options: "i" } },
         { code: { $regex: search, $options: "i" } },
+        { name: { $regex: search, $options: "i" } },
         { nativeName: { $regex: search, $options: "i" } },
       ];
     }
 
-    const languages = await Language.find(query).sort({ name: 1 });
-    res.json({ languages, count: languages.length });
+    const languages = await Language.find(query).sort({ createdAt: -1 });
+    const languagesData = languages.map(language => {
+      const languageObj = language.toObject();
+      languageObj.name = getLanguageValue(languageObj.name);
+      languageObj.nativeName = getLanguageValue(languageObj.nativeName);
+      return languageObj;
+    });
+    res.json({ languages: languagesData, count: languagesData.length });
   } catch (err) {
     next(err);
   }
@@ -84,7 +100,10 @@ export const getLanguageById = async (req, res, next) => {
       return res.status(404).json({ message: "Language not found" });
     }
 
-    res.json({ language });
+    const languageObj = language.toObject();
+    languageObj.name = getLanguageValue(languageObj.name);
+    languageObj.nativeName = getLanguageValue(languageObj.nativeName);
+    res.json({ language: languageObj });
   } catch (err) {
     next(err);
   }
@@ -107,12 +126,17 @@ export const updateLanguage = async (req, res, next) => {
       return res.status(404).json({ message: "Language not found" });
     }
 
-    // Check for duplicates if name or code is being updated
-    if (name || code) {
+    if (name !== undefined || code !== undefined) {
       const updateQuery = { _id: { $ne: id } };
       const orConditions = [];
+      
       if (name) {
-        orConditions.push({ name: { $regex: new RegExp(`^${name}$`, "i") } });
+        const normalizedName = normalizeLanguageValue(name);
+        const nameValue = getLanguageValue(normalizedName);
+        orConditions.push(
+          { "name.en": { $regex: new RegExp(`^${nameValue}$`, "i") } },
+          { name: { $regex: new RegExp(`^${nameValue}$`, "i") } }
+        );
       }
       if (code) {
         orConditions.push({ code: code.toUpperCase() });
@@ -126,14 +150,17 @@ export const updateLanguage = async (req, res, next) => {
       }
     }
 
-    if (name !== undefined) language.name = name;
+    if (name !== undefined) language.name = normalizeLanguageValue(name);
     if (code !== undefined) language.code = code.toUpperCase();
-    if (nativeName !== undefined) language.nativeName = nativeName;
+    if (nativeName !== undefined) language.nativeName = normalizeLanguageValue(nativeName);
     if (flag !== undefined) language.flag = flag;
     if (status !== undefined) language.status = status;
 
     await language.save();
-    res.json({ language });
+    const languageObj = language.toObject();
+    languageObj.name = getLanguageValue(languageObj.name);
+    languageObj.nativeName = getLanguageValue(languageObj.nativeName);
+    res.json({ language: languageObj });
   } catch (err) {
     if (err.code === 11000) {
       return res.status(409).json({ message: "Language with this name or code already exists" });

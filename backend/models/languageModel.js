@@ -3,11 +3,9 @@ import mongoose from "mongoose";
 const languageSchema = new mongoose.Schema(
   {
     name: {
-      type: String,
+      type: mongoose.Schema.Types.Mixed,
       required: true,
-      trim: true,
-      unique: true,
-      index: true,
+      default: { en: "" },
     },
     code: {
       type: String,
@@ -18,9 +16,8 @@ const languageSchema = new mongoose.Schema(
       index: true,
     },
     nativeName: {
-      type: String,
-      trim: true,
-      default: "",
+      type: mongoose.Schema.Types.Mixed,
+      default: { en: "" },
     },
     flag: {
       type: String,
@@ -36,8 +33,17 @@ const languageSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Indexes
-languageSchema.index({ status: 1, name: 1 });
+languageSchema.pre("save", function (next) {
+  if (typeof this.name === "string") {
+    this.name = { en: this.name };
+  }
+  if (typeof this.nativeName === "string") {
+    this.nativeName = { en: this.nativeName };
+  }
+  next();
+});
+
+languageSchema.index({ status: 1, createdAt: -1 });
 
 export default mongoose.model("Language", languageSchema);
 

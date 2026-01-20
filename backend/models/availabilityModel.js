@@ -51,7 +51,7 @@ const availabilitySchema = new mongoose.Schema(
     currency: {
       type: String,
       required: true,
-      default: "USD",
+      default: "INR",
       uppercase: true,
     },
     // Breakdown of price calculation (for transparency)

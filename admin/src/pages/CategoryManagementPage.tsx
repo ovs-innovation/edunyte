@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, Download, Filter, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 import { CategoriesAPI, ApiCategory } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
+import { getLanguageValue, normalizeLanguageValue } from '@/lib/languageHelper';
 import {
   Table,
   TableBody,
@@ -77,8 +78,8 @@ const CategoryManagementPage = () => {
     if (category) {
       setEditCategory(category);
       setFormData({
-        name: category.name,
-        description: category.description || '',
+        name: getLanguageValue(category.name),
+        description: getLanguageValue(category.description),
         image: category.image || '',
         status: category.status,
       });
@@ -112,11 +113,16 @@ const CategoryManagementPage = () => {
     }
 
     try {
+      const payload = {
+        ...formData,
+        name: normalizeLanguageValue(formData.name),
+        description: normalizeLanguageValue(formData.description),
+      };
       if (editCategory) {
-        await CategoriesAPI.update(editCategory._id, formData);
+        await CategoriesAPI.update(editCategory._id, payload);
         toast({ title: 'Category updated successfully' });
       } else {
-        await CategoriesAPI.create(formData);
+        await CategoriesAPI.create(payload);
         toast({ title: 'Category created successfully' });
       }
       handleCloseDialog();
@@ -218,14 +224,14 @@ const CategoryManagementPage = () => {
                 categories.map((category) => (
                   <TableRow key={category._id} className="border-border transition-colors hover:bg-muted/30">
                     <TableCell>
-                      <span className="font-medium text-foreground">{category.name}</span>
+                      <span className="font-medium text-foreground">{getLanguageValue(category.name)}</span>
                     </TableCell>
                     <TableCell>
                       {category.image ? (
                         <div className="w-10 h-10 rounded overflow-hidden border border-border">
                           <img
                             src={category.image}
-                            alt={category.name}
+                            alt={getLanguageValue(category.name)}
                             className="w-full h-full object-cover"
                             onError={(e) => {
                               e.currentTarget.style.display = 'none';
@@ -238,7 +244,7 @@ const CategoryManagementPage = () => {
                     </TableCell>
                     <TableCell>
                       <span className="text-sm text-muted-foreground line-clamp-1">
-                        {category.description || '—'}
+                        {getLanguageValue(category.description) || '—'}
                       </span>
                     </TableCell>
                     <TableCell>

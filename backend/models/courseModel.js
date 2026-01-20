@@ -3,15 +3,13 @@ import mongoose from "mongoose";
 const courseSchema = new mongoose.Schema(
   {
     name: {
-      type: String,
+      type: mongoose.Schema.Types.Mixed,
       required: true,
-      trim: true,
-      index: true,
+      default: { en: "" },
     },
     description: {
-      type: String,
-      trim: true,
-      default: "",
+      type: mongoose.Schema.Types.Mixed,
+      default: { en: "" },
     },
     category: {
       type: String,
@@ -37,9 +35,17 @@ const courseSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Indexes for better query performance
+courseSchema.pre("save", function (next) {
+  if (typeof this.name === "string") {
+    this.name = { en: this.name };
+  }
+  if (typeof this.description === "string") {
+    this.description = { en: this.description };
+  }
+  next();
+});
+
 courseSchema.index({ status: 1, createdAt: -1 });
-courseSchema.index({ name: "text", description: "text" });
 
 export default mongoose.model("Course", courseSchema);
 

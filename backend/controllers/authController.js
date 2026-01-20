@@ -7,6 +7,7 @@ import Role from "../models/roleModel.js";
 import { resolveRoleKey } from "../lib/validateRole.js";
 import { sendOTPEmail, sendResetPasswordEmail } from "../utils/emailService.js";
 import TeacherProfile from "../models/teacherProfileModel.js";
+import { getLanguageValue } from "../utils/languageHelper.js";
 import crypto from "crypto";
 
 const resolvePermissions = async (roleKey) => {
@@ -161,7 +162,10 @@ export const me = async (req, res, next) => {
       if (!teacherProfile) {
         teacherProfile = await TeacherProfile.create({ userId: user._id });
       }
-      userData.profile = teacherProfile;
+      const profileObj = teacherProfile.toObject();
+      profileObj.bio = getLanguageValue(profileObj.bio);
+      profileObj.aboutUs = getLanguageValue(profileObj.aboutUs);
+      userData.profile = profileObj;
     }
     
     res.json({ user: userData });

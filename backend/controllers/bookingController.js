@@ -4,6 +4,7 @@ import TeacherCourse from "../models/teacherCourseModel.js";
 import User from "../models/userModel.js";
 import mongoose from "mongoose";
 import { generateMeeting } from "../utils/meetingGateway.js";
+import { convertCurrency, getBaseCurrency } from "../utils/currencyHelper.js";
 
 /**
  * Booking Controller

@@ -1,5 +1,6 @@
 import Course from "../models/courseModel.js";
 import mongoose from "mongoose";
+import { normalizeLanguageValue, getLanguageValue, transformLanguageFields } from "../utils/languageHelper.js";
 
 /**
  * Course Controller
@@ -14,15 +15,23 @@ export const createCourse = async (req, res, next) => {
     const { name, description, category, image, status } = req.body;
     const createdBy = req.user.id;
 
-    // Check if course with same name already exists
-    const existing = await Course.findOne({ name: { $regex: new RegExp(`^${name}$`, "i") } });
+    const normalizedName = normalizeLanguageValue(name);
+    const normalizedDescription = normalizeLanguageValue(description);
+    const nameValue = getLanguageValue(normalizedName);
+
+    const existing = await Course.findOne({
+      $or: [
+        { "name.en": { $regex: new RegExp(`^${nameValue}$`, "i") } },
+        { name: { $regex: new RegExp(`^${nameValue}$`, "i") } }
+      ]
+    });
     if (existing) {
       return res.status(409).json({ message: "Course with this name already exists" });
     }
 
     const course = await Course.create({
-      name,
-      description,
+      name: normalizedName,
+      description: normalizedDescription,
       category,
       image,
       status: status || "active",
@@ -30,7 +39,10 @@ export const createCourse = async (req, res, next) => {
     });
 
     await course.populate("createdBy", "name email");
-    res.status(201).json({ course });
+    const courseObj = course.toObject();
+    courseObj.name = getLanguageValue(courseObj.name);
+    courseObj.description = getLanguageValue(courseObj.description);
+    res.status(201).json({ course: courseObj });
   } catch (err) {
     next(err);
   }
@@ -50,6 +62,8 @@ export const getCourses = async (req, res, next) => {
 
     if (search) {
       query.$or = [
+        { "name.en": { $regex: search, $options: "i" } },
+        { "description.en": { $regex: search, $options: "i" } },
         { name: { $regex: search, $options: "i" } },
         { description: { $regex: search, $options: "i" } },
       ];
@@ -59,7 +73,14 @@ export const getCourses = async (req, res, next) => {
       .populate("createdBy", "name email")
       .sort({ createdAt: -1 });
 
-    res.json({ courses, count: courses.length });
+    const coursesData = courses.map(course => {
+      const courseObj = course.toObject();
+      courseObj.name = getLanguageValue(courseObj.name);
+      courseObj.description = getLanguageValue(courseObj.description);
+      return courseObj;
+    });
+
+    res.json({ courses: coursesData, count: coursesData.length });
   } catch (err) {
     next(err);
   }
@@ -80,7 +101,10 @@ export const getCourseById = async (req, res, next) => {
       return res.status(404).json({ message: "Course not found" });
     }
 
-    res.json({ course });
+    const courseObj = course.toObject();
+    courseObj.name = getLanguageValue(courseObj.name);
+    courseObj.description = getLanguageValue(courseObj.description);
+    res.json({ course: courseObj });
   } catch (err) {
     next(err);
   }
@@ -103,23 +127,37 @@ export const updateCourse = async (req, res, next) => {
       return res.status(404).json({ message: "Course not found" });
     }
 
-    // Check for duplicate name if name is being updated
-    if (name && name !== course.name) {
-      const existing = await Course.findOne({ name: { $regex: new RegExp(`^${name}$`, "i") } });
-      if (existing) {
-        return res.status(409).json({ message: "Course with this name already exists" });
+    if (name !== undefined) {
+      const normalizedName = normalizeLanguageValue(name);
+      const nameValue = getLanguageValue(normalizedName);
+      const currentNameValue = getLanguageValue(course.name);
+
+      if (nameValue !== currentNameValue) {
+        const existing = await Course.findOne({
+          $or: [
+            { "name.en": { $regex: new RegExp(`^${nameValue}$`, "i") } },
+            { name: { $regex: new RegExp(`^${nameValue}$`, "i") } }
+          ],
+          _id: { $ne: id }
+        });
+        if (existing) {
+          return res.status(409).json({ message: "Course with this name already exists" });
+        }
       }
-      course.name = name;
+      course.name = normalizedName;
     }
 
-    if (description !== undefined) course.description = description;
+    if (description !== undefined) course.description = normalizeLanguageValue(description);
     if (category !== undefined) course.category = category;
     if (image !== undefined) course.image = image;
     if (status !== undefined) course.status = status;
 
     await course.save();
     await course.populate("createdBy", "name email");
-    res.json({ course });
+    const courseObj = course.toObject();
+    courseObj.name = getLanguageValue(courseObj.name);
+    courseObj.description = getLanguageValue(courseObj.description);
+    res.json({ course: courseObj });
   } catch (err) {
     next(err);
   }

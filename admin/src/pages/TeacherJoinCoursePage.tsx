@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, BookOpen, Languages as LanguagesIcon } from 'lucide-react';
 import { TeacherCourseJoinAPI, CoursesAPI, LanguagesAPI, ApiCourse, ApiLanguage } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
+import { getLanguageValue } from '@/lib/languageHelper';
 import {
   Dialog,
   DialogContent,
@@ -256,7 +257,7 @@ const TeacherJoinCoursePage = () => {
                     <div className="relative w-full h-48 sm:h-52 md:h-60 rounded-lg overflow-hidden">
                       <img
                         src={course.image}
-                        alt={course.name}
+                        alt={getLanguageValue(course.name)}
                         className="w-full h-full object-fill rounded-lg"
                         onError={(e) => {
                           e.currentTarget.style.display = 'none';
@@ -268,7 +269,7 @@ const TeacherJoinCoursePage = () => {
                 <CardHeader className="flex-1">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <CardTitle className="text-lg line-clamp-1">{course.name}</CardTitle>
+                      <CardTitle className="text-lg line-clamp-1">{getLanguageValue(course.name)}</CardTitle>
                       {course.category && (
                         <Badge variant="outline" className="mt-2">
                           {course.category}
@@ -288,7 +289,7 @@ const TeacherJoinCoursePage = () => {
                 </CardHeader>
                 <CardContent className="flex-1 flex flex-col">
                   <CardDescription className="line-clamp-2 mb-4 flex-1">
-                    {course.description || 'No description available'}
+                    {getLanguageValue(course.description) || 'No description available'}
                   </CardDescription>
                   <Button
                     onClick={() => handleOpenDialog(course)}
@@ -309,7 +310,7 @@ const TeacherJoinCoursePage = () => {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Join Course: {selectedCourse?.name}</DialogTitle>
+            <DialogTitle>Join Course: {selectedCourse ? getLanguageValue(selectedCourse.name) : ''}</DialogTitle>
             <DialogDescription>
               Fill in the details to request joining this course. Admin will review your request.
             </DialogDescription>
@@ -344,7 +345,7 @@ const TeacherJoinCoursePage = () => {
                           return (
                             <CommandItem
                               key={lang.code}
-                              value={`${lang.code} ${lang.name} ${lang.nativeName || ''}`}
+                              value={`${lang.code} ${getLanguageValue(lang.name)} ${getLanguageValue(lang.nativeName) || ''}`}
                               onSelect={() => {
                                 if (isSelected) {
                                   setFormData({ ...formData, languages: formData.languages.filter(l => l.code !== lang.code) });
@@ -363,9 +364,9 @@ const TeacherJoinCoursePage = () => {
                                   readOnly
                                   className="rounded border-gray-300 cursor-pointer"
                                 />
-                                <span className="font-medium">{lang.name}</span>
-                                {lang.nativeName && lang.nativeName !== lang.name && (
-                                  <span className="text-muted-foreground text-sm">({lang.nativeName})</span>
+                                <span className="font-medium">{getLanguageValue(lang.name)}</span>
+                                {lang.nativeName && getLanguageValue(lang.nativeName) !== getLanguageValue(lang.name) && (
+                                  <span className="text-muted-foreground text-sm">({getLanguageValue(lang.nativeName)})</span>
                                 )}
                               </div>
                             </CommandItem>
@@ -383,7 +384,7 @@ const TeacherJoinCoursePage = () => {
                     const proficiency = PROFICIENCY_LEVELS.find((p) => p.value === langWithProf.proficiency);
                     return lang ? (
                       <div key={langWithProf.code} className="flex items-center gap-1">
-                        <span className="text-sm font-medium">{lang.name}</span>
+                        <span className="text-sm font-medium">{getLanguageValue(lang.name)}</span>
                         <Badge 
                           className={cn("text-xs", proficiency?.color)}
                           variant="secondary"

@@ -3,6 +3,8 @@ import Course from "../models/courseModel.js";
 import Language from "../models/languageModel.js";
 import User from "../models/userModel.js";
 import mongoose from "mongoose";
+import { normalizeLanguageValue, getLanguageValue } from "../utils/languageHelper.js";
+import { convertCurrency, getBaseCurrency } from "../utils/currencyHelper.js";
 
 /**
  * TeacherCourse Controller
@@ -64,12 +66,12 @@ export const joinCourse = async (req, res, next) => {
       existing.status = "pending";
       existing.languageIds = languageIds;
       existing.price = price;
-      existing.currency = (currency || "USD").toUpperCase();
+      existing.currency = (currency || getBaseCurrency()).toUpperCase();
       existing.timezone = timezone || "UTC";
       existing.introductionVideo = introductionVideo || "";
-      existing.experience = experience || "";
-      existing.bio = bio || "";
-      existing.aboutCourse = aboutCourse || "";
+      existing.experience = normalizeLanguageValue(experience);
+      existing.bio = normalizeLanguageValue(bio);
+      existing.aboutCourse = normalizeLanguageValue(aboutCourse);
       existing.rejectionReason = "";
       await existing.save();
       await existing.populate([
@@ -77,7 +79,11 @@ export const joinCourse = async (req, res, next) => {
         { path: "courseId", select: "name description category image status" },
         { path: "languageIds", select: "name code" },
       ]);
-      return res.json({ teacherCourse: existing, message: "Request resubmitted successfully" });
+      const existingObj = existing.toObject();
+      existingObj.experience = getLanguageValue(existingObj.experience);
+      existingObj.bio = getLanguageValue(existingObj.bio);
+      existingObj.aboutCourse = getLanguageValue(existingObj.aboutCourse);
+      return res.json({ teacherCourse: existingObj, message: "Request resubmitted successfully" });
     }
 
     // Create new request with multiple languages
@@ -86,12 +92,12 @@ export const joinCourse = async (req, res, next) => {
       courseId,
       languageIds,
       price,
-      currency: (currency || "USD").toUpperCase(),
+      currency: (currency || getBaseCurrency()).toUpperCase(),
       timezone: timezone || "UTC",
       introductionVideo: introductionVideo || "",
-      experience: experience || "",
-      bio: bio || "",
-      aboutCourse: aboutCourse || "",
+      experience: normalizeLanguageValue(experience),
+      bio: normalizeLanguageValue(bio),
+      aboutCourse: normalizeLanguageValue(aboutCourse),
       status: "pending",
     });
 
@@ -101,7 +107,11 @@ export const joinCourse = async (req, res, next) => {
       { path: "languageIds", select: "name code" },
     ]);
 
-    res.status(201).json({ teacherCourse });
+    const tcObj = teacherCourse.toObject();
+    tcObj.experience = getLanguageValue(tcObj.experience);
+    tcObj.bio = getLanguageValue(tcObj.bio);
+    tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
+    res.status(201).json({ teacherCourse: tcObj });
   } catch (err) {
     if (err.code === 11000) {
       return res.status(409).json({ message: "Duplicate request for this course-language combination" });
@@ -128,7 +138,20 @@ export const getMyCourses = async (req, res, next) => {
       .populate("languageIds", "name code nativeName")
       .sort({ createdAt: -1 });
 
-    res.json({ teacherCourses, count: teacherCourses.length });
+    const targetCurrency = req.query.currency || getBaseCurrency();
+    const teacherCoursesData = teacherCourses.map(tc => {
+      const tcObj = tc.toObject();
+      tcObj.experience = getLanguageValue(tcObj.experience);
+      tcObj.bio = getLanguageValue(tcObj.bio);
+      tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
+      if (tcObj.price && tcObj.currency && tcObj.currency !== targetCurrency) {
+        tcObj.price = convertCurrency(tcObj.price, tcObj.currency, targetCurrency);
+        tcObj.currency = targetCurrency;
+      }
+      return tcObj;
+    });
+
+    res.json({ teacherCourses: teacherCoursesData, count: teacherCoursesData.length });
   } catch (err) {
     next(err);
   }
@@ -213,7 +236,20 @@ export const getTeacherCourseRequests = async (req, res, next) => {
       .populate("reviewedBy", "name email")
       .sort({ createdAt: -1 });
 
-    res.json({ teacherCourses, count: teacherCourses.length });
+    const targetCurrency = req.query.currency || getBaseCurrency();
+    const teacherCoursesData = teacherCourses.map(tc => {
+      const tcObj = tc.toObject();
+      tcObj.experience = getLanguageValue(tcObj.experience);
+      tcObj.bio = getLanguageValue(tcObj.bio);
+      tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
+      if (tcObj.price && tcObj.currency && tcObj.currency !== targetCurrency) {
+        tcObj.price = convertCurrency(tcObj.price, tcObj.currency, targetCurrency);
+        tcObj.currency = targetCurrency;
+      }
+      return tcObj;
+    });
+
+    res.json({ teacherCourses: teacherCoursesData, count: teacherCoursesData.length });
   } catch (err) {
     next(err);
   }
@@ -251,7 +287,11 @@ export const approveTeacherCourse = async (req, res, next) => {
       { path: "reviewedBy", select: "name email" },
     ]);
 
-    res.json({ teacherCourse, message: "Request approved successfully" });
+    const tcObj = teacherCourse.toObject();
+    tcObj.experience = getLanguageValue(tcObj.experience);
+    tcObj.bio = getLanguageValue(tcObj.bio);
+    tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
+    res.json({ teacherCourse: tcObj, message: "Request approved successfully" });
   } catch (err) {
     next(err);
   }
@@ -291,7 +331,11 @@ export const rejectTeacherCourse = async (req, res, next) => {
       { path: "reviewedBy", select: "name email" },
     ]);
 
-    res.json({ teacherCourse, message: "Request rejected successfully" });
+    const tcObj = teacherCourse.toObject();
+    tcObj.experience = getLanguageValue(tcObj.experience);
+    tcObj.bio = getLanguageValue(tcObj.bio);
+    tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
+    res.json({ teacherCourse: tcObj, message: "Request rejected successfully" });
   } catch (err) {
     next(err);
   }
@@ -370,7 +414,7 @@ export const getCourseTeachers = async (req, res, next) => {
     // Get all approved teacher-course mappings that include this language
     const teacherCourses = await TeacherCourse.find({
       courseId,
-      languageIds: { $in: [languageId] }, // Find courses where languageIds array includes this languageId
+      languageIds: { $in: [languageId] },
       status: "approved",
     })
       .populate("teacherId", "name email")
@@ -378,7 +422,20 @@ export const getCourseTeachers = async (req, res, next) => {
       .populate("languageIds", "name code nativeName")
       .sort({ price: 1 });
 
-    res.json({ teacherCourses, count: teacherCourses.length });
+    const targetCurrency = req.query.currency || getBaseCurrency();
+    const teacherCoursesData = teacherCourses.map(tc => {
+      const tcObj = tc.toObject();
+      tcObj.experience = getLanguageValue(tcObj.experience);
+      tcObj.bio = getLanguageValue(tcObj.bio);
+      tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
+      if (tcObj.price && tcObj.currency && tcObj.currency !== targetCurrency) {
+        tcObj.price = convertCurrency(tcObj.price, tcObj.currency, targetCurrency);
+        tcObj.currency = targetCurrency;
+      }
+      return tcObj;
+    });
+
+    res.json({ teacherCourses: teacherCoursesData, count: teacherCoursesData.length });
   } catch (err) {
     next(err);
   }

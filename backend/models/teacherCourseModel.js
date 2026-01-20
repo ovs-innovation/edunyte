@@ -35,21 +35,16 @@ const teacherCourseSchema = new mongoose.Schema(
     },
     currency: {
       type: String,
-      default: "USD",
+      default: "INR",
       uppercase: true,
     },
-    // Course-specific experience and bio (not from profile)
     experience: {
-      type: String,
-      trim: true,
-      default: "",
-      // Teacher's experience/qualifications specific to this course
+      type: mongoose.Schema.Types.Mixed,
+      default: { en: "" },
     },
     bio: {
-      type: String,
-      trim: true,
-      default: "",
-      // Teacher's bio specific to this course
+      type: mongoose.Schema.Types.Mixed,
+      default: { en: "" },
     },
     status: {
       type: String,
@@ -70,12 +65,9 @@ const teacherCourseSchema = new mongoose.Schema(
       default: "",
       // Can be YouTube, Vimeo, or any video URL
     },
-    // About course - detailed description of what teacher will teach in this course
     aboutCourse: {
-      type: String,
-      trim: true,
-      default: "",
-      // Detailed description about the course content, teaching approach, etc.
+      type: mongoose.Schema.Types.Mixed,
+      default: { en: "" },
     },
     // Availability schedule (stored as JSON or separate collection in future)
     availability: {
@@ -105,11 +97,23 @@ teacherCourseSchema.index(
   { unique: true }
 );
 
-// Indexes for querying
+teacherCourseSchema.pre("save", function (next) {
+  if (typeof this.experience === "string") {
+    this.experience = { en: this.experience };
+  }
+  if (typeof this.bio === "string") {
+    this.bio = { en: this.bio };
+  }
+  if (typeof this.aboutCourse === "string") {
+    this.aboutCourse = { en: this.aboutCourse };
+  }
+  next();
+});
+
 teacherCourseSchema.index({ status: 1, createdAt: -1 });
 teacherCourseSchema.index({ courseId: 1, status: 1 });
 teacherCourseSchema.index({ teacherId: 1, status: 1 });
-teacherCourseSchema.index({ languageIds: 1 }); // For querying by language
+teacherCourseSchema.index({ languageIds: 1 });
 
 export default mongoose.model("TeacherCourse", teacherCourseSchema);
 

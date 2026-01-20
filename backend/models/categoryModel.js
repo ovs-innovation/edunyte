@@ -7,16 +7,13 @@ import mongoose from "mongoose";
 const categorySchema = new mongoose.Schema(
   {
     name: {
-      type: String,
+      type: mongoose.Schema.Types.Mixed,
       required: true,
-      trim: true,
-      unique: true,
-      index: true,
+      default: { en: "" },
     },
     description: {
-      type: String,
-      trim: true,
-      default: "",
+      type: mongoose.Schema.Types.Mixed,
+      default: { en: "" },
     },
     image: {
       type: String,
@@ -39,8 +36,17 @@ const categorySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Indexes
-categorySchema.index({ status: 1, name: 1 });
+categorySchema.pre("save", function (next) {
+  if (typeof this.name === "string") {
+    this.name = { en: this.name };
+  }
+  if (typeof this.description === "string") {
+    this.description = { en: this.description };
+  }
+  next();
+});
+
+categorySchema.index({ status: 1, createdAt: -1 });
 categorySchema.index({ createdBy: 1 });
 
 export default mongoose.model("Category", categorySchema);

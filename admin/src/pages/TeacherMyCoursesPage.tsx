@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { BookOpen, CheckCircle2, XCircle, Clock, Plus, Video, ExternalLink, LogOut } from 'lucide-react';
 import { TeacherCourseJoinAPI, ApiTeacherCourse } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
+import { getLanguageValue } from '@/lib/languageHelper';
 import {
   Table,
   TableBody,
@@ -60,14 +61,14 @@ const TeacherMyCoursesPage = () => {
 
   const getCourseName = (course: ApiTeacherCourse['courseId']) => {
     if (typeof course === 'string') return 'Unknown';
-    return course.name || 'Unknown';
+    return getLanguageValue(course.name) || 'Unknown';
   };
 
   const getLanguageNames = (languages: ApiTeacherCourse['languageIds']) => {
     if (!Array.isArray(languages)) return 'Unknown';
     return languages.map(lang => {
       if (typeof lang === 'string') return 'Unknown';
-      return lang.name || lang.code || 'Unknown';
+      return getLanguageValue(lang.name) || lang.code || 'Unknown';
     }).join(', ');
   };
 
@@ -210,7 +211,7 @@ const TeacherMyCoursesPage = () => {
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-foreground">{getCourseName(request.courseId)}</p>
                             {request.bio && (
-                              <p className="text-sm text-muted-foreground line-clamp-1 mt-1">{request.bio}</p>
+                              <p className="text-sm text-muted-foreground line-clamp-1 mt-1">{getLanguageValue(request.bio)}</p>
                             )}
                             {request.introductionVideo && (
                               <a
@@ -231,7 +232,7 @@ const TeacherMyCoursesPage = () => {
                         <div className="flex flex-wrap gap-1">
                           {Array.isArray(request.languageIds) ? (
                             request.languageIds.map((lang, idx) => {
-                              const langName = typeof lang === 'string' ? 'Unknown' : (lang.name || lang.code || 'Unknown');
+                              const langName = typeof lang === 'string' ? 'Unknown' : (getLanguageValue(lang.name) || lang.code || 'Unknown');
                               return (
                                 <Badge key={idx} variant="outline">{langName}</Badge>
                               );

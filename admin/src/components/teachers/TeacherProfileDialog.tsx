@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PermissionGate } from "@/components/PermissionGate";
+import { getLanguageValue, normalizeLanguageValue } from "@/lib/languageHelper";
 
 type Mode = "view" | "edit";
 
@@ -44,8 +45,8 @@ export function TeacherProfileDialog({ open, mode, onClose, profile, userId, onS
 
   useEffect(() => {
     if (profile && open) {
-      setBio(profile.bio || "");
-      setAboutUs(profile.aboutUs || "");
+      setBio(getLanguageValue(profile.bio) || "");
+      setAboutUs(getLanguageValue(profile.aboutUs) || "");
       setExpertise(profile.expertise || []);
       setExperience(profile.experience || 0);
       setKycStatus(profile.kycStatus || "pending");
@@ -71,8 +72,8 @@ export function TeacherProfileDialog({ open, mode, onClose, profile, userId, onS
     try {
       const data = await TeacherProfileAPI.getProfile(targetUserId);
       if (data.profile) {
-        setBio(data.profile.bio || "");
-        setAboutUs(data.profile.aboutUs || "");
+        setBio(getLanguageValue(data.profile.bio) || "");
+        setAboutUs(getLanguageValue(data.profile.aboutUs) || "");
         setExpertise(data.profile.expertise || []);
         setExperience(data.profile.experience || 0);
         setKycStatus(data.profile.kycStatus || "pending");
@@ -129,8 +130,8 @@ export function TeacherProfileDialog({ open, mode, onClose, profile, userId, onS
     setLoading(true);
     try {
       const res = await TeacherProfileAPI.update(targetUserId, {
-        bio,
-        aboutUs,
+        bio: normalizeLanguageValue(bio),
+        aboutUs: normalizeLanguageValue(aboutUs),
         expertise,
         experience,
         kycStatus,
