@@ -6,7 +6,7 @@ const FooterCommon = () => {
          <div className="col-xl-3 col-lg-4 col-md-6">
             <div className="footer__widget">
                <div className="logo mb-35">
-                  <Link to="/"><img src="/assets/img/logo/secondary_logo.svg" alt="img" /></Link>
+                  <Link to="/"><img src="/assets/img/logo/edunyte-light.png" height="100" width="100" alt="img" /></Link>
                </div>
                <div className="footer__content">
                   <p>when an unknown printer took galley of type and scrambled it to make pspecimen bookt has.</p>

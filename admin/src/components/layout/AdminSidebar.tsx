@@ -86,10 +86,11 @@ export function AdminSidebar() {
       <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-4">
         {!collapsed && (
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-primary">
+            <img src="/assets/img/logo/edunyte-light.png" alt="Logo" width={100} height={100} />
+            {/* <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-primary">
               <Shield className="h-4 w-4 text-primary-foreground" />
-            </div>
-            <span className="text-lg font-semibold text-foreground">AdminHub</span>
+            </div> */}
+            {/* <span className="text-lg font-semibold text-foreground">AdminHub</span> */}
           </div>
         )}
         <Button
