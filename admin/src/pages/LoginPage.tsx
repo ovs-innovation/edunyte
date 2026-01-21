@@ -109,9 +109,7 @@ const LoginPage = () => {
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md space-y-8 animate-fade-in">
           <div className="text-center space-y-2">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl gradient-primary shadow-glow mb-4">
-              <Shield className="h-8 w-8 text-primary-foreground" />
-            </div>
+            <img src="/assets/img/logo/edunyte-light.png" width={100} height={100} alt="Logo" className="w-52 h-52 mx-auto" />
             <h1 className="text-3xl font-bold tracking-tight text-foreground">
               {requiresOTP ? 'Enter Verification Code' : 'Welcome Back'}
             </h1>
