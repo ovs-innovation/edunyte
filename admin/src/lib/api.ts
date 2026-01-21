@@ -305,8 +305,8 @@ export const CoursesAPI = {
   list: () => apiFetch<{ courses: ApiCourse[]; count: number }>("/admin/courses"),
   get: (id: string) => apiFetch<{ course: ApiCourse }>(`/admin/courses/${id}`),
   create: (payload: {
-    name: string;
-    description?: string;
+    name: string | { en: string };
+    description?: string | { en: string };
     category?: string;
     image?: string;
     status?: "active" | "inactive";
@@ -316,8 +316,8 @@ export const CoursesAPI = {
       body: JSON.stringify(payload),
     }),
   update: (id: string, payload: {
-    name?: string;
-    description?: string;
+    name?: string | { en: string };
+    description?: string | { en: string };
     category?: string;
     image?: string;
     status?: "active" | "inactive";

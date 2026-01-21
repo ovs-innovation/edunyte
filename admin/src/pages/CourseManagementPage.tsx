@@ -175,8 +175,8 @@ const CourseManagementPage = () => {
             const course = courses.find(c => c._id === id);
             if (course) {
               await CoursesAPI.update(id, {
-                name: course.name,
-                description: course.description,
+                name: getLanguageValue(course.name),
+                description: getLanguageValue(course.description),
                 category: course.category,
                 image: course.image,
                 status: 'inactive',
