@@ -1,0 +1,16 @@
+{
+  "common": {
+    "login": "लॉगिन",
+    "logout": "लॉगआउट",
+    "buy_now": "अभी खरीदें",
+    "price": "कीमत",
+    "language": "भाषा",
+    "currency": "मुद्रा",
+    "english": "अंग्रेज़ी",
+    "hindi": "हिंदी",
+    "select_language": "भाषा चुनें",
+    "select_currency": "मुद्रा चुनें"
+  }
+}
+
+

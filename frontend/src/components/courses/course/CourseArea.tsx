@@ -4,10 +4,12 @@ import CourseSidebar from './CourseSidebar';
 import CourseTop from './CourseTop';
 import UseCourses from '../../../hooks/UseCourses';
 import { Link } from 'react-router-dom';
+import { usePriceFormatter } from '../../../hooks/usePriceFormatter';
 
 const CourseArea = () => {
 
    const { courses, setCourses } = UseCourses();
+   const { formatPriceWithConversion } = usePriceFormatter();
 
    const itemsPerPage = 12;
    const [itemOffset, setItemOffset] = useState(0);
@@ -17,9 +19,6 @@ const CourseArea = () => {
 
    const startOffset = itemOffset + 1;
    const totalItems = courses.length;
-
-   useEffect(() => {
-   }, [courses]);
 
    const handlePageClick = (event: { selected: number }) => {
       const newOffset = (event.selected * itemsPerPage) % courses.length;
@@ -73,7 +72,7 @@ const CourseArea = () => {
                                                 <i className="flaticon-arrow-right"></i>
                                              </Link>
                                           </div>
-                                          <h5 className="price">${item.price}.00</h5>
+                                          <h5 className="price">{formatPriceWithConversion(item.price)}</h5>
                                        </div>
                                     </div>
                                  </div>
@@ -110,7 +109,7 @@ const CourseArea = () => {
                                                 <i className="fas fa-star"></i>  ({item.rating} Reviews)
                                              </div>
                                           </li>
-                                          <li className="price">${item.price}.00</li>
+                                          <li className="price">{formatPriceWithConversion(item.price)}</li>
                                        </ul>
                                        <h5 className="title"><a href="course-details.html">{item.title}</a></h5>
                                        <p className="author">By <a href="#">{item.instructors}</a></p>

@@ -7,7 +7,8 @@ import { Link } from "react-router-dom"
 import InjectableSvg from "../../hooks/InjectableSvg"
 import CustomSelect from "../../ui/CustomSelect"
 import TotalWishlist from "../../components/common/TotalWishlist"
-import TotalCart from "../../components/common/TotalCart"
+import LanguageCurrencySwitcher from "../../components/common/LanguageCurrencySwitcher"
+import { useTranslation } from "react-i18next"
 
 const HeaderOne = () => {
 
@@ -19,6 +20,7 @@ const HeaderOne = () => {
 
    const { sticky } = UseSticky();
    const [isActive, setIsActive] = useState<boolean>(false);
+   const { t } = useTranslation();
 
    return (
       <>
@@ -42,6 +44,9 @@ const HeaderOne = () => {
                               </div>
                               <div className="tgmenu__action">
                                  <ul className="list-wrap">
+                                    <li>
+                                       <LanguageCurrencySwitcher />
+                                    </li>
                                     <li className="wishlist-icon">
                                        <Link to="/wishlist" className="cart-count">
                                           <InjectableSvg src="/assets/img/icons/heart.svg" className="injectable" alt="img" />
@@ -49,7 +54,7 @@ const HeaderOne = () => {
                                        </Link>
                                     </li>
                                     <li className="header-btn login-btn">
-                                       <Link to="/login">Log in</Link>
+                                       <Link to="/login">{t("common.login")}</Link>
                                     </li>
                                  </ul>
                               </div>

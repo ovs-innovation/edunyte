@@ -3,12 +3,14 @@ import { useDispatch, useSelector } from "react-redux";
 import UseCartInfo from "../../../hooks/UseCartInfo";
 import { RootState } from "../../../redux/store";
 import { Link } from "react-router-dom";
+import { usePriceFormatter } from "../../../hooks/usePriceFormatter";
 
 const CartArea = () => {
 
    const productItem = useSelector((state: RootState) => state.cart.cart);
    const dispatch = useDispatch();
    const { total } = UseCartInfo();
+   const { formatPriceWithConversion } = usePriceFormatter();
 
    const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
@@ -51,7 +53,7 @@ const CartArea = () => {
                                  <td className="product__name">
                                     <Link to={`/shop-details/${item.id}`}>{item.title}</Link>
                                  </td>
-                                 <td className="product__price">${item.price}.00</td>
+                                 <td className="product__price">{formatPriceWithConversion(item.price)}</td>
                                  <td className="product__quantity">
                                     <div className="cart-plus-minus">
                                        <input type="text" onChange={handleSubmit} value={item.quantity} readOnly />
@@ -59,7 +61,7 @@ const CartArea = () => {
                                        <div onClick={() => dispatch(addToCart(item))} className="inc qtybutton">+</div>
                                     </div>
                                  </td>
-                                 <td className="product__subtotal">${item.price * item.quantity}.00</td>
+                                 <td className="product__subtotal">{formatPriceWithConversion(item.price * item.quantity)}</td>
                                  <td className="product__remove">
                                     <a style={{ cursor: "pointer" }} onClick={() => dispatch(remove_cart_product(item))}>×</a>
                                  </td>
@@ -85,8 +87,8 @@ const CartArea = () => {
                      <div className="cart__collaterals-wrap">
                         <h2 className="title">Cart totals</h2>
                         <ul className="list-wrap">
-                           <li>Subtotal <span>${total.toFixed(2)}</span></li>
-                           <li>Total <span className="amount">${total.toFixed(2)}</span></li>
+                           <li>Subtotal <span>{formatPriceWithConversion(total)}</span></li>
+                           <li>Total <span className="amount">{formatPriceWithConversion(total)}</span></li>
                         </ul>
                         <Link to="/check-out" className="btn">Proceed to checkout</Link>
                      </div>

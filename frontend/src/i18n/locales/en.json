@@ -1,0 +1,16 @@
+{
+  "common": {
+    "login": "Login",
+    "logout": "Logout",
+    "buy_now": "Buy Now",
+    "price": "Price",
+    "language": "Language",
+    "currency": "Currency",
+    "english": "English",
+    "hindi": "Hindi",
+    "select_language": "Select Language",
+    "select_currency": "Select Currency"
+  }
+}
+
+

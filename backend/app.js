@@ -20,6 +20,7 @@ import teacherAvailabilityRoutes from "./routes/teacher/availabilityRoutes.js";
 import teacherBookingRoutes from "./routes/teacher/bookingRoutes.js";
 import studentCourseRoutes from "./routes/student/courseRoutes.js";
 import studentBookingRoutes from "./routes/student/bookingRoutes.js";
+import currencyRoutes from "./routes/currencyRoutes.js";
 import { ensureDefaultRoles } from "./controllers/roleController.js";
 
 
@@ -57,6 +58,7 @@ app.use("/api/teacher/availability", teacherAvailabilityRoutes);
 app.use("/api/teacher/bookings", teacherBookingRoutes);
 app.use("/api/courses", studentCourseRoutes);
 app.use("/api/bookings", studentBookingRoutes);
+app.use("/api/currency", currencyRoutes);
 app.use(errorHandler);
 
 export default app;
