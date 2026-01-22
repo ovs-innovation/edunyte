@@ -53,20 +53,44 @@ export const createCourse = async (req, res, next) => {
  */
 export const getCourses = async (req, res, next) => {
   try {
-    const { status, search } = req.query;
+    const { status, search, category } = req.query;
     const query = {};
 
     if (status) {
       query.status = status;
     }
 
+    if (category) {
+      const Category = (await import("../models/categoryModel.js")).default;
+      const categoryDoc = await Category.findById(category);
+      if (categoryDoc) {
+        const categoryName = getLanguageValue(categoryDoc.name);
+        query.$or = [
+          { category: categoryName },
+          { "category.en": categoryName }
+        ];
+      }
+    }
+
     if (search) {
-      query.$or = [
-        { "name.en": { $regex: search, $options: "i" } },
-        { "description.en": { $regex: search, $options: "i" } },
-        { name: { $regex: search, $options: "i" } },
-        { description: { $regex: search, $options: "i" } },
-      ];
+      const searchQuery = {
+        $or: [
+          { "name.en": { $regex: search, $options: "i" } },
+          { "description.en": { $regex: search, $options: "i" } },
+          { name: { $regex: search, $options: "i" } },
+          { description: { $regex: search, $options: "i" } },
+        ]
+      };
+      
+      if (query.$or) {
+        query.$and = [
+          { $or: query.$or },
+          searchQuery
+        ];
+        delete query.$or;
+      } else {
+        Object.assign(query, searchQuery);
+      }
     }
 
     const courses = await Course.find(query)

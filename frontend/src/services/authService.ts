@@ -22,6 +22,9 @@ export interface AuthResponse {
     role: string
     permissions: string[]
     status: string
+    photo?: string
+    avatar?: string
+    image?: string
   }
 }
 

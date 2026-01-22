@@ -1,12 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation } from 'swiper/modules';
-import course_data from "../../../data/home-data/CourseData";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { fetchCourses, type Course } from "../../../services/courseService";
+import { fetchCategories, type Category } from "../../../services/categoryService";
 
-const tab_title: string[] = ["All Courses", "Design", "Business", "Development"];
-
-// slider setting
 const setting = {
   slidesPerView: 4,
   loop: true,
@@ -14,7 +13,6 @@ const setting = {
   observer: true,
   observeParents: true,
   autoplay: false,
-  // Navigation arrows
   navigation: {
     nextEl: '.courses-button-next',
     prevEl: '.courses-button-prev',
@@ -48,12 +46,72 @@ interface CourseProps {
 }
 
 const CourseArea = ({ style }: CourseProps) => {
-
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState(0);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const response = await fetchCategories('active');
+        setCategories(response.categories);
+      } catch (err) {
+        console.error('Failed to load categories:', err);
+      }
+    };
+    loadCategories();
+  }, []);
+
+  useEffect(() => {
+    const loadCourses = async () => {
+      try {
+        setLoading(true);
+        const params: { status: string; limit?: number; category?: string } = { 
+          status: 'active',
+          limit: 12
+        };
+        if (selectedCategory) {
+          params.category = selectedCategory;
+        }
+        const response = await fetchCourses(params);
+        setCourses(response.courses);
+      } catch (err) {
+        console.error('Failed to load courses:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCourses();
+  }, [selectedCategory]);
 
   const handleTabClick = (index: number) => {
     setActiveTab(index);
+    if (index === 0) {
+      setSelectedCategory(null);
+    } else if (categories[index - 1]) {
+      setSelectedCategory(categories[index - 1]._id);
+    }
   };
+
+  const tabTitles = [t('common.all_courses'), ...categories.map(cat => cat.name)];
+
+  if (loading) {
+    return (
+      <section className={`courses-area ${style ? "section-py-120" : "section-pt-120 section-pb-90"}`} style={{ backgroundImage: `url(/assets/img/bg/courses_bg.jpg )` }}>
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-12 text-center">
+              <p>{t('common.loading')}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className={`courses-area ${style ? "section-py-120" : "section-pt-120 section-pb-90"}`} style={{ backgroundImage: `url(/assets/img/bg/courses_bg.jpg )` }}>
@@ -62,13 +120,13 @@ const CourseArea = ({ style }: CourseProps) => {
           <div className="row justify-content-center">
             <div className="col-lg-6">
               <div className="section__title text-center mb-40">
-                <span className="sub-title">Top Class Courses</span>
-                <h2 className="title">Explore Our World&apos;s Best Courses</h2>
-                <p className="desc">When known printer took a galley of type scrambl edmake</p>
+                <span className="sub-title">{t('common.top_class_courses')}</span>
+                <h2 className="title">{t('common.best_exciting_class_experience')}</h2>
+                <p className="desc">{t('common.category_description')}</p>
               </div>
               <div className="courses__nav">
                 <ul className="nav nav-tabs" id="courseTab" role="tablist">
-                  {tab_title.map((tab, index) => (
+                  {tabTitles.map((tab, index) => (
                     <li key={index} onClick={() => handleTabClick(index)} className="nav-item" role="presentation">
                       <button className={`nav-link ${activeTab === index ? "active" : ""}`}>{tab}</button>
                     </li>
@@ -80,48 +138,53 @@ const CourseArea = ({ style }: CourseProps) => {
         </div>
 
         <div className="tab-content" id="courseTabContent">
-          {course_data.filter((items) => items.page === "home_1").map((course_item, index) => (
-            <div key={course_item.id} className={`tab-pane fade ${activeTab === index ? 'show active' : ''}`} id="all-tab-pane" role="tabpanel" aria-labelledby="all-tab">
+          <div className={`tab-pane fade ${activeTab === activeTab ? 'show active' : ''}`} id="all-tab-pane" role="tabpanel" aria-labelledby="all-tab">
+            {courses.length === 0 ? (
+              <div className="row justify-content-center">
+                <div className="col-12 text-center">
+                  <p>{t('common.no_courses_found')}</p>
+                </div>
+              </div>
+            ) : (
               <Swiper {...setting} modules={[Autoplay, Navigation]} className="swiper courses-swiper-active">
-                {course_item.course_details.map((item) => (
-                  <SwiperSlide key={item.id} className="swiper-slide">
+                {courses.map((item) => (
+                  <SwiperSlide key={item._id} className="swiper-slide">
                     <div className="courses__item shine__animate-item">
                       <div className="courses__item-thumb">
-                        <Link to="/course-details" className="shine__animate-link">
-                          <img src={item.thumb} alt="img" />
+                        <Link to={`/course-details?id=${item._id}`} className="shine__animate-link">
+                          <img src={item.image || '/assets/img/courses/course_default.jpg'} alt={item.name} />
                         </Link>
                       </div>
                       <div className="courses__item-content">
                         <ul className="courses__item-meta list-wrap">
                           <li className="courses__item-tag">
-                            <Link to="/course">{item.tag}</Link>
+                            <Link to={`/courses?category=${selectedCategory || ''}`}>{item.category || t('common.categories')}</Link>
                           </li>
-                          <li className="avg-rating"><i className="fas fa-star"></i> {item.review}</li>
+                          <li className="avg-rating"><i className="fas fa-star"></i> (5.0 {t('common.reviews')})</li>
                         </ul>
-                        <h5 className="title"><Link to="/course-details">{item.title}</Link></h5>
-                        <p className="author">By <Link to="#">{item.author}</Link></p>
+                        <h5 className="title"><Link to={`/course-details?id=${item._id}`}>{item.name}</Link></h5>
+                        {item.description && <p className="info">{item.description}</p>}
                         <div className="courses__item-bottom">
                           <div className="button">
-                            <Link to="/course-details">
-                              <span className="text">Enroll Now</span>
+                            <Link to={`/course-details?id=${item._id}`}>
+                              <span className="text">{t('common.book_session')}</span>
                               <i className="flaticon-arrow-right"></i>
                             </Link>
                           </div>
-                          <h5 className="price">${item.price}.00</h5>
                         </div>
                       </div>
                     </div>
                   </SwiperSlide>
                 ))}
               </Swiper>
-              {!style &&
-                <div className="courses__nav">
-                  <div className="courses-button-prev"><i className="flaticon-arrow-right"></i></div>
-                  <div className="courses-button-next"><i className="flaticon-arrow-right"></i></div>
-                </div>
-              }
-            </div>
-          ))}
+            )}
+            {!style && (
+              <div className="courses__nav">
+                <div className="courses-button-prev"><i className="flaticon-arrow-right"></i></div>
+                <div className="courses-button-next"><i className="flaticon-arrow-right"></i></div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </section>

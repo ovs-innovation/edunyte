@@ -2,17 +2,45 @@
 import Select from 'react-select'
 import makeAnimated from 'react-select/animated'
 import { useTranslation } from 'react-i18next'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { fetchCategories, type Category } from '../services/categoryService'
 
 const animatedComponents = makeAnimated()
 
-const rawOptions: Array<{ value: string; labelKey: string }> = []
-
 const CustomSelect = ({ value, onChange }: any) => {
    const { t } = useTranslation()
-   const options = rawOptions.map((opt) => ({
-     value: opt.value,
-     label: t(opt.labelKey),
+   const navigate = useNavigate()
+   const [categories, setCategories] = useState<Category[]>([])
+
+   useEffect(() => {
+      const loadCategories = async () => {
+         try {
+            const response = await fetchCategories('active')
+            setCategories(response.categories)
+         } catch (err) {
+            console.error('Failed to load categories:', err)
+         }
+      }
+      loadCategories()
+   }, [])
+
+   const options = categories.map((cat) => ({
+      value: cat._id,
+      label: cat.name,
    }))
+
+   const handleCategoryChange = (selectedOption: any) => {
+      if (selectedOption) {
+         navigate(`/courses?category=${selectedOption.value}`)
+      } else {
+         navigate('/courses')
+      }
+      if (onChange) {
+         onChange(selectedOption)
+      }
+   }
+
    return (
       <form onSubmit={(e) => e.preventDefault()} className="tgmenu__search-form">
          <div className="select-grp">
@@ -22,7 +50,7 @@ const CustomSelect = ({ value, onChange }: any) => {
             <Select
                components={animatedComponents}
                value={value}
-               onChange={onChange}
+               onChange={handleCategoryChange}
                options={options}
                placeholder={t('common.categories')}
                classNamePrefix="course-category-dropdown"
@@ -30,6 +58,7 @@ const CustomSelect = ({ value, onChange }: any) => {
                   ...theme,
                })}
                isSearchable={false}
+               isClearable={true}
             />
          </div>
          <div className="input-grp">

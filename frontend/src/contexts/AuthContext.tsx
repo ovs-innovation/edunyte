@@ -21,6 +21,9 @@ interface User {
   role: string
   permissions: string[]
   status: string
+  photo?: string
+  avatar?: string
+  image?: string
 }
 
 interface AuthContextType {

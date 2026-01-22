@@ -10,6 +10,7 @@ import TotalWishlist from "../../components/common/TotalWishlist"
 import LanguageCurrencySwitcher from "../../components/common/LanguageCurrencySwitcher"
 import { useTranslation } from "react-i18next"
 import { useAuth } from "../../contexts/AuthContext"
+import { useNavigate } from "react-router-dom"
 
 const HeaderOne = () => {
 
@@ -23,6 +24,75 @@ const HeaderOne = () => {
    const [isActive, setIsActive] = useState<boolean>(false);
    const { t } = useTranslation();
    const { isAuthenticated, user, logout } = useAuth();
+   const navigate = useNavigate();
+
+   const handleUserClick = (e: React.MouseEvent) => {
+      if (!isAuthenticated) {
+         e.preventDefault();
+         navigate('/login');
+      }
+   };
+
+   const getInitials = (name: string) => {
+      return name
+         .split(' ')
+         .map(n => n[0])
+         .join('')
+         .toUpperCase()
+         .slice(0, 2);
+   };
+
+   const getUserAvatar = () => {
+      if (user?.photo || user?.avatar || user?.image) {
+         return user.photo || user.avatar || user.image;
+      }
+      return null;
+   };
+
+   const renderAvatar = (size: number = 40) => {
+      const avatarUrl = getUserAvatar();
+      const avatarStyle: React.CSSProperties = {
+         display: 'flex',
+         alignItems: 'center',
+         justifyContent: 'center',
+         width: `${size}px`,
+         height: `${size}px`,
+         borderRadius: '50%',
+         background: avatarUrl ? 'transparent' : '#6c5ce7',
+         color: '#fff',
+         textDecoration: 'none',
+         fontSize: `${size * 0.35}px`,
+         fontWeight: '600',
+         overflow: 'hidden',
+         objectFit: 'cover' as const
+      };
+
+      if (avatarUrl) {
+         return (
+            <img 
+               src={avatarUrl} 
+               alt={user?.name || 'User'} 
+               style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  borderRadius: '50%'
+               }}
+               onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const parent = target.parentElement;
+                  if (parent) {
+                     parent.style.background = '#6c5ce7';
+                     parent.textContent = user?.name ? getInitials(user.name) : 'U';
+                  }
+               }}
+            />
+         );
+      }
+
+      return user?.name ? getInitials(user.name) : 'U';
+   };
 
    return (
       <>
@@ -50,7 +120,16 @@ const HeaderOne = () => {
                                        <LanguageCurrencySwitcher />
                                     </li>
                                     <li className="wishlist-icon">
-                                       <Link to="/wishlist" className="cart-count">
+                                       <Link 
+                                          to="/wishlist" 
+                                          className="cart-count"
+                                          onClick={(e) => {
+                                             if (!isAuthenticated) {
+                                                e.preventDefault();
+                                                navigate('/login');
+                                             }
+                                          }}
+                                       >
                                           <InjectableSvg src="/assets/img/icons/heart.svg" className="injectable" alt="img" />
                                           <TotalWishlist />
                                        </Link>
@@ -58,8 +137,26 @@ const HeaderOne = () => {
                                     <li className="header-btn login-btn">
                                        {isAuthenticated ? (
                                           <div className="user-menu" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                             <Link to="/student-dashboard" className="user-name" style={{ color: 'inherit', textDecoration: 'none' }}>
-                                                {user?.name || t("common.my_account")}
+                                             <Link 
+                                                to="/student-dashboard" 
+                                                className="user-avatar" 
+                                                style={{ 
+                                                   display: 'flex', 
+                                                   alignItems: 'center', 
+                                                   justifyContent: 'center',
+                                                   width: '40px',
+                                                   height: '40px',
+                                                   borderRadius: '50%',
+                                                   background: getUserAvatar() ? 'transparent' : '#6c5ce7',
+                                                   color: '#fff',
+                                                   textDecoration: 'none',
+                                                   fontSize: '14px',
+                                                   fontWeight: '600',
+                                                   overflow: 'hidden'
+                                                }}
+                                                title={user?.name || t("common.my_account")}
+                                             >
+                                                {renderAvatar(40)}
                                              </Link>
                                              <span style={{ color: '#ccc' }}>|</span>
                                              <button 
@@ -85,9 +182,28 @@ const HeaderOne = () => {
                               </div>
                               <div className="mobile-login-btn">
                                  {isAuthenticated ? (
-                                    <Link to="/student-dashboard"><InjectableSvg src="/assets/img/icons/user.svg" alt="" className="injectable" /></Link>
+                                    <Link 
+                                       to="/student-dashboard"
+                                       style={{ 
+                                          display: 'flex', 
+                                          alignItems: 'center', 
+                                          justifyContent: 'center',
+                                          width: '40px',
+                                          height: '40px',
+                                          borderRadius: '50%',
+                                          background: getUserAvatar() ? 'transparent' : '#6c5ce7',
+                                          color: '#fff',
+                                          textDecoration: 'none',
+                                          fontSize: '14px',
+                                          fontWeight: '600',
+                                          overflow: 'hidden'
+                                       }}
+                                       title={user?.name || t("common.my_account")}
+                                    >
+                                       {renderAvatar(40)}
+                                    </Link>
                                  ) : (
-                                    <Link to="/login"><InjectableSvg src="/assets/img/icons/user.svg" alt="" className="injectable" /></Link>
+                                    <Link to="/login" onClick={handleUserClick}><InjectableSvg src="/assets/img/icons/user.svg" alt="" className="injectable" /></Link>
                                  )}
                               </div>
                               <div onClick={() => setIsActive(true)} className="mobile-nav-toggler"><i className="tg-flaticon-menu-1"></i></div>
