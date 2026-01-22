@@ -33,6 +33,9 @@
     "login_success": "Login successfully",
     "my_account": "My Account",
     "dashboard": "Dashboard",
-    "profile": "Profile"
+    "profile": "Profile",
+    "home": "Home",
+    "categories": "Categories",
+    "search_courses_placeholder": "Search for course..."
   }
 }

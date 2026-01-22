@@ -1,18 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import Select from 'react-select';
-import makeAnimated from 'react-select/animated';
+import Select from 'react-select'
+import makeAnimated from 'react-select/animated'
+import { useTranslation } from 'react-i18next'
 
-const animatedComponents = makeAnimated();
+const animatedComponents = makeAnimated()
 
-const options = [
-   { value: 'business', label: 'Business' },
-   { value: 'data-science', label: 'Data Science' },
-   { value: 'art-design', label: 'Art & Design' },
-   { value: 'marketing', label: 'Marketing' },
-   { value: 'finance', label: 'Finance' },
-];
+const rawOptions: Array<{ value: string; labelKey: string }> = []
 
 const CustomSelect = ({ value, onChange }: any) => {
+   const { t } = useTranslation()
+   const options = rawOptions.map((opt) => ({
+     value: opt.value,
+     label: t(opt.labelKey),
+   }))
    return (
       <form onSubmit={(e) => e.preventDefault()} className="tgmenu__search-form">
          <div className="select-grp">
@@ -24,7 +24,7 @@ const CustomSelect = ({ value, onChange }: any) => {
                value={value}
                onChange={onChange}
                options={options}
-               placeholder="Categories"
+               placeholder={t('common.categories')}
                classNamePrefix="course-category-dropdown"
                theme={(theme) => ({
                   ...theme,
@@ -33,7 +33,7 @@ const CustomSelect = ({ value, onChange }: any) => {
             />
          </div>
          <div className="input-grp">
-            <input type="text" placeholder="Search For Course . . ." />
+            <input type="text" placeholder={t('common.search_courses_placeholder')} />
             <button type="submit"><i className="flaticon-search"></i></button>
          </div>
       </form>

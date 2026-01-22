@@ -33,7 +33,10 @@
     "login_success": "लॉगिन सफल",
     "my_account": "मेरा खाता",
     "dashboard": "डैशबोर्ड",
-    "profile": "प्रोफ़ाइल"
+    "profile": "प्रोफ़ाइल",
+    "home": "होम",
+    "categories": "श्रेणियाँ",
+    "search_courses_placeholder": "कोर्स खोजें..."
   }
 }
 
