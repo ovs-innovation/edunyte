@@ -1,0 +1,15 @@
+{
+  "common": {
+    "login": "Anmelden",
+    "logout": "Abmelden",
+    "buy_now": "Jetzt kaufen",
+    "price": "Preis",
+    "language": "Sprache",
+    "currency": "Währung",
+    "english": "Englisch",
+    "hindi": "Hindi",
+    "select_language": "Sprache auswählen",
+    "select_currency": "Währung auswählen"
+  }
+}
+

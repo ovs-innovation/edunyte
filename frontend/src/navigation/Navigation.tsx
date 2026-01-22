@@ -1,4 +1,4 @@
-import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import Home from '../pages/Home';
 import HomeTwo from '../pages/HomeTwo';
 import HomeEight from '../pages/HomeEight';
@@ -51,8 +51,7 @@ import NotFound from '../pages/NotFound';
 
 const AppNavigation = () => {
   return (
-    <Router>
-      <Routes>
+    <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/home-two" element={<HomeTwo />} />
         <Route path="/home-three" element={<HomeThree />} />
@@ -104,7 +103,6 @@ const AppNavigation = () => {
         {/* <Route path="/blog-details/:id" element={<DynamicBlogDeatils />} /> */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </Router>
   );
 };
 

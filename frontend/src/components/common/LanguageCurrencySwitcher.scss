@@ -168,7 +168,9 @@
           }
 
           .nested-option-item {
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             width: 100%;
             padding: 10px 12px;
             background: transparent;
@@ -194,9 +196,63 @@
               color: #1976d2;
               font-weight: 500;
             }
+
+            .language-flag {
+              font-size: 18px;
+              line-height: 1;
+            }
+
+            .language-name {
+              flex: 1;
+            }
           }
         }
       }
+    }
+  }
+}
+
+.tgmobile__language-currency {
+  padding: 15px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 0;
+
+  .language-currency-switcher {
+    width: 100%;
+
+    .switcher-trigger {
+      width: 100%;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: #f8f9fa;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+    }
+
+    .switcher-dropdown {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 320px;
+      max-height: 80vh;
+      overflow-y: auto;
+      z-index: 10001;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      right: auto;
+    }
+
+    .nested-dropdown-menu {
+      position: fixed !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      width: 85% !important;
+      max-width: 280px !important;
+      max-height: 60vh !important;
+      z-index: 10002 !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25) !important;
     }
   }
 }
@@ -208,6 +264,21 @@
       left: 0;
       width: 260px;
       min-width: 260px;
+    }
+  }
+
+  .tgmobile__language-currency {
+    .language-currency-switcher {
+      .switcher-dropdown {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 320px;
+        right: auto;
+        left: 50%;
+      }
     }
   }
 }

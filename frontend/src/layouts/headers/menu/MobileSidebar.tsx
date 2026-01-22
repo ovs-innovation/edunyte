@@ -1,11 +1,16 @@
 import { Link } from "react-router-dom"
 import MobileMenu from "./MobileMenu"
+import LanguageCurrencySwitcher from "../../../components/common/LanguageCurrencySwitcher"
+import { useAuth } from "../../../contexts/AuthContext"
+import { useTranslation } from "react-i18next"
 
 interface MobileSidebarProps {
    isActive: boolean;
    setIsActive: (isActive: boolean) => void;
 }
 const MobileSidebar = ({ isActive, setIsActive }: MobileSidebarProps) => {
+   const { isAuthenticated, user, logout } = useAuth()
+   const { t } = useTranslation()
 
    return (
       <div className={isActive ? "mobile-menu-visible" : ""}>
@@ -21,9 +26,37 @@ const MobileSidebar = ({ isActive, setIsActive }: MobileSidebarProps) => {
                      <button><i className="fas fa-search"></i></button>
                   </form>
                </div>
+               <div className="tgmobile__language-currency">
+                  <LanguageCurrencySwitcher />
+               </div>
                <div className="tgmobile__menu-outer">
                   <MobileMenu />
                </div>
+               {isAuthenticated ? (
+                  <div className="mobile-auth-section">
+                     <div className="mobile-user-info">
+                        <p className="user-name">{user?.name || t("common.my_account")}</p>
+                        <p className="user-email">{user?.email}</p>
+                     </div>
+                     <div className="mobile-auth-buttons">
+                        <Link to="/student-dashboard" className="btn" onClick={() => setIsActive(false)}>
+                           {t("common.dashboard")}
+                        </Link>
+                        <button onClick={() => { logout(); setIsActive(false); }} className="btn btn-outline">
+                           {t("common.logout")}
+                        </button>
+                     </div>
+                  </div>
+               ) : (
+                  <div className="mobile-auth-section">
+                     <Link to="/login" className="btn" onClick={() => setIsActive(false)}>
+                        {t("common.login")}
+                     </Link>
+                     <Link to="/registration" className="btn btn-outline" onClick={() => setIsActive(false)}>
+                        {t("common.sign_up")}
+                     </Link>
+                  </div>
+               )}
                <div className="social-links">
                   <ul className="list-wrap">
                      <li><Link to="#"><i className="fab fa-facebook-f"></i></Link></li>

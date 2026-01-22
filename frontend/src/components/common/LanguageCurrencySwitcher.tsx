@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useCurrency, CURRENCIES, CurrencyCode } from '../../contexts/CurrencyContext'
+import { getEnabledLanguages, getLanguageByCode, BASE_LANGUAGE } from '../../i18n/languageConfig'
+import { loadLanguageTranslations } from '../../i18n'
 import './LanguageCurrencySwitcher.scss'
 
 const LanguageCurrencySwitcher: React.FC = () => {
@@ -13,11 +15,16 @@ const LanguageCurrencySwitcher: React.FC = () => {
   const langDropdownRef = useRef<HTMLDivElement>(null)
   const currencyDropdownRef = useRef<HTMLDivElement>(null)
 
-  const currentLang = i18n.language || 'en'
+  const currentLang = i18n.language || BASE_LANGUAGE
   const currencyInfo = getCurrencyInfo()
+  const enabledLanguages = getEnabledLanguages()
 
-  const getLanguageName = (lang: string): string => {
-    return lang === 'en' ? t('common.english') : t('common.hindi')
+  const getLanguageDisplayName = (langCode: string): string => {
+    const lang = getLanguageByCode(langCode)
+    if (lang) {
+      return lang.nativeName || lang.name
+    }
+    return langCode.toUpperCase()
   }
 
   useEffect(() => {
@@ -44,8 +51,9 @@ const LanguageCurrencySwitcher: React.FC = () => {
     }
   }, [isOpen, langDropdownOpen, currencyDropdownOpen])
 
-  const handleLanguageChange = (newLang: string) => {
+  const handleLanguageChange = async (newLang: string) => {
     if (newLang !== currentLang) {
+      await loadLanguageTranslations(newLang)
       i18n.changeLanguage(newLang)
     }
     setLangDropdownOpen(false)
@@ -80,7 +88,7 @@ const LanguageCurrencySwitcher: React.FC = () => {
         aria-label={`${t('common.language')}, ${t('common.currency')}`}
       >
         <span className="trigger-text">
-          {getLanguageName(currentLang)}, {currencyInfo.code}
+          {getLanguageDisplayName(currentLang)}, {currencyInfo.code}
         </span>
         <svg
           className={`chevron-icon ${isOpen ? 'open' : ''}`}
@@ -117,7 +125,7 @@ const LanguageCurrencySwitcher: React.FC = () => {
                   setCurrencyDropdownOpen(false)
                 }}
               >
-                <span>{getLanguageName(currentLang)}</span>
+                <span>{getLanguageDisplayName(currentLang)}</span>
                 <svg
                   className={`chevron-icon ${langDropdownOpen ? 'open' : ''}`}
                   width="12"
@@ -137,20 +145,17 @@ const LanguageCurrencySwitcher: React.FC = () => {
               </button>
               {langDropdownOpen && (
                 <div className="nested-dropdown-menu">
-                  <button
-                    type="button"
-                    className={`nested-option-item ${currentLang === 'en' ? 'selected' : ''}`}
-                    onClick={() => handleLanguageChange('en')}
-                  >
-                    {t('common.english')}
-                  </button>
-                  <button
-                    type="button"
-                    className={`nested-option-item ${currentLang === 'hi' ? 'selected' : ''}`}
-                    onClick={() => handleLanguageChange('hi')}
-                  >
-                    {t('common.hindi')}
-                  </button>
+                  {enabledLanguages.map((lang) => (
+                    <button
+                      key={lang.code}
+                      type="button"
+                      className={`nested-option-item ${currentLang === lang.code ? 'selected' : ''}`}
+                      onClick={() => handleLanguageChange(lang.code)}
+                    >
+                      <span className="language-flag">{lang.flag}</span>
+                      <span className="language-name">{lang.nativeName}</span>
+                    </button>
+                  ))}
                 </div>
               )}
             </div>

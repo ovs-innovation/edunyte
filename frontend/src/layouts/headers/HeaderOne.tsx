@@ -9,6 +9,7 @@ import CustomSelect from "../../ui/CustomSelect"
 import TotalWishlist from "../../components/common/TotalWishlist"
 import LanguageCurrencySwitcher from "../../components/common/LanguageCurrencySwitcher"
 import { useTranslation } from "react-i18next"
+import { useAuth } from "../../contexts/AuthContext"
 
 const HeaderOne = () => {
 
@@ -21,6 +22,7 @@ const HeaderOne = () => {
    const { sticky } = UseSticky();
    const [isActive, setIsActive] = useState<boolean>(false);
    const { t } = useTranslation();
+   const { isAuthenticated, user, logout } = useAuth();
 
    return (
       <>
@@ -54,12 +56,39 @@ const HeaderOne = () => {
                                        </Link>
                                     </li>
                                     <li className="header-btn login-btn">
-                                       <Link to="/login">{t("common.login")}</Link>
+                                       {isAuthenticated ? (
+                                          <div className="user-menu" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                             <Link to="/student-dashboard" className="user-name" style={{ color: 'inherit', textDecoration: 'none' }}>
+                                                {user?.name || t("common.my_account")}
+                                             </Link>
+                                             <span style={{ color: '#ccc' }}>|</span>
+                                             <button 
+                                                onClick={logout} 
+                                                className="logout-btn"
+                                                style={{ 
+                                                   background: 'none', 
+                                                   border: 'none', 
+                                                   color: 'inherit', 
+                                                   cursor: 'pointer',
+                                                   padding: 0,
+                                                   fontSize: 'inherit'
+                                                }}
+                                             >
+                                                {t("common.logout")}
+                                             </button>
+                                          </div>
+                                       ) : (
+                                          <Link to="/login">{t("common.login")}</Link>
+                                       )}
                                     </li>
                                  </ul>
                               </div>
                               <div className="mobile-login-btn">
-                                 <Link to="/login"><InjectableSvg src="/assets/img/icons/user.svg" alt="" className="injectable" /></Link>
+                                 {isAuthenticated ? (
+                                    <Link to="/student-dashboard"><InjectableSvg src="/assets/img/icons/user.svg" alt="" className="injectable" /></Link>
+                                 ) : (
+                                    <Link to="/login"><InjectableSvg src="/assets/img/icons/user.svg" alt="" className="injectable" /></Link>
+                                 )}
                               </div>
                               <div onClick={() => setIsActive(true)} className="mobile-nav-toggler"><i className="tg-flaticon-menu-1"></i></div>
                            </nav>

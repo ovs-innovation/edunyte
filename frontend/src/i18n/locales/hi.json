@@ -1,6 +1,8 @@
 {
   "common": {
     "login": "लॉगिन",
+    "student_registration": "छात्र रजिस्टर",
+    "student_login": "छात्र लॉगिन",
     "logout": "लॉगआउट",
     "buy_now": "अभी खरीदें",
     "price": "कीमत",
@@ -9,7 +11,29 @@
     "english": "अंग्रेज़ी",
     "hindi": "हिंदी",
     "select_language": "भाषा चुनें",
-    "select_currency": "मुद्रा चुनें"
+    "select_currency": "मुद्रा चुनें",
+    "welcome_back": "वापसी पर स्वागत है!",
+    "login_description": "अरे! लॉग इन करने के लिए तैयार? बस नीचे अपना उपयोगकर्ता नाम और पासवर्ड दर्ज करें और आप कुछ ही समय में वापस कार्रवाई में होंगे। चलो चलते हैं!",
+    "continue_with_google": "Google के साथ जारी रखें",
+    "or": "या",
+    "email": "ईमेल",
+    "password": "पासवर्ड",
+    "remember_me": "मुझे याद रखें",
+    "forgot_password": "पासवर्ड भूल गए?",
+    "sign_in": "साइन इन करें",
+    "dont_have_account": "खाता नहीं है?",
+    "sign_up": "साइन अप करें",
+    "create_account": "अपना खाता बनाएं",
+    "registration_description": "अरे! पार्टी में शामिल होने के लिए तैयार? शुरू करने के लिए हमें आपसे कुछ विवरण चाहिए। चलो यह करते हैं!",
+    "first_name": "पहला नाम",
+    "last_name": "अंतिम नाम",
+    "confirm_password": "पासवर्ड की पुष्टि करें",
+    "already_have_account": "पहले से खाता है?",
+    "registration_success": "पंजीकरण सफल",
+    "login_success": "लॉगिन सफल",
+    "my_account": "मेरा खाता",
+    "dashboard": "डैशबोर्ड",
+    "profile": "प्रोफ़ाइल"
   }
 }
 
