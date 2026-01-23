@@ -1,27 +1,30 @@
 import { Link } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 import LoginForm from "../../../forms/LoginForm"
 
 const LoginArea = () => {
+   const { t } = useTranslation()
+
    return (
       <section className="singUp-area section-py-120">
          <div className="container">
             <div className="row justify-content-center">
                <div className="col-xl-6 col-lg-8">
                   <div className="singUp-wrap">
-                     <h2 className="title">Welcome back!</h2>
-                     <p>Hey there! Ready to log in? Just enter your username and password below and you&apos;ll be back in action in no time. Let&apos;s go!</p>
+                     <h2 className="title">{t("common.welcome_back")}</h2>
+                     <p>{t("common.login_description")}</p>
                      <div className="account__social">
                         <Link to="#" className="account__social-btn">
                            <img src="/assets/img/icons/google.svg" alt="img" />
-                           Continue with google
+                           {t("common.continue_with_google")}
                         </Link>
                      </div>
                      <div className="account__divider">
-                        <span>or</span>
+                        <span>{t("common.or")}</span>
                      </div>
                      <LoginForm />
                      <div className="account__switch">
-                        <p>Don&apos;t have an account?<Link to="/registration">Sign Up</Link></p>
+                        <p>{t("common.dont_have_account")}<Link to="/registration">{t("common.sign_up")}</Link></p>
                      </div>
                   </div>
                </div>

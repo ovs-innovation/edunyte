@@ -9,10 +9,12 @@ import { addToCart } from "../../../redux/features/cartSlice";
 import { addToWishlist } from "../../../redux/features/wishlistSlice";
 import { Link } from "react-router-dom";
 import { Product } from "../../../redux/features/productSlice";
+import { usePriceFormatter } from "../../../hooks/usePriceFormatter";
 
 const ProductArea = () => {
    const { products, setProducts } = UseProducts();
    const dispatch = useDispatch();
+   const { formatPriceWithConversion } = usePriceFormatter();
 
    const itemsPerPage = 9;
    const [itemOffset, setItemOffset] = useState(0);
@@ -23,19 +25,15 @@ const ProductArea = () => {
    const startOffset = itemOffset + 1;
    const totalItems = products.length;
 
-   useEffect(() => {}, [products]);
-
    const handlePageClick = (event: { selected: number }) => {
       const newOffset = (event.selected * itemsPerPage) % products.length;
       setItemOffset(newOffset);
    };
 
-   // Add to cart
    const handleAddToCart = (item: Product) => {
       dispatch(addToCart(item));
    };
 
-   // Add to wishlist
    const handleAddToWishlist = (item: Product) => {
       dispatch(addToWishlist(item));
    };
@@ -79,7 +77,10 @@ const ProductArea = () => {
                                           <Rating initialValue={item.rating} size={20} readonly={true} />
                                           <span className="avg">({item.rating})</span>
                                        </div>
-                                       <h4 className="price">${item.price}.00{item.old_price && <del>${item.old_price}.00</del>}</h4>
+                                       <h4 className="price">
+                                          {formatPriceWithConversion(item.price)}
+                                          {item.old_price && <del>{formatPriceWithConversion(item.old_price)}</del>}
+                                       </h4>
                                     </div>
                                  </div>
                               </div>

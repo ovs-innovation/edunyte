@@ -1,11 +1,12 @@
 import { ChangeEvent, useState } from "react";
-import { useSelector } from "react-redux";
-import { Course, selectCourses } from "../../../redux/features/courseSlice";
+import type { Course } from "../../../services/courseService";
+import { useTranslation } from "react-i18next";
 
 interface CourseTopProps {
    startOffset: number;
    endOffset: number;
    totalItems: number;
+   courses: Course[];
    setCourses: (courses: Course[]) => void;
    handleTabClick: (index: number) => void;
    activeTab: number;
@@ -35,41 +36,32 @@ const tab_title: TitleType[] = [
    },
 ];
 
-const CourseTop = ({ startOffset, endOffset, totalItems, setCourses, handleTabClick, activeTab }: CourseTopProps) => {
-
-   const allCourses = useSelector(selectCourses);
+const CourseTop = ({ startOffset, endOffset, totalItems, courses, setCourses, handleTabClick, activeTab }: CourseTopProps) => {
+   const { t } = useTranslation();
    const [selected, setSelected] = useState('');
 
    const selectHandler = (event: ChangeEvent<HTMLSelectElement>) => {
       const select = event.target.value;
       setSelected(select);
 
-      let sortedCourses = [...allCourses];
+      let sortedCourses = [...courses];
 
       switch (select) {
-         // case 'popular':
-         //    sortedCourses = sortedCourses
-         //       .filter(item => item.popular)
-         //       .sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
-         //    break;
          case 'popular':
-            sortedCourses = sortedCourses
-               .filter(item => item.popular)
-               .sort((a, b) => {
-                  const aPopular = parseFloat(a.popular || "0");
-                  const bPopular = parseFloat(b.popular || "0");
-                  return bPopular - aPopular;
-               });
+            sortedCourses = sortedCourses.sort((a, b) => {
+               const aDate = new Date(a.createdAt || 0).getTime();
+               const bDate = new Date(b.createdAt || 0).getTime();
+               return bDate - aDate;
+            });
             break;
-
          case 'price':
-            sortedCourses = sortedCourses.sort((a, b) => a.price - b.price);
+            sortedCourses = sortedCourses.sort((a, b) => 0);
             break;
          case 'rating':
-            sortedCourses = sortedCourses.sort((a, b) => b.rating - a.rating);
+            sortedCourses = sortedCourses.sort((a, b) => 0);
             break;
          default:
-            sortedCourses = allCourses;
+            sortedCourses = courses;
             break;
       }
       setCourses(sortedCourses);
@@ -80,19 +72,19 @@ const CourseTop = ({ startOffset, endOffset, totalItems, setCourses, handleTabCl
          <div className="row align-items-center">
             <div className="col-md-5">
                <div className="courses-top-left">
-                  <p>Showing {startOffset}-{endOffset} of {totalItems} Results</p>
+                  <p>{t('common.showing_results', { start: startOffset, end: endOffset, total: totalItems })}</p>
                </div>
             </div>
             <div className="col-md-7">
                <div className="d-flex justify-content-center justify-content-md-end align-items-center flex-wrap">
                   <div className="courses-top-right m-0 ms-md-auto">
-                     <span className="sort-by">Sort By:</span>
+                     <span className="sort-by">{t('common.sort_by')}:</span>
                      <div className="courses-top-right-select">
                         <select onChange={selectHandler} value={selected} name="orderby" className="orderby">
-                           <option value="">Default sorting</option>
-                           <option value="popular">Sort by popularity</option>
-                           <option value="price">Sort by price</option>
-                           <option value="rating">Sort by rating</option>
+                           <option value="">{t('common.default_sorting')}</option>
+                           <option value="popular">{t('common.sort_by_popularity')}</option>
+                           <option value="price">{t('common.sort_by_price')}</option>
+                           <option value="rating">{t('common.sort_by_rating')}</option>
                         </select>
                      </div>
                   </div>

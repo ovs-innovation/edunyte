@@ -1,65 +1,15 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import { Link } from 'react-router-dom';
-
-interface DatatYpe {
-   id: number;
-   icon: string;
-   title: string;
-   total: string;
-}
-
-const category_data: DatatYpe[] = [
-   {
-      id: 1,
-      icon: "flaticon-graphic-design",
-      title: "Graphic Design",
-      total: "(22)"
-   },
-   {
-      id: 2,
-      icon: "flaticon-investment",
-      title: "Finance",
-      total: "(41)"
-   },
-   {
-      id: 3,
-      icon: "flaticon-coding",
-      title: "Development",
-      total: "(29)"
-   },
-   {
-      id: 4,
-      icon: "flaticon-email",
-      title: "Marketing",
-      total: "(31)"
-   },
-   {
-      id: 5,
-      icon: "flaticon-fashion",
-      title: "Life Style",
-      total: "(23)"
-   },
-   {
-      id: 6,
-      icon: "flaticon-interaction",
-      title: "Management",
-      total: "(19)"
-   },
-   {
-      id: 7,
-      icon: "flaticon-web-design",
-      title: "App Design",
-      total: "(18)"
-   },
-];
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { fetchCategories, type Category } from '../../../services/categoryService';
 
 // slider setting
 const setting = {
    slidesPerView: 6,
    spaceBetween: 44,
    loop: true,
-   // Navigation arrows
    navigation: {
       nextEl: '.categories-button-next',
       prevEl: '.categories-button-prev',
@@ -90,15 +40,78 @@ const setting = {
 };
 
 const Categories = () => {
+   const { t } = useTranslation();
+   const [categories, setCategories] = useState<Category[]>([]);
+   const [loading, setLoading] = useState(true);
+   const [error, setError] = useState<string | null>(null);
+
+   useEffect(() => {
+      const loadCategories = async () => {
+         try {
+            setLoading(true);
+            const response = await fetchCategories('active');
+            setCategories(response.categories);
+            setError(null);
+         } catch (err) {
+            setError(err instanceof Error ? err.message : t('common.error_loading_data'));
+         } finally {
+            setLoading(false);
+         }
+      };
+
+      loadCategories();
+   }, [t]);
+
+   const getCategoryIcon = (index: number) => {
+      const icons = [
+         "flaticon-graphic-design",
+         "flaticon-investment",
+         "flaticon-coding",
+         "flaticon-email",
+         "flaticon-fashion",
+         "flaticon-interaction",
+         "flaticon-web-design",
+      ];
+      return icons[index % icons.length];
+   };
+
+   if (loading) {
+      return (
+         <section className="categories-area section-py-120">
+            <div className="container">
+               <div className="row justify-content-center">
+                  <div className="col-12 text-center">
+                     <p>{t('common.loading')}</p>
+                  </div>
+               </div>
+            </div>
+         </section>
+      );
+   }
+
+   if (error) {
+      return (
+         <section className="categories-area section-py-120">
+            <div className="container">
+               <div className="row justify-content-center">
+                  <div className="col-12 text-center">
+                     <p>{error}</p>
+                  </div>
+               </div>
+            </div>
+         </section>
+      );
+   }
+
    return (
       <section className="categories-area section-py-120">
          <div className="container">
             <div className="row justify-content-center">
                <div className="col-xl-5 col-lg-7">
                   <div className="section__title text-center mb-40">
-                     <span className="sub-title">Trending Categories</span>
-                     <h2 className="title">Top Category We Have</h2>
-                     <p className="desc">when known printer took a galley of type scrambl edmake</p>
+                     <span className="sub-title">{t('common.trending_categories')}</span>
+                     <h2 className="title">{t('common.top_category_we_have')}</h2>
+                     <p className="desc">{t('common.category_description')}</p>
                   </div>
                </div>
             </div>
@@ -107,15 +120,21 @@ const Categories = () => {
                <div className="col-12">
                   <div className="categories__wrap">
                      <Swiper {...setting} modules={[Navigation]} className="swiper categories-active">
-                        {category_data.map((item) => (
-                           <SwiperSlide key={item.id} className="swiper-slide">
+                        {categories.map((item, index) => (
+                           <SwiperSlide key={item._id} className="swiper-slide">
                               <div className="categories__item">
-                                 <Link to="/courses">
-                                    <div className="icon">
-                                       <i className={item.icon}></i>
-                                    </div>
-                                    <span className="name">{item.title}</span>
-                                    <span className="courses">{item.total}</span>
+                                 <Link to={`/courses?category=${item._id}`}>
+                                    {item.image ? (
+                                       <div className="icon">
+                                          <img src={item.image} alt={item.name} style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '50%' }} />
+                                       </div>
+                                    ) : (
+                                       <div className="icon">
+                                          <i className={getCategoryIcon(index)}></i>
+                                       </div>
+                                    )}
+                                    <span className="name">{item.name}</span>
+                                    <span className="courses">({t('common.courses')})</span>
                                  </Link>
                               </div>
                            </SwiperSlide>

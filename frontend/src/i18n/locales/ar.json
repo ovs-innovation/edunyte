@@ -1,0 +1,15 @@
+{
+  "common": {
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "buy_now": "اشتري الآن",
+    "price": "السعر",
+    "language": "اللغة",
+    "currency": "العملة",
+    "english": "الإنجليزية",
+    "hindi": "الهندية",
+    "select_language": "اختر اللغة",
+    "select_currency": "اختر العملة"
+  }
+}
+

@@ -1,25 +1,28 @@
 import { Link } from "react-router-dom"
 import MobileMenu from "./MobileMenu"
+import LanguageCurrencySwitcher from "../../../components/common/LanguageCurrencySwitcher"
 
 interface MobileSidebarProps {
    isActive: boolean;
    setIsActive: (isActive: boolean) => void;
 }
 const MobileSidebar = ({ isActive, setIsActive }: MobileSidebarProps) => {
-
    return (
       <div className={isActive ? "mobile-menu-visible" : ""}>
          <div className="tgmobile__menu">
             <nav className="tgmobile__menu-box">
                <div onClick={() => setIsActive(false)} className="close-btn"><i className="tg-flaticon-close-1"></i></div>
                <div className="nav-logo">
-                  <Link to="/"><img src="/assets/img/logo/logo.svg" alt="Logo" /></Link>
+                  <Link to="/"><img src="/assets/img/logo/edunyte-light.png" height="100" width="100" alt="Logo" /></Link>
                </div>
                <div className="tgmobile__search">
                   <form onSubmit={(e) => e.preventDefault()}>
                      <input type="text" placeholder="Search here..." />
                      <button><i className="fas fa-search"></i></button>
                   </form>
+               </div>
+               <div className="tgmobile__language-currency">
+                  <LanguageCurrencySwitcher />
                </div>
                <div className="tgmobile__menu-outer">
                   <MobileMenu />

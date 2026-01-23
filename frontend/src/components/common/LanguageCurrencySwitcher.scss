@@ -1,0 +1,295 @@
+.language-currency-switcher {
+  position: relative;
+  display: inline-block;
+  z-index: 1000;
+
+  .switcher-trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: transparent;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+
+    &:hover {
+      border-color: #007bff;
+      background: #f8f9fa;
+    }
+
+    .trigger-text {
+      font-weight: 500;
+    }
+
+    .chevron-icon {
+      transition: transform 0.2s ease;
+      color: #666;
+
+      &.open {
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  .switcher-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 240px;
+    min-width: 240px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    z-index: 9999;
+    padding: 20px;
+    animation: fadeIn 0.2s ease;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto;
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .dropdown-section {
+      margin-bottom: 24px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .section-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 8px;
+      }
+
+      .nested-dropdown-wrapper {
+        position: relative;
+        width: 100%;
+
+        .nested-dropdown-trigger {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+          padding: 10px 12px;
+          background: #ffffff;
+          border: 1px solid #e0e0e0;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 14px;
+          color: #333;
+          text-align: left;
+          transition: all 0.15s ease;
+
+          &:hover {
+            border-color: #d0d0d0;
+            background: #f8f9fa;
+          }
+
+          span {
+            flex: 1;
+          }
+
+          .chevron-icon {
+            margin-left: 8px;
+            transition: transform 0.2s ease;
+            color: #666;
+            flex-shrink: 0;
+
+            &.open {
+              transform: rotate(180deg);
+            }
+          }
+        }
+
+        .nested-dropdown-menu {
+          position: absolute;
+          top: calc(100% + 4px);
+          left: 0;
+          right: 0;
+          background: #ffffff;
+          border: 1px solid #e0e0e0;
+          border-radius: 6px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          z-index: 10000;
+          overflow: hidden;
+          animation: slideDown 0.2s ease;
+
+          @keyframes slideDown {
+            from {
+              opacity: 0;
+              transform: translateY(-4px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
+          &.currency-menu {
+            max-height: 220px;
+            overflow-y: auto;
+
+            &::-webkit-scrollbar {
+              width: 4px;
+            }
+
+            &::-webkit-scrollbar-track {
+              background: #f5f5f5;
+              border-radius: 2px;
+            }
+
+            &::-webkit-scrollbar-thumb {
+              background: #d0d0d0;
+              border-radius: 2px;
+
+              &:hover {
+                background: #b0b0b0;
+              }
+            }
+          }
+
+          .nested-option-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px 12px;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+            text-align: left;
+            transition: all 0.15s ease;
+
+            &:last-child {
+              border-bottom: none;
+            }
+
+            &:hover {
+              background: #f8f9fa;
+              color: #007bff;
+            }
+
+            &.selected {
+              background: #e3f2fd;
+              color: #1976d2;
+              font-weight: 500;
+            }
+
+            .language-flag {
+              font-size: 18px;
+              line-height: 1;
+            }
+
+            .language-name {
+              flex: 1;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.tgmobile__language-currency {
+  padding: 15px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 0;
+
+  .language-currency-switcher {
+    width: 100%;
+
+    .switcher-trigger {
+      width: 100%;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: #f8f9fa;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+    }
+
+    .switcher-dropdown {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 320px;
+      max-height: 80vh;
+      overflow-y: auto;
+      z-index: 10001;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      right: auto;
+    }
+
+    .nested-dropdown-menu {
+      position: fixed !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      width: 85% !important;
+      max-width: 280px !important;
+      max-height: 60vh !important;
+      z-index: 10002 !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25) !important;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .language-currency-switcher {
+    .switcher-dropdown {
+      right: auto;
+      left: 0;
+      width: 260px;
+      min-width: 260px;
+    }
+  }
+
+  .tgmobile__language-currency {
+    .language-currency-switcher {
+      .switcher-dropdown {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 320px;
+        right: auto;
+        left: 50%;
+      }
+    }
+  }
+}
+
+.tgmenu__action {
+  position: relative;
+  overflow: visible;
+}
+
+.tgmenu__action li {
+  position: relative;
+  overflow: visible;
+}
+

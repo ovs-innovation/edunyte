@@ -1,5 +1,6 @@
 import TeacherProfile from "../models/teacherProfileModel.js";
 import User from "../models/userModel.js";
+import { getLanguageValue, normalizeLanguageValue } from "../utils/languageHelper.js";
 
 export const getTeacherProfile = async (req, res, next) => {
   try {
@@ -16,7 +17,10 @@ export const getTeacherProfile = async (req, res, next) => {
       profile = await TeacherProfile.create({ userId });
       profile = await TeacherProfile.findById(profile._id).populate("userId", "name email status");
     }
-    res.json({ profile });
+    const profileObj = profile.toObject();
+    profileObj.bio = getLanguageValue(profileObj.bio);
+    profileObj.aboutUs = getLanguageValue(profileObj.aboutUs);
+    res.json({ profile: profileObj });
   } catch (err) {
     next(err);
   }
@@ -34,7 +38,10 @@ export const getMyTeacherProfile = async (req, res, next) => {
       profile = await TeacherProfile.create({ userId });
       profile = await TeacherProfile.findById(profile._id).populate("userId", "name email status");
     }
-    res.json({ profile });
+    const profileObj = profile.toObject();
+    profileObj.bio = getLanguageValue(profileObj.bio);
+    profileObj.aboutUs = getLanguageValue(profileObj.aboutUs);
+    res.json({ profile: profileObj });
   } catch (err) {
     next(err);
   }
@@ -42,7 +49,8 @@ export const getMyTeacherProfile = async (req, res, next) => {
 
 export const updateTeacherProfile = async (req, res, next) => {
   try {
-    const { userId } = req.params;
+    // Handle /me route - use authenticated user's ID when userId param is not present
+    const userId = req.params.userId || req.user.id;
     const requestingUserId = req.user.id;
     const user = await User.findById(userId);
     if (!user) {
@@ -53,9 +61,12 @@ export const updateTeacherProfile = async (req, res, next) => {
     }
     const {
       bio,
+      aboutUs,
       photo,
       expertise,
       experience,
+      country,
+      countryCode,
       socialLinks,
       payoutInfo,
       rating,
@@ -64,10 +75,13 @@ export const updateTeacherProfile = async (req, res, next) => {
     if (!profile) {
       profile = await TeacherProfile.create({ userId });
     }
-    if (bio !== undefined) profile.bio = bio;
+    if (bio !== undefined) profile.bio = normalizeLanguageValue(bio);
+    if (aboutUs !== undefined) profile.aboutUs = normalizeLanguageValue(aboutUs);
     if (photo !== undefined) profile.photo = photo;
     if (expertise !== undefined) profile.expertise = Array.isArray(expertise) ? expertise : [];
     if (experience !== undefined) profile.experience = experience;
+    if (country !== undefined) profile.country = country;
+    if (countryCode !== undefined) profile.countryCode = countryCode ? countryCode.toUpperCase() : "";
     if (socialLinks !== undefined) {
       profile.socialLinks = {
         ...profile.socialLinks,
@@ -86,7 +100,10 @@ export const updateTeacherProfile = async (req, res, next) => {
     }
     await profile.save();
     await profile.populate("userId", "name email status");
-    res.json({ profile });
+    const profileObj = profile.toObject();
+    profileObj.bio = getLanguageValue(profileObj.bio);
+    profileObj.aboutUs = getLanguageValue(profileObj.aboutUs);
+    res.json({ profile: profileObj });
   } catch (err) {
     next(err);
   }
@@ -113,7 +130,13 @@ export const listTeacherProfiles = async (req, res, next) => {
           p.userId?.email?.toLowerCase().includes(searchLower)
       );
     }
-    res.json({ profiles, count: profiles.length });
+    const profilesData = profiles.map(profile => {
+      const profileObj = profile.toObject();
+      profileObj.bio = getLanguageValue(profileObj.bio);
+      profileObj.aboutUs = getLanguageValue(profileObj.aboutUs);
+      return profileObj;
+    });
+    res.json({ profiles: profilesData, count: profilesData.length });
   } catch (err) {
     next(err);
   }
@@ -139,7 +162,10 @@ export const updateKycStatus = async (req, res, next) => {
     }
     await profile.save();
     await profile.populate("userId", "name email status");
-    res.json({ profile });
+    const profileObj = profile.toObject();
+    profileObj.bio = getLanguageValue(profileObj.bio);
+    profileObj.aboutUs = getLanguageValue(profileObj.aboutUs);
+    res.json({ profile: profileObj });
   } catch (err) {
     next(err);
   }
@@ -166,7 +192,10 @@ export const updateEarnings = async (req, res, next) => {
     }
     await profile.save();
     await profile.populate("userId", "name email status");
-    res.json({ profile });
+    const profileObj = profile.toObject();
+    profileObj.bio = getLanguageValue(profileObj.bio);
+    profileObj.aboutUs = getLanguageValue(profileObj.aboutUs);
+    res.json({ profile: profileObj });
   } catch (err) {
     next(err);
   }
@@ -190,7 +219,10 @@ export const processPayout = async (req, res, next) => {
     profile.paidAmount += amount;
     await profile.save();
     await profile.populate("userId", "name email status");
-    res.json({ profile });
+    const profileObj = profile.toObject();
+    profileObj.bio = getLanguageValue(profileObj.bio);
+    profileObj.aboutUs = getLanguageValue(profileObj.aboutUs);
+    res.json({ profile: profileObj });
   } catch (err) {
     next(err);
   }

@@ -25,7 +25,7 @@ const HeaderFive = () => {
                         <div className="tgmenu__wrap">
                            <nav className="tgmenu__nav">
                               <div className="logo">
-                                 <Link to="/"><img src="/assets/img/logo/logo.svg" alt="Logo" /></Link>
+                                 <Link to="/"><img src="/assets/img/logo/edunyte-light.png" height="100" width="100" alt="Logo" /></Link>
                               </div>
                               <div className="tgmenu__categories select-grp-two d-none d-md-block">
                                  <div className="dropdown">

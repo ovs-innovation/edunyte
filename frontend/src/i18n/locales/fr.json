@@ -1,0 +1,15 @@
+{
+  "common": {
+    "login": "Se connecter",
+    "logout": "Se déconnecter",
+    "buy_now": "Acheter maintenant",
+    "price": "Prix",
+    "language": "Langue",
+    "currency": "Devise",
+    "english": "Anglais",
+    "hindi": "Hindi",
+    "select_language": "Sélectionner la langue",
+    "select_currency": "Sélectionner la devise"
+  }
+}
+

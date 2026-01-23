@@ -1,0 +1,15 @@
+{
+  "common": {
+    "login": "登录",
+    "logout": "登出",
+    "buy_now": "立即购买",
+    "price": "价格",
+    "language": "语言",
+    "currency": "货币",
+    "english": "英语",
+    "hindi": "印地语",
+    "select_language": "选择语言",
+    "select_currency": "选择货币"
+  }
+}
+

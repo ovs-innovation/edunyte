@@ -1,0 +1,15 @@
+{
+  "common": {
+    "login": "로그인",
+    "logout": "로그아웃",
+    "buy_now": "지금 구매",
+    "price": "가격",
+    "language": "언어",
+    "currency": "통화",
+    "english": "영어",
+    "hindi": "힌디어",
+    "select_language": "언어 선택",
+    "select_currency": "통화 선택"
+  }
+}
+

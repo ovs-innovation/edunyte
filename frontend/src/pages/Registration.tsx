@@ -5,7 +5,7 @@ import SEO from '../components/SEO';
 const Registration = () => {
    return (
       <Wrapper>
-         <SEO pageTitle={'SkillGro Registration'} />
+         <SEO pageTitle={'Edunyte Registration'} />
          <RegistrationMain />
       </Wrapper>
    );

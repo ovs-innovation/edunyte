@@ -1,0 +1,15 @@
+{
+  "common": {
+    "login": "Entrar",
+    "logout": "Sair",
+    "buy_now": "Comprar agora",
+    "price": "Preço",
+    "language": "Idioma",
+    "currency": "Moeda",
+    "english": "Inglês",
+    "hindi": "Hindi",
+    "select_language": "Selecionar idioma",
+    "select_currency": "Selecionar moeda"
+  }
+}
+

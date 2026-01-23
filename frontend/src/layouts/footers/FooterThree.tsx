@@ -14,7 +14,7 @@ const FooterThree = () => {
                   <div className="col-xl-2 col-lg-4 col-md-6">
                      <div className="footer__widget">
                         <div className="logo mb-35">
-                           <Link to=""><img src="/assets/img/logo/secondary_logo.svg" alt="img" /></Link>
+                           <Link to=""><img src="/assets/img/logo/edunyte-light.png" height="100" width="100" alt="img" /></Link>
                         </div>
                         <div className="footer__content footer__content-two">
                            <p>201 S. Grand Ave., 1st Floor New York City, NY 28020</p>

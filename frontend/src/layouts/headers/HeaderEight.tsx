@@ -20,7 +20,7 @@ const HeaderEight = () => {
         <div className="tg-header__logo-area">
           <div className="container">
             <div className="logo text-center">
-              <Link to="/"><img src="/assets/img/logo/logo.svg" alt="Logo" /></Link>
+              <Link to="/"><img src="/assets/img/logo/edunyte-light.png" height="100" width="100" alt="Logo" /></Link>
             </div>
           </div>
         </div>
@@ -31,7 +31,7 @@ const HeaderEight = () => {
                 <div className="tgmenu__wrap">
                   <nav className="tgmenu__nav">
                     <div className="logo d-none">
-                      <Link to="/"><img src="/assets/img/logo/logo.svg" alt="Logo" /></Link>
+                      <Link to="/"><img src="/assets/img/logo/edunyte-light.png" height="100" width="100" alt="Logo" /></Link>
                     </div>
                     <div className="tg-header__contact">
                       <div className="icon">

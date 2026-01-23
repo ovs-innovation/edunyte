@@ -1,0 +1,15 @@
+{
+  "common": {
+    "login": "Войти",
+    "logout": "Выйти",
+    "buy_now": "Купить сейчас",
+    "price": "Цена",
+    "language": "Язык",
+    "currency": "Валюта",
+    "english": "Английский",
+    "hindi": "Хинди",
+    "select_language": "Выбрать язык",
+    "select_currency": "Выбрать валюту"
+  }
+}
+

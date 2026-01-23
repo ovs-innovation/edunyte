@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 
 const BreadcrumbOne = ({ title, sub_title, sub_title_2, style }: any) => {
+   const { t } = useTranslation();
    return (
       <section className="breadcrumb__area breadcrumb__bg" style={{ backgroundImage: `url(/assets/img/bg/breadcrumb_bg.jpg)` }}>
          <div className="container">
@@ -13,7 +15,7 @@ const BreadcrumbOne = ({ title, sub_title, sub_title_2, style }: any) => {
                            style ? (
                               <>
                                  <span property="itemListElement" typeof="ListItem">
-                                    <Link to="/">Home</Link>
+                                    <Link to="/">{t('common.home')}</Link>
                                  </span>
                                  <span className="breadcrumb-separator"><i className="fas fa-angle-right"></i></span>
                                  <span property="itemListElement" typeof="ListItem">
@@ -25,7 +27,7 @@ const BreadcrumbOne = ({ title, sub_title, sub_title_2, style }: any) => {
                            ) : (
                               <>
                                  <span property="itemListElement" typeof="ListItem">
-                                    <Link to="/">Home</Link>
+                                    <Link to="/">{t('common.home')}</Link>
                                  </span>
                                  <span className="breadcrumb-separator"><i className="fas fa-angle-right"></i></span>
                                  <span property="itemListElement" typeof="ListItem">{sub_title}</span>

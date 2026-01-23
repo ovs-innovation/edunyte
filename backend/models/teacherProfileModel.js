@@ -9,9 +9,12 @@ const teacherProfileSchema = new mongoose.Schema(
       unique: true,
     },
     bio: {
-      type: String,
-      trim: true,
-      default: "",
+      type: mongoose.Schema.Types.Mixed,
+      default: { en: "" },
+    },
+    aboutUs: {
+      type: mongoose.Schema.Types.Mixed,
+      default: { en: "" },
     },
     photo: {
       type: String,
@@ -25,6 +28,17 @@ const teacherProfileSchema = new mongoose.Schema(
       type: Number,
       default: 0,
       min: 0,
+    },
+    country: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    countryCode: {
+      type: String,
+      trim: true,
+      default: "",
+      uppercase: true,
     },
     socialLinks: {
       website: { type: String, default: "" },
@@ -94,6 +108,16 @@ const teacherProfileSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+teacherProfileSchema.pre("save", function (next) {
+  if (typeof this.bio === "string") {
+    this.bio = { en: this.bio };
+  }
+  if (typeof this.aboutUs === "string") {
+    this.aboutUs = { en: this.aboutUs };
+  }
+  next();
+});
 
 teacherProfileSchema.index({ userId: 1 });
 teacherProfileSchema.index({ kycStatus: 1 });
