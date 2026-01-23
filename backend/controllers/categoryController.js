@@ -3,14 +3,38 @@ import User from "../models/userModel.js";
 import mongoose from "mongoose";
 import { normalizeLanguageValue, getLanguageValue } from "../utils/languageHelper.js";
 
-/**
- * Category Controller
- * Handles CRUD operations for categories
- */
+const slugify = (text) => {
+  if (!text) return "";
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w\-]+/g, "")
+    .replace(/\-\-+/g, "-")
+    .replace(/^-+/, "")
+    .replace(/-+$/, "");
+};
 
-/**
- * Get all categories
- */
+const ensureCategorySlug = async (categoryDoc) => {
+  if (!categoryDoc) return;
+  if (categoryDoc.slug) return;
+
+  const nameValue = getLanguageValue(categoryDoc.name);
+  const baseSlug = slugify(nameValue);
+  if (!baseSlug) return;
+
+  let slug = baseSlug;
+  let counter = 1;
+  while (await Category.findOne({ slug, _id: { $ne: categoryDoc._id } })) {
+    slug = `${baseSlug}-${counter}`;
+    counter++;
+  }
+
+  categoryDoc.slug = slug;
+  await categoryDoc.save();
+};
+
 export const getCategories = async (req, res, next) => {
   try {
     const { status } = req.query;
@@ -22,6 +46,11 @@ export const getCategories = async (req, res, next) => {
     const categories = await Category.find(query)
       .populate("createdBy", "name email")
       .sort({ createdAt: -1 });
+
+    for (const c of categories) {
+      // eslint-disable-next-line no-await-in-loop
+      await ensureCategorySlug(c);
+    }
 
     const categoriesData = categories.map(category => {
       const categoryObj = category.toObject();
@@ -36,9 +65,6 @@ export const getCategories = async (req, res, next) => {
   }
 };
 
-/**
- * Get single category
- */
 export const getCategory = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -50,6 +76,8 @@ export const getCategory = async (req, res, next) => {
     if (!category) {
       return res.status(404).json({ message: "Category not found" });
     }
+
+    await ensureCategorySlug(category);
 
     const categoryObj = category.toObject();
     categoryObj.name = getLanguageValue(categoryObj.name);

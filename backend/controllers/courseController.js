@@ -2,6 +2,38 @@ import Course from "../models/courseModel.js";
 import mongoose from "mongoose";
 import { normalizeLanguageValue, getLanguageValue, transformLanguageFields } from "../utils/languageHelper.js";
 
+const slugify = (text) => {
+  if (!text) return "";
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w\-]+/g, "")
+    .replace(/\-\-+/g, "-")
+    .replace(/^-+/, "")
+    .replace(/-+$/, "");
+};
+
+const ensureCourseSlug = async (courseDoc) => {
+  if (!courseDoc) return;
+  if (courseDoc.slug) return;
+
+  const nameValue = getLanguageValue(courseDoc.name);
+  const baseSlug = slugify(nameValue);
+  if (!baseSlug) return;
+
+  let slug = baseSlug;
+  let counter = 1;
+  while (await Course.findOne({ slug, _id: { $ne: courseDoc._id } })) {
+    slug = `${baseSlug}-${counter}`;
+    counter++;
+  }
+
+  courseDoc.slug = slug;
+  await courseDoc.save();
+};
+
 /**
  * Course Controller
  * Admin-only operations for managing courses
@@ -97,6 +129,12 @@ export const getCourses = async (req, res, next) => {
       .populate("createdBy", "name email")
       .sort({ createdAt: -1 });
 
+    // Backfill slug for older records created before slug existed
+    for (const c of courses) {
+      // eslint-disable-next-line no-await-in-loop
+      await ensureCourseSlug(c);
+    }
+
     const coursesData = courses.map(course => {
       const courseObj = course.toObject();
       courseObj.name = getLanguageValue(courseObj.name);
@@ -124,6 +162,9 @@ export const getCourseById = async (req, res, next) => {
     if (!course) {
       return res.status(404).json({ message: "Course not found" });
     }
+
+    // Backfill slug for older records created before slug existed
+    await ensureCourseSlug(course);
 
     const courseObj = course.toObject();
     courseObj.name = getLanguageValue(courseObj.name);
