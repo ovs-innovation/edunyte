@@ -17,20 +17,21 @@ const slugify = (text) => {
 
 const ensureCourseSlug = async (courseDoc) => {
   if (!courseDoc) return;
-  if (courseDoc.slug) return;
+  const currentSlug = getLanguageValue(courseDoc.slug);
+  if (currentSlug) return;
 
   const nameValue = getLanguageValue(courseDoc.name);
   const baseSlug = slugify(nameValue);
   if (!baseSlug) return;
 
-  let slug = baseSlug;
+  let slugValue = baseSlug;
   let counter = 1;
-  while (await Course.findOne({ slug, _id: { $ne: courseDoc._id } })) {
-    slug = `${baseSlug}-${counter}`;
+  while (await Course.findOne({ "slug.en": slugValue, _id: { $ne: courseDoc._id } })) {
+    slugValue = `${baseSlug}-${counter}`;
     counter++;
   }
 
-  courseDoc.slug = slug;
+  courseDoc.slug = { en: slugValue };
   await courseDoc.save();
 };
 
@@ -74,6 +75,7 @@ export const createCourse = async (req, res, next) => {
     const courseObj = course.toObject();
     courseObj.name = getLanguageValue(courseObj.name);
     courseObj.description = getLanguageValue(courseObj.description);
+    courseObj.slug = getLanguageValue(courseObj.slug);
     res.status(201).json({ course: courseObj });
   } catch (err) {
     next(err);
@@ -139,6 +141,7 @@ export const getCourses = async (req, res, next) => {
       const courseObj = course.toObject();
       courseObj.name = getLanguageValue(courseObj.name);
       courseObj.description = getLanguageValue(courseObj.description);
+      courseObj.slug = getLanguageValue(courseObj.slug);
       return courseObj;
     });
 
@@ -169,6 +172,7 @@ export const getCourseById = async (req, res, next) => {
     const courseObj = course.toObject();
     courseObj.name = getLanguageValue(courseObj.name);
     courseObj.description = getLanguageValue(courseObj.description);
+    courseObj.slug = getLanguageValue(courseObj.slug);
     res.json({ course: courseObj });
   } catch (err) {
     next(err);
@@ -222,6 +226,7 @@ export const updateCourse = async (req, res, next) => {
     const courseObj = course.toObject();
     courseObj.name = getLanguageValue(courseObj.name);
     courseObj.description = getLanguageValue(courseObj.description);
+    courseObj.slug = getLanguageValue(courseObj.slug);
     res.json({ course: courseObj });
   } catch (err) {
     next(err);

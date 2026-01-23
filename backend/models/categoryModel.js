@@ -17,12 +17,8 @@ const categorySchema = new mongoose.Schema(
       default: "",
     },
     slug: {
-      type: String,
-      trim: true,
-      lowercase: true,
-      unique: true,
-      sparse: true,
-      index: true,
+      type: mongoose.Schema.Types.Mixed,
+      default: { en: "" },
     },
     status: {
       type: String,
@@ -60,22 +56,29 @@ categorySchema.pre("save", async function (next) {
     this.description = { en: this.description };
   }
 
+  if (typeof this.slug === "string") {
+    this.slug = { en: this.slug };
+  }
+
   if (this.isNew || this.isModified("name")) {
     const { getLanguageValue } = await import("../utils/languageHelper.js");
     const nameValue = getLanguageValue(this.name);
     const baseSlug = generateSlug(nameValue);
 
     if (baseSlug) {
-      let slug = baseSlug;
+      let slugValue = baseSlug;
       let counter = 1;
       const Category = this.constructor;
 
-      while (await Category.findOne({ slug, _id: { $ne: this._id } })) {
-        slug = `${baseSlug}-${counter}`;
+      while (await Category.findOne({ 
+        "slug.en": slugValue, 
+        _id: { $ne: this._id } 
+      })) {
+        slugValue = `${baseSlug}-${counter}`;
         counter++;
       }
 
-      this.slug = slug;
+      this.slug = { en: slugValue };
     }
   }
 
@@ -84,6 +87,7 @@ categorySchema.pre("save", async function (next) {
 
 categorySchema.index({ status: 1, createdAt: -1 });
 categorySchema.index({ createdBy: 1 });
+categorySchema.index({ "slug.en": 1 }, { unique: true, sparse: true });
 
 export default mongoose.model("Category", categorySchema);
 

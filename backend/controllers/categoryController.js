@@ -18,20 +18,21 @@ const slugify = (text) => {
 
 const ensureCategorySlug = async (categoryDoc) => {
   if (!categoryDoc) return;
-  if (categoryDoc.slug) return;
+  const currentSlug = getLanguageValue(categoryDoc.slug);
+  if (currentSlug) return;
 
   const nameValue = getLanguageValue(categoryDoc.name);
   const baseSlug = slugify(nameValue);
   if (!baseSlug) return;
 
-  let slug = baseSlug;
+  let slugValue = baseSlug;
   let counter = 1;
-  while (await Category.findOne({ slug, _id: { $ne: categoryDoc._id } })) {
-    slug = `${baseSlug}-${counter}`;
+  while (await Category.findOne({ "slug.en": slugValue, _id: { $ne: categoryDoc._id } })) {
+    slugValue = `${baseSlug}-${counter}`;
     counter++;
   }
 
-  categoryDoc.slug = slug;
+  categoryDoc.slug = { en: slugValue };
   await categoryDoc.save();
 };
 
@@ -56,6 +57,7 @@ export const getCategories = async (req, res, next) => {
       const categoryObj = category.toObject();
       categoryObj.name = getLanguageValue(categoryObj.name);
       categoryObj.description = getLanguageValue(categoryObj.description);
+      categoryObj.slug = getLanguageValue(categoryObj.slug);
       return categoryObj;
     });
 
@@ -82,6 +84,7 @@ export const getCategory = async (req, res, next) => {
     const categoryObj = category.toObject();
     categoryObj.name = getLanguageValue(categoryObj.name);
     categoryObj.description = getLanguageValue(categoryObj.description);
+    categoryObj.slug = getLanguageValue(categoryObj.slug);
     res.json({ category: categoryObj });
   } catch (err) {
     next(err);
@@ -125,6 +128,7 @@ export const createCategory = async (req, res, next) => {
     const categoryObj = category.toObject();
     categoryObj.name = getLanguageValue(categoryObj.name);
     categoryObj.description = getLanguageValue(categoryObj.description);
+    categoryObj.slug = getLanguageValue(categoryObj.slug);
     res.status(201).json({ category: categoryObj });
   } catch (err) {
     if (err.code === 11000) {
@@ -180,6 +184,7 @@ export const updateCategory = async (req, res, next) => {
     const categoryObj = category.toObject();
     categoryObj.name = getLanguageValue(categoryObj.name);
     categoryObj.description = getLanguageValue(categoryObj.description);
+    categoryObj.slug = getLanguageValue(categoryObj.slug);
     res.json({ category: categoryObj });
   } catch (err) {
     if (err.code === 11000) {

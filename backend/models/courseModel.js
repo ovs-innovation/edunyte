@@ -21,12 +21,8 @@ const courseSchema = new mongoose.Schema(
       default: "",
     },
     slug: {
-      type: String,
-      trim: true,
-      lowercase: true,
-      unique: true,
-      sparse: true,
-      index: true,
+      type: mongoose.Schema.Types.Mixed,
+      default: { en: "" },
     },
     status: {
       type: String,
@@ -65,24 +61,30 @@ courseSchema.pre("save", async function (next) {
     this.description = { en: this.description };
   }
 
-  // Auto-generate slug from course name if not provided or if name changed
+  if (typeof this.slug === "string") {
+    this.slug = { en: this.slug };
+  }
+
   if (this.isNew || this.isModified("name")) {
     const { getLanguageValue } = await import("../utils/languageHelper.js");
     const nameValue = getLanguageValue(this.name);
-    let baseSlug = generateSlug(nameValue);
+    const currentSlugValue = getLanguageValue(this.slug);
+    const baseSlug = generateSlug(nameValue);
     
-    // Ensure slug is unique
     if (baseSlug) {
-      let slug = baseSlug;
+      let slugValue = baseSlug;
       let counter = 1;
       const Course = this.constructor;
       
-      while (await Course.findOne({ slug, _id: { $ne: this._id } })) {
-        slug = `${baseSlug}-${counter}`;
+      while (await Course.findOne({ 
+        "slug.en": slugValue, 
+        _id: { $ne: this._id } 
+      })) {
+        slugValue = `${baseSlug}-${counter}`;
         counter++;
       }
       
-      this.slug = slug;
+      this.slug = { en: slugValue };
     }
   }
 
@@ -90,6 +92,7 @@ courseSchema.pre("save", async function (next) {
 });
 
 courseSchema.index({ status: 1, createdAt: -1 });
+courseSchema.index({ "slug.en": 1 }, { unique: true, sparse: true });
 
 export default mongoose.model("Course", courseSchema);
 
