@@ -32,7 +32,8 @@ const CustomSelect = ({ value, onChange }: any) => {
 
    const handleCategoryChange = (selectedOption: any) => {
       if (selectedOption) {
-         navigate(`/courses?category=${selectedOption.value}`)
+         const category = categories.find(cat => cat._id === selectedOption.value);
+         navigate(`/courses?category=${category?.slug || selectedOption.value}`)
       } else {
          navigate('/courses')
       }

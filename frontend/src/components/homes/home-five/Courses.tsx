@@ -199,7 +199,7 @@ const Courses = () => {
                   <div key={item._id} className="col-xl-3 col-lg-4 col-md-6">
                      <div className="courses__item-six shine__animate-item">
                         <div className="courses__item-thumb-five shine__animate-link">
-                           <Link to={`/course-details?id=${item._id}`}>
+                           <Link to={`/course/${item.slug || item._id}`}>
                               <img src={item.image || '/assets/img/courses/course_default.jpg'} alt={item.name} />
                            </Link>
                            <a onClick={() => handleAddToWishlist(item)} className="courses__wishlist-two course-heart-btn" style={{ cursor: "pointer" }}>
@@ -220,12 +220,12 @@ const Courses = () => {
                               </li>
                            </ul>
                            <h2 className="title">
-                              <Link to={`/course-details?id=${item._id}`}>{item.name}</Link>
+                              <Link to={`/course/${item.slug || item._id}`}>{item.name}</Link>
                            </h2>
                            <p>{item.description || ''}</p>
                            <div className="courses__item-content-bottom-two">
                               <div className="button">
-                                 <Link to={`/course-details?id=${item._id}`}>
+                                 <Link to={`/course/${item.slug || item._id}`}>
                                     <span className="text">{t('common.book_session')}</span>
                                     <i className="flaticon-arrow-right"></i>
                                  </Link>

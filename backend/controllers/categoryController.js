@@ -70,11 +70,14 @@ export const getCategories = async (req, res, next) => {
 export const getCategory = async (req, res, next) => {
   try {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Invalid category ID" });
+    let category;
+
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      category = await Category.findById(id).populate("createdBy", "name email");
+    } else {
+      category = await Category.findOne({ "slug.en": id }).populate("createdBy", "name email");
     }
 
-    const category = await Category.findById(id).populate("createdBy", "name email");
     if (!category) {
       return res.status(404).json({ message: "Category not found" });
     }

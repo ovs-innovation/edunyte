@@ -4,7 +4,7 @@ import { fetchCategories, type Category } from "../../../services/categoryServic
 import { useTranslation } from "react-i18next";
 
 interface CourseSidebarProps {
-   setSelectedCategory: (categoryId: string | null) => void;
+   setSelectedCategory: (categorySlug: string | null) => void;
    selectedCategory: string | null;
 }
 
@@ -25,8 +25,8 @@ const CourseSidebar = ({ setSelectedCategory, selectedCategory }: CourseSidebarP
       loadCategories();
    }, []);
 
-   const handleCategory = (categoryId: string | null) => {
-      setSelectedCategory(categoryId);
+   const handleCategory = (categorySlug: string | null) => {
+      setSelectedCategory(categorySlug);
    };
 
    const categoriesToShow = showMoreCategory ? categories : categories.slice(0, 8);
@@ -46,9 +46,9 @@ const CourseSidebar = ({ setSelectedCategory, selectedCategory }: CourseSidebarP
                      </li>
                      {categoriesToShow.map((category) => (
                         <li key={category._id}>
-                           <div onClick={() => handleCategory(category._id)} className="form-check">
-                              <input className="form-check-input" type="checkbox" checked={selectedCategory === category._id} readOnly id={`cat_${category._id}`} />
-                              <label className="form-check-label" htmlFor={`cat_${category._id}`} onClick={() => handleCategory(category._id)}>{category.name}</label>
+                           <div onClick={() => handleCategory(category.slug || category._id)} className="form-check">
+                              <input className="form-check-input" type="checkbox" checked={selectedCategory === (category.slug || category._id)} readOnly id={`cat_${category._id}`} />
+                              <label className="form-check-label" htmlFor={`cat_${category._id}`} onClick={() => handleCategory(category.slug || category._id)}>{category.name}</label>
                            </div>
                         </li>
                      ))}

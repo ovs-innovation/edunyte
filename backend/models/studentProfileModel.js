@@ -16,6 +16,11 @@ const studentProfileSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    timezone: {
+      type: String,
+      trim: true,
+      default: "UTC",
+    },
     enrolledCourses: [
       {
         courseId: {

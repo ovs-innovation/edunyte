@@ -441,3 +441,132 @@ export const getCourseTeachers = async (req, res, next) => {
   }
 };
 
+/**
+ * Public: Get all teachers for a course by slug with availability
+ */
+export const getCourseTeachersBySlug = async (req, res, next) => {
+  try {
+    const { slug } = req.params;
+    const { startDate, endDate } = req.query;
+
+    // Find course by slug
+    let course;
+    if (mongoose.Types.ObjectId.isValid(slug)) {
+      course = await Course.findById(slug);
+    } else {
+      course = await Course.findOne({ "slug.en": slug });
+    }
+
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    // Get all approved teacher-course mappings for this course
+    const teacherCourses = await TeacherCourse.find({
+      courseId: course._id,
+      status: "approved",
+    })
+      .populate("teacherId", "name email")
+      .populate("courseId", "name description")
+      .populate("languageIds", "name code nativeName")
+      .sort({ price: 1 });
+
+    // Get teacher profiles and availability for each teacher
+    const TeacherProfile = (await import("../models/teacherProfileModel.js")).default;
+    const Availability = (await import("../models/availabilityModel.js")).default;
+    const { getLanguageValue } = await import("../utils/languageHelper.js");
+
+    const targetCurrency = req.query.currency || getBaseCurrency();
+    const now = new Date();
+    const defaultEndDate = new Date();
+    defaultEndDate.setDate(defaultEndDate.getDate() + 30); // Next 30 days
+
+    const teachersData = await Promise.all(
+      teacherCourses.map(async (tc) => {
+        const tcObj = tc.toObject();
+        tcObj.experience = getLanguageValue(tcObj.experience);
+        tcObj.bio = getLanguageValue(tcObj.bio);
+        tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
+
+        if (tcObj.languageIds && Array.isArray(tcObj.languageIds)) {
+          tcObj.languageIds = tcObj.languageIds.map((lang) => ({
+            _id: lang._id,
+            name: getLanguageValue(lang.name),
+            code: lang.code,
+            nativeName: getLanguageValue(lang.nativeName),
+          }));
+        }
+
+        const teacherProfile = await TeacherProfile.findOne({ userId: tc.teacherId });
+        if (teacherProfile) {
+          tcObj.teacherProfile = {
+            photo: teacherProfile.photo || "",
+            rating: teacherProfile.rating || 0,
+            totalReviews: teacherProfile.totalReviews || 0,
+            totalStudents: teacherProfile.totalStudents || 0,
+            experience: teacherProfile.experience || 0,
+            country: teacherProfile.country || "",
+            countryCode: teacherProfile.countryCode || "",
+            bio: getLanguageValue(teacherProfile.bio),
+          };
+        } else {
+          tcObj.teacherProfile = {
+            photo: "",
+            rating: 0,
+            totalReviews: 0,
+            totalStudents: 0,
+            experience: 0,
+            country: "",
+            countryCode: "",
+            bio: "",
+          };
+        }
+
+        // Get availability slots
+        const availabilityQuery = {
+          teacherId: tc.teacherId,
+          courseId: course._id,
+          status: "available",
+          date: { $gte: now },
+        };
+
+        if (startDate) {
+          availabilityQuery.date.$gte = new Date(startDate);
+        }
+        if (endDate) {
+          availabilityQuery.date.$lte = new Date(endDate);
+        } else {
+          availabilityQuery.date.$lte = defaultEndDate;
+        }
+
+        const availabilities = await Availability.find(availabilityQuery)
+          .sort({ date: 1, startTime: 1 })
+          .limit(50); // Limit to first 50 slots for performance
+
+        tcObj.availability = availabilities.map((av) => ({
+          _id: av._id,
+          date: av.date,
+          startTime: av.startTime,
+          endTime: av.endTime,
+          duration: av.duration,
+          price: av.price,
+          currency: av.currency,
+          timezone: av.timezone,
+        }));
+
+        // Currency conversion
+        if (tcObj.price && tcObj.currency && tcObj.currency !== targetCurrency) {
+          tcObj.price = convertCurrency(tcObj.price, tcObj.currency, targetCurrency);
+          tcObj.currency = targetCurrency;
+        }
+
+        return tcObj;
+      })
+    );
+
+    res.json({ teachers: teachersData, count: teachersData.length });
+  } catch (err) {
+    next(err);
+  }
+};
+

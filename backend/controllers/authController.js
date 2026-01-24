@@ -101,6 +101,20 @@ export const login = async (req, res, next) => {
     }
     user.lastLogin = new Date();
     await user.save();
+
+    if (user.role === "student") {
+      const StudentProfile = (await import("../models/studentProfileModel.js")).default;
+      let studentProfile = await StudentProfile.findOne({ userId: user._id });
+      if (!studentProfile) {
+        studentProfile = await StudentProfile.create({ userId: user._id });
+      }
+      const timezone = req.body.timezone || req.headers['x-timezone'] || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+      if (timezone) {
+        studentProfile.timezone = timezone;
+        await studentProfile.save();
+      }
+    }
+
     const perms = await resolvePermissions(user.role);
     const token = generateToken(user);
     res.json({ token, user: formatUser(user, perms) });

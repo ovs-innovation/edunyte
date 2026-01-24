@@ -96,7 +96,14 @@ export const getCourses = async (req, res, next) => {
 
     if (category) {
       const Category = (await import("../models/categoryModel.js")).default;
-      const categoryDoc = await Category.findById(category);
+      let categoryDoc;
+      
+      if (mongoose.Types.ObjectId.isValid(category)) {
+        categoryDoc = await Category.findById(category);
+      } else {
+        categoryDoc = await Category.findOne({ "slug.en": category });
+      }
+      
       if (categoryDoc) {
         const categoryName = getLanguageValue(categoryDoc.name);
         query.$or = [
@@ -152,21 +159,23 @@ export const getCourses = async (req, res, next) => {
 };
 
 /**
- * Get a single course by ID
+ * Get a single course by ID or slug
  */
 export const getCourseById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Invalid course ID" });
+    let course;
+
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      course = await Course.findById(id).populate("createdBy", "name email");
+    } else {
+      course = await Course.findOne({ "slug.en": id }).populate("createdBy", "name email");
     }
 
-    const course = await Course.findById(id).populate("createdBy", "name email");
     if (!course) {
       return res.status(404).json({ message: "Course not found" });
     }
 
-    // Backfill slug for older records created before slug existed
     await ensureCourseSlug(course);
 
     const courseObj = course.toObject();
