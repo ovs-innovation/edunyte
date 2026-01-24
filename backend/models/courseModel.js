@@ -39,18 +39,17 @@ const courseSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Helper function to generate slug from text
 const generateSlug = (text) => {
   if (!text) return "";
   return text
     .toString()
     .toLowerCase()
     .trim()
-    .replace(/\s+/g, "-") // Replace spaces with hyphens
-    .replace(/[^\w\-]+/g, "") // Remove all non-word chars except hyphens
-    .replace(/\-\-+/g, "-") // Replace multiple hyphens with single hyphen
-    .replace(/^-+/, "") // Trim hyphens from start
-    .replace(/-+$/, ""); // Trim hyphens from end
+    .replace(/\s+/g, "-") 
+    .replace(/[^\w\-]+/g, "") 
+    .replace(/\-\-+/g, "-") 
+    .replace(/^-+/, "") 
+    .replace(/-+$/, ""); 
 };
 
 courseSchema.pre("save", async function (next) {
