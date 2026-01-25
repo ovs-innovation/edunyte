@@ -447,7 +447,7 @@ export const getCourseTeachers = async (req, res, next) => {
 export const getCourseTeachersBySlug = async (req, res, next) => {
   try {
     const { slug } = req.params;
-    const { startDate, endDate, studentTimezone } = req.query;
+    const { startDate, endDate } = req.query;
 
     // Find course by slug
     let course;
@@ -475,7 +475,6 @@ export const getCourseTeachersBySlug = async (req, res, next) => {
     const TeacherProfile = (await import("../models/teacherProfileModel.js")).default;
     const Availability = (await import("../models/availabilityModel.js")).default;
     const { getLanguageValue } = await import("../utils/languageHelper.js");
-    const { convertTimeBetweenTimezones } = await import("../utils/timezoneHelper.js");
 
     const targetCurrency = req.query.currency || getBaseCurrency();
     const now = new Date();
@@ -524,11 +523,8 @@ export const getCourseTeachersBySlug = async (req, res, next) => {
         }
 
         // Get availability slots
-        // Extract teacherId - when populated, it's an object, so get _id
-        const teacherIdForQuery = tc.teacherId?._id || tc.teacherId;
-        
         const availabilityQuery = {
-          teacherId: teacherIdForQuery,
+          teacherId: tc.teacherId,
           courseId: course._id,
           status: "available",
           date: { $gte: now },
@@ -545,27 +541,7 @@ export const getCourseTeachersBySlug = async (req, res, next) => {
 
         const availabilities = await Availability.find(availabilityQuery)
           .sort({ date: 1, startTime: 1 })
-          .limit(50);
-
-        if (studentTimezone) {
-          availabilities = availabilities.map((av) => {
-            const avObj = av.toObject();
-            if (avObj.timezone && studentTimezone && avObj.timezone !== studentTimezone) {
-              try {
-                avObj.startTime = convertTimeBetweenTimezones(avObj.date, avObj.startTime, avObj.timezone, studentTimezone);
-                avObj.endTime = convertTimeBetweenTimezones(avObj.date, avObj.endTime, avObj.timezone, studentTimezone);
-                avObj.displayTimezone = studentTimezone;
-                avObj.originalTimezone = avObj.timezone;
-              } catch (err) {
-                console.error("Timezone conversion error:", err);
-                avObj.displayTimezone = avObj.timezone;
-              }
-            } else {
-              avObj.displayTimezone = avObj.timezone || "UTC";
-            }
-            return avObj;
-          });
-        }
+          .limit(50); // Limit to first 50 slots for performance
 
         tcObj.availability = availabilities.map((av) => ({
           _id: av._id,
@@ -576,192 +552,7 @@ export const getCourseTeachersBySlug = async (req, res, next) => {
           price: av.price,
           currency: av.currency,
           timezone: av.timezone,
-          displayTimezone: av.displayTimezone,
         }));
-
-        // Currency conversion
-        if (tcObj.price && tcObj.currency && tcObj.currency !== targetCurrency) {
-          tcObj.price = convertCurrency(tcObj.price, tcObj.currency, targetCurrency);
-          tcObj.currency = targetCurrency;
-        }
-
-        return tcObj;
-      })
-    );
-
-    res.json({ teachers: teachersData, count: teachersData.length });
-  } catch (err) {
-    next(err);
-  }
-};
-
-/**
- * Public: Get all teachers for a course by slug with availability (separate query)
- */
-export const getCourseTeachersWithAvailability = async (req, res, next) => {
-  try {
-    const { slug } = req.params;
-    const { startDate, endDate, studentTimezone } = req.query;
-
-    // Find course by slug
-    let course;
-    if (mongoose.Types.ObjectId.isValid(slug)) {
-      course = await Course.findById(slug);
-    } else {
-      course = await Course.findOne({ "slug.en": slug });
-    }
-
-    if (!course) {
-      return res.status(404).json({ message: "Course not found" });
-    }
-
-    // Get all approved teacher-course mappings for this course
-    const teacherCourses = await TeacherCourse.find({
-      courseId: course._id,
-      status: "approved",
-    })
-      .populate("teacherId", "name email")
-      .populate("courseId", "name description")
-      .populate("languageIds", "name code nativeName")
-      .sort({ price: 1 });
-
-    // Get teacher profiles and availability for each teacher
-    const TeacherProfile = (await import("../models/teacherProfileModel.js")).default;
-    const Availability = (await import("../models/availabilityModel.js")).default;
-    const { getLanguageValue } = await import("../utils/languageHelper.js");
-    const { convertTimeBetweenTimezones } = await import("../utils/timezoneHelper.js");
-
-    const targetCurrency = req.query.currency || getBaseCurrency();
-    const now = new Date();
-    const defaultEndDate = new Date();
-    defaultEndDate.setDate(defaultEndDate.getDate() + 30);
-
-    const teachersData = await Promise.all(
-      teacherCourses.map(async (tc) => {
-        const tcObj = tc.toObject();
-        tcObj.experience = getLanguageValue(tcObj.experience);
-        tcObj.bio = getLanguageValue(tcObj.bio);
-        tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
-
-        if (tcObj.languageIds && Array.isArray(tcObj.languageIds)) {
-          tcObj.languageIds = tcObj.languageIds.map((lang) => ({
-            _id: lang._id,
-            name: getLanguageValue(lang.name),
-            code: lang.code,
-            nativeName: getLanguageValue(lang.nativeName),
-          }));
-        }
-
-        const teacherProfile = await TeacherProfile.findOne({ userId: tc.teacherId });
-        if (teacherProfile) {
-          tcObj.teacherProfile = {
-            photo: teacherProfile.photo || "",
-            rating: teacherProfile.rating || 0,
-            totalReviews: teacherProfile.totalReviews || 0,
-            totalStudents: teacherProfile.totalStudents || 0,
-            experience: teacherProfile.experience || 0,
-            country: teacherProfile.country || "",
-            countryCode: teacherProfile.countryCode || "",
-            bio: getLanguageValue(teacherProfile.bio),
-          };
-        } else {
-          tcObj.teacherProfile = {
-            photo: "",
-            rating: 0,
-            totalReviews: 0,
-            totalStudents: 0,
-            experience: 0,
-            country: "",
-            countryCode: "",
-            bio: "",
-          };
-        }
-
-        // Get availability slots - use the same approach as getMyAvailability
-        // Extract teacherId - when populated, it's an object, so get _id
-        const teacherIdValue = tc.teacherId?._id ? tc.teacherId._id : tc.teacherId;
-        const courseIdValue = course._id;
-        
-        // Debug: Check what we're querying with
-        console.log(`[DEBUG] Querying availability for teacherId: ${teacherIdValue}, courseId: ${courseIdValue}`);
-        
-        // First, test if ANY availability exists (no filters)
-        const testQuery = { teacherId: teacherIdValue, courseId: courseIdValue };
-        const testResults = await Availability.find(testQuery).limit(1);
-        console.log(`[DEBUG] Found ${testResults.length} total availability records (no filters)`);
-        if (testResults.length > 0) {
-          console.log(`[DEBUG] Sample: teacherId=${String(testResults[0].teacherId)}, courseId=${String(testResults[0].courseId)}, status=${testResults[0].status}, date=${testResults[0].date}`);
-        }
-        
-        // Build query exactly like getMyAvailability
-        const availabilityQuery = {
-          teacherId: teacherIdValue,
-          courseId: courseIdValue,
-          status: "available",
-        };
-
-        // Build date filter like getMyAvailability
-        if (startDate || endDate) {
-          availabilityQuery.date = {};
-          if (startDate) {
-            availabilityQuery.date.$gte = new Date(startDate);
-          } else {
-            availabilityQuery.date.$gte = now;
-          }
-          if (endDate) {
-            availabilityQuery.date.$lte = new Date(endDate);
-          } else {
-            availabilityQuery.date.$lte = defaultEndDate;
-          }
-        } else {
-          availabilityQuery.date = { $gte: now, $lte: defaultEndDate };
-        }
-        
-        console.log(`[DEBUG] Final query:`, JSON.stringify({
-          teacherId: String(teacherIdValue),
-          courseId: String(courseIdValue),
-          status: availabilityQuery.status,
-          date: availabilityQuery.date,
-        }, null, 2));
-
-        const availabilities = await Availability.find(availabilityQuery)
-          .sort({ date: 1, startTime: 1 })
-          .limit(50);
-        
-        console.log(`[DEBUG] Found ${availabilities.length} available slots`);
-
-        // Process and convert timezones if needed
-        const processedAvailabilities = availabilities.map((av) => {
-          const avObj = av.toObject();
-          
-          if (studentTimezone && avObj.timezone && avObj.timezone !== studentTimezone) {
-            try {
-              avObj.startTime = convertTimeBetweenTimezones(avObj.date, avObj.startTime, avObj.timezone, studentTimezone);
-              avObj.endTime = convertTimeBetweenTimezones(avObj.date, avObj.endTime, avObj.timezone, studentTimezone);
-              avObj.displayTimezone = studentTimezone;
-              avObj.originalTimezone = avObj.timezone;
-            } catch (err) {
-              console.error("Timezone conversion error:", err);
-              avObj.displayTimezone = avObj.timezone;
-            }
-          } else {
-            avObj.displayTimezone = avObj.timezone || "UTC";
-          }
-          
-          return {
-            _id: avObj._id,
-            date: avObj.date,
-            startTime: avObj.startTime,
-            endTime: avObj.endTime,
-            duration: avObj.duration,
-            price: avObj.price,
-            currency: avObj.currency,
-            timezone: avObj.timezone,
-            displayTimezone: avObj.displayTimezone,
-          };
-        });
-
-        tcObj.availability = processedAvailabilities;
 
         // Currency conversion
         if (tcObj.price && tcObj.currency && tcObj.currency !== targetCurrency) {

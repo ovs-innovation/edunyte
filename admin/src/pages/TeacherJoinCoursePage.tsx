@@ -167,10 +167,16 @@ const TeacherJoinCoursePage = () => {
           if (!apiLang) {
             const libLang = libraryLanguages.find((l) => l.code === code);
             if (libLang) {
-              apiLang = languages.find((l) => 
-                l.name?.toLowerCase() === libLang.name.toLowerCase() ||
-                l.nativeName?.toLowerCase() === libLang.nativeName.toLowerCase()
-              );
+              apiLang = languages.find((l) => {
+                const apiLangName = getLanguageValue(l.name)?.toLowerCase();
+                const apiLangNativeName = getLanguageValue(l.nativeName)?.toLowerCase();
+                const libLangName = getLanguageValue(libLang.name)?.toLowerCase();
+                const libLangNativeName = getLanguageValue(libLang.nativeName)?.toLowerCase();
+                return (
+                  (apiLangName && apiLangName === libLangName) ||
+                  (apiLangNativeName && apiLangNativeName === libLangNativeName)
+                );
+              });
             }
           }
           return apiLang?._id;

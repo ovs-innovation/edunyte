@@ -18,6 +18,7 @@ interface FilterState {
   search: string;
   timeRanges: string[];
   days: string[];
+  language: string;
 }
 
 const TeachersSelection = () => {
@@ -43,8 +44,8 @@ const TeachersSelection = () => {
   const [currentCourse, setCurrentCourse] = useState<Course | null>(null);
   const [courseDropdownOpen, setCourseDropdownOpen] = useState(false);
   const [courseSearch, setCourseSearch] = useState('');
-  const [availabilityDropdownOpen, setAvailabilityDropdownOpen] = useState(false);
-  const [timeDayFilterOpen, setTimeDayFilterOpen] = useState(false);
+  const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
+  const [languageSearch, setLanguageSearch] = useState('');
   const [filters, setFilters] = useState<FilterState>({
     priceRange: '',
     country: '',
@@ -53,6 +54,7 @@ const TeachersSelection = () => {
     search: '',
     timeRanges: [],
     days: [],
+    language: '',
   });
 
   const timeRanges = [
@@ -106,19 +108,13 @@ const TeachersSelection = () => {
     loadTeachers();
   }, [slug, t]);
 
-
-  const getTeacherAvailability = (teacher: TeacherCourse) => {
-    return teacher.availability || [];
-  };
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      if (!target.closest('.course-dropdown-container') && !target.closest('.country-dropdown-container') && !target.closest('.availability-dropdown-container') && !target.closest('.time-day-filter-container')) {
+      if (!target.closest('.course-dropdown-container') && !target.closest('.country-dropdown-container') && !target.closest('.language-dropdown-container')) {
         setCourseDropdownOpen(false);
         setCountryDropdownOpen(false);
-        setAvailabilityDropdownOpen(false);
-        setTimeDayFilterOpen(false);
+        setLanguageDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -156,9 +152,15 @@ const TeachersSelection = () => {
       });
     }
 
+    if (filters.language) {
+      filtered = filtered.filter((teacher) => {
+        return teacher.languageIds?.some((lang) => lang._id === filters.language || lang.name === filters.language);
+      });
+    }
+
     if (filters.availability === 'available') {
       filtered = filtered.filter((teacher) => {
-        return getTeacherAvailability(teacher).length > 0;
+        return teacher.availability && teacher.availability.length > 0;
       });
     }
 
@@ -219,10 +221,9 @@ const TeachersSelection = () => {
       };
 
       filtered = filtered.filter((teacher) => {
-        const availability = getTeacherAvailability(teacher);
-        if (!availability || availability.length === 0) return false;
+        if (!teacher.availability || teacher.availability.length === 0) return false;
 
-        return availability.some((slot) => {
+        return teacher.availability.some((slot) => {
           try {
             const slotTimezone = slot.timezone || teacher.timezone || 'UTC';
             const instant = getSlotInstant(slot.date, slot.startTime, slotTimezone);
@@ -360,6 +361,22 @@ const TeachersSelection = () => {
     return Array.from(countries).sort();
   };
 
+  const getLanguages = () => {
+    const languageMap = new Map<string, { _id: string; name: string; code: string; nativeName?: string }>();
+    teachers.forEach((teacher) => {
+      if (teacher.languageIds) {
+        teacher.languageIds.forEach((lang) => {
+          if (!languageMap.has(lang._id)) {
+            languageMap.set(lang._id, lang);
+          }
+        });
+      }
+    });
+    return Array.from(languageMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+  };
+
+  const popularLanguages = ['Hindi', 'Tamil', 'Telugu', 'Kannada', 'Marathi', 'English'];
+
   const handleBookTrial = (teacher: TeacherCourse) => {
     if (!isAuthenticated) {
       navigate('/login');
@@ -435,6 +452,7 @@ const TeachersSelection = () => {
 
   const priceRanges = getPriceRanges();
   const countries = getCountries();
+  const languages = getLanguages();
 
   return (
     <>
@@ -518,7 +536,7 @@ const TeachersSelection = () => {
                   onClick={() => {
                     setCourseDropdownOpen(!courseDropdownOpen);
                     setCountryDropdownOpen(false);
-                    setAvailabilityDropdownOpen(false);
+                    setLanguageDropdownOpen(false);
                   }}
                   style={{
                     borderRadius: '8px',
@@ -697,7 +715,7 @@ const TeachersSelection = () => {
                   onClick={() => {
                     setCountryDropdownOpen(!countryDropdownOpen);
                     setCourseDropdownOpen(false);
-                    setAvailabilityDropdownOpen(false);
+                    setLanguageDropdownOpen(false);
                   }}
                   style={{
                     borderRadius: '8px',
@@ -833,17 +851,17 @@ const TeachersSelection = () => {
                   </div>
                 )}
               </div>
-              <div className="filter-item availability-dropdown-container" style={{ flex: '0 1 auto', minWidth: '160px', position: 'relative' }}>
+              <div className="filter-item language-dropdown-container" style={{ flex: '0 1 auto', minWidth: '160px', position: 'relative' }}>
                 <div
                   className="form-select"
                   onClick={() => {
-                    setAvailabilityDropdownOpen(!availabilityDropdownOpen);
+                    setLanguageDropdownOpen(!languageDropdownOpen);
                     setCourseDropdownOpen(false);
                     setCountryDropdownOpen(false);
                   }}
                   style={{
                     borderRadius: '8px',
-                    border: filters.availability ? '1px solid #e91e63' : '1px solid #e0e0e0',
+                    border: filters.language ? '1px solid #e91e63' : '1px solid #e0e0e0',
                     padding: '10px 16px',
                     fontSize: '14px',
                     backgroundColor: '#fff',
@@ -854,11 +872,17 @@ const TeachersSelection = () => {
                     minHeight: '42px',
                   }}
                 >
-                  <span style={{ color: filters.availability ? '#000' : '#999' }}>
-                    {filters.availability === 'available' ? t('common.has_availability') : t('common.im_available')}
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                    {filters.language ? (
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {languages.find(l => l._id === filters.language || l.name === filters.language)?.name || filters.language}
+                      </span>
+                    ) : (
+                      <span style={{ color: '#999' }}>Also speaks</span>
+                    )}
+                  </div>
                 </div>
-                {availabilityDropdownOpen && (
+                {languageDropdownOpen && (
                   <div
                     style={{
                       position: 'absolute',
@@ -871,286 +895,158 @@ const TeachersSelection = () => {
                       borderRadius: '8px',
                       boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                       zIndex: 1000,
+                      maxHeight: '400px',
                       overflow: 'hidden',
+                      display: 'flex',
+                      flexDirection: 'column',
                     }}
                   >
-                    <div
-                      onClick={() => {
-                        setFilters({ ...filters, availability: '' });
-                        setAvailabilityDropdownOpen(false);
-                      }}
-                      style={{
-                        padding: '12px 16px',
-                        cursor: 'pointer',
-                        backgroundColor: filters.availability === '' ? '#e3f2fd' : 'transparent',
-                        color: filters.availability === '' ? '#000' : '#666',
-                        borderBottom: '1px solid #f0f0f0',
-                      }}
-                      onMouseEnter={(e) => {
-                        if (filters.availability !== '') {
-                          e.currentTarget.style.backgroundColor = '#f5f5f5';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (filters.availability !== '') {
-                          e.currentTarget.style.backgroundColor = 'transparent';
-                        }
-                      }}
-                    >
-                      {t('common.im_available')}
-                    </div>
-                    <div
-                      onClick={() => {
-                        setFilters({ ...filters, availability: 'available' });
-                        setAvailabilityDropdownOpen(false);
-                      }}
-                      style={{
-                        padding: '12px 16px',
-                        cursor: 'pointer',
-                        backgroundColor: filters.availability === 'available' ? '#e3f2fd' : 'transparent',
-                        color: filters.availability === 'available' ? '#000' : '#666',
-                      }}
-                      onMouseEnter={(e) => {
-                        if (filters.availability !== 'available') {
-                          e.currentTarget.style.backgroundColor = '#f5f5f5';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (filters.availability !== 'available') {
-                          e.currentTarget.style.backgroundColor = 'transparent';
-                        }
-                      }}
-                    >
-                      {t('common.has_availability')}
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div className="filter-item time-day-filter-container" style={{ flex: '0 1 auto', minWidth: '180px', position: 'relative' }}>
-                <div
-                  className="form-select"
-                  onClick={() => {
-                    setTimeDayFilterOpen(!timeDayFilterOpen);
-                    setCourseDropdownOpen(false);
-                    setCountryDropdownOpen(false);
-                    setAvailabilityDropdownOpen(false);
-                  }}
-                  style={{
-                    borderRadius: '8px',
-                    border: (filters.timeRanges.length > 0 || filters.days.length > 0) ? '1px solid #e91e63' : '1px solid #e0e0e0',
-                    padding: '10px 16px',
-                    fontSize: '14px',
-                    backgroundColor: '#fff',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    minHeight: '42px',
-                  }}
-                >
-                  <span style={{ color: (filters.timeRanges.length > 0 || filters.days.length > 0) ? '#000' : '#999' }}>
-                    {filters.timeRanges.length > 0 || filters.days.length > 0 
-                      ? `${filters.timeRanges.length} time${filters.timeRanges.length !== 1 ? 's' : ''}, ${filters.days.length} day${filters.days.length !== 1 ? 's' : ''}`
-                      : 'Time & Day'}
-                  </span>
-                </div>
-                {timeDayFilterOpen && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '100%',
-                      left: 0,
-                      marginTop: '4px',
-                      backgroundColor: '#fff',
-                      border: '1px solid #e0e0e0',
-                      borderRadius: '12px',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                      zIndex: 1002,
-                      padding: '20px',
-                      minWidth: '500px',
-                      maxWidth: '600px',
-                    }}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <div style={{ marginBottom: '24px' }}>
-                      <h6 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px', color: '#1a1a1a' }}>Times</h6>
-                      
-                      <div style={{ marginBottom: '20px' }}>
-                        <div style={{ fontSize: '14px', fontWeight: '500', marginBottom: '10px', color: '#666' }}>Daytime</div>
-                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                          {timeRanges.filter(tr => tr.group === 'daytime').map(tr => (
-                            <button
-                              key={tr.id}
-                              onClick={() => {
-                                const newRanges = filters.timeRanges.includes(tr.id)
-                                  ? filters.timeRanges.filter(r => r !== tr.id)
-                                  : [...filters.timeRanges, tr.id];
-                                setFilters({ ...filters, timeRanges: newRanges });
-                              }}
-                              style={{
-                                padding: '10px 16px',
-                                borderRadius: '8px',
-                                border: '1px solid #e0e0e0',
-                                backgroundColor: filters.timeRanges.includes(tr.id) ? '#e91e63' : '#fff',
-                                color: filters.timeRanges.includes(tr.id) ? '#fff' : '#1a1a1a',
-                                cursor: 'pointer',
-                                fontSize: '14px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '6px',
-                                transition: 'all 0.2s',
-                              }}
-                              onMouseEnter={(e) => {
-                                if (!filters.timeRanges.includes(tr.id)) {
-                                  e.currentTarget.style.borderColor = '#e91e63';
-                                  e.currentTarget.style.backgroundColor = '#fce4ec';
-                                }
-                              }}
-                              onMouseLeave={(e) => {
-                                if (!filters.timeRanges.includes(tr.id)) {
-                                  e.currentTarget.style.borderColor = '#e0e0e0';
-                                  e.currentTarget.style.backgroundColor = '#fff';
-                                }
-                              }}
-                            >
-                              <span>{tr.icon}</span>
-                              <span>{tr.label}</span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div style={{ marginBottom: '20px' }}>
-                        <div style={{ fontSize: '14px', fontWeight: '500', marginBottom: '10px', color: '#666' }}>Evening and night</div>
-                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                          {timeRanges.filter(tr => tr.group === 'evening').map(tr => (
-                            <button
-                              key={tr.id}
-                              onClick={() => {
-                                const newRanges = filters.timeRanges.includes(tr.id)
-                                  ? filters.timeRanges.filter(r => r !== tr.id)
-                                  : [...filters.timeRanges, tr.id];
-                                setFilters({ ...filters, timeRanges: newRanges });
-                              }}
-                              style={{
-                                padding: '10px 16px',
-                                borderRadius: '8px',
-                                border: '1px solid #e0e0e0',
-                                backgroundColor: filters.timeRanges.includes(tr.id) ? '#e91e63' : '#fff',
-                                color: filters.timeRanges.includes(tr.id) ? '#fff' : '#1a1a1a',
-                                cursor: 'pointer',
-                                fontSize: '14px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '6px',
-                                transition: 'all 0.2s',
-                              }}
-                              onMouseEnter={(e) => {
-                                if (!filters.timeRanges.includes(tr.id)) {
-                                  e.currentTarget.style.borderColor = '#e91e63';
-                                  e.currentTarget.style.backgroundColor = '#fce4ec';
-                                }
-                              }}
-                              onMouseLeave={(e) => {
-                                if (!filters.timeRanges.includes(tr.id)) {
-                                  e.currentTarget.style.borderColor = '#e0e0e0';
-                                  e.currentTarget.style.backgroundColor = '#fff';
-                                }
-                              }}
-                            >
-                              <span>{tr.icon}</span>
-                              <span>{tr.label}</span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div style={{ marginBottom: '20px' }}>
-                        <div style={{ fontSize: '14px', fontWeight: '500', marginBottom: '10px', color: '#666' }}>Morning</div>
-                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                          {timeRanges.filter(tr => tr.group === 'morning').map(tr => (
-                            <button
-                              key={tr.id}
-                              onClick={() => {
-                                const newRanges = filters.timeRanges.includes(tr.id)
-                                  ? filters.timeRanges.filter(r => r !== tr.id)
-                                  : [...filters.timeRanges, tr.id];
-                                setFilters({ ...filters, timeRanges: newRanges });
-                              }}
-                              style={{
-                                padding: '10px 16px',
-                                borderRadius: '8px',
-                                border: '1px solid #e0e0e0',
-                                backgroundColor: filters.timeRanges.includes(tr.id) ? '#e91e63' : '#fff',
-                                color: filters.timeRanges.includes(tr.id) ? '#fff' : '#1a1a1a',
-                                cursor: 'pointer',
-                                fontSize: '14px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '6px',
-                                transition: 'all 0.2s',
-                              }}
-                              onMouseEnter={(e) => {
-                                if (!filters.timeRanges.includes(tr.id)) {
-                                  e.currentTarget.style.borderColor = '#e91e63';
-                                  e.currentTarget.style.backgroundColor = '#fce4ec';
-                                }
-                              }}
-                              onMouseLeave={(e) => {
-                                if (!filters.timeRanges.includes(tr.id)) {
-                                  e.currentTarget.style.borderColor = '#e0e0e0';
-                                  e.currentTarget.style.backgroundColor = '#fff';
-                                }
-                              }}
-                            >
-                              <span>{tr.icon}</span>
-                              <span>{tr.label}</span>
-                            </button>
-                          ))}
-                        </div>
+                    <div style={{ padding: '8px', borderBottom: '1px solid #e0e0e0' }}>
+                      <div style={{ position: 'relative' }}>
+                        <i className="fas fa-search" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#999', fontSize: '14px' }}></i>
+                        <input
+                          type="text"
+                          placeholder="Type to search"
+                          value={languageSearch}
+                          onChange={(e) => setLanguageSearch(e.target.value)}
+                          onClick={(e) => e.stopPropagation()}
+                          style={{
+                            width: '100%',
+                            padding: '8px 12px 8px 36px',
+                            border: '1px solid #e0e0e0',
+                            borderRadius: '6px',
+                            fontSize: '14px',
+                          }}
+                        />
                       </div>
                     </div>
-
-                    <div>
-                      <h6 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px', color: '#1a1a1a' }}>Days</h6>
-                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                        {days.map(day => (
-                          <button
-                            key={day}
-                            onClick={() => {
-                              const newDays = filters.days.includes(day)
-                                ? filters.days.filter(d => d !== day)
-                                : [...filters.days, day];
-                              setFilters({ ...filters, days: newDays });
-                            }}
-                            style={{
-                              padding: '10px 16px',
-                              borderRadius: '8px',
-                              border: '1px solid #e0e0e0',
-                              backgroundColor: filters.days.includes(day) ? '#e91e63' : '#fff',
-                              color: filters.days.includes(day) ? '#fff' : '#1a1a1a',
-                              cursor: 'pointer',
-                              fontSize: '14px',
-                              transition: 'all 0.2s',
-                              minWidth: '60px',
-                            }}
-                            onMouseEnter={(e) => {
-                              if (!filters.days.includes(day)) {
-                                e.currentTarget.style.borderColor = '#e91e63';
-                                e.currentTarget.style.backgroundColor = '#fce4ec';
-                              }
-                            }}
-                            onMouseLeave={(e) => {
-                              if (!filters.days.includes(day)) {
-                                e.currentTarget.style.borderColor = '#e0e0e0';
-                                e.currentTarget.style.backgroundColor = '#fff';
-                              }
-                            }}
-                          >
-                            {day}
-                          </button>
-                        ))}
+                    <div style={{ overflowY: 'auto', maxHeight: '350px' }}>
+                      <div
+                        onClick={() => {
+                          setFilters({ ...filters, language: '' });
+                          setLanguageDropdownOpen(false);
+                          setLanguageSearch('');
+                        }}
+                        style={{
+                          padding: '12px 16px',
+                          cursor: 'pointer',
+                          backgroundColor: filters.language === '' ? '#f5f5f5' : 'transparent',
+                          borderBottom: '1px solid #f0f0f0',
+                        }}
+                        onMouseEnter={(e) => {
+                          if (filters.language !== '') {
+                            e.currentTarget.style.backgroundColor = '#f5f5f5';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (filters.language !== '') {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                          }
+                        }}
+                      >
+                        <span style={{ color: '#999', fontSize: '14px' }}>All languages</span>
                       </div>
+                      {languages.filter((lang) => {
+                        if (!languageSearch) return true;
+                        const searchLower = languageSearch.toLowerCase();
+                        return lang.name.toLowerCase().includes(searchLower) || 
+                               (lang.nativeName && lang.nativeName.toLowerCase().includes(searchLower)) ||
+                               lang.code.toLowerCase().includes(searchLower);
+                      }).length > 0 && (
+                        <>
+                          {popularLanguages.length > 0 && (
+                            <>
+                              <div style={{ padding: '12px 16px 8px', fontSize: '14px', fontWeight: '600', color: '#1a1a1a' }}>Popular</div>
+                              {languages
+                                .filter((lang) => {
+                                  if (!popularLanguages.includes(lang.name)) return false;
+                                  if (!languageSearch) return true;
+                                  const searchLower = languageSearch.toLowerCase();
+                                  return lang.name.toLowerCase().includes(searchLower) || 
+                                         (lang.nativeName && lang.nativeName.toLowerCase().includes(searchLower)) ||
+                                         lang.code.toLowerCase().includes(searchLower);
+                                })
+                                .map((lang) => (
+                                  <div
+                                    key={lang._id}
+                                    onClick={() => {
+                                      setFilters({ ...filters, language: lang._id });
+                                      setLanguageDropdownOpen(false);
+                                      setLanguageSearch('');
+                                    }}
+                                    style={{
+                                      padding: '12px 16px',
+                                      cursor: 'pointer',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '10px',
+                                      backgroundColor: filters.language === lang._id ? '#f5f5f5' : 'transparent',
+                                      borderBottom: '1px solid #f0f0f0',
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      if (filters.language !== lang._id) {
+                                        e.currentTarget.style.backgroundColor = '#f5f5f5';
+                                      }
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      if (filters.language !== lang._id) {
+                                        e.currentTarget.style.backgroundColor = 'transparent';
+                                      }
+                                    }}
+                                  >
+                                    <span style={{ fontSize: '14px', flex: 1 }}>{lang.name}</span>
+                                    {filters.language === lang._id && (
+                                      <i className="fas fa-check" style={{ color: '#e91e63', fontSize: '12px' }}></i>
+                                    )}
+                                  </div>
+                                ))}
+                            </>
+                          )}
+                          {languages
+                            .filter((lang) => {
+                              if (popularLanguages.includes(lang.name)) return false;
+                              if (!languageSearch) return true;
+                              const searchLower = languageSearch.toLowerCase();
+                              return lang.name.toLowerCase().includes(searchLower) || 
+                                     (lang.nativeName && lang.nativeName.toLowerCase().includes(searchLower)) ||
+                                     lang.code.toLowerCase().includes(searchLower);
+                            })
+                            .map((lang) => (
+                              <div
+                                key={lang._id}
+                                onClick={() => {
+                                  setFilters({ ...filters, language: lang._id });
+                                  setLanguageDropdownOpen(false);
+                                  setLanguageSearch('');
+                                }}
+                                style={{
+                                  padding: '12px 16px',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '10px',
+                                  backgroundColor: filters.language === lang._id ? '#f5f5f5' : 'transparent',
+                                  borderBottom: '1px solid #f0f0f0',
+                                }}
+                                onMouseEnter={(e) => {
+                                  if (filters.language !== lang._id) {
+                                    e.currentTarget.style.backgroundColor = '#f5f5f5';
+                                  }
+                                }}
+                                onMouseLeave={(e) => {
+                                  if (filters.language !== lang._id) {
+                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                  }
+                                }}
+                              >
+                                <span style={{ fontSize: '14px', flex: 1 }}>{lang.name}</span>
+                                {filters.language === lang._id && (
+                                  <i className="fas fa-check" style={{ color: '#e91e63', fontSize: '12px' }}></i>
+                                )}
+                              </div>
+                            ))}
+                        </>
+                      )}
                     </div>
                   </div>
                 )}
@@ -1205,7 +1101,7 @@ const TeachersSelection = () => {
                       courseName = (courseId.name as any).en || String(courseId.name);
                     }
                   }
-                  const availabilityCount = getTeacherAvailability(teacher).length;
+                  const availabilityCount = Array.isArray(teacher.availability) ? teacher.availability.length : 0;
                   const isHovered = hoveredTeacher === teacher._id;
                   const isSelected = selectedTeacher?._id === teacher._id;
 
@@ -1452,7 +1348,7 @@ const TeachersSelection = () => {
                         >
                           <h6 className="mb-2 fw-semibold">{t('common.available_slots')}:</h6>
                           <div className="d-flex flex-wrap gap-2">
-                            {getTeacherAvailability(teacher).slice(0, 8).map((slot) => (
+                            {teacher.availability.slice(0, 8).map((slot) => (
                               <button
                                 key={slot._id}
                                 className="btn btn-outline-primary btn-sm"

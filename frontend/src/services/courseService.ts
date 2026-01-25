@@ -126,7 +126,6 @@ export const fetchCourseTeachers = async (
     startDate?: string
     endDate?: string
     currency?: string
-    studentTimezone?: string
   }
 ): Promise<TeachersResponse> => {
   const queryParams = new URLSearchParams()
@@ -139,12 +138,8 @@ export const fetchCourseTeachers = async (
   if (params?.currency) {
     queryParams.append('currency', params.currency)
   }
-  if (params?.studentTimezone) {
-    queryParams.append('studentTimezone', params.studentTimezone)
-  }
 
-  // Use the new endpoint that includes availability
-  const response = await fetch(`${API_BASE_URL}/public/courses/${slug}/teachers-with-availability?${queryParams.toString()}`)
+  const response = await fetch(`${API_BASE_URL}/public/courses/${slug}/teachers?${queryParams.toString()}`)
   
   if (!response.ok) {
     throw new Error('Failed to fetch teachers')
@@ -156,7 +151,6 @@ export const fetchCourseTeachers = async (
 export interface AvailabilityResponse {
   availabilities: Array<{
     _id: string
-    teacherId?: { _id: string } | string
     date: string
     startTime: string
     endTime: string
