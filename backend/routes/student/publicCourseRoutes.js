@@ -1,6 +1,6 @@
 import express from "express";
 import { getCourses, getCourseById } from "../../controllers/courseController.js";
-import { getCourseTeachersBySlug } from "../../controllers/teacherCourseController.js";
+import { getCourseTeachersBySlug, getCourseTeachersWithAvailability } from "../../controllers/teacherCourseController.js";
 import { getCourseAvailability } from "../../controllers/availabilityController.js";
 
 const router = express.Router();
@@ -11,6 +11,7 @@ router.get("/", (req, res, next) => {
 }, getCourses);
 
 // This route must come before /:id to avoid route conflicts
+router.get("/:slug/teachers-with-availability", getCourseTeachersWithAvailability);
 router.get("/:slug/teachers", getCourseTeachersBySlug);
 router.get("/availability", getCourseAvailability);
 
