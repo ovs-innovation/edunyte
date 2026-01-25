@@ -57,18 +57,6 @@ const TeachersSelection = () => {
     language: '',
   });
 
-  const timeRanges = [
-    { id: '9-12', label: '9-12', icon: '☀️', group: 'daytime' },
-    { id: '12-15', label: '12-15', icon: '☀️', group: 'daytime' },
-    { id: '15-18', label: '15-18', icon: '☀️', group: 'daytime' },
-    { id: '18-21', label: '18-21', icon: '🌅', group: 'evening' },
-    { id: '21-24', label: '21-24', icon: '🌙', group: 'evening' },
-    { id: '0-3', label: '0-3', icon: '🌙', group: 'evening' },
-    { id: '3-6', label: '3-6', icon: '😴', group: 'morning' },
-    { id: '6-9', label: '6-9', icon: '🌅', group: 'morning' },
-  ];
-
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 
   useEffect(() => {
@@ -457,63 +445,178 @@ const TeachersSelection = () => {
   return (
     <>
       <style>{`
-        @media (max-width: 768px) {
-          .teachers-selection-page .filters-bar {
-            flex-direction: column !important;
-          }
-          .teachers-selection-page .filter-item {
-            width: 100% !important;
-            min-width: 100% !important;
-            flex: 1 1 100% !important;
-          }
-          .teachers-selection-page .teacher-card {
-            padding: 16px !important;
-          }
-          .teachers-selection-page .teacher-card .text-end {
-            text-align: left !important;
-            margin-top: 5px;
-            margin-left: 0 !important;
-          }
-          .teachers-selection-page .teacher-card .text-end .w-100 {
-            width: 100% !important;
-          }
-        }
-        @media (max-width: 992px) {
-          .teachers-selection-page .teacher-video-sidebar {
-            position: relative !important;
-            top: 0 !important;
-            margin-top: 10px;
-          }
-        }
-        @media (min-width: 1200px) {
-          .teachers-selection-page .container {
-            padding: 2px 20px !important;
-          }
-        }
         .teachers-selection-page .filters-bar .form-control:focus,
         .teachers-selection-page .filters-bar .form-select:focus {
           border-color: #e91e63 !important;
           box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.1) !important;
           outline: none !important;
         }
-        @media (max-width: 768px) {
-          .teachers-selection-page .time-day-filter-container > div[style*="minWidth: '500px'"] {
-            min-width: calc(100vw - 40px) !important;
-            max-width: calc(100vw - 40px) !important;
+
+        @media (max-width: 992px) {
+          .teachers-selection-page .price-wishlist-section-desktop,
+          .teachers-selection-page .action-buttons-section-desktop {
+            display: none !important;
+          }
+          .teachers-selection-page .price-buttons-mobile {
+            display: flex !important;
+          }
+        }
+
+        @media (min-width: 993px) {
+          .teachers-selection-page .price-wishlist-section-desktop,
+          .teachers-selection-page .action-buttons-section-desktop {
+            display: block !important;
+          }
+          .teachers-selection-page .price-buttons-mobile {
+            display: none !important;
+          }
+        }
+
+        @media (max-width: 576px) {
+          .teachers-selection-page .container {
+            padding: 12px 16px 16px 16px !important;
+          }
+          .teachers-selection-page h1 {
+            font-size: 20px !important;
+            margin-bottom: 16px !important;
+            line-height: 1.3 !important;
+          }
+          .teachers-selection-page .filters-bar {
+            flex-direction: column !important;
+            padding: 12px !important;
+            gap: 10px !important;
+            border-radius: 8px !important;
+            margin-bottom: 16px !important;
+          }
+          .teachers-selection-page .filter-item {
+            width: 100% !important;
+            min-width: 100% !important;
+            flex: 1 1 100% !important;
+          }
+          .teachers-selection-page .filter-item .form-select,
+          .teachers-selection-page .filter-item .form-control {
+            min-height: 44px !important;
+            font-size: 14px !important;
+            padding: 10px 12px !important;
+          }
+          .teachers-selection-page .teacher-card {
+            padding: 16px !important;
+            margin-bottom: 16px !important;
+          }
+          .teachers-selection-page .teacher-card .row.g-3 {
+            margin: 0 !important;
+          }
+          .teachers-selection-page .teacher-card .row.g-3 > div {
+            padding: 0 !important;
+            margin-bottom: 12px !important;
+          }
+          .teachers-selection-page .teacher-card .teacher-content-col {
+            padding-right: 0 !important;
+            padding-left: 0 !important;
+          }
+          .teachers-selection-page .teacher-card .border-top {
+            margin-top: 12px !important;
+            padding-top: 12px !important;
+          }
+          .teachers-selection-page .teacher-card .d-flex.justify-content-between {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 12px !important;
+          }
+          .teachers-selection-page .teacher-card .d-flex.justify-content-between > div:first-child {
+            width: 100% !important;
+            justify-content: space-between !important;
+          }
+          .teachers-selection-page .teacher-card .d-flex.flex-column {
+            width: 100% !important;
+          }
+          .teachers-selection-page .teacher-card .availability-popup {
+            position: relative !important;
             left: 0 !important;
             right: 0 !important;
+            top: 0 !important;
+            margin-top: 12px !important;
+            margin-bottom: 0 !important;
+          }
+          .teachers-selection-page .col-lg-8,
+          .teachers-selection-page .col-lg-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+          }
+          .teachers-selection-page .teacher-video-sidebar {
+            display: none !important;
+          }
+          .teachers-selection-page .language-dropdown-container > div[style*="position: absolute"],
+          .teachers-selection-page .country-dropdown-container > div[style*="position: absolute"],
+          .teachers-selection-page .course-dropdown-container > div[style*="position: absolute"] {
+            left: 0 !important;
+            right: 0 !important;
+            width: 100% !important;
+          }
+        }
+
+        @media (min-width: 577px) and (max-width: 768px) {
+          .teachers-selection-page .container {
+            padding: 12px 16px 20px 16px !important;
+          }
+          .teachers-selection-page h1 {
+            font-size: 24px !important;
+            margin-bottom: 16px !important;
+          }
+          .teachers-selection-page .filters-bar {
+            flex-wrap: wrap !important;
+            gap: 10px !important;
+            padding: 14px !important;
+            margin-bottom: 16px !important;
+          }
+          .teachers-selection-page .filter-item {
+            flex: 1 1 calc(50% - 5px) !important;
+            min-width: calc(50% - 5px) !important;
+          }
+          .teachers-selection-page .filter-item:first-child {
+            flex: 1 1 100% !important;
+            min-width: 100% !important;
+          }
+          .teachers-selection-page .teacher-card {
+            padding: 18px !important;
+          }
+          .teachers-selection-page .teacher-card .teacher-content-col {
+            padding-right: 0 !important;
+          }
+          .teachers-selection-page .teacher-video-sidebar {
+            display: none !important;
+          }
+        }
+
+        @media (min-width: 769px) and (max-width: 992px) {
+          .teachers-selection-page .container {
+            padding: 14px 18px 20px 18px !important;
+          }
+          .teachers-selection-page .teacher-video-sidebar {
+            position: relative !important;
+            top: 0 !important;
+            margin-top: 20px !important;
+          }
+          .teachers-selection-page .teacher-card .teacher-content-col {
+            padding-right: 0 !important;
+          }
+        }
+
+        @media (min-width: 993px) {
+          .teachers-selection-page .container {
+            padding: 16px 20px 20px 20px !important;
           }
         }
       `}</style>
       <div className="teachers-selection-page" style={{ backgroundColor: '#fff', minHeight: '100vh' }}>
-        <div className="container" style={{ maxWidth: '1400px', padding: '10px 20px 20px 20px' }}>
-        <div className="row mb-3" style={{ marginTop: '0' }}>
-          <div className="col-12">
-            <h1 className="h2 fw-bold mb-2" style={{ fontSize: '32px', color: '#1a1a1a' }}>
-              {filteredTeachers.length} {t('common.available_teachers')} {t('common.to_help_you_succeed')}
-            </h1>
+        <div className="container" style={{ maxWidth: '1400px', padding: '16px 20px 20px 20px' }}>
+          <div className="row mb-3">
+            <div className="col-12">
+              <h1 className="h2 fw-bold mb-2" style={{ fontSize: '32px', color: '#1a1a1a', lineHeight: '1.2' }}>
+                {filteredTeachers.length} {t('common.available_teachers')} {t('common.to_help_you_succeed')}
+              </h1>
+            </div>
           </div>
-        </div>
 
         <div className="row mb-3">
           <div className="col-12">
@@ -648,7 +751,7 @@ const TeachersSelection = () => {
                   </div>
                 )}
               </div>
-              <div className="filter-item" style={{ position: 'relative', flex: '1 1 200px', minWidth: '200px' }}>
+              <div className="filter-item search-input-container" style={{ position: 'relative', flex: '1 1 200px', minWidth: '200px' }}>
                 <input
                   type="text"
                   className="form-control"
@@ -658,7 +761,7 @@ const TeachersSelection = () => {
                   style={{
                     borderRadius: '8px',
                     border: '1px solid #e0e0e0',
-                    padding: '10px 16px',
+                    padding: '10px 40px 10px 16px',
                     fontSize: '14px',
                     transition: 'all 0.2s',
                   }}
@@ -680,8 +783,9 @@ const TeachersSelection = () => {
                     transform: 'translateY(-50%)',
                     color: '#999',
                     pointerEvents: 'none',
+                    fontSize: '14px',
                   }}
-                ></i>
+                />
               </div>
               <div className="filter-item" style={{ flex: '0 1 auto', minWidth: '160px' }}>
                 <select
@@ -1122,13 +1226,13 @@ const TeachersSelection = () => {
                       onMouseLeave={() => setHoveredTeacher(null)}
                       onClick={() => setSelectedTeacher(teacher)}
                     >
-                      <div className="position-absolute" style={{ top: '20px', right: '20px', zIndex: 2 }}>
-                        <div className="d-flex align-items-start mb-2" style={{ gap: '16px' }}>
-                          <div className="text-end">
-                            <div className="fw-bold text-primary mb-1" style={{ fontSize: '28px' }}>
+                      <div className="position-absolute price-wishlist-section-desktop" style={{ top: '20px', right: '20px', zIndex: 2, maxWidth: '200px' }}>
+                        <div className="d-flex align-items-start" style={{ gap: '12px' }}>
+                          <div className="text-end" style={{ maxWidth: '150px', wordBreak: 'break-word' }}>
+                            <div className="fw-bold text-primary mb-1" style={{ fontSize: '20px', lineHeight: '1.2' }}>
                               {formatPrice(teacher.price || 0, teacher.currency || 'INR')}
                             </div>
-                            <small className="text-muted d-block" style={{ fontSize: '12px' }}>
+                            <small className="text-muted d-block" style={{ fontSize: '11px' }}>
                               {t('common.per_hour')}
                             </small>
                           </div>
@@ -1136,8 +1240,8 @@ const TeachersSelection = () => {
                             className="btn btn-link p-0"
                             onClick={(e) => toggleFavorite(teacher._id, e)}
                             style={{
-                              width: '32px',
-                              height: '32px',
+                              width: '28px',
+                              height: '28px',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
@@ -1145,19 +1249,31 @@ const TeachersSelection = () => {
                               background: 'transparent',
                               cursor: 'pointer',
                               flexShrink: 0,
+                              marginTop: '2px',
                             }}
                           >
                             <i
                               className={favoriteTeachers.has(teacher._id) ? 'fas fa-heart' : 'far fa-heart'}
                               style={{
-                                fontSize: '20px',
+                                fontSize: '18px',
                                 color: favoriteTeachers.has(teacher._id) ? '#e91e63' : '#999',
                                 transition: 'color 0.2s',
                               }}
                             ></i>
                           </button>
                         </div>
-                        <div className="d-flex flex-column align-items-end gap-2 mt-3">
+                      </div>
+
+                      <div 
+                        className="position-absolute action-buttons-section-desktop" 
+                        style={{ 
+                          top: '70px', 
+                          right: '20px', 
+                          zIndex: 2,
+                          minWidth: '160px',
+                        }}
+                      >
+                        <div className="d-flex flex-column align-items-end gap-2">
                           <button
                             className="btn btn-sm"
                             onClick={(e) => {
@@ -1202,6 +1318,7 @@ const TeachersSelection = () => {
                           </button>
                         </div>
                       </div>
+
                       <div className="row g-3">
                         <div className="col-auto">
                           <div
@@ -1239,7 +1356,7 @@ const TeachersSelection = () => {
                             )}
                           </div>
                         </div>
-                        <div className="col" style={{ paddingRight: '180px' }}>
+                        <div className="col teacher-content-col" style={{ paddingRight: '200px' }}>
                           <div className="d-flex align-items-center gap-2 mb-2 flex-wrap">
                             <h5 className="mb-0 fw-bold" style={{ fontSize: '18px' }}>
                               {teacherName}
@@ -1330,6 +1447,88 @@ const TeachersSelection = () => {
                           )}
                         </div>
                       </div>
+                      
+                      <div className="mt-3 pt-3 border-top price-buttons-mobile d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div className="d-flex align-items-center gap-3">
+                          <div className="text-start">
+                            <div className="fw-bold text-primary mb-1" style={{ fontSize: '20px', lineHeight: '1.2' }}>
+                              {formatPrice(teacher.price || 0, teacher.currency || 'INR')}
+                            </div>
+                            <small className="text-muted d-block" style={{ fontSize: '11px' }}>
+                              {t('common.per_hour')}
+                            </small>
+                          </div>
+                          <button
+                            className="btn btn-link p-0"
+                            onClick={(e) => toggleFavorite(teacher._id, e)}
+                            style={{
+                              width: '32px',
+                              height: '32px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              border: 'none',
+                              background: 'transparent',
+                              cursor: 'pointer',
+                              flexShrink: 0,
+                            }}
+                          >
+                            <i
+                              className={favoriteTeachers.has(teacher._id) ? 'fas fa-heart' : 'far fa-heart'}
+                              style={{
+                                fontSize: '20px',
+                                color: favoriteTeachers.has(teacher._id) ? '#e91e63' : '#999',
+                                transition: 'color 0.2s',
+                              }}
+                            />
+                          </button>
+                        </div>
+                        <div className="d-flex flex-column gap-2" style={{ minWidth: '160px' }}>
+                          <button
+                            className="btn btn-sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleBookTrial(teacher);
+                            }}
+                            style={{
+                              backgroundColor: '#e91e63',
+                              borderColor: '#e91e63',
+                              fontSize: '13px',
+                              padding: '10px 20px',
+                              borderRadius: '8px',
+                              fontWeight: '500',
+                              color: '#fff',
+                              width: '100%',
+                              minWidth: '140px',
+                            }}
+                          >
+                            {t('common.book_trial_lesson')}
+                          </button>
+                          <button
+                            className="btn btn-sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSendMessage(teacher);
+                            }}
+                            style={{
+                              backgroundColor: '#fff',
+                              borderColor: '#ddd',
+                              borderWidth: '1px',
+                              borderStyle: 'solid',
+                              fontSize: '13px',
+                              padding: '10px 20px',
+                              borderRadius: '8px',
+                              fontWeight: '500',
+                              color: '#1a1a1a',
+                              width: '100%',
+                              minWidth: '140px',
+                            }}
+                          >
+                            {t('common.send_message')}
+                          </button>
+                        </div>
+                      </div>
+                      
                       {isHovered && availabilityCount > 0 && (
                         <div
                           className="availability-popup mt-3 p-3 border rounded"
@@ -1384,107 +1583,113 @@ const TeachersSelection = () => {
           </div>
 
           <div className="col-12 col-lg-4">
-            {selectedTeacher && (
-              <div className="teacher-video-sidebar" style={{ position: 'sticky', top: '20px' }}>
-                <div className="card border-0 shadow-sm" style={{ borderRadius: '12px', overflow: 'hidden' }}>
-                  {selectedTeacher.introductionVideo ? (
-                    <div className="position-relative">
-                      <div
-                        className="video-thumbnail"
-                        style={{
-                          width: '100%',
-                          aspectRatio: '16/9',
-                          backgroundColor: '#f8f9fa',
-                          overflow: 'hidden',
-                          cursor: 'pointer',
-                          position: 'relative',
-                        }}
+            {(() => {
+              const activeTeacherId = hoveredTeacher || (selectedTeacher?._id);
+              const activeTeacher = activeTeacherId ? filteredTeachers.find(t => t._id === activeTeacherId) : null;
+              
+              if (!activeTeacher) return null;
+              
+              return (
+                <div className="teacher-video-sidebar" style={{ position: 'sticky', top: '20px' }}>
+                  <div className="card border-0 shadow-sm" style={{ borderRadius: '12px', overflow: 'hidden' }}>
+                    {activeTeacher.introductionVideo ? (
+                        <div className="position-relative">
+                          <div
+                            className="video-thumbnail"
+                            style={{
+                              width: '100%',
+                              aspectRatio: '16/9',
+                              backgroundColor: '#f8f9fa',
+                              overflow: 'hidden',
+                              cursor: 'pointer',
+                              position: 'relative',
+                            }}
                         onClick={() => {
-                          if (selectedTeacher.introductionVideo) {
-                            setVideoUrl(selectedTeacher.introductionVideo);
+                          if (activeTeacher.introductionVideo) {
+                            setVideoUrl(activeTeacher.introductionVideo);
                             setVideoModalOpen(true);
                           }
                         }}
                       >
-                        {getYouTubeThumbnail(selectedTeacher.introductionVideo) ? (
+                        {getYouTubeThumbnail(activeTeacher.introductionVideo) ? (
                           <img
-                            src={getYouTubeThumbnail(selectedTeacher.introductionVideo)}
-                            alt="Video thumbnail"
-                            style={{
-                              width: '100%',
-                              height: '100%',
-                              objectFit: 'cover',
-                            }}
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).style.display = 'none';
-                            }}
-                          />
-                        ) : null}
+                            src={getYouTubeThumbnail(activeTeacher.introductionVideo)}
+                                alt="Video thumbnail"
+                                style={{
+                                  width: '100%',
+                                  height: '100%',
+                                  objectFit: 'cover',
+                                }}
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).style.display = 'none';
+                                }}
+                              />
+                            ) : null}
+                            <div
+                              className="position-absolute top-50 start-50 translate-middle"
+                              style={{
+                                width: '70px',
+                                height: '70px',
+                                borderRadius: '50%',
+                                background: 'linear-gradient(135deg, #e91e63 0%, #f06292 100%)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: '#fff',
+                                fontSize: '32px',
+                                boxShadow: '0 4px 12px rgba(233, 30, 99, 0.4)',
+                                zIndex: 2,
+                                transition: 'transform 0.2s',
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1.1)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1)';
+                              }}
+                            >
+                              <i className="fas fa-play" style={{ marginLeft: '4px' }}></i>
+                            </div>
+                            <div
+                              className="position-absolute bottom-0 start-0 end-0 p-2"
+                              style={{
+                                background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)',
+                                color: '#fff',
+                                fontSize: '12px',
+                                fontWeight: '600',
+                                zIndex: 1,
+                              }}
+                            >
+                              {t('common.watch_intro')}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
                         <div
-                          className="position-absolute top-50 start-50 translate-middle"
+                          className="video-placeholder d-flex align-items-center justify-content-center"
                           style={{
-                            width: '70px',
-                            height: '70px',
-                            borderRadius: '50%',
-                            background: 'linear-gradient(135deg, #e91e63 0%, #f06292 100%)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: '#fff',
-                            fontSize: '32px',
-                            boxShadow: '0 4px 12px rgba(233, 30, 99, 0.4)',
-                            zIndex: 2,
-                            transition: 'transform 0.2s',
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1.1)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1)';
+                            width: '100%',
+                            aspectRatio: '16/9',
+                            backgroundColor: '#f8f9fa',
                           }}
                         >
-                          <i className="fas fa-play" style={{ marginLeft: '4px' }}></i>
+                          <div className="text-center text-muted">
+                            <i className="fas fa-video fa-3x mb-2"></i>
+                            <p className="small mb-0">{t('common.no_video_available')}</p>
+                          </div>
                         </div>
-                        <div
-                          className="position-absolute bottom-0 start-0 end-0 p-2"
-                          style={{
-                            background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)',
-                            color: '#fff',
-                            fontSize: '12px',
-                            fontWeight: '600',
-                            zIndex: 1,
-                          }}
-                        >
-                          {t('common.watch_intro')}
+                      )}
+                      <div className="card-body p-3">
+                        <div className="d-flex align-items-center gap-2 mb-3">
+                          <h6 className="mb-0 fw-bold">
+                            {typeof activeTeacher.teacherId === 'object' ? activeTeacher.teacherId.name : ''}
+                          </h6>
+                          <i className="fas fa-check-circle text-primary"></i>
                         </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div
-                      className="video-placeholder d-flex align-items-center justify-content-center"
-                      style={{
-                        width: '100%',
-                        aspectRatio: '16/9',
-                        backgroundColor: '#f8f9fa',
-                      }}
-                    >
-                      <div className="text-center text-muted">
-                        <i className="fas fa-video fa-3x mb-2"></i>
-                        <p className="small mb-0">{t('common.no_video_available')}</p>
-                      </div>
-                    </div>
-                  )}
-                  <div className="card-body p-3">
-                    <div className="d-flex align-items-center gap-2 mb-3">
-                      <h6 className="mb-0 fw-bold">
-                        {typeof selectedTeacher.teacherId === 'object' ? selectedTeacher.teacherId.name : ''}
-                      </h6>
-                      <i className="fas fa-check-circle text-primary"></i>
-                    </div>
-                    <div className="d-flex flex-column gap-2">
-                      <button
-                        className="btn btn-outline-secondary w-100"
-                        onClick={() => handleViewSchedule(selectedTeacher)}
+                        <div className="d-flex flex-column gap-2">
+                          <button
+                            className="btn btn-outline-secondary w-100"
+                            onClick={() => handleViewSchedule(activeTeacher)}
                         style={{
                           borderRadius: '8px',
                           padding: '10px',
@@ -1494,27 +1699,28 @@ const TeachersSelection = () => {
                       >
                         {t('common.view_full_schedule')}
                       </button>
-                      <button
-                        className="btn btn-outline-secondary w-100"
-                        onClick={() => {
-                          const teacherId =
-                            typeof selectedTeacher.teacherId === 'object' ? selectedTeacher.teacherId._id : '';
-                          navigate(`/teacher/${teacherId}`);
-                        }}
-                        style={{
-                          borderRadius: '8px',
-                          padding: '10px',
-                          fontSize: '14px',
-                          fontWeight: '500',
-                        }}
-                      >
-                        {t('common.see_teacher_profile')}
-                      </button>
+                          <button
+                            className="btn btn-outline-secondary w-100"
+                            onClick={() => {
+                              const teacherId =
+                                typeof activeTeacher.teacherId === 'object' ? activeTeacher.teacherId._id : '';
+                              navigate(`/teacher/${teacherId}`);
+                            }}
+                            style={{
+                              borderRadius: '8px',
+                              padding: '10px',
+                              fontSize: '14px',
+                              fontWeight: '500',
+                            }}
+                          >
+                            {t('common.see_teacher_profile')}
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            )}
+                );
+              })()}
           </div>
         </div>
         </div>
