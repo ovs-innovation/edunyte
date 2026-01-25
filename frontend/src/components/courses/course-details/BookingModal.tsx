@@ -44,11 +44,11 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
     if (isOpen) {
       const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
       setStudentTimezone(tz);
-      loadAvailability();
+      loadAvailability(tz);
     }
   }, [isOpen, teacher, courseId, selectedDate, selectedDuration]);
 
-  const loadAvailability = async () => {
+  const loadAvailability = async (tzOverride?: string) => {
     if (!teacher || !courseId) return;
     try {
       setLoading(true);
@@ -57,10 +57,11 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
       startDate.setDate(startDate.getDate() - 7);
       const endDate = new Date(selectedDate);
       endDate.setDate(endDate.getDate() + 30);
+      const tz = tzOverride || studentTimezone;
 
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
       const response = await fetch(
-        `${API_BASE_URL}/public/courses/availability?courseId=${courseId}&teacherId=${teacherId}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&studentTimezone=${encodeURIComponent(studentTimezone)}`
+        `${API_BASE_URL}/public/courses/availability?courseId=${courseId}&teacherId=${teacherId}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&studentTimezone=${encodeURIComponent(tz)}`
       );
       
       if (!response.ok) {
@@ -89,12 +90,13 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
     return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   };
 
+  const formatFullDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
   const formatTime = (timeString: string) => {
     const [hours, minutes] = timeString.split(':');
-    const hour = parseInt(hours, 10);
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    const displayHour = hour % 12 || 12;
-    return `${displayHour}:${minutes} ${ampm}`;
+    return `${hours.padStart(2, '0')}:${minutes}`;
   };
 
   const getWeekDates = () => {
@@ -314,6 +316,9 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
             <div className="mb-3">
               <p className="text-muted small mb-2">
                 {t('common.in_your_timezone')} {studentTimezone} ({new Date().toLocaleTimeString('en-US', { timeZone: studentTimezone, timeZoneName: 'short' }).split(' ').pop() || ''})
+              </p>
+              <p className="text-muted small mb-0">
+                {formatFullDate(selectedDate)}
               </p>
             </div>
 

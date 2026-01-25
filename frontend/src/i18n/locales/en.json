@@ -109,6 +109,7 @@
     "meeting_platform_cost": "Meeting platform cost",
     "total": "Total",
     "cancel": "Cancel",
-    "continue": "Continue"
+    "continue": "Continue",
+    "select_course": "Select course"
   }
 }

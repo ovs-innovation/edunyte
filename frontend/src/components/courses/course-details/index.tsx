@@ -67,7 +67,7 @@ const CourseDetails = () => {
    return (
       <>
          <HeaderOne />
-         <main className="main-area fix">
+         <main >
             <CourseDetailsArea single_course={course} />
          </main>
          <FooterOne style={false} style_2={true} />

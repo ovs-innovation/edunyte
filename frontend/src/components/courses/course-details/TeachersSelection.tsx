@@ -1,9 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchCourseTeachers, type TeacherCourse } from '../../../services/courseService';
+import { fetchCourseTeachers, fetchCourses, type TeacherCourse, type Course } from '../../../services/courseService';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../contexts/AuthContext';
 import BookingModal from './BookingModal';
+import * as Flags from 'country-flag-icons/react/3x2';
+import countriesLib from 'i18n-iso-countries';
+import enLocale from 'i18n-iso-countries/langs/en.json';
+
+countriesLib.registerLocale(enLocale);
 
 interface FilterState {
   priceRange: string;
@@ -11,6 +16,8 @@ interface FilterState {
   availability: string;
   sortBy: string;
   search: string;
+  timeRanges: string[];
+  days: string[];
 }
 
 const TeachersSelection = () => {
@@ -28,13 +35,55 @@ const TeachersSelection = () => {
   const [bookingTeacher, setBookingTeacher] = useState<TeacherCourse | null>(null);
   const [expandedBios, setExpandedBios] = useState<Set<string>>(new Set());
   const [favoriteTeachers, setFavoriteTeachers] = useState<Set<string>>(new Set());
+  const [videoModalOpen, setVideoModalOpen] = useState(false);
+  const [videoUrl, setVideoUrl] = useState<string>('');
+  const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
+  const [countrySearch, setCountrySearch] = useState('');
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [currentCourse, setCurrentCourse] = useState<Course | null>(null);
+  const [courseDropdownOpen, setCourseDropdownOpen] = useState(false);
+  const [courseSearch, setCourseSearch] = useState('');
+  const [availabilityDropdownOpen, setAvailabilityDropdownOpen] = useState(false);
+  const [timeDayFilterOpen, setTimeDayFilterOpen] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     priceRange: '',
     country: '',
     availability: '',
     sortBy: 'top_picks',
     search: '',
+    timeRanges: [],
+    days: [],
   });
+
+  const timeRanges = [
+    { id: '9-12', label: '9-12', icon: '☀️', group: 'daytime' },
+    { id: '12-15', label: '12-15', icon: '☀️', group: 'daytime' },
+    { id: '15-18', label: '15-18', icon: '☀️', group: 'daytime' },
+    { id: '18-21', label: '18-21', icon: '🌅', group: 'evening' },
+    { id: '21-24', label: '21-24', icon: '🌙', group: 'evening' },
+    { id: '0-3', label: '0-3', icon: '🌙', group: 'evening' },
+    { id: '3-6', label: '3-6', icon: '😴', group: 'morning' },
+    { id: '6-9', label: '6-9', icon: '🌅', group: 'morning' },
+  ];
+
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+
+  useEffect(() => {
+    const loadCourses = async () => {
+      try {
+        const response = await fetchCourses({ status: 'active' });
+        setCourses(response.courses);
+        const current = response.courses.find((c) => c.slug === slug);
+        if (current) {
+          setCurrentCourse(current);
+        }
+      } catch (err) {
+        console.error('Failed to load courses:', err);
+      }
+    };
+    loadCourses();
+  }, [slug]);
 
   useEffect(() => {
     const loadTeachers = async () => {
@@ -56,6 +105,27 @@ const TeachersSelection = () => {
     };
     loadTeachers();
   }, [slug, t]);
+
+
+  const getTeacherAvailability = (teacher: TeacherCourse) => {
+    return teacher.availability || [];
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.course-dropdown-container') && !target.closest('.country-dropdown-container') && !target.closest('.availability-dropdown-container') && !target.closest('.time-day-filter-container')) {
+        setCourseDropdownOpen(false);
+        setCountryDropdownOpen(false);
+        setAvailabilityDropdownOpen(false);
+        setTimeDayFilterOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     let filtered = [...teachers];
@@ -88,7 +158,98 @@ const TeachersSelection = () => {
 
     if (filters.availability === 'available') {
       filtered = filtered.filter((teacher) => {
-        return teacher.availability && teacher.availability.length > 0;
+        return getTeacherAvailability(teacher).length > 0;
+      });
+    }
+
+    if (filters.timeRanges.length > 0 || filters.days.length > 0) {
+      const studentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      const getSlotInstant = (date: string | Date, time: string, timezone: string) => {
+        try {
+          const dateObj = typeof date === 'string' ? new Date(date) : date;
+          if (isNaN(dateObj.getTime())) return null;
+          const [hours, minutes] = time.split(':');
+          const dateStr = new Intl.DateTimeFormat('en-CA', {
+            timeZone: timezone,
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          }).format(dateObj);
+          const dateTimeStr = `${dateStr}T${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}:00`;
+          const tempDate = new Date(dateTimeStr);
+
+          const fromDateStr = tempDate.toLocaleString('en-US', {
+            timeZone: timezone,
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false,
+          });
+
+          return new Date(
+            fromDateStr.replace(
+              /(\d+)\/(\d+)\/(\d+), (\d+):(\d+):(\d+)/,
+              '$3-$1-$2T$4:$5:$6'
+            )
+          );
+        } catch (err) {
+          console.error('Timezone conversion error:', err);
+          return null;
+        }
+      };
+
+      const getStudentDayName = (instant: Date) => {
+        return new Intl.DateTimeFormat('en-US', {
+          weekday: 'short',
+          timeZone: studentTimezone,
+        }).format(instant);
+      };
+
+      const getStudentHour = (instant: Date) => {
+        const hourStr = new Intl.DateTimeFormat('en-US', {
+          hour: '2-digit',
+          hour12: false,
+          timeZone: studentTimezone,
+        }).format(instant);
+        return parseInt(hourStr, 10);
+      };
+
+      filtered = filtered.filter((teacher) => {
+        const availability = getTeacherAvailability(teacher);
+        if (!availability || availability.length === 0) return false;
+
+        return availability.some((slot) => {
+          try {
+            const slotTimezone = slot.timezone || teacher.timezone || 'UTC';
+            const instant = getSlotInstant(slot.date, slot.startTime, slotTimezone);
+            if (!instant) return false;
+
+            const dayName = getStudentDayName(instant);
+
+            let matchesDay = true;
+            if (filters.days.length > 0) {
+              matchesDay = filters.days.includes(dayName);
+            }
+
+            let matchesTime = true;
+            if (filters.timeRanges.length > 0) {
+              const hour = getStudentHour(instant);
+              matchesTime = filters.timeRanges.some((range) => {
+                const [start, end] = range.split('-').map(Number);
+                return hour >= start && hour < end;
+              });
+            }
+
+            return matchesDay && matchesTime;
+          } catch (err) {
+            console.error('Error filtering slot:', err, slot);
+            return false;
+          }
+        });
       });
     }
 
@@ -123,17 +284,35 @@ const TeachersSelection = () => {
     }).format(price);
   };
 
-  const getCountryFlag = (countryCode: string): string => {
-    if (!countryCode || countryCode.length !== 2) return '';
+  const CountryFlag = ({ code }: { code: string }) => {
+    if (!code) return null;
+    
     try {
-      const codePoints = countryCode
-        .toUpperCase()
-        .split('')
-        .map((char) => 127397 + char.charCodeAt(0));
-      return String.fromCodePoint(...codePoints);
-    } catch {
-      return '';
+      const upperCode = code.toUpperCase();
+      const FlagComponent = (Flags as Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>>)[upperCode];
+      if (FlagComponent) {
+        return <FlagComponent style={{ width: '24px', height: '18px', borderRadius: '2px', objectFit: 'cover' }} />;
+      }
+    } catch (error) {
+      console.error('Error rendering flag:', error);
     }
+    
+    return <span style={{ fontSize: '12px', color: '#666' }}>{code}</span>;
+  };
+
+  const getYouTubeVideoId = (url: string): string | null => {
+    if (!url) return null;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return match && match[2].length === 11 ? match[2] : null;
+  };
+
+  const getYouTubeThumbnail = (url: string): string => {
+    const videoId = getYouTubeVideoId(url);
+    if (videoId) {
+      return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+    }
+    return '';
   };
 
   const formatDate = (dateString: string) => {
@@ -143,10 +322,7 @@ const TeachersSelection = () => {
 
   const formatTime = (timeString: string) => {
     const [hours, minutes] = timeString.split(':');
-    const hour = parseInt(hours, 10);
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    const displayHour = hour % 12 || 12;
-    return `${displayHour}:${minutes} ${ampm}`;
+    return `${hours.padStart(2, '0')}:${minutes}`;
   };
 
   const getPriceRanges = () => {
@@ -164,6 +340,16 @@ const TeachersSelection = () => {
     ];
   };
 
+  const getCountryName = (code: string): string => {
+    if (!code) return '';
+    try {
+      const name = countriesLib.getName(code.toUpperCase(), 'en');
+      return name || code;
+    } catch {
+      return code;
+    }
+  };
+
   const getCountries = () => {
     const countries = new Set<string>();
     teachers.forEach((teacher) => {
@@ -171,7 +357,7 @@ const TeachersSelection = () => {
         countries.add(teacher.teacherProfile.countryCode);
       }
     });
-    return Array.from(countries);
+    return Array.from(countries).sort();
   };
 
   const handleBookTrial = (teacher: TeacherCourse) => {
@@ -267,7 +453,7 @@ const TeachersSelection = () => {
           }
           .teachers-selection-page .teacher-card .text-end {
             text-align: left !important;
-            margin-top: 12px;
+            margin-top: 5px;
             margin-left: 0 !important;
           }
           .teachers-selection-page .teacher-card .text-end .w-100 {
@@ -278,12 +464,12 @@ const TeachersSelection = () => {
           .teachers-selection-page .teacher-video-sidebar {
             position: relative !important;
             top: 0 !important;
-            margin-top: 24px;
+            margin-top: 10px;
           }
         }
         @media (min-width: 1200px) {
           .teachers-selection-page .container {
-            padding: 40px 40px !important;
+            padding: 2px 20px !important;
           }
         }
         .teachers-selection-page .filters-bar .form-control:focus,
@@ -292,10 +478,18 @@ const TeachersSelection = () => {
           box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.1) !important;
           outline: none !important;
         }
+        @media (max-width: 768px) {
+          .teachers-selection-page .time-day-filter-container > div[style*="minWidth: '500px'"] {
+            min-width: calc(100vw - 40px) !important;
+            max-width: calc(100vw - 40px) !important;
+            left: 0 !important;
+            right: 0 !important;
+          }
+        }
       `}</style>
       <div className="teachers-selection-page" style={{ backgroundColor: '#fff', minHeight: '100vh' }}>
-        <div className="container" style={{ maxWidth: '1400px', padding: '40px 20px' }}>
-        <div className="row mb-4">
+        <div className="container" style={{ maxWidth: '1400px', padding: '10px 20px 20px 20px' }}>
+        <div className="row mb-3" style={{ marginTop: '0' }}>
           <div className="col-12">
             <h1 className="h2 fw-bold mb-2" style={{ fontSize: '32px', color: '#1a1a1a' }}>
               {filteredTeachers.length} {t('common.available_teachers')} {t('common.to_help_you_succeed')}
@@ -303,7 +497,7 @@ const TeachersSelection = () => {
           </div>
         </div>
 
-        <div className="row mb-4">
+        <div className="row mb-3">
           <div className="col-12">
             <div
               className="filters-bar"
@@ -318,6 +512,124 @@ const TeachersSelection = () => {
                 boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
               }}
             >
+              <div className="filter-item course-dropdown-container" style={{ flex: '0 1 auto', minWidth: '200px', position: 'relative' }}>
+                <div
+                  className="form-select"
+                  onClick={() => {
+                    setCourseDropdownOpen(!courseDropdownOpen);
+                    setCountryDropdownOpen(false);
+                    setAvailabilityDropdownOpen(false);
+                  }}
+                  style={{
+                    borderRadius: '8px',
+                    border: '1px solid #e0e0e0',
+                    padding: '10px 16px',
+                    fontSize: '14px',
+                    backgroundColor: '#fff',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    minHeight: '42px',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                    {currentCourse ? (
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <i className="fas fa-graduation-cap" style={{ marginRight: '8px', color: '#666' }}></i>
+                        {currentCourse.name}
+                      </span>
+                    ) : (
+                      <span style={{ color: '#999' }}>
+                        <i className="fas fa-graduation-cap" style={{ marginRight: '8px', color: '#999' }}></i>
+                        {t('common.select_course')}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                {courseDropdownOpen && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: 0,
+                      right: 0,
+                      marginTop: '4px',
+                      backgroundColor: '#fff',
+                      border: '1px solid #e0e0e0',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                      zIndex: 1001,
+                      maxHeight: '300px',
+                      overflow: 'hidden',
+                      display: 'flex',
+                      flexDirection: 'column',
+                    }}
+                  >
+                    <div style={{ padding: '8px', borderBottom: '1px solid #e0e0e0' }}>
+                      <input
+                        type="text"
+                        placeholder="Type to search..."
+                        value={courseSearch}
+                        onChange={(e) => setCourseSearch(e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                          width: '100%',
+                          padding: '8px 12px',
+                          border: '1px solid #e0e0e0',
+                          borderRadius: '6px',
+                          fontSize: '14px',
+                        }}
+                      />
+                    </div>
+                    <div style={{ overflowY: 'auto', maxHeight: '250px' }}>
+                      {courses
+                        .filter((course) => {
+                          if (!courseSearch) return true;
+                          const name = (course.name || '').toLowerCase();
+                          return name.includes(courseSearch.toLowerCase());
+                        })
+                        .map((course) => (
+                          <div
+                            key={course._id}
+                            onClick={() => {
+                              if (course.slug && course.slug !== slug) {
+                                navigate(`/course/${course.slug}`);
+                              }
+                              setCourseDropdownOpen(false);
+                              setCourseSearch('');
+                            }}
+                            style={{
+                              padding: '12px 16px',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '10px',
+                              backgroundColor: currentCourse?._id === course._id ? '#f5f5f5' : 'transparent',
+                              borderBottom: '1px solid #f0f0f0',
+                            }}
+                            onMouseEnter={(e) => {
+                              if (currentCourse?._id !== course._id) {
+                                e.currentTarget.style.backgroundColor = '#f5f5f5';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (currentCourse?._id !== course._id) {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                              }
+                            }}
+                          >
+                            <i className="fas fa-graduation-cap" style={{ color: '#666', fontSize: '14px' }}></i>
+                            <span style={{ fontSize: '14px', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{course.name}</span>
+                            {currentCourse?._id === course._id && (
+                              <i className="fas fa-check" style={{ color: '#e91e63', fontSize: '12px', flexShrink: 0 }}></i>
+                            )}
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
+              </div>
               <div className="filter-item" style={{ position: 'relative', flex: '1 1 200px', minWidth: '200px' }}>
                 <input
                   type="text"
@@ -366,10 +678,9 @@ const TeachersSelection = () => {
                     backgroundColor: '#fff',
                     cursor: 'pointer',
                     appearance: 'none',
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'right 12px center',
-                    paddingRight: '40px',
+                    WebkitAppearance: 'none',
+                    MozAppearance: 'none',
+                    paddingRight: '16px',
                   }}
                 >
                   <option value="">{t('common.price_per_lesson')}</option>
@@ -380,11 +691,14 @@ const TeachersSelection = () => {
                   ))}
                 </select>
               </div>
-              <div className="filter-item" style={{ flex: '0 1 auto', minWidth: '160px' }}>
-                <select
+              <div className="filter-item country-dropdown-container" style={{ flex: '0 1 auto', minWidth: '180px', position: 'relative' }}>
+                <div
                   className="form-select"
-                  value={filters.country}
-                  onChange={(e) => setFilters({ ...filters, country: e.target.value })}
+                  onClick={() => {
+                    setCountryDropdownOpen(!countryDropdownOpen);
+                    setCourseDropdownOpen(false);
+                    setAvailabilityDropdownOpen(false);
+                  }}
                   style={{
                     borderRadius: '8px',
                     border: '1px solid #e0e0e0',
@@ -392,43 +706,454 @@ const TeachersSelection = () => {
                     fontSize: '14px',
                     backgroundColor: '#fff',
                     cursor: 'pointer',
-                    appearance: 'none',
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'right 12px center',
-                    paddingRight: '40px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    minHeight: '42px',
                   }}
                 >
-                  <option value="">{t('common.any_country')}</option>
-                  {countries.map((country) => (
-                    <option key={country} value={country}>
-                      {country}
-                    </option>
-                  ))}
-                </select>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                    {filters.country ? (
+                      <>
+                        <CountryFlag code={filters.country} />
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{getCountryName(filters.country)}</span>
+                      </>
+                    ) : (
+                      <span style={{ color: '#999' }}>{t('common.any_country')}</span>
+                    )}
+                  </div>
+                </div>
+                {countryDropdownOpen && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: 0,
+                      right: 0,
+                      marginTop: '4px',
+                      backgroundColor: '#fff',
+                      border: '1px solid #e0e0e0',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                      zIndex: 1000,
+                      maxHeight: '300px',
+                      overflow: 'hidden',
+                      display: 'flex',
+                      flexDirection: 'column',
+                    }}
+                  >
+                    <div style={{ padding: '8px', borderBottom: '1px solid #e0e0e0' }}>
+                      <input
+                        type="text"
+                        placeholder="Type to search..."
+                        value={countrySearch}
+                        onChange={(e) => setCountrySearch(e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                          width: '100%',
+                          padding: '8px 12px',
+                          border: '1px solid #e0e0e0',
+                          borderRadius: '6px',
+                          fontSize: '14px',
+                        }}
+                      />
+                    </div>
+                    <div style={{ overflowY: 'auto', maxHeight: '250px' }}>
+                      <div
+                        onClick={() => {
+                          setFilters({ ...filters, country: '' });
+                          setCountryDropdownOpen(false);
+                          setCountrySearch('');
+                        }}
+                        style={{
+                          padding: '12px 16px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          backgroundColor: filters.country === '' ? '#f5f5f5' : 'transparent',
+                          borderBottom: '1px solid #f0f0f0',
+                        }}
+                        onMouseEnter={(e) => {
+                          if (filters.country !== '') {
+                            e.currentTarget.style.backgroundColor = '#f5f5f5';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (filters.country !== '') {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                          }
+                        }}
+                      >
+                        <span style={{ color: '#999', fontSize: '14px' }}>{t('common.any_country')}</span>
+                      </div>
+                      {countries
+                        .filter((country) => {
+                          if (!countrySearch) return true;
+                          const name = getCountryName(country).toLowerCase();
+                          const code = country.toLowerCase();
+                          return name.includes(countrySearch.toLowerCase()) || code.includes(countrySearch.toLowerCase());
+                        })
+                        .map((country) => (
+                          <div
+                            key={country}
+                            onClick={() => {
+                              setFilters({ ...filters, country });
+                              setCountryDropdownOpen(false);
+                              setCountrySearch('');
+                            }}
+                            style={{
+                              padding: '12px 16px',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '10px',
+                              backgroundColor: filters.country === country ? '#f5f5f5' : 'transparent',
+                              borderBottom: '1px solid #f0f0f0',
+                            }}
+                            onMouseEnter={(e) => {
+                              if (filters.country !== country) {
+                                e.currentTarget.style.backgroundColor = '#f5f5f5';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (filters.country !== country) {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                              }
+                            }}
+                          >
+                            <CountryFlag code={country} />
+                            <span style={{ fontSize: '14px', flex: 1 }}>{getCountryName(country)}</span>
+                            {filters.country === country && (
+                              <i className="fas fa-check" style={{ color: '#e91e63', fontSize: '12px' }}></i>
+                            )}
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
               </div>
-              <div className="filter-item" style={{ flex: '0 1 auto', minWidth: '160px' }}>
-                <select
+              <div className="filter-item availability-dropdown-container" style={{ flex: '0 1 auto', minWidth: '160px', position: 'relative' }}>
+                <div
                   className="form-select"
-                  value={filters.availability}
-                  onChange={(e) => setFilters({ ...filters, availability: e.target.value })}
+                  onClick={() => {
+                    setAvailabilityDropdownOpen(!availabilityDropdownOpen);
+                    setCourseDropdownOpen(false);
+                    setCountryDropdownOpen(false);
+                  }}
                   style={{
                     borderRadius: '8px',
-                    border: '1px solid #e0e0e0',
+                    border: filters.availability ? '1px solid #e91e63' : '1px solid #e0e0e0',
                     padding: '10px 16px',
                     fontSize: '14px',
                     backgroundColor: '#fff',
                     cursor: 'pointer',
-                    appearance: 'none',
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'right 12px center',
-                    paddingRight: '40px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    minHeight: '42px',
                   }}
                 >
-                  <option value="">{t('common.im_available')}</option>
-                  <option value="available">{t('common.has_availability')}</option>
-                </select>
+                  <span style={{ color: filters.availability ? '#000' : '#999' }}>
+                    {filters.availability === 'available' ? t('common.has_availability') : t('common.im_available')}
+                  </span>
+                </div>
+                {availabilityDropdownOpen && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: 0,
+                      right: 0,
+                      marginTop: '4px',
+                      backgroundColor: '#fff',
+                      border: '1px solid #e0e0e0',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                      zIndex: 1000,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div
+                      onClick={() => {
+                        setFilters({ ...filters, availability: '' });
+                        setAvailabilityDropdownOpen(false);
+                      }}
+                      style={{
+                        padding: '12px 16px',
+                        cursor: 'pointer',
+                        backgroundColor: filters.availability === '' ? '#e3f2fd' : 'transparent',
+                        color: filters.availability === '' ? '#000' : '#666',
+                        borderBottom: '1px solid #f0f0f0',
+                      }}
+                      onMouseEnter={(e) => {
+                        if (filters.availability !== '') {
+                          e.currentTarget.style.backgroundColor = '#f5f5f5';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (filters.availability !== '') {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                      }}
+                    >
+                      {t('common.im_available')}
+                    </div>
+                    <div
+                      onClick={() => {
+                        setFilters({ ...filters, availability: 'available' });
+                        setAvailabilityDropdownOpen(false);
+                      }}
+                      style={{
+                        padding: '12px 16px',
+                        cursor: 'pointer',
+                        backgroundColor: filters.availability === 'available' ? '#e3f2fd' : 'transparent',
+                        color: filters.availability === 'available' ? '#000' : '#666',
+                      }}
+                      onMouseEnter={(e) => {
+                        if (filters.availability !== 'available') {
+                          e.currentTarget.style.backgroundColor = '#f5f5f5';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (filters.availability !== 'available') {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                      }}
+                    >
+                      {t('common.has_availability')}
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="filter-item time-day-filter-container" style={{ flex: '0 1 auto', minWidth: '180px', position: 'relative' }}>
+                <div
+                  className="form-select"
+                  onClick={() => {
+                    setTimeDayFilterOpen(!timeDayFilterOpen);
+                    setCourseDropdownOpen(false);
+                    setCountryDropdownOpen(false);
+                    setAvailabilityDropdownOpen(false);
+                  }}
+                  style={{
+                    borderRadius: '8px',
+                    border: (filters.timeRanges.length > 0 || filters.days.length > 0) ? '1px solid #e91e63' : '1px solid #e0e0e0',
+                    padding: '10px 16px',
+                    fontSize: '14px',
+                    backgroundColor: '#fff',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    minHeight: '42px',
+                  }}
+                >
+                  <span style={{ color: (filters.timeRanges.length > 0 || filters.days.length > 0) ? '#000' : '#999' }}>
+                    {filters.timeRanges.length > 0 || filters.days.length > 0 
+                      ? `${filters.timeRanges.length} time${filters.timeRanges.length !== 1 ? 's' : ''}, ${filters.days.length} day${filters.days.length !== 1 ? 's' : ''}`
+                      : 'Time & Day'}
+                  </span>
+                </div>
+                {timeDayFilterOpen && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: 0,
+                      marginTop: '4px',
+                      backgroundColor: '#fff',
+                      border: '1px solid #e0e0e0',
+                      borderRadius: '12px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                      zIndex: 1002,
+                      padding: '20px',
+                      minWidth: '500px',
+                      maxWidth: '600px',
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div style={{ marginBottom: '24px' }}>
+                      <h6 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px', color: '#1a1a1a' }}>Times</h6>
+                      
+                      <div style={{ marginBottom: '20px' }}>
+                        <div style={{ fontSize: '14px', fontWeight: '500', marginBottom: '10px', color: '#666' }}>Daytime</div>
+                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                          {timeRanges.filter(tr => tr.group === 'daytime').map(tr => (
+                            <button
+                              key={tr.id}
+                              onClick={() => {
+                                const newRanges = filters.timeRanges.includes(tr.id)
+                                  ? filters.timeRanges.filter(r => r !== tr.id)
+                                  : [...filters.timeRanges, tr.id];
+                                setFilters({ ...filters, timeRanges: newRanges });
+                              }}
+                              style={{
+                                padding: '10px 16px',
+                                borderRadius: '8px',
+                                border: '1px solid #e0e0e0',
+                                backgroundColor: filters.timeRanges.includes(tr.id) ? '#e91e63' : '#fff',
+                                color: filters.timeRanges.includes(tr.id) ? '#fff' : '#1a1a1a',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                transition: 'all 0.2s',
+                              }}
+                              onMouseEnter={(e) => {
+                                if (!filters.timeRanges.includes(tr.id)) {
+                                  e.currentTarget.style.borderColor = '#e91e63';
+                                  e.currentTarget.style.backgroundColor = '#fce4ec';
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                if (!filters.timeRanges.includes(tr.id)) {
+                                  e.currentTarget.style.borderColor = '#e0e0e0';
+                                  e.currentTarget.style.backgroundColor = '#fff';
+                                }
+                              }}
+                            >
+                              <span>{tr.icon}</span>
+                              <span>{tr.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div style={{ marginBottom: '20px' }}>
+                        <div style={{ fontSize: '14px', fontWeight: '500', marginBottom: '10px', color: '#666' }}>Evening and night</div>
+                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                          {timeRanges.filter(tr => tr.group === 'evening').map(tr => (
+                            <button
+                              key={tr.id}
+                              onClick={() => {
+                                const newRanges = filters.timeRanges.includes(tr.id)
+                                  ? filters.timeRanges.filter(r => r !== tr.id)
+                                  : [...filters.timeRanges, tr.id];
+                                setFilters({ ...filters, timeRanges: newRanges });
+                              }}
+                              style={{
+                                padding: '10px 16px',
+                                borderRadius: '8px',
+                                border: '1px solid #e0e0e0',
+                                backgroundColor: filters.timeRanges.includes(tr.id) ? '#e91e63' : '#fff',
+                                color: filters.timeRanges.includes(tr.id) ? '#fff' : '#1a1a1a',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                transition: 'all 0.2s',
+                              }}
+                              onMouseEnter={(e) => {
+                                if (!filters.timeRanges.includes(tr.id)) {
+                                  e.currentTarget.style.borderColor = '#e91e63';
+                                  e.currentTarget.style.backgroundColor = '#fce4ec';
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                if (!filters.timeRanges.includes(tr.id)) {
+                                  e.currentTarget.style.borderColor = '#e0e0e0';
+                                  e.currentTarget.style.backgroundColor = '#fff';
+                                }
+                              }}
+                            >
+                              <span>{tr.icon}</span>
+                              <span>{tr.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div style={{ marginBottom: '20px' }}>
+                        <div style={{ fontSize: '14px', fontWeight: '500', marginBottom: '10px', color: '#666' }}>Morning</div>
+                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                          {timeRanges.filter(tr => tr.group === 'morning').map(tr => (
+                            <button
+                              key={tr.id}
+                              onClick={() => {
+                                const newRanges = filters.timeRanges.includes(tr.id)
+                                  ? filters.timeRanges.filter(r => r !== tr.id)
+                                  : [...filters.timeRanges, tr.id];
+                                setFilters({ ...filters, timeRanges: newRanges });
+                              }}
+                              style={{
+                                padding: '10px 16px',
+                                borderRadius: '8px',
+                                border: '1px solid #e0e0e0',
+                                backgroundColor: filters.timeRanges.includes(tr.id) ? '#e91e63' : '#fff',
+                                color: filters.timeRanges.includes(tr.id) ? '#fff' : '#1a1a1a',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                transition: 'all 0.2s',
+                              }}
+                              onMouseEnter={(e) => {
+                                if (!filters.timeRanges.includes(tr.id)) {
+                                  e.currentTarget.style.borderColor = '#e91e63';
+                                  e.currentTarget.style.backgroundColor = '#fce4ec';
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                if (!filters.timeRanges.includes(tr.id)) {
+                                  e.currentTarget.style.borderColor = '#e0e0e0';
+                                  e.currentTarget.style.backgroundColor = '#fff';
+                                }
+                              }}
+                            >
+                              <span>{tr.icon}</span>
+                              <span>{tr.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h6 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px', color: '#1a1a1a' }}>Days</h6>
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        {days.map(day => (
+                          <button
+                            key={day}
+                            onClick={() => {
+                              const newDays = filters.days.includes(day)
+                                ? filters.days.filter(d => d !== day)
+                                : [...filters.days, day];
+                              setFilters({ ...filters, days: newDays });
+                            }}
+                            style={{
+                              padding: '10px 16px',
+                              borderRadius: '8px',
+                              border: '1px solid #e0e0e0',
+                              backgroundColor: filters.days.includes(day) ? '#e91e63' : '#fff',
+                              color: filters.days.includes(day) ? '#fff' : '#1a1a1a',
+                              cursor: 'pointer',
+                              fontSize: '14px',
+                              transition: 'all 0.2s',
+                              minWidth: '60px',
+                            }}
+                            onMouseEnter={(e) => {
+                              if (!filters.days.includes(day)) {
+                                e.currentTarget.style.borderColor = '#e91e63';
+                                e.currentTarget.style.backgroundColor = '#fce4ec';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!filters.days.includes(day)) {
+                                e.currentTarget.style.borderColor = '#e0e0e0';
+                                e.currentTarget.style.backgroundColor = '#fff';
+                              }
+                            }}
+                          >
+                            {day}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="filter-item" style={{ flex: '0 1 auto', minWidth: '180px' }}>
                 <select
@@ -443,10 +1168,9 @@ const TeachersSelection = () => {
                     backgroundColor: '#fff',
                     cursor: 'pointer',
                     appearance: 'none',
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'right 12px center',
-                    paddingRight: '40px',
+                    WebkitAppearance: 'none',
+                    MozAppearance: 'none',
+                    paddingRight: '16px',
                   }}
                 >
                   <option value="top_picks">{t('common.sort_by_top_picks')}</option>
@@ -481,7 +1205,7 @@ const TeachersSelection = () => {
                       courseName = (courseId.name as any).en || String(courseId.name);
                     }
                   }
-                  const availabilityCount = Array.isArray(teacher.availability) ? teacher.availability.length : 0;
+                  const availabilityCount = getTeacherAvailability(teacher).length;
                   const isHovered = hoveredTeacher === teacher._id;
                   const isSelected = selectedTeacher?._id === teacher._id;
 
@@ -626,8 +1350,8 @@ const TeachersSelection = () => {
                             </h5>
                             <i className="fas fa-check-circle text-primary"></i>
                             {teacher.teacherProfile?.countryCode && (
-                              <span style={{ fontSize: '20px' }} title={teacher.teacherProfile.country || ''}>
-                                {getCountryFlag(teacher.teacherProfile.countryCode)}
+                              <span title={teacher.teacherProfile.country || teacher.teacherProfile.countryCode} style={{ display: 'inline-flex', alignItems: 'center', marginLeft: '4px' }}>
+                                <CountryFlag code={teacher.teacherProfile.countryCode} />
                               </span>
                             )}
                           </div>
@@ -728,7 +1452,7 @@ const TeachersSelection = () => {
                         >
                           <h6 className="mb-2 fw-semibold">{t('common.available_slots')}:</h6>
                           <div className="d-flex flex-wrap gap-2">
-                            {teacher.availability.slice(0, 8).map((slot) => (
+                            {getTeacherAvailability(teacher).slice(0, 8).map((slot) => (
                               <button
                                 key={slot._id}
                                 className="btn btn-outline-primary btn-sm"
@@ -781,10 +1505,25 @@ const TeachersSelection = () => {
                         }}
                         onClick={() => {
                           if (selectedTeacher.introductionVideo) {
-                            window.open(selectedTeacher.introductionVideo, '_blank');
+                            setVideoUrl(selectedTeacher.introductionVideo);
+                            setVideoModalOpen(true);
                           }
                         }}
                       >
+                        {getYouTubeThumbnail(selectedTeacher.introductionVideo) ? (
+                          <img
+                            src={getYouTubeThumbnail(selectedTeacher.introductionVideo)}
+                            alt="Video thumbnail"
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                            }}
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        ) : null}
                         <div
                           className="position-absolute top-50 start-50 translate-middle"
                           style={{
@@ -895,6 +1634,72 @@ const TeachersSelection = () => {
           }}
           onConfirm={handleBookingConfirm}
         />
+      )}
+      {videoModalOpen && (
+        <div
+          className="modal fade show"
+          style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 9999 }}
+          onClick={() => setVideoModalOpen(false)}
+        >
+          <div
+            className="modal-dialog modal-dialog-centered modal-lg"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: '900px' }}
+          >
+            <div className="modal-content" style={{ borderRadius: '16px', border: 'none', backgroundColor: 'transparent' }}>
+              <div className="modal-header border-0 pb-0" style={{ padding: '0', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  className="btn-close btn-close-white"
+                  onClick={() => setVideoModalOpen(false)}
+                  aria-label="Close"
+                  style={{
+                    fontSize: '24px',
+                    opacity: 1,
+                    filter: 'brightness(0) invert(1)',
+                    width: '40px',
+                    height: '40px',
+                    backgroundColor: 'rgba(0,0,0,0.5)',
+                    borderRadius: '50%',
+                  }}
+                ></button>
+              </div>
+              <div className="modal-body p-0" style={{ borderRadius: '12px', overflow: 'hidden' }}>
+                {getYouTubeVideoId(videoUrl) ? (
+                  <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden' }}>
+                    <iframe
+                      src={`https://www.youtube.com/embed/${getYouTubeVideoId(videoUrl)}?autoplay=1`}
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        border: 'none',
+                      }}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      width: '100%',
+                      aspectRatio: '16/9',
+                      backgroundColor: '#000',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#fff',
+                    }}
+                  >
+                    <p>Video URL is not supported</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

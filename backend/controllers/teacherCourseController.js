@@ -447,7 +447,7 @@ export const getCourseTeachers = async (req, res, next) => {
 export const getCourseTeachersBySlug = async (req, res, next) => {
   try {
     const { slug } = req.params;
-    const { startDate, endDate } = req.query;
+    const { startDate, endDate, studentTimezone } = req.query;
 
     // Find course by slug
     let course;
@@ -475,6 +475,7 @@ export const getCourseTeachersBySlug = async (req, res, next) => {
     const TeacherProfile = (await import("../models/teacherProfileModel.js")).default;
     const Availability = (await import("../models/availabilityModel.js")).default;
     const { getLanguageValue } = await import("../utils/languageHelper.js");
+    const { convertTimeBetweenTimezones } = await import("../utils/timezoneHelper.js");
 
     const targetCurrency = req.query.currency || getBaseCurrency();
     const now = new Date();
@@ -523,8 +524,11 @@ export const getCourseTeachersBySlug = async (req, res, next) => {
         }
 
         // Get availability slots
+        // Extract teacherId - when populated, it's an object, so get _id
+        const teacherIdForQuery = tc.teacherId?._id || tc.teacherId;
+        
         const availabilityQuery = {
-          teacherId: tc.teacherId,
+          teacherId: teacherIdForQuery,
           courseId: course._id,
           status: "available",
           date: { $gte: now },
@@ -541,7 +545,27 @@ export const getCourseTeachersBySlug = async (req, res, next) => {
 
         const availabilities = await Availability.find(availabilityQuery)
           .sort({ date: 1, startTime: 1 })
-          .limit(50); // Limit to first 50 slots for performance
+          .limit(50);
+
+        if (studentTimezone) {
+          availabilities = availabilities.map((av) => {
+            const avObj = av.toObject();
+            if (avObj.timezone && studentTimezone && avObj.timezone !== studentTimezone) {
+              try {
+                avObj.startTime = convertTimeBetweenTimezones(avObj.date, avObj.startTime, avObj.timezone, studentTimezone);
+                avObj.endTime = convertTimeBetweenTimezones(avObj.date, avObj.endTime, avObj.timezone, studentTimezone);
+                avObj.displayTimezone = studentTimezone;
+                avObj.originalTimezone = avObj.timezone;
+              } catch (err) {
+                console.error("Timezone conversion error:", err);
+                avObj.displayTimezone = avObj.timezone;
+              }
+            } else {
+              avObj.displayTimezone = avObj.timezone || "UTC";
+            }
+            return avObj;
+          });
+        }
 
         tcObj.availability = availabilities.map((av) => ({
           _id: av._id,
@@ -552,6 +576,7 @@ export const getCourseTeachersBySlug = async (req, res, next) => {
           price: av.price,
           currency: av.currency,
           timezone: av.timezone,
+          displayTimezone: av.displayTimezone,
         }));
 
         // Currency conversion

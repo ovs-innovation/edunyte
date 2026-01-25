@@ -7,6 +7,7 @@ export interface Course {
   category?: string
   image?: string
   status: string
+  slug?: string
   createdBy?: {
     _id: string
     name: string
@@ -150,6 +151,7 @@ export const fetchCourseTeachers = async (
 export interface AvailabilityResponse {
   availabilities: Array<{
     _id: string
+    teacherId?: { _id: string } | string
     date: string
     startTime: string
     endTime: string
