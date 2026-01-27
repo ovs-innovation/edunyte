@@ -430,6 +430,11 @@ export interface ApiTeacherCourse {
   teacherId: ApiUser | string;
   courseId: ApiCourse | string;
   languageIds: ApiLanguage[] | string[];
+  languageProficiencies?: Array<{
+    languageId: string | ApiLanguage;
+    code: string;
+    proficiency: "native" | "c2" | "c1" | "b2" | "b1" | "a2" | "a1";
+  }>;
   price: number;
   currency: string;
   baseCurrency?: string;
@@ -484,7 +489,14 @@ export const TeacherCourseJoinAPI = {
   getLanguages: () => apiFetch<{ languages: ApiLanguage[]; count: number }>("/teacher/languages"),
   joinCourse: (payload: {
     courseId: string;
-    languageIds: string[];
+    languageIds?: string[];
+    languageCodes?: string[];
+    languages?: Array<{
+      code: string;
+      proficiency: "native" | "c2" | "c1" | "b2" | "b1" | "a2" | "a1";
+      name?: any;
+      nativeName?: any;
+    }>;
     price: number;
     currency?: string;
     timezone?: string;
@@ -503,6 +515,13 @@ export const TeacherCourseJoinAPI = {
   },
   updateCourse: (id: string, payload: {
     languageIds?: string[];
+    languageCodes?: string[];
+    languages?: Array<{
+      code: string;
+      proficiency: "native" | "c2" | "c1" | "b2" | "b1" | "a2" | "a1";
+      name?: any;
+      nativeName?: any;
+    }>;
     price?: number;
     currency?: string;
     timezone?: string;

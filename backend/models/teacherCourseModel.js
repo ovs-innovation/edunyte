@@ -28,6 +28,30 @@ const teacherCourseSchema = new mongoose.Schema(
       required: true,
       default: [],
     },
+    languageProficiencies: {
+      type: [
+        {
+          languageId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Language",
+            required: true,
+          },
+          code: {
+            type: String,
+            required: true,
+            uppercase: true,
+            trim: true,
+          },
+          proficiency: {
+            type: String,
+            enum: ["native", "c2", "c1", "b2", "b1", "a2", "a1"],
+            default: "native",
+            required: true,
+          },
+        },
+      ],
+      default: [],
+    },
     price: {
       type: Number,
       required: true,

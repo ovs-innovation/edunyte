@@ -25,6 +25,7 @@ const availabilitySchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+    // Legacy local-time fields (kept for backward compatibility)
     startTime: {
       type: String,
       required: true,
@@ -34,6 +35,17 @@ const availabilitySchema = new mongoose.Schema(
       type: String,
       required: true,
       // Format: "HH:mm" in teacher's timezone
+    },
+    // UTC absolute instants – source of truth for all time calculations
+    startTimeUTC: {
+      type: Date,
+      default: null,
+      index: true,
+    },
+    endTimeUTC: {
+      type: Date,
+      default: null,
+      index: true,
     },
     duration: {
       type: Number,
@@ -114,6 +126,7 @@ availabilitySchema.index({ teacherId: 1, date: 1, status: 1 });
 availabilitySchema.index({ courseId: 1, date: 1 });
 availabilitySchema.index({ teacherId: 1, courseId: 1, date: 1 });
 availabilitySchema.index({ date: 1, status: 1 });
+availabilitySchema.index({ teacherId: 1, courseId: 1, startTimeUTC: 1 });
 availabilitySchema.index({ bookingId: 1 });
 
 export default mongoose.model("Availability", availabilitySchema);

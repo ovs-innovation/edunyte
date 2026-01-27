@@ -14,7 +14,12 @@ const languageTextSchema = z.any().refine(
 
 export const createTeacherCourseSchema = z.object({
   courseId: z.string().min(1, "Course ID is required"),
-  languageIds: z.array(z.string().min(1, "Language ID is required")).min(1, "At least one language is required"),
+  languageIds: z.array(z.string().min(1, "Language ID is required")).min(1, "At least one language is required").optional(),
+  languageCodes: z.array(z.string().min(1, "Language code is required")).min(1, "At least one language is required").optional(),
+  languages: z.array(z.object({
+    code: z.string().min(1, "Language code is required"),
+    proficiency: z.enum(["native", "c2", "c1", "b2", "b1", "a2", "a1"]).optional().default("native"),
+  })).min(1, "At least one language is required").optional(),
   price: z.number().min(0, "Price must be non-negative"),
   currency: z.string().optional().default("INR"),
   timezone: z.string().optional().default("UTC"),
@@ -25,10 +30,23 @@ export const createTeacherCourseSchema = z.object({
   experience: languageTextSchema,
   bio: languageTextSchema,
   aboutCourse: languageTextSchema,
+}).refine((data) => {
+  if (Array.isArray(data.languages) && data.languages.length > 0) return true;
+  if (Array.isArray(data.languageIds) && data.languageIds.length > 0) return true;
+  if (Array.isArray(data.languageCodes) && data.languageCodes.length > 0) return true;
+  return false;
+}, {
+  message: "At least one language is required",
+  path: ["languageIds"],
 });
 
 export const updateTeacherCourseSchema = z.object({
   languageIds: z.array(z.string().min(1, "Language ID is required")).min(1, "At least one language is required").optional(),
+  languageCodes: z.array(z.string().min(1, "Language code is required")).min(1, "At least one language is required").optional(),
+  languages: z.array(z.object({
+    code: z.string().min(1, "Language code is required"),
+    proficiency: z.enum(["native", "c2", "c1", "b2", "b1", "a2", "a1"]).optional().default("native"),
+  })).min(1, "At least one language is required").optional(),
   price: z.number().min(0, "Price must be non-negative").optional(),
   currency: z.string().optional(),
   timezone: z.string().optional(),

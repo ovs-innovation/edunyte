@@ -394,8 +394,42 @@ const TeachersSelection = () => {
     return Array.from(countries).sort();
   };
 
+  const languageDisplayNames =
+    typeof Intl !== 'undefined' && (Intl as any).DisplayNames
+      ? new (Intl as any).DisplayNames(['en'], { type: 'language' })
+      : null;
+
+  const formatLanguageLabel = (lang: { _id?: string; name?: string; code?: string; nativeName?: string }) => {
+    if (!lang) return '';
+    const code = (lang.code || '').toString().toUpperCase();
+    let label = (lang.nativeName || lang.name || '').toString().trim();
+
+    // If label is missing or just the code, try to resolve via Intl.DisplayNames
+    if ((!label || label.toUpperCase() === code) && languageDisplayNames && code) {
+      try {
+        const resolved = languageDisplayNames.of(code.toLowerCase());
+        if (resolved) {
+          label = resolved.toString();
+        }
+      } catch {
+        // ignore and fall back
+      }
+    }
+
+    if (!label) {
+      label = code || '';
+    }
+
+    // Append code in parentheses for clarity
+    if (code && !label.toLowerCase().includes(`(${code.toLowerCase()}`)) {
+      return `${label} (${code})`;
+    }
+
+    return label;
+  };
+
   const getLanguages = () => {
-    const languageMap = new Map<string, { _id: string; name: string; code: string; nativeName?: string }>();
+    const languageMap = new Map<string, { _id: string; name?: string; code?: string; nativeName?: string }>();
     teachers.forEach((teacher) => {
       if (teacher.languageIds) {
         teacher.languageIds.forEach((lang) => {
@@ -405,7 +439,7 @@ const TeachersSelection = () => {
         });
       }
     });
-    return Array.from(languageMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+    return Array.from(languageMap.values()).sort((a, b) => formatLanguageLabel(a).localeCompare(formatLanguageLabel(b)));
   };
 
   const popularLanguages = ['Hindi', 'Tamil', 'Telugu', 'Kannada', 'Marathi', 'English'];
@@ -1023,9 +1057,14 @@ const TeachersSelection = () => {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
                     {filters.language ? (
-                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {languages.find(l => l._id === filters.language || l.name === filters.language)?.name || filters.language}
-                      </span>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {(() => {
+                        const lang = languages.find(
+                          (l) => l._id === filters.language || formatLanguageLabel(l) === filters.language
+                        );
+                        return lang ? formatLanguageLabel(lang) : filters.language || 'Also speaks';
+                      })()}
+                    </span>
                     ) : (
                       <span style={{ color: '#999' }}>Also speaks</span>
                     )}
@@ -1098,9 +1137,14 @@ const TeachersSelection = () => {
                       {languages.filter((lang) => {
                         if (!languageSearch) return true;
                         const searchLower = languageSearch.toLowerCase();
-                        return lang.name.toLowerCase().includes(searchLower) || 
-                               (lang.nativeName && lang.nativeName.toLowerCase().includes(searchLower)) ||
-                               lang.code.toLowerCase().includes(searchLower);
+                        const name = (lang.name || '').toString().toLowerCase();
+                        const nativeName = (lang.nativeName || '').toString().toLowerCase();
+                        const code = (lang.code || '').toString().toLowerCase();
+                        return (
+                          name.includes(searchLower) ||
+                          nativeName.includes(searchLower) ||
+                          code.includes(searchLower)
+                        );
                       }).length > 0 && (
                         <>
                           {popularLanguages.length > 0 && (
@@ -1108,12 +1152,18 @@ const TeachersSelection = () => {
                               <div style={{ padding: '12px 16px 8px', fontSize: '14px', fontWeight: '600', color: '#1a1a1a' }}>Popular</div>
                               {languages
                                 .filter((lang) => {
-                                  if (!popularLanguages.includes(lang.name)) return false;
+                                  const langName = (lang.name || '').toString();
+                                  if (!popularLanguages.includes(langName)) return false;
                                   if (!languageSearch) return true;
                                   const searchLower = languageSearch.toLowerCase();
-                                  return lang.name.toLowerCase().includes(searchLower) || 
-                                         (lang.nativeName && lang.nativeName.toLowerCase().includes(searchLower)) ||
-                                         lang.code.toLowerCase().includes(searchLower);
+                                  const name = (lang.name || '').toString().toLowerCase();
+                                  const nativeName = (lang.nativeName || '').toString().toLowerCase();
+                                  const code = (lang.code || '').toString().toLowerCase();
+                                  return (
+                                    name.includes(searchLower) ||
+                                    nativeName.includes(searchLower) ||
+                                    code.includes(searchLower)
+                                  );
                                 })
                                 .map((lang) => (
                                   <div
@@ -1143,7 +1193,7 @@ const TeachersSelection = () => {
                                       }
                                     }}
                                   >
-                                    <span style={{ fontSize: '14px', flex: 1 }}>{lang.name}</span>
+                                    <span style={{ fontSize: '14px', flex: 1 }}>{formatLanguageLabel(lang)}</span>
                                     {filters.language === lang._id && (
                                       <i className="fas fa-check" style={{ color: '#e91e63', fontSize: '12px' }}></i>
                                     )}
@@ -1153,12 +1203,18 @@ const TeachersSelection = () => {
                           )}
                           {languages
                             .filter((lang) => {
-                              if (popularLanguages.includes(lang.name)) return false;
+                              const langName = (lang.name || '').toString();
+                              if (popularLanguages.includes(langName)) return false;
                               if (!languageSearch) return true;
                               const searchLower = languageSearch.toLowerCase();
-                              return lang.name.toLowerCase().includes(searchLower) || 
-                                     (lang.nativeName && lang.nativeName.toLowerCase().includes(searchLower)) ||
-                                     lang.code.toLowerCase().includes(searchLower);
+                              const name = (lang.name || '').toString().toLowerCase();
+                              const nativeName = (lang.nativeName || '').toString().toLowerCase();
+                              const code = (lang.code || '').toString().toLowerCase();
+                              return (
+                                name.includes(searchLower) ||
+                                nativeName.includes(searchLower) ||
+                                code.includes(searchLower)
+                              );
                             })
                             .map((lang) => (
                               <div
@@ -1188,7 +1244,7 @@ const TeachersSelection = () => {
                                   }
                                 }}
                               >
-                                <span style={{ fontSize: '14px', flex: 1 }}>{lang.name}</span>
+                                    <span style={{ fontSize: '14px', flex: 1 }}>{formatLanguageLabel(lang)}</span>
                                 {filters.language === lang._id && (
                                   <i className="fas fa-check" style={{ color: '#e91e63', fontSize: '12px' }}></i>
                                 )}
@@ -1240,7 +1296,12 @@ const TeachersSelection = () => {
                 filteredTeachers.map((teacher) => {
                   const teacherId = typeof teacher.teacherId === 'object' ? teacher.teacherId : { name: '', _id: '' };
                   const teacherName = String(teacherId.name || '');
-                  const languages = Array.isArray(teacher.languageIds) ? teacher.languageIds : [];
+                  const languages =
+                    Array.isArray((teacher as any).languages) && (teacher as any).languages.length > 0
+                      ? (teacher as any).languages
+                      : Array.isArray(teacher.languageIds)
+                        ? teacher.languageIds
+                        : [];
                   const courseId = typeof teacher.courseId === 'object' ? teacher.courseId : null;
                   let courseName = '';
                   if (courseId && courseId.name) {
@@ -1428,20 +1489,33 @@ const TeachersSelection = () => {
                           <div className="mb-2 small text-muted d-flex align-items-center gap-2">
                             <i className="fas fa-language" style={{ fontSize: '14px', color: '#666' }}></i>
                             <span>{t('common.speaks')}: </span>
-                            {languages.map((lang, idx) => {
-                              let langName = '';
-                              if (typeof lang === 'object' && lang !== null) {
-                                langName = String(lang.nativeName || lang.name || '');
-                              } else {
-                                langName = String(lang || '');
+                            {languages.map(
+                              (
+                                lang: { _id?: string; name?: string; code?: string; nativeName?: string; proficiency?: string },
+                                idx: number
+                              ) => {
+                                const baseLabel = formatLanguageLabel(lang);
+                                const proficiency = lang.proficiency;
+                                let profLabel = '';
+                                if (proficiency) {
+                                  const value = proficiency.toLowerCase();
+                                  if (value === 'native') profLabel = 'Native';
+                                  else if (value === 'c2') profLabel = 'Proficient C2';
+                                  else if (value === 'c1') profLabel = 'Advanced C1';
+                                  else if (value === 'b2') profLabel = 'Upper Intermediate B2';
+                                  else if (value === 'b1') profLabel = 'Intermediate B1';
+                                  else if (value === 'a2') profLabel = 'Elementary A2';
+                                  else if (value === 'a1') profLabel = 'Beginner A1';
+                                }
+                                const fullLabel = profLabel ? `${baseLabel} – ${profLabel}` : baseLabel;
+                                return (
+                                  <span key={lang._id || idx}>
+                                    {fullLabel}
+                                    {idx < languages.length - 1 && ', '}
+                                  </span>
+                                );
                               }
-                              return (
-                                <span key={lang?._id || idx}>
-                                  {langName}
-                                  {idx < languages.length - 1 && ', '}
-                                </span>
-                              );
-                            })}
+                            )}
                           </div>
                           {teacher.experience && (
                             <p className="small text-muted mb-2" style={{ lineHeight: '1.6' }}>

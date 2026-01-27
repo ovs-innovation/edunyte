@@ -14,7 +14,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
@@ -35,6 +34,33 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { useConfirmDialog } from '@/hooks/use-confirm-dialog';
+import { Badge } from '@/components/ui/badge';
+
+const PROFICIENCY_LEVELS = [
+  { value: 'native', label: 'Native' },
+  { value: 'c2', label: 'Proficient C2' },
+  { value: 'c1', label: 'Advanced C1' },
+  { value: 'b2', label: 'Upper Intermediate B2' },
+  { value: 'b1', label: 'Intermediate B1' },
+  { value: 'a2', label: 'Elementary A2' },
+  { value: 'a1', label: 'Beginner A1' },
+] as const;
+
+type ProficiencyLevel = typeof PROFICIENCY_LEVELS[number]['value'];
+
+const PROFICIENCY_LABELS: Record<ProficiencyLevel, string> = PROFICIENCY_LEVELS.reduce(
+  (acc, level) => {
+    acc[level.value] = level.label;
+    return acc;
+  },
+  {} as Record<ProficiencyLevel, string>
+);
+
+const getProficiencyLabel = (value?: string) => {
+  if (!value) return '';
+  const key = value.toLowerCase() as ProficiencyLevel;
+  return PROFICIENCY_LABELS[key] || value.toUpperCase();
+};
 
 const TeacherApprovalPage = () => {
   const [teacherCourses, setTeacherCourses] = useState<ApiTeacherCourse[]>([]);
@@ -111,14 +137,6 @@ const TeacherApprovalPage = () => {
   const getCourseName = (course: ApiTeacherCourse['courseId']) => {
     if (typeof course === 'string') return 'Unknown';
     return getLanguageValue(course.name) || 'Unknown';
-  };
-
-  const getLanguageNames = (languages: ApiTeacherCourse['languageIds']) => {
-    if (!Array.isArray(languages)) return 'Unknown';
-    return languages.map(lang => {
-      if (typeof lang === 'string') return 'Unknown';
-      return getLanguageValue(lang.name) || lang.code || 'Unknown';
-    }).join(', ');
   };
 
   const getTeacherBio = (teacherCourse: ApiTeacherCourse) => {
@@ -277,11 +295,36 @@ const TeacherApprovalPage = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
-                        {Array.isArray(request.languageIds) ? (
+                        {Array.isArray((request as any).languages) && (request as any).languages.length > 0 ? (
+                          (request as any).languages.map(
+                            (
+                              lang: {
+                                code?: string;
+                                name?: string;
+                                proficiency?: string;
+                              },
+                              idx: number
+                            ) => {
+                              const displayName = lang.name || lang.code || 'Unknown';
+                              const profLabel = getProficiencyLabel(lang.proficiency);
+                              return (
+                                <Badge key={idx} variant="outline">
+                                  {displayName}
+                                  {profLabel ? ` (${profLabel})` : ''}
+                                </Badge>
+                              );
+                            }
+                          )
+                        ) : Array.isArray(request.languageIds) ? (
                           request.languageIds.map((lang, idx) => {
-                            const langName = typeof lang === 'string' ? 'Unknown' : (getLanguageValue(lang.name) || lang.code || 'Unknown');
+                            const langName =
+                              typeof lang === 'string'
+                                ? 'Unknown'
+                                : getLanguageValue(lang.name) || lang.code || 'Unknown';
                             return (
-                              <Badge key={idx} variant="outline">{langName}</Badge>
+                              <Badge key={idx} variant="outline">
+                                {langName}
+                              </Badge>
                             );
                           })
                         ) : (

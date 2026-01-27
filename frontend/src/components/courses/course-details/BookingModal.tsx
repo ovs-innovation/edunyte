@@ -59,7 +59,7 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
       endDate.setDate(endDate.getDate() + 30);
       const tz = tzOverride || studentTimezone;
 
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8085/api';
       const response = await fetch(
         `${API_BASE_URL}/public/courses/availability?courseId=${courseId}&teacherId=${teacherId}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&studentTimezone=${encodeURIComponent(tz)}`
       );

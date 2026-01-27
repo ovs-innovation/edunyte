@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { BookOpen, CheckCircle2, XCircle, Clock, Plus, Video, ExternalLink, LogOut, Edit } from 'lucide-react';
-import { TeacherCourseJoinAPI, ApiTeacherCourse, LanguagesAPI } from '@/lib/api';
+import { TeacherCourseJoinAPI, ApiTeacherCourse } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import { getLanguageValue } from '@/lib/languageHelper';
 import {
@@ -37,7 +37,7 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import { Check, ChevronsUpDown } from 'lucide-react';
-import { getCurrencies } from '@/utils/countryData';
+import { getCurrencies, getLanguages as getLibraryLanguages } from '@/utils/countryData';
 import {
   Table,
   TableBody,
@@ -54,6 +54,38 @@ import { useRole } from '@/contexts/RoleContext';
 import { useNavigate } from 'react-router-dom';
 import { useConfirmDialog } from '@/hooks/use-confirm-dialog';
 
+// Proficiency levels (kept in sync with backend schema)
+const PROFICIENCY_LEVELS = [
+  { value: 'native', label: 'Native' },
+  { value: 'c2', label: 'Proficient C2' },
+  { value: 'c1', label: 'Advanced C1' },
+  { value: 'b2', label: 'Upper Intermediate B2' },
+  { value: 'b1', label: 'Intermediate B1' },
+  { value: 'a2', label: 'Elementary A2' },
+  { value: 'a1', label: 'Beginner A1' },
+] as const;
+
+type ProficiencyLevel = typeof PROFICIENCY_LEVELS[number]['value'];
+
+const PROFICIENCY_LABELS: Record<ProficiencyLevel, string> = PROFICIENCY_LEVELS.reduce(
+  (acc, level) => {
+    acc[level.value] = level.label;
+    return acc;
+  },
+  {} as Record<ProficiencyLevel, string>
+);
+
+const getProficiencyLabel = (value?: string) => {
+  if (!value) return '';
+  const key = value.toLowerCase() as ProficiencyLevel;
+  return PROFICIENCY_LABELS[key] || value.toUpperCase();
+};
+
+interface LanguageWithProficiency {
+  code: string;
+  proficiency: ProficiencyLevel;
+}
+
 const TeacherMyCoursesPage = () => {
   const { currentRole } = useRole();
   const navigate = useNavigate();
@@ -68,7 +100,7 @@ const TeacherMyCoursesPage = () => {
   const [currencies] = useState(() => getCurrencies());
   const [currencyOpen, setCurrencyOpen] = useState(false);
   const [formData, setFormData] = useState({
-    languageIds: [] as string[],
+    languages: [] as LanguageWithProficiency[],
     price: '',
     currency: 'USD',
     introductionVideo: '',
@@ -77,6 +109,8 @@ const TeacherMyCoursesPage = () => {
     aboutCourse: '',
   });
   const [submitting, setSubmitting] = useState(false);
+  const [proficiencyDialogOpen, setProficiencyDialogOpen] = useState(false);
+  const [selectedLanguageForProficiency, setSelectedLanguageForProficiency] = useState<string | null>(null);
   const { toast } = useToast();
   const { confirm, ConfirmDialog } = useConfirmDialog();
 
@@ -85,25 +119,17 @@ const TeacherMyCoursesPage = () => {
       navigate('/');
       return;
     }
+    setLanguages(getLibraryLanguages());
     loadMyCourses();
-    loadLanguages();
   }, [currentRole, filterStatus]);
-
-  const loadLanguages = async () => {
-    try {
-      const data = await LanguagesAPI.list();
-      setLanguages(data.languages || []);
-    } catch (err) {
-      console.error('Failed to load languages:', err);
-    }
-  };
 
   const loadMyCourses = async () => {
     setLoading(true);
     try {
       const status = filterStatus !== 'all' ? filterStatus : undefined;
       const data = await TeacherCourseJoinAPI.getMyCourses(status);
-      setTeacherCourses(data.teacherCourses || []);
+      const list = data.teacherCourses || [];
+      setTeacherCourses(list);
     } catch (err: any) {
       toast({ title: 'Failed to load courses', description: err?.message, variant: 'destructive' });
     } finally {
@@ -116,12 +142,23 @@ const TeacherMyCoursesPage = () => {
     return getLanguageValue(course.name) || 'Unknown';
   };
 
-  const getLanguageNames = (languages: ApiTeacherCourse['languageIds']) => {
-    if (!Array.isArray(languages)) return 'Unknown';
-    return languages.map(lang => {
-      if (typeof lang === 'string') return 'Unknown';
-      return getLanguageValue(lang.name) || lang.code || 'Unknown';
-    }).join(', ');
+  const getLanguageNames = (languagesArr: ApiTeacherCourse['languageIds']) => {
+    if (!Array.isArray(languagesArr)) return 'Unknown';
+    return languagesArr
+      .map((lang) => {
+        if (typeof lang === 'string') return 'Unknown';
+        const code = lang.code || '';
+        const lib = code
+          ? libraryLanguageByCode.get(code) ||
+            libraryLanguageByCode.get(code.toLowerCase()) ||
+            libraryLanguageByCode.get(code.toUpperCase())
+          : null;
+        if (lib) {
+          return getLanguageValue(lib.name) || code || 'Unknown';
+        }
+        return getLanguageValue(lang.name) || code || 'Unknown';
+      })
+      .join(', ');
   };
 
   const statusStyles: Record<string, string> = {
@@ -147,12 +184,34 @@ const TeacherMyCoursesPage = () => {
     }
 
     setEditingId(request._id);
-    const languageIds = Array.isArray(request.languageIds)
-      ? request.languageIds.map((lang: any) => (typeof lang === 'string' ? lang : lang._id))
-      : [];
+    const existingLanguages = Array.isArray((request as any).languages) ? (request as any).languages : [];
+    const languagesWithProf: LanguageWithProficiency[] =
+      existingLanguages.length > 0
+        ? existingLanguages
+            .map((lang: any) => ({
+              code: (lang?.code || '').toString(),
+              proficiency: (lang?.proficiency || 'native') as ProficiencyLevel,
+            }))
+            .filter((l) => !!l.code)
+        : Array.isArray(request.languageProficiencies) && request.languageProficiencies.length > 0
+          ? request.languageProficiencies
+              .map((lp) => ({
+                code: (lp?.code || '').toString(),
+                proficiency: (lp?.proficiency || 'native') as ProficiencyLevel,
+              }))
+              .filter((l) => !!l.code)
+          : Array.isArray(request.languageIds)
+            ? request.languageIds
+                .map((lang: any) =>
+                  typeof lang === 'object' && lang.code
+                    ? ({ code: lang.code, proficiency: 'native' as ProficiencyLevel })
+                    : null
+                )
+                .filter(Boolean) as LanguageWithProficiency[]
+            : [];
     
     setFormData({
-      languageIds,
+      languages: languagesWithProf,
       price: (typeof request.originalPrice === 'number' ? request.originalPrice : request.price)?.toString() || '',
       currency: (request.teacherCurrency || request.currency || 'USD'),
       introductionVideo: request.introductionVideo || '',
@@ -166,7 +225,7 @@ const TeacherMyCoursesPage = () => {
   const handleUpdateCourse = async () => {
     if (!editingId) return;
 
-    if (formData.languageIds.length === 0) {
+    if (formData.languages.length === 0) {
       toast({
         title: 'Validation Error',
         description: 'Please select at least one language',
@@ -186,8 +245,18 @@ const TeacherMyCoursesPage = () => {
 
     setSubmitting(true);
     try {
+      const payloadLanguages = formData.languages.map((l) => {
+        const lib = languages.find((x) => x.code === l.code);
+        return {
+          ...l,
+          name: lib?.name,
+          nativeName: lib?.nativeName,
+        };
+      });
+
       await TeacherCourseJoinAPI.updateCourse(editingId, {
-        languageIds: formData.languageIds,
+        languageCodes: formData.languages.map((l) => l.code),
+        languages: payloadLanguages,
         price: parseFloat(formData.price),
         currency: formData.currency,
         introductionVideo: formData.introductionVideo,
@@ -212,6 +281,32 @@ const TeacherMyCoursesPage = () => {
       setSubmitting(false);
     }
   };
+
+  const libraryLanguageByCode = useMemo(() => {
+    const map = new Map<string, any>();
+    languages.forEach((l) => {
+      if (l?.code) {
+        const code = String(l.code);
+        map.set(code, l);
+        map.set(code.toLowerCase(), l);
+        map.set(code.toUpperCase(), l);
+      }
+    });
+    return map;
+  }, [languages]);
+
+  const selectedLanguageLabel = useMemo(() => {
+    if (formData.languages.length === 0) return "Select languages...";
+    const names = formData.languages
+      .map((l) => {
+        const lang = libraryLanguageByCode.get(l.code);
+        return lang ? getLanguageValue(lang.name) : l.code;
+      })
+      .filter(Boolean);
+
+    if (names.length <= 2) return names.join(", ");
+    return `${names.slice(0, 2).join(", ")} +${names.length - 2} more`;
+  }, [formData.languages, libraryLanguageByCode]);
 
   const handleExitCourse = async (id: string) => {
     const confirmed = await confirm({
@@ -359,11 +454,36 @@ const TeacherMyCoursesPage = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
-                          {Array.isArray(request.languageIds) ? (
+                          {Array.isArray((request as any).languages) && (request as any).languages.length > 0 ? (
+                            (request as any).languages.map(
+                              (
+                                lang: {
+                                  code?: string;
+                                  name?: string;
+                                  proficiency?: string;
+                                },
+                                idx: number
+                              ) => {
+                                const displayName = lang.name || lang.code || 'Unknown';
+                                const profLabel = getProficiencyLabel(lang.proficiency);
+                                return (
+                                  <Badge key={idx} variant="outline">
+                                    {displayName}
+                                    {profLabel ? ` (${profLabel})` : ''}
+                                  </Badge>
+                                );
+                              }
+                            )
+                          ) : Array.isArray(request.languageIds) ? (
                             request.languageIds.map((lang, idx) => {
-                              const langName = typeof lang === 'string' ? 'Unknown' : (getLanguageValue(lang.name) || lang.code || 'Unknown');
+                              const langName =
+                                typeof lang === 'string'
+                                  ? 'Unknown'
+                                  : getLanguageValue(lang.name) || lang.code || 'Unknown';
                               return (
-                                <Badge key={idx} variant="outline">{langName}</Badge>
+                                <Badge key={idx} variant="outline">
+                                  {langName}
+                                </Badge>
                               );
                             })
                           ) : (
@@ -464,9 +584,7 @@ const TeacherMyCoursesPage = () => {
                     role="combobox"
                     className="w-full justify-between"
                   >
-                    {formData.languageIds.length > 0
-                      ? `${formData.languageIds.length} language(s) selected`
-                      : "Select languages..."}
+                    <span className="truncate">{selectedLanguageLabel}</span>
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
@@ -477,32 +595,36 @@ const TeacherMyCoursesPage = () => {
                       <CommandEmpty>No language found.</CommandEmpty>
                       <CommandGroup>
                         {languages.map((lang) => {
-                          const isSelected = formData.languageIds.includes(lang._id);
+                          const code = lang.code || '';
+                          const isSelected = formData.languages.some((l) => l.code === code);
                           return (
                             <CommandItem
-                              key={lang._id}
-                              value={lang._id}
+                              key={code}
+                              value={code}
                               onSelect={() => {
                                 if (isSelected) {
                                   setFormData({
                                     ...formData,
-                                    languageIds: formData.languageIds.filter((id) => id !== lang._id),
+                                    languages: formData.languages.filter((l) => l.code !== code),
                                   });
                                 } else {
                                   setFormData({
                                     ...formData,
-                                    languageIds: [...formData.languageIds, lang._id],
+                                    languages: [...formData.languages, { code, proficiency: 'native' }],
                                   });
+                                  setSelectedLanguageForProficiency(code);
+                                  setProficiencyDialogOpen(true);
                                 }
                               }}
                             >
-                              <Check
-                                className={cn(
-                                  "mr-2 h-4 w-4",
-                                  isSelected ? "opacity-100" : "opacity-0"
-                                )}
+                              <input
+                                type="checkbox"
+                                className="mr-2 h-4 w-4"
+                                checked={isSelected}
+                                readOnly
                               />
-                              {getLanguageValue(lang.name)} ({lang.code})
+                              <span className="truncate">{getLanguageValue(lang.name)}</span>
+                              <span className="ml-2 text-xs text-muted-foreground">({lang.code})</span>
                             </CommandItem>
                           );
                         })}
@@ -511,20 +633,31 @@ const TeacherMyCoursesPage = () => {
                   </Command>
                 </PopoverContent>
               </Popover>
-              {formData.languageIds.length > 0 && (
+              {formData.languages.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {formData.languageIds.map((langId) => {
-                    const lang = languages.find((l) => l._id === langId);
+                  {formData.languages.map((lw) => {
+                    const lang = libraryLanguageByCode.get(lw.code);
                     if (!lang) return null;
+                    const prof = PROFICIENCY_LEVELS.find((p) => p.value === lw.proficiency);
                     return (
-                      <Badge key={langId} variant="secondary">
+                      <Badge key={lw.code} variant="secondary" className="flex items-center gap-1">
                         {getLanguageValue(lang.name)}
+                        <button
+                          type="button"
+                          className="ml-1 text-xs underline underline-offset-2 opacity-80 hover:opacity-100"
+                          onClick={() => {
+                            setSelectedLanguageForProficiency(lw.code);
+                            setProficiencyDialogOpen(true);
+                          }}
+                        >
+                          {prof?.label || 'Native'}
+                        </button>
                         <button
                           className="ml-1 hover:text-destructive"
                           onClick={() => {
                             setFormData({
                               ...formData,
-                              languageIds: formData.languageIds.filter((id) => id !== langId),
+                              languages: formData.languages.filter((l) => l.code !== lw.code),
                             });
                           }}
                         >
@@ -654,6 +787,39 @@ const TeacherMyCoursesPage = () => {
               {submitting ? 'Updating...' : 'Update Request'}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Proficiency Selection Dialog */}
+      <Dialog open={proficiencyDialogOpen} onOpenChange={setProficiencyDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Select Proficiency</DialogTitle>
+            <DialogDescription>
+              Choose your proficiency level for the selected language.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 py-4">
+            {PROFICIENCY_LEVELS.map((level) => (
+              <button
+                key={level.value}
+                type="button"
+                className="w-full text-left px-3 py-2 rounded-md border hover:bg-muted transition-colors"
+                onClick={() => {
+                  if (!selectedLanguageForProficiency) return;
+                  setFormData((prev) => ({
+                    ...prev,
+                    languages: prev.languages.map((l) =>
+                      l.code === selectedLanguageForProficiency ? { ...l, proficiency: level.value } : l
+                    ),
+                  }));
+                  setProficiencyDialogOpen(false);
+                }}
+              >
+                {level.label}
+              </button>
+            ))}
+          </div>
         </DialogContent>
       </Dialog>
     </AdminLayout>

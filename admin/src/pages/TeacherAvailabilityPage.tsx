@@ -259,17 +259,28 @@ const TeacherAvailabilityPage = () => {
     return acc;
   }, {} as Record<string, ApiAvailability[]>);
 
-  // Get week dates
   const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 }); // Monday
   const weekDates = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
-  // Get slots for a specific date
   const getSlotsForDate = (date: Date) => {
     const dateKey = format(date, 'yyyy-MM-dd');
     return groupedByDate[dateKey] || [];
   };
 
   const selectedCourse = courses.find((c) => c._id === selectedCourseId);
+
+  const getDisplayLanguageName = (lang: any): string => {
+    if (!lang) return 'Unknown';
+    if (typeof lang === 'string') return lang;
+
+    if (typeof lang.name === 'string' && lang.name.trim()) return lang.name;
+    if (typeof lang.nativeName === 'string' && lang.nativeName.trim()) return lang.nativeName;
+
+    const nameFromObj = getLanguageValue(lang.name);
+    if (nameFromObj) return nameFromObj;
+
+    return (lang.code || 'Unknown') as string;
+  };
 
   return (
     <AdminLayout>
@@ -316,12 +327,20 @@ const TeacherAvailabilityPage = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {courses.map((course) => {
-                    // Get all languages for this course
+                    // Get all languages for this course from joined teacherCourses
                     const courseLanguages = teacherCourses
-                      .filter(tc => typeof tc.courseId !== 'string' && tc.courseId._id === course._id)
-                      .flatMap(tc => Array.isArray(tc.languageIds) ? tc.languageIds.map(l => typeof l === 'string' ? 'Unknown' : (getLanguageValue(l.name) || l.code || 'Unknown')) : []);
+                      .filter((tc) => typeof tc.courseId !== 'string' && tc.courseId._id === course._id)
+                      .flatMap((tc) => {
+                        const langs =
+                          Array.isArray((tc as any).languages) && (tc as any).languages.length > 0
+                            ? (tc as any).languages
+                            : Array.isArray(tc.languageIds)
+                              ? tc.languageIds
+                              : [];
+                        return langs.map((l: any) => getDisplayLanguageName(l));
+                      });
                     const uniqueLanguages = Array.from(new Set(courseLanguages));
-                    
+
                     return (
                       <SelectItem key={course._id} value={course._id}>
                         <div className="flex items-center gap-2">
@@ -353,8 +372,16 @@ const TeacherAvailabilityPage = () => {
                       <span className="font-semibold text-foreground">Languages:</span>
                       <div className="flex items-center gap-1 flex-wrap">
                         {teacherCourses
-                          .filter(tc => typeof tc.courseId !== 'string' && tc.courseId._id === selectedCourseId)
-                          .flatMap(tc => Array.isArray(tc.languageIds) ? tc.languageIds.map(l => typeof l === 'string' ? 'Unknown' : (getLanguageValue(l.name) || l.code || 'Unknown')) : [])
+                          .filter((tc) => typeof tc.courseId !== 'string' && tc.courseId._id === selectedCourseId)
+                          .flatMap((tc) => {
+                            const langs =
+                              Array.isArray((tc as any).languages) && (tc as any).languages.length > 0
+                                ? (tc as any).languages
+                                : Array.isArray(tc.languageIds)
+                                  ? tc.languageIds
+                                  : [];
+                            return langs.map((l: any) => getDisplayLanguageName(l));
+                          })
                           .filter((v, i, a) => a.indexOf(v) === i)
                           .map((lang, idx) => (
                             <Badge key={idx} variant="secondary" className="text-xs">
@@ -607,14 +634,8 @@ const TeacherAvailabilityPage = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="15">15 minutes</SelectItem>
                   <SelectItem value="25">25 minutes</SelectItem>
-                  <SelectItem value="30">30 minutes</SelectItem>
-                  <SelectItem value="45">45 minutes</SelectItem>
                   <SelectItem value="50">50 minutes</SelectItem>
-                  <SelectItem value="60">60 minutes</SelectItem>
-                  <SelectItem value="90">90 minutes</SelectItem>
-                  <SelectItem value="120">120 minutes</SelectItem>
                 </SelectContent>
               </Select>
             </div>
