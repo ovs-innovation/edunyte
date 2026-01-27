@@ -335,7 +335,17 @@ const TeacherJoinCoursePage = () => {
                     <span>
                       {formData.languages.length === 0
                         ? 'Select languages...'
-                        : `${formData.languages.length} language${formData.languages.length > 1 ? 's' : ''} selected`}
+                        : (() => {
+                            const names = formData.languages
+                              .map((lwp) => {
+                                const lang = libraryLanguages.find((l) => l.code === lwp.code);
+                                return lang ? getLanguageValue(lang.name) : lwp.code;
+                              })
+                              .filter(Boolean);
+                            const shown = names.slice(0, 2).join(', ');
+                            const extra = names.length - 2;
+                            return extra > 0 ? `${shown} +${extra}` : shown;
+                          })()}
                     </span>
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>

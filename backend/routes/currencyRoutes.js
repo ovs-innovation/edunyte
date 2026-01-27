@@ -1,10 +1,10 @@
 import express from "express";
-import { convertCurrency, getExchangeRates } from "../controllers/currencyController.js";
+import { convertCurrency, getExchangeRatesController } from "../controllers/currencyController.js";
 
 const router = express.Router();
 
-// Get exchange rates
-router.get("/rates", getExchangeRates);
+// Get exchange rates (cached from Redis)
+router.get("/exchange-rates", getExchangeRatesController);
 
 // Convert currency
 router.post("/convert", convertCurrency);

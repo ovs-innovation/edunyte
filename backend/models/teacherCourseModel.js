@@ -33,10 +33,28 @@ const teacherCourseSchema = new mongoose.Schema(
       required: true,
       min: 0,
     },
+    // Currency of the stored price in DB (always base currency: USD)
     currency: {
       type: String,
-      default: "INR",
+      default: "USD",
       uppercase: true,
+    },
+    // Base currency metadata (explicit for clarity / migrations)
+    baseCurrency: {
+      type: String,
+      default: "USD",
+      uppercase: true,
+    },
+    // Teacher's submitted currency + amount (for display/auditing only)
+    teacherCurrency: {
+      type: String,
+      default: "USD",
+      uppercase: true,
+    },
+    originalPrice: {
+      type: Number,
+      min: 0,
+      default: 0,
     },
     experience: {
       type: mongoose.Schema.Types.Mixed,

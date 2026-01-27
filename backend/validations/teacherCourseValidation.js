@@ -27,6 +27,20 @@ export const createTeacherCourseSchema = z.object({
   aboutCourse: languageTextSchema,
 });
 
+export const updateTeacherCourseSchema = z.object({
+  languageIds: z.array(z.string().min(1, "Language ID is required")).min(1, "At least one language is required").optional(),
+  price: z.number().min(0, "Price must be non-negative").optional(),
+  currency: z.string().optional(),
+  timezone: z.string().optional(),
+  introductionVideo: z.union([
+    z.string().url("Invalid video URL"),
+    z.literal("")
+  ]).optional(),
+  experience: languageTextSchema,
+  bio: languageTextSchema,
+  aboutCourse: languageTextSchema,
+});
+
 export const updateTeacherCourseStatusSchema = z.object({
   status: z.enum(["approved", "rejected"]),
   rejectionReason: z.string().optional().default(""),

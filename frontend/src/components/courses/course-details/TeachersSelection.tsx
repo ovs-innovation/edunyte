@@ -266,11 +266,33 @@ const TeachersSelection = () => {
   }, [filters, teachers, selectedTeacher]);
 
   const formatPrice = (price: number, currency: string) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: currency || 'INR',
-      minimumFractionDigits: 0,
-    }).format(price);
+    if (!price || isNaN(price) || price <= 0) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: currency || 'USD',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(0);
+    }
+    
+    const validCurrency = typeof currency === 'string' && currency.length === 3 ? currency : 'USD';
+    
+    try {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: validCurrency,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(price);
+    } catch (error) {
+      // Fallback if currency is invalid
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(price);
+    }
   };
 
   const CountryFlag = ({ code }: { code: string }) => {
@@ -1230,7 +1252,7 @@ const TeachersSelection = () => {
                         <div className="d-flex align-items-start" style={{ gap: '12px' }}>
                           <div className="text-end" style={{ maxWidth: '150px', wordBreak: 'break-word' }}>
                             <div className="fw-bold text-primary mb-1" style={{ fontSize: '20px', lineHeight: '1.2' }}>
-                              {formatPrice(teacher.price || 0, teacher.currency || 'INR')}
+                              {formatPrice(teacher.price || 0, teacher.currency || 'USD')}
                             </div>
                             <small className="text-muted d-block" style={{ fontSize: '11px' }}>
                               {t('common.per_hour')}
@@ -1452,7 +1474,7 @@ const TeachersSelection = () => {
                         <div className="d-flex align-items-center gap-3">
                           <div className="text-start">
                             <div className="fw-bold text-primary mb-1" style={{ fontSize: '20px', lineHeight: '1.2' }}>
-                              {formatPrice(teacher.price || 0, teacher.currency || 'INR')}
+                              {formatPrice(teacher.price || 0, teacher.currency || 'USD')}
                             </div>
                             <small className="text-muted d-block" style={{ fontSize: '11px' }}>
                               {t('common.per_hour')}

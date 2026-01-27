@@ -225,16 +225,16 @@ const TeacherApprovalPage = () => {
                       <div>
                         <p className="font-medium text-foreground">{getTeacherName(request.teacherId)}</p>
                         <p className="text-xs text-muted-foreground">
-                          Price: {request.currency} {request.price} | Timezone: {request.timezone}
+                          Price: {typeof request.currency === 'string' ? request.currency : 'USD'} {typeof request.price === 'number' ? request.price.toFixed(2) : String(request.price || '0.00')} | Timezone: {request.timezone || 'UTC'}
                         </p>
                         {request.experience && (
                           <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
-                            <strong>Experience:</strong> {getLanguageValue(request.experience)}
+                            <strong>Experience:</strong> {String(getLanguageValue(request.experience) || '')}
                           </p>
                         )}
                         {request.bio && (
                           <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                            <strong>Bio:</strong> {getLanguageValue(request.bio)}
+                            <strong>Bio:</strong> {String(getLanguageValue(request.bio) || '')}
                           </p>
                         )}
                         {request.introductionVideo && (
@@ -269,7 +269,7 @@ const TeacherApprovalPage = () => {
                           <p className="font-medium text-foreground">{getCourseName(request.courseId)}</p>
                           {typeof request.courseId !== 'string' && request.courseId?.description && (
                             <p className="text-sm text-muted-foreground line-clamp-1 mt-1">
-                              {getLanguageValue(request.courseId.description)}
+                              {String(getLanguageValue(request.courseId.description) || '')}
                             </p>
                           )}
                         </div>
@@ -291,7 +291,7 @@ const TeacherApprovalPage = () => {
                     </TableCell>
                     <TableCell>
                       <span className="font-medium">
-                        {request.currency} {request.price}
+                        {typeof request.currency === 'string' ? request.currency : 'USD'} {typeof request.price === 'number' ? request.price.toFixed(2) : String(request.price || '0.00')}
                       </span>
                     </TableCell>
                     <TableCell>

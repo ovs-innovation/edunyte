@@ -18,6 +18,10 @@ export const joinCourse = async (req, res, next) => {
   try {
     const teacherId = req.user.id;
     const { courseId, languageIds, price, currency, timezone, introductionVideo, experience, bio, aboutCourse } = req.body;
+    const baseCurrency = getBaseCurrency();
+    const teacherCurrency = (currency || baseCurrency).toUpperCase();
+    const originalPrice = typeof price === "number" ? price : 0;
+    const priceInBase = await convertCurrency(originalPrice, teacherCurrency, baseCurrency);
 
     // Verify user is a teacher
     const user = await User.findById(teacherId);
@@ -65,8 +69,11 @@ export const joinCourse = async (req, res, next) => {
       // If rejected, allow re-application
       existing.status = "pending";
       existing.languageIds = languageIds;
-      existing.price = price;
-      existing.currency = (currency || getBaseCurrency()).toUpperCase();
+      existing.price = priceInBase;
+      existing.currency = baseCurrency;
+      existing.baseCurrency = baseCurrency;
+      existing.teacherCurrency = teacherCurrency;
+      existing.originalPrice = originalPrice;
       existing.timezone = timezone || "UTC";
       existing.introductionVideo = introductionVideo || "";
       existing.experience = normalizeLanguageValue(experience);
@@ -91,8 +98,11 @@ export const joinCourse = async (req, res, next) => {
       teacherId,
       courseId,
       languageIds,
-      price,
-      currency: (currency || getBaseCurrency()).toUpperCase(),
+      price: priceInBase,
+      currency: baseCurrency,
+      baseCurrency,
+      teacherCurrency,
+      originalPrice,
       timezone: timezone || "UTC",
       introductionVideo: introductionVideo || "",
       experience: normalizeLanguageValue(experience),
@@ -138,20 +148,104 @@ export const getMyCourses = async (req, res, next) => {
       .populate("languageIds", "name code nativeName")
       .sort({ createdAt: -1 });
 
-    const targetCurrency = req.query.currency || getBaseCurrency();
-    const teacherCoursesData = teacherCourses.map(tc => {
+    const teacherCoursesData = teacherCourses.map((tc) => {
       const tcObj = tc.toObject();
       tcObj.experience = getLanguageValue(tcObj.experience);
       tcObj.bio = getLanguageValue(tcObj.bio);
       tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
-      if (tcObj.price && tcObj.currency && tcObj.currency !== targetCurrency) {
-        tcObj.price = convertCurrency(tcObj.price, tcObj.currency, targetCurrency);
-        tcObj.currency = targetCurrency;
-      }
       return tcObj;
     });
 
     res.json({ teacherCourses: teacherCoursesData, count: teacherCoursesData.length });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * Teacher: Update a course request
+ */
+export const updateCourseRequest = async (req, res, next) => {
+  try {
+    const teacherId = req.user.id;
+    const { id } = req.params;
+    const { languageIds, price, currency, timezone, introductionVideo, experience, bio, aboutCourse } = req.body;
+    const baseCurrency = getBaseCurrency();
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid course request ID" });
+    }
+
+    // Verify user is a teacher
+    const user = await User.findById(teacherId);
+    if (!user || user.role !== "teacher") {
+      return res.status(403).json({ message: "Only teachers can update course requests" });
+    }
+
+    const teacherCourse = await TeacherCourse.findById(id);
+    if (!teacherCourse) {
+      return res.status(404).json({ message: "Course request not found" });
+    }
+
+    // Verify the teacher owns this request
+    if (teacherCourse.teacherId.toString() !== teacherId) {
+      return res.status(403).json({ message: "You can only update your own course requests" });
+    }
+
+    // Only allow updates if status is pending or rejected
+    if (teacherCourse.status === "approved") {
+      return res.status(400).json({ message: "Cannot update an approved course request. Please contact admin." });
+    }
+
+    // Update fields
+    if (languageIds !== undefined) {
+      teacherCourse.languageIds = languageIds;
+    }
+    if (price !== undefined || currency !== undefined) {
+      const teacherCurrency = (currency || teacherCourse.teacherCurrency || baseCurrency).toUpperCase();
+      const originalPrice = typeof price === "number" ? price : teacherCourse.originalPrice || 0;
+      const priceInBase = await convertCurrency(originalPrice, teacherCurrency, baseCurrency);
+      teacherCourse.price = priceInBase;
+      teacherCourse.currency = baseCurrency;
+      teacherCourse.baseCurrency = baseCurrency;
+      teacherCourse.teacherCurrency = teacherCurrency;
+      teacherCourse.originalPrice = originalPrice;
+    }
+    if (timezone !== undefined) {
+      teacherCourse.timezone = timezone;
+    }
+    if (introductionVideo !== undefined) {
+      teacherCourse.introductionVideo = introductionVideo;
+    }
+    if (experience !== undefined) {
+      teacherCourse.experience = normalizeLanguageValue(experience);
+    }
+    if (bio !== undefined) {
+      teacherCourse.bio = normalizeLanguageValue(bio);
+    }
+    if (aboutCourse !== undefined) {
+      teacherCourse.aboutCourse = normalizeLanguageValue(aboutCourse);
+    }
+
+    // Reset status to pending if it was rejected
+    if (teacherCourse.status === "rejected") {
+      teacherCourse.status = "pending";
+      teacherCourse.rejectionReason = "";
+    }
+
+    await teacherCourse.save();
+    await teacherCourse.populate([
+      { path: "teacherId", select: "name email" },
+      { path: "courseId", select: "name description category image status" },
+      { path: "languageIds", select: "name code" },
+    ]);
+
+    const teacherCourseObj = teacherCourse.toObject();
+    teacherCourseObj.experience = getLanguageValue(teacherCourseObj.experience);
+    teacherCourseObj.bio = getLanguageValue(teacherCourseObj.bio);
+    teacherCourseObj.aboutCourse = getLanguageValue(teacherCourseObj.aboutCourse);
+
+    res.json({ teacherCourse: teacherCourseObj, message: "Course request updated successfully" });
   } catch (err) {
     next(err);
   }
@@ -236,16 +330,11 @@ export const getTeacherCourseRequests = async (req, res, next) => {
       .populate("reviewedBy", "name email")
       .sort({ createdAt: -1 });
 
-    const targetCurrency = req.query.currency || getBaseCurrency();
-    const teacherCoursesData = teacherCourses.map(tc => {
+    const teacherCoursesData = teacherCourses.map((tc) => {
       const tcObj = tc.toObject();
       tcObj.experience = getLanguageValue(tcObj.experience);
       tcObj.bio = getLanguageValue(tcObj.bio);
       tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
-      if (tcObj.price && tcObj.currency && tcObj.currency !== targetCurrency) {
-        tcObj.price = convertCurrency(tcObj.price, tcObj.currency, targetCurrency);
-        tcObj.currency = targetCurrency;
-      }
       return tcObj;
     });
 
@@ -422,16 +511,11 @@ export const getCourseTeachers = async (req, res, next) => {
       .populate("languageIds", "name code nativeName")
       .sort({ price: 1 });
 
-    const targetCurrency = req.query.currency || getBaseCurrency();
-    const teacherCoursesData = teacherCourses.map(tc => {
+    const teacherCoursesData = teacherCourses.map((tc) => {
       const tcObj = tc.toObject();
       tcObj.experience = getLanguageValue(tcObj.experience);
       tcObj.bio = getLanguageValue(tcObj.bio);
       tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
-      if (tcObj.price && tcObj.currency && tcObj.currency !== targetCurrency) {
-        tcObj.price = convertCurrency(tcObj.price, tcObj.currency, targetCurrency);
-        tcObj.currency = targetCurrency;
-      }
       return tcObj;
     });
 
@@ -476,7 +560,6 @@ export const getCourseTeachersBySlug = async (req, res, next) => {
     const Availability = (await import("../models/availabilityModel.js")).default;
     const { getLanguageValue } = await import("../utils/languageHelper.js");
 
-    const targetCurrency = req.query.currency || getBaseCurrency();
     const now = new Date();
     const defaultEndDate = new Date();
     defaultEndDate.setDate(defaultEndDate.getDate() + 30); // Next 30 days
@@ -553,12 +636,6 @@ export const getCourseTeachersBySlug = async (req, res, next) => {
           currency: av.currency,
           timezone: av.timezone,
         }));
-
-        // Currency conversion
-        if (tcObj.price && tcObj.currency && tcObj.currency !== targetCurrency) {
-          tcObj.price = convertCurrency(tcObj.price, tcObj.currency, targetCurrency);
-          tcObj.currency = targetCurrency;
-        }
 
         return tcObj;
       })
