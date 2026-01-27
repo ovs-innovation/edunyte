@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { getSelectedCurrency, setSelectedCurrency, formatPrice as formatPriceIntl } from '../services/currencyService'
 
 export type CurrencyCode = 'INR' | 'USD' | 'EUR' | 'GBP' | 'JPY' | 'AUD' | 'CAD' | 'SGD' | 'AED' | 'SAR' | 'BRL' | 'PLN' | 'UAH'
 
@@ -24,7 +25,7 @@ export const CURRENCIES: Record<CurrencyCode, Currency> = {
   UAH: { code: 'UAH', symbol: '₴', name: 'Ukrainian Hryvnia' },
 }
 
-const STORAGE_KEY = 'app_currency'
+const LEGACY_STORAGE_KEY = 'app_currency'
 
 interface CurrencyContextType {
   currency: CurrencyCode
@@ -50,9 +51,20 @@ interface CurrencyProviderProps {
 export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) => {
   const getInitialCurrency = (): CurrencyCode => {
     if (typeof window !== 'undefined') {
-      const stored = window.localStorage.getItem(STORAGE_KEY) as CurrencyCode
-      if (stored && CURRENCIES[stored]) {
-        return stored
+      // Prefer the new unified currency key (used by currencyService + currencyChanged event)
+      const selected = getSelectedCurrency() as CurrencyCode
+      if (selected && CURRENCIES[selected]) return selected
+
+      // Backward compatibility: migrate legacy key once
+      const legacy = window.localStorage.getItem(LEGACY_STORAGE_KEY) as CurrencyCode
+      if (legacy && CURRENCIES[legacy]) {
+        try {
+          setSelectedCurrency(legacy)
+          window.localStorage.removeItem(LEGACY_STORAGE_KEY)
+        } catch {
+          // ignore
+        }
+        return legacy
       }
     }
     return 'INR'
@@ -62,9 +74,21 @@ export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) 
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      window.localStorage.setItem(STORAGE_KEY, currency)
+      // Persist via unified currency service (also dispatches currencyChanged event)
+      setSelectedCurrency(currency)
     }
   }, [currency])
+
+  useEffect(() => {
+    const handleCurrencyChange = (event: CustomEvent) => {
+      const next = event?.detail?.currency as CurrencyCode
+      if (next && CURRENCIES[next]) {
+        setCurrencyState(next)
+      }
+    }
+    window.addEventListener('currencyChanged', handleCurrencyChange as EventListener)
+    return () => window.removeEventListener('currencyChanged', handleCurrencyChange as EventListener)
+  }, [])
 
   const setCurrency = (newCurrency: CurrencyCode) => {
     if (CURRENCIES[newCurrency]) {
@@ -77,9 +101,7 @@ export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) 
   }
 
   const formatPrice = (amount: number): string => {
-    const currencyInfo = getCurrencyInfo()
-    const formattedAmount = amount.toFixed(2)
-    return `${currencyInfo.symbol}${formattedAmount}`
+    return formatPriceIntl(amount, currency)
   }
 
   return (

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { fetchCourseTeachers, fetchCourses, type TeacherCourse, type Course } from '../../../services/courseService';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useCurrency } from '../../../hooks/useCurrency';
 import BookingModal from './BookingModal';
 import * as Flags from 'country-flag-icons/react/3x2';
 import countriesLib from 'i18n-iso-countries';
@@ -26,6 +27,7 @@ const TeachersSelection = () => {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const { currency: selectedCurrency, convertPrice: convertPriceToSelected, formatPrice: formatPriceSelected } = useCurrency();
   const [teachers, setTeachers] = useState<TeacherCourse[]>([]);
   const [filteredTeachers, setFilteredTeachers] = useState<TeacherCourse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,6 +48,7 @@ const TeachersSelection = () => {
   const [courseSearch, setCourseSearch] = useState('');
   const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
   const [languageSearch, setLanguageSearch] = useState('');
+  const [displayPrices, setDisplayPrices] = useState<Record<string, { amount: number; formatted: string }>>({});
   const [filters, setFilters] = useState<FilterState>({
     priceRange: '',
     country: '',
@@ -97,6 +100,43 @@ const TeachersSelection = () => {
   }, [slug, t]);
 
   useEffect(() => {
+    let cancelled = false;
+    const loadDisplayPrices = async () => {
+      if (!teachers || teachers.length === 0) {
+        setDisplayPrices({});
+        return;
+      }
+      try {
+        const entries = await Promise.all(
+          teachers.map(async (teacher) => {
+            const usdAmount = typeof teacher.price === 'number' ? teacher.price : 0;
+            const converted = await convertPriceToSelected(usdAmount, selectedCurrency);
+            return [
+              teacher._id,
+              {
+                amount: converted,
+                formatted: formatPriceSelected(converted, selectedCurrency),
+              },
+            ] as const;
+          })
+        );
+        if (!cancelled) {
+          setDisplayPrices(Object.fromEntries(entries));
+        }
+      } catch (err) {
+        console.error('Failed to convert teacher prices:', err);
+        if (!cancelled) {
+          setDisplayPrices({});
+        }
+      }
+    };
+    loadDisplayPrices();
+    return () => {
+      cancelled = true;
+    };
+  }, [teachers, selectedCurrency, convertPriceToSelected, formatPriceSelected]);
+
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       if (!target.closest('.course-dropdown-container') && !target.closest('.country-dropdown-container') && !target.closest('.language-dropdown-container')) {
@@ -113,6 +153,10 @@ const TeachersSelection = () => {
 
   useEffect(() => {
     let filtered = [...teachers];
+    const getComparablePrice = (teacher: TeacherCourse) => {
+      const mapped = displayPrices[teacher._id]?.amount;
+      return typeof mapped === 'number' && !isNaN(mapped) ? mapped : (teacher.price || 0);
+    };
 
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
@@ -126,7 +170,7 @@ const TeachersSelection = () => {
     if (filters.priceRange) {
       const [min, max] = filters.priceRange.split('-').map(Number);
       filtered = filtered.filter((teacher) => {
-        const price = teacher.price || 0;
+        const price = getComparablePrice(teacher);
         if (max) {
           return price >= min && price <= max;
         }
@@ -244,10 +288,10 @@ const TeachersSelection = () => {
 
     switch (filters.sortBy) {
       case 'price_low':
-        filtered.sort((a, b) => (a.price || 0) - (b.price || 0));
+        filtered.sort((a, b) => getComparablePrice(a) - getComparablePrice(b));
         break;
       case 'price_high':
-        filtered.sort((a, b) => (b.price || 0) - (a.price || 0));
+        filtered.sort((a, b) => getComparablePrice(b) - getComparablePrice(a));
         break;
       case 'rating':
         filtered.sort((a, b) => (b.teacherProfile?.rating || 0) - (a.teacherProfile?.rating || 0));
@@ -263,36 +307,13 @@ const TeachersSelection = () => {
     if (filtered.length > 0 && (!selectedTeacher || !filtered.find((t) => t._id === selectedTeacher._id))) {
       setSelectedTeacher(filtered[0]);
     }
-  }, [filters, teachers, selectedTeacher]);
+  }, [filters, teachers, selectedTeacher, displayPrices]);
 
-  const formatPrice = (price: number, currency: string) => {
-    if (!price || isNaN(price) || price <= 0) {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: currency || 'USD',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(0);
-    }
-    
-    const validCurrency = typeof currency === 'string' && currency.length === 3 ? currency : 'USD';
-    
-    try {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: validCurrency,
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(price);
-    } catch (error) {
-      // Fallback if currency is invalid
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(price);
-    }
+  const getFormattedTeacherPrice = (teacher: TeacherCourse) => {
+    const mapped = displayPrices[teacher._id]?.formatted;
+    if (mapped) return mapped;
+    const usdAmount = typeof teacher.price === 'number' ? teacher.price : 0;
+    return formatPriceSelected(usdAmount, selectedCurrency);
   };
 
   const CountryFlag = ({ code }: { code: string }) => {
@@ -338,7 +359,9 @@ const TeachersSelection = () => {
 
   const getPriceRanges = () => {
     if (teachers.length === 0) return [];
-    const prices = teachers.map((t) => t.price || 0).filter((p) => p > 0);
+    const prices = teachers
+      .map((t) => displayPrices[t._id]?.amount ?? (t.price || 0))
+      .filter((p) => typeof p === 'number' && !isNaN(p) && p > 0);
     if (prices.length === 0) return [];
     const min = Math.min(...prices);
     const max = Math.max(...prices);
@@ -1252,7 +1275,7 @@ const TeachersSelection = () => {
                         <div className="d-flex align-items-start" style={{ gap: '12px' }}>
                           <div className="text-end" style={{ maxWidth: '150px', wordBreak: 'break-word' }}>
                             <div className="fw-bold text-primary mb-1" style={{ fontSize: '20px', lineHeight: '1.2' }}>
-                              {formatPrice(teacher.price || 0, teacher.currency || 'USD')}
+                              {getFormattedTeacherPrice(teacher)}
                             </div>
                             <small className="text-muted d-block" style={{ fontSize: '11px' }}>
                               {t('common.per_hour')}
@@ -1474,7 +1497,7 @@ const TeachersSelection = () => {
                         <div className="d-flex align-items-center gap-3">
                           <div className="text-start">
                             <div className="fw-bold text-primary mb-1" style={{ fontSize: '20px', lineHeight: '1.2' }}>
-                              {formatPrice(teacher.price || 0, teacher.currency || 'USD')}
+                              {getFormattedTeacherPrice(teacher)}
                             </div>
                             <small className="text-muted d-block" style={{ fontSize: '11px' }}>
                               {t('common.per_hour')}
