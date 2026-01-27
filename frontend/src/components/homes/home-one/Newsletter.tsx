@@ -1,4 +1,13 @@
+
+
+import React from 'react';
+import { useTranslation, Trans } from 'react-i18next';
+
+// Use a function component for <br /> to avoid void element issues in Trans
+const Br = () => <br />;
+
 const Newsletter = () => {
+   const { t } = useTranslation();
    return (
       <section className="newsletter__area">
          <div className="container">
@@ -12,11 +21,13 @@ const Newsletter = () => {
                </div>
                <div className="col-lg-8">
                   <div className="newsletter__content">
-                     <h2 className="title">Want to stay <span>informed</span> about <br /> new <span>courses & study?</span></h2>
+                     <h2 className="title">
+                        <Trans i18nKey="newsletter.title" components={[<span />, <Br key="br" />, <span />]} />
+                     </h2>
                      <div className="newsletter__form">
                         <form onSubmit={(e) => e.preventDefault()}>
-                           <input type="email" placeholder="Type your e-mail" />
-                           <button type="submit" className="btn">Subscribe Now</button>
+                           <input type="email" placeholder={t('newsletter.placeholder')} />
+                           <button type="submit" className="btn">{t('newsletter.subscribe')}</button>
                         </form>
                      </div>
                   </div>

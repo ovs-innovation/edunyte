@@ -1,3 +1,4 @@
+
 {
   "common": {
     "login": "Login",
@@ -111,5 +112,94 @@
     "cancel": "Cancel",
     "continue": "Continue",
     "select_course": "Select course"
-  }
+  },
+  "banner": {
+    "never_stop": "Never Stop",
+    "learning": "Learning",
+    "life_never_stop_teaching": "Personal Learning. Real Tutors.",
+    "subtitle": "Connect with experienced instructors for personalized, one-to-one learning experiences designed around your goals.",
+    "start_free_trial": "Find a Tutor",
+    "author_1": "Expert Tutors",
+    "author_2": "Global Learners"
+  },
+
+  "about": {
+    "enrolled_students": "Active Learners",
+    "get_more_about_us": "Get to Know Us",
+    "thousand_of_top": "Expert Tutors in One Place",
+    "desc": "Discover qualified instructors from around the world offering personalized learning support across subjects, skills, and languages.",
+    "world_class_instructors": "Verified Expert Tutors",
+    "access_class_anywhere": "Learn Anytime, Anywhere",
+    "flexible_course_plan": "Flexible Learning Schedules",
+    "start_free_trial": "Get Started"
+  },
+
+  "newsletter": {
+    "title": "Stay <1>updated</1> with <2/><3>new tutors & learning tips</3>",
+    "placeholder": "Enter your email address",
+    "subscribe": "Subscribe"
+  },
+
+  "instructor": {
+    "sub_title": "Meet Our Skilled Tutors",
+    "title": "Connect with experienced instructors, all in one platform.",
+    "desc": "Our tutors are carefully selected for their expertise, teaching experience, and ability to deliver personalized learning outcomes.",
+    "see_all": "View All Tutors"
+  },
+   "counter": [
+    { "count": 45, "count_text": "K+", "text": "Active Students" },
+    { "count": 89, "count_text": "+", "text": "Faculty Courses" },
+    { "count": 156, "count_text": "K", "text": "Best Professors" },
+    { "count": 42, "count_text": "K", "text": "Award Achieved" }
+  ],
+  "faq_section": {
+    "sub_title": "FAQ",
+    "title": "Learn With Trusted, Professional Instructors",
+    "desc": "Find answers to common questions about our learning platform, instructors, and how personalized learning works."
+  },
+  "faq": [
+    {
+      "question": "What does this platform offer?",
+      "answer": "Our platform connects learners with experienced, verified instructors for personalized, one-to-one learning across various subjects, skills, and languages."
+    },
+    {
+      "question": "Why should I choose this platform?",
+      "answer": "We focus on quality, flexibility, and personalization by allowing learners to choose instructors based on expertise, availability, and learning goals."
+    },
+    {
+      "question": "How does learning on this platform work?",
+      "answer": "Learners can browse instructor profiles, select a tutor that fits their needs, and schedule personalized sessions at a convenient time."
+    },
+    {
+      "question": "Is there a fixed course price?",
+      "answer": "No. Instructors set their own rates, giving learners the flexibility to choose options that fit their budget and learning preferences."
+    }
+  ],
+   "features_section": {
+    "sub_title": "How We Start Journey",
+    "title": "Start Your Learning Journey Today!",
+    "desc": "Connect with expert tutors for personalized one-to-one online lessons and start improving your skills with guidance made just for you."
+  },
+  "features": [
+    {
+      "title": "Learn with Expert Tutors",
+      "desc": "Get personal guidance from experienced teachers.",
+      "icon": "/assets/img/features/feature1.svg"
+    },
+    {
+      "title": "Learn Anything",
+      "desc": "Explore languages, academics, coding, hobbies, and more.",
+      "icon": "/assets/img/features/feature2.svg"
+    },
+    {
+      "title": "1-to-1 Personalized Lessons",
+      "desc": "Private sessions focused completely on your progress.",
+      "icon": "/assets/img/features/feature3.svg"
+    },
+    {
+      "title": "Flexible Schedule",
+      "desc": "Learn anytime with classes that fit your lifestyle.",
+      "icon": "/assets/img/features/feature4.svg"
+    }
+  ]
 }

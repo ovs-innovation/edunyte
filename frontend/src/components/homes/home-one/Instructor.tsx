@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import BtnArrow from "../../../svg/BtnArrow";
+import { useTranslation } from 'react-i18next';
 
 interface DataType {
    id: number;
@@ -41,6 +42,7 @@ const instructor_data: DataType[] = [
 ];
 
 const Instructor = () => {
+   const { t } = useTranslation();
    return (
       <section className="instructor__area">
          <div className="container">
@@ -48,12 +50,12 @@ const Instructor = () => {
                <div className="col-xl-4">
                   <div className="instructor__content-wrap">
                      <div className="section__title mb-15">
-                        <span className="sub-title">Skilled Introduce</span>
-                        <h2 className="title">Our Top Class & Expert Instructors in One Place</h2>
+                        <span className="sub-title">{t('instructor.sub_title')}</span>
+                        <h2 className="title">{t('instructor.title')}</h2>
                      </div>
-                     <p>when an unknown printer took a galley of type and scrambled makespecimen book has survived not only five centuries</p>
+                     <p>{t('instructor.desc')}</p>
                      <div className="tg-button-wrap">
-                        <Link to="/instructors" className="btn arrow-btn">See All Instructors<BtnArrow /></Link>
+                        <Link to="/instructors" className="btn arrow-btn">{t('instructor.see_all')}<BtnArrow /></Link>
                      </div>
                   </div>
                </div>

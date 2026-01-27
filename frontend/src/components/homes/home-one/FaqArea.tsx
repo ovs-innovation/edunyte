@@ -1,4 +1,4 @@
-import faq_data from "../../../data/home-data/FaqData";
+import { useTranslation, Trans } from 'react-i18next';
 import InjectableSvg from "../../../hooks/InjectableSvg";
 import MotionAnimation from "../../../hooks/MotionAnimation";
 import SvgAnimation from "../../../hooks/SvgAnimation";
@@ -17,13 +17,18 @@ const FaqArea = () => {
 
    const [faqData, setFaqData] = useState<faqItem[]>([]);
 
-   useEffect(() => {
-       const initialFaqData: faqItem[] = faq_data.map((faq, index) => ({
-           ...faq,
-           showAnswer: index === 0,
-       }));
-       setFaqData(initialFaqData);
-   }, []);
+      const { t } = useTranslation();
+      useEffect(() => {
+         // @ts-ignore
+         const i18nFaqData = t('faq', { returnObjects: true });
+         const initialFaqData: faqItem[] = i18nFaqData.map((faq: any, index: number) => ({
+            ...faq,
+            showAnswer: index === 0,
+            page: 'home_1',
+            id: index + 1,
+         }));
+         setFaqData(initialFaqData);
+      }, [t]);
 
    const toggleAnswer = (index: number) => {
        setFaqData((prevFaqData) => {
@@ -62,10 +67,12 @@ const FaqArea = () => {
                <div className="col-lg-6">
                   <div className="faq__content">
                      <div className="section__title pb-10">
-                        <span className="sub-title">Faq’s</span>
-                        <h2 className="title">Start Learning From <br /> World’s Pro Instructors</h2>
+                        <span className="sub-title">{t('faq_section.sub_title')}</span>
+                        <h2 className="title">
+                          <Trans i18nKey="faq_section.title" components={[<br />]} />
+                        </h2>
                      </div>
-                     <p>Groove’s intuitive shared inbox makes it easy for team members to organize, prioritize and.In this episode.</p>
+                     <p>{t('faq_section.desc')}</p>
                      <div className="faq__wrap">
                         <div className="accordion" id="accordionExample">
                            {faqData.map((item, index) => (
