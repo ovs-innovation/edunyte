@@ -88,25 +88,25 @@ const Course = () => {
                      <div key={item._id} className="col-xl-3 col-lg-4 col-md-6">
                         <div className="courses__item-five shine__animate-item">
                            <div className="courses__item-thumb-four shine__animate-link">
-                              <Link to={`/course-details?id=${item._id}`}>
-                                 <img src={item.image || '/assets/img/courses/course_default.jpg'} alt={item.name} />
-                              </Link>
-                              <a onClick={() => handleAddToWishlist(item)} className="courses__wishlist-two course-heart-btn" style={{ cursor: "pointer" }}>
-                                 <InjectableSvg src="/assets/img/icons/heart02.svg" alt="" className="injectable" />
-                              </a>
-                           </div>
-                           <div className="courses__item-content-four">
-                              <ul className="courses__item-meta list-wrap">
-                                 <li className="courses__item-tag courses__item-tag-two">
-                                    <Link to={`/courses?category=${item.category || ''}`}>{item.category || t('common.categories')}</Link>
-                                 </li>
-                                 <li className="avg-rating"><i className="fas fa-star"></i> (5.0 {t('common.reviews')})</li>
-                              </ul>
-                              <h2 className="title"><Link to={`/course-details?id=${item._id}`}>{item.name}</Link></h2>
-                              {item.description && <p className="info">{item.description}</p>}
-                              <div className="courses__item-bottom-three">
-                                 <div className="button">
-                                    <Link to={`/course-details?id=${item._id}`}>
+                                  <Link to={`/course/${item.slug || item._id}`}>
+                                     <img src={item.image || '/assets/img/courses/course_default.jpg'} alt={item.name} />
+                                  </Link>
+                                  <a onClick={() => handleAddToWishlist(item)} className="courses__wishlist-two course-heart-btn" style={{ cursor: "pointer" }}>
+                                     <InjectableSvg src="/assets/img/icons/heart02.svg" alt="" className="injectable" />
+                                  </a>
+                               </div>
+                               <div className="courses__item-content-four">
+                                  <ul className="courses__item-meta list-wrap">
+                                     <li className="courses__item-tag courses__item-tag-two">
+                                        <Link to={`/courses?category=${item.category || ''}`}>{item.category || t('common.categories')}</Link>
+                                     </li>
+                                     <li className="avg-rating"><i className="fas fa-star"></i> (5.0 {t('common.reviews')})</li>
+                                  </ul>
+                                  <h2 className="title"><Link to={`/course/${item.slug || item._id}`}>{item.name}</Link></h2>
+                                  {item.description && <p className="info">{item.description}</p>}
+                                  <div className="courses__item-bottom-three">
+                                     <div className="button">
+                                        <Link to={`/course/${item.slug || item._id}`}>
                                        <span className="text">{t('common.book_session')}</span>
                                        <i className="flaticon-arrow-right"></i>
                                     </Link>

@@ -151,7 +151,7 @@ const CourseArea = ({ style }: CourseProps) => {
                   <SwiperSlide key={item._id} className="swiper-slide">
                     <div className="courses__item shine__animate-item">
                       <div className="courses__item-thumb">
-                        <Link to={`/course-details?id=${item._id}`} className="shine__animate-link">
+                        <Link to={`/course/${item.slug || item._id}`} className="shine__animate-link">
                           <img src={item.image || '/assets/img/courses/course_default.jpg'} alt={item.name} />
                         </Link>
                       </div>
@@ -162,11 +162,11 @@ const CourseArea = ({ style }: CourseProps) => {
                           </li>
                           <li className="avg-rating"><i className="fas fa-star"></i> (5.0 {t('common.reviews')})</li>
                         </ul>
-                        <h5 className="title"><Link to={`/course-details?id=${item._id}`}>{item.name}</Link></h5>
+                        <h5 className="title"><Link to={`/course/${item.slug || item._id}`}>{item.name}</Link></h5>
                         {item.description && <p className="info">{item.description}</p>}
                         <div className="courses__item-bottom">
                           <div className="button">
-                            <Link to={`/course-details?id=${item._id}`}>
+                            <Link to={`/course/${item.slug || item._id}`}>
                               <span className="text">{t('common.book_session')}</span>
                               <i className="flaticon-arrow-right"></i>
                             </Link>

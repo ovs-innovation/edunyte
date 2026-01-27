@@ -295,6 +295,7 @@ export interface ApiCourse {
   description: string | { en: string };
   category: string;
   image: string;
+  slug?: string;
   status: "active" | "inactive";
   createdBy: ApiUser | string;
   createdAt?: string;
@@ -339,6 +340,7 @@ export interface ApiCategory {
   name: string | { en: string };
   description?: string | { en: string };
   image?: string;
+  slug?: string;
   status: "active" | "inactive";
   createdBy: ApiUser | string;
   createdAt?: string;
@@ -352,8 +354,8 @@ export const CategoriesAPI = {
   },
   get: (id: string) => apiFetch<{ category: ApiCategory }>(`/admin/categories/${id}`),
   create: (payload: {
-    name: string;
-    description?: string;
+    name: string | { en: string };
+    description?: string | { en: string };
     image?: string;
     status?: "active" | "inactive";
   }) =>
@@ -362,8 +364,8 @@ export const CategoriesAPI = {
       body: JSON.stringify(payload),
     }),
   update: (id: string, payload: {
-    name?: string;
-    description?: string;
+    name?: string | { en: string };
+    description?: string | { en: string };
     image?: string;
     status?: "active" | "inactive";
   }) =>
@@ -430,6 +432,9 @@ export interface ApiTeacherCourse {
   languageIds: ApiLanguage[] | string[];
   price: number;
   currency: string;
+  baseCurrency?: string;
+  teacherCurrency?: string;
+  originalPrice?: number;
   timezone: string;
   experience: string;
   bio: string;
@@ -496,6 +501,20 @@ export const TeacherCourseJoinAPI = {
     const query = status ? `?status=${status}` : "";
     return apiFetch<{ teacherCourses: ApiTeacherCourse[]; count: number }>(`/teacher/my-courses${query}`);
   },
+  updateCourse: (id: string, payload: {
+    languageIds?: string[];
+    price?: number;
+    currency?: string;
+    timezone?: string;
+    introductionVideo?: string;
+    experience?: string;
+    bio?: string;
+    aboutCourse?: string;
+  }) =>
+    apiFetch<{ teacherCourse: ApiTeacherCourse; message: string }>(`/teacher/my-courses/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    }),
   exitCourse: (id: string) =>
     apiFetch<{ message: string }>(`/teacher/my-courses/${id}`, {
       method: "DELETE",

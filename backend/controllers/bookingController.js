@@ -4,7 +4,8 @@ import TeacherCourse from "../models/teacherCourseModel.js";
 import User from "../models/userModel.js";
 import mongoose from "mongoose";
 import { generateMeeting } from "../utils/meetingGateway.js";
-import { convertCurrency, getBaseCurrency } from "../utils/currencyHelper.js";
+import { convertPriceForCheckout } from "../middlewares/currencyMiddleware.js";
+import { getBaseCurrency } from "../utils/currencyHelper.js";
 
 /**
  * Booking Controller
@@ -17,7 +18,7 @@ import { convertCurrency, getBaseCurrency } from "../utils/currencyHelper.js";
 export const createBooking = async (req, res, next) => {
   try {
     const studentId = req.user.id;
-    const { availabilityId, studentNotes } = req.body;
+    const { availabilityId, studentNotes, currency: requestedCurrency } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(availabilityId)) {
       return res.status(400).json({ message: "Invalid availability ID" });
@@ -78,21 +79,37 @@ export const createBooking = async (req, res, next) => {
       "zoom"
     );
 
+    // Price conversion: All prices in DB are stored in USD (base currency)
+    // Convert to requested currency for payment gateway
+    const usdPrice = availability.price || teacherCourse.price; // Price in USD from DB
+    const targetCurrency = (requestedCurrency || 'USD').toUpperCase();
+    
+    let convertedPrice = usdPrice;
+    if (targetCurrency !== 'USD') {
+      try {
+        convertedPrice = await convertPriceForCheckout(usdPrice, targetCurrency);
+      } catch (error) {
+        console.error('Error converting price for checkout:', error);
+        // Fallback to USD if conversion fails
+      }
+    }
+
     // Create booking
+    // Store USD price in DB, but use converted price for payment
     const booking = await Booking.create({
       studentId,
       teacherId: teacherCourse.teacherId,
       teacherCourseId: teacherCourse._id,
       availabilityId,
       courseId: teacherCourse.courseId,
-      languageId: languageId, // Use the languageId from request
+      languageId: languageId,
       sessionDate: availability.date,
       startTime: availability.startTime,
       endTime: availability.endTime,
       duration: availability.duration,
       timezone: availability.timezone,
-      price: teacherCourse.price,
-      currency: teacherCourse.currency,
+      price: usdPrice, // Store USD price in DB
+      currency: 'USD', // Always USD in DB
       studentNotes: studentNotes || "",
       status: "scheduled",
       paymentStatus: "pending",
@@ -100,6 +117,13 @@ export const createBooking = async (req, res, next) => {
       meetingId: meetingDetails.meetingId || "",
       meetingPassword: meetingDetails.password || "",
     });
+
+    // Return booking with converted price for payment gateway
+    const bookingResponse = booking.toObject();
+    bookingResponse.paymentPrice = convertedPrice; // Price for payment gateway
+    bookingResponse.paymentCurrency = targetCurrency; // Currency for payment gateway
+    bookingResponse.basePrice = usdPrice; // Original USD price
+    bookingResponse.baseCurrency = 'USD';
 
     // Update availability status
     availability.status = "booked";
@@ -113,7 +137,21 @@ export const createBooking = async (req, res, next) => {
       { path: "languageId", select: "name code" },
     ]);
 
-    res.status(201).json({ booking, message: "Booking created successfully" });
+    // Convert booking to object and add payment info
+    const bookingObj = booking.toObject();
+    bookingObj.paymentPrice = convertedPrice;
+    bookingObj.paymentCurrency = targetCurrency;
+    bookingObj.basePrice = usdPrice;
+    bookingObj.baseCurrency = 'USD';
+
+    res.status(201).json({ 
+      booking: bookingObj, 
+      message: "Booking created successfully",
+      payment: {
+        amount: convertedPrice,
+        currency: targetCurrency,
+      }
+    });
   } catch (err) {
     next(err);
   }

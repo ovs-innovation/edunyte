@@ -40,6 +40,10 @@ const migrateData = async () => {
           course.description = { en: course.description };
           updated = true;
         }
+        if (typeof course.slug === "string" && course.slug) {
+          course.slug = { en: course.slug };
+          updated = true;
+        }
         if (updated) {
           await course.save();
           migratedCourses++;
@@ -62,6 +66,10 @@ const migrateData = async () => {
         }
         if (typeof category.description === "string") {
           category.description = { en: category.description };
+          updated = true;
+        }
+        if (typeof category.slug === "string" && category.slug) {
+          category.slug = { en: category.slug };
           updated = true;
         }
         if (updated) {

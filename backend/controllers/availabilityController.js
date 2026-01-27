@@ -5,6 +5,7 @@ import Booking from "../models/bookingModel.js";
 import User from "../models/userModel.js";
 import mongoose from "mongoose";
 import { convertCurrency, getBaseCurrency } from "../utils/currencyHelper.js";
+import { convertTimeBetweenTimezones } from "../utils/timezoneHelper.js";
 
 /**
  * Availability Controller
@@ -227,6 +228,68 @@ export const getAvailableSlots = async (req, res, next) => {
       .sort({ date: 1, startTime: 1 });
 
     res.json({ availabilities, count: availabilities.length });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * Public: Get availability for a course (for students)
+ * Supports timezone conversion
+ */
+export const getCourseAvailability = async (req, res, next) => {
+  try {
+    const { courseId } = req.query;
+    const { teacherId, startDate, endDate, studentTimezone } = req.query;
+
+    if (!courseId || !mongoose.Types.ObjectId.isValid(courseId)) {
+      return res.status(400).json({ message: "Valid courseId is required" });
+    }
+
+    const query = {
+      courseId,
+      status: "available",
+      date: { $gte: new Date() },
+    };
+
+    if (teacherId && mongoose.Types.ObjectId.isValid(teacherId)) {
+      query.teacherId = teacherId;
+    }
+
+    if (startDate) {
+      query.date.$gte = new Date(startDate);
+    }
+    if (endDate) {
+      query.date.$lte = new Date(endDate);
+    }
+
+    const availabilities = await Availability.find(query)
+      .populate("teacherId", "name email")
+      .populate("courseId", "name description")
+      .sort({ date: 1, startTime: 1 });
+
+    let processedAvailabilities = availabilities;
+    if (studentTimezone) {
+      processedAvailabilities = availabilities.map((av) => {
+        const avObj = av.toObject();
+        if (av.timezone && studentTimezone && av.timezone !== studentTimezone) {
+          try {
+            avObj.startTime = convertTimeBetweenTimezones(av.date, av.startTime, av.timezone, studentTimezone);
+            avObj.endTime = convertTimeBetweenTimezones(av.date, av.endTime, av.timezone, studentTimezone);
+            avObj.displayTimezone = studentTimezone;
+            avObj.originalTimezone = av.timezone;
+          } catch (err) {
+            console.error('Timezone conversion error:', err);
+            avObj.displayTimezone = av.timezone;
+          }
+        } else {
+          avObj.displayTimezone = av.timezone || 'UTC';
+        }
+        return avObj;
+      });
+    }
+
+    res.json({ availabilities: processedAvailabilities, count: processedAvailabilities.length });
   } catch (err) {
     next(err);
   }

@@ -44,6 +44,18 @@ import { cn } from '@/lib/utils';
 import { CloudinaryImageUploader } from '@/components/ui/cloudinary-image-uploader';
 import { useConfirmDialog } from '@/hooks/use-confirm-dialog';
 
+const generateSlugPreview = (text: string): string => {
+  if (!text) return '';
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w\-]+/g, '')
+    .replace(/\-\-+/g, '-')
+    .replace(/^-+/, '')
+    .replace(/-+$/, '');
+};
+
 const CategoryManagementPage = () => {
   const [categories, setCategories] = useState<ApiCategory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -153,7 +165,6 @@ const CategoryManagementPage = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between animate-fade-in">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-foreground">Category Management</h1>
@@ -185,7 +196,6 @@ const CategoryManagementPage = () => {
           </div>
         </div>
 
-        {/* Table */}
         <div className="rounded-xl border border-border bg-card overflow-hidden animate-slide-up">
           <Table>
             <TableHeader>
@@ -296,7 +306,6 @@ const CategoryManagementPage = () => {
         </div>
       </div>
 
-      {/* Create/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
@@ -314,6 +323,15 @@ const CategoryManagementPage = () => {
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="e.g., Fitness, Education"
               />
+              {formData.name && (
+                <div className="text-xs text-muted-foreground">
+                  <span className="font-medium">Slug preview:</span>{' '}
+                  <code className="bg-muted px-1.5 py-0.5 rounded">
+                    {generateSlugPreview(formData.name)}
+                  </code>
+                  <span className="ml-2 text-xs">(auto-generated on save)</span>
+                </div>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>

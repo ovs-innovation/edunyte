@@ -55,13 +55,14 @@ export const updateStudentProfile = async (req, res, next) => {
     if (user.role !== "student") {
       return res.status(400).json({ message: "User is not a student" });
     }
-    const { photo, phone, progress } = req.body;
+    const { photo, phone, progress, timezone } = req.body;
     let profile = await StudentProfile.findOne({ userId });
     if (!profile) {
       profile = await StudentProfile.create({ userId });
     }
     if (photo !== undefined) profile.photo = photo;
     if (phone !== undefined) profile.phone = phone;
+    if (timezone !== undefined) profile.timezone = timezone;
     if (progress) {
       if (progress.totalHoursSpent !== undefined) {
         profile.progress.totalHoursSpent = progress.totalHoursSpent;

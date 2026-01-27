@@ -45,6 +45,19 @@ import { cn } from '@/lib/utils';
 import { CloudinaryImageUploader } from '@/components/ui/cloudinary-image-uploader';
 import { useConfirmDialog } from '@/hooks/use-confirm-dialog';
 
+// Helper function to generate slug preview from text
+const generateSlugPreview = (text: string): string => {
+  if (!text) return '';
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/[^\w\-]+/g, '') // Remove all non-word chars except hyphens
+    .replace(/\-\-+/g, '-') // Replace multiple hyphens with single hyphen
+    .replace(/^-+/, '') // Trim hyphens from start
+    .replace(/-+$/, ''); // Trim hyphens from end
+};
+
 const CourseManagementPage = () => {
   const [courses, setCourses] = useState<ApiCourse[]>([]);
   const [categories, setCategories] = useState<ApiCategory[]>([]);
@@ -369,6 +382,15 @@ const CourseManagementPage = () => {
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="e.g., Yoga Class"
               />
+              {formData.name && (
+                <div className="text-xs text-muted-foreground">
+                  <span className="font-medium">Slug preview:</span>{' '}
+                  <code className="bg-muted px-1.5 py-0.5 rounded">
+                    {generateSlugPreview(formData.name)}
+                  </code>
+                  <span className="ml-2 text-xs">(auto-generated on save)</span>
+                </div>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>

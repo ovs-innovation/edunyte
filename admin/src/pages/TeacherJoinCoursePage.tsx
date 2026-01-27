@@ -167,10 +167,16 @@ const TeacherJoinCoursePage = () => {
           if (!apiLang) {
             const libLang = libraryLanguages.find((l) => l.code === code);
             if (libLang) {
-              apiLang = languages.find((l) => 
-                l.name?.toLowerCase() === libLang.name.toLowerCase() ||
-                l.nativeName?.toLowerCase() === libLang.nativeName.toLowerCase()
-              );
+              apiLang = languages.find((l) => {
+                const apiLangName = getLanguageValue(l.name)?.toLowerCase();
+                const apiLangNativeName = getLanguageValue(l.nativeName)?.toLowerCase();
+                const libLangName = getLanguageValue(libLang.name)?.toLowerCase();
+                const libLangNativeName = getLanguageValue(libLang.nativeName)?.toLowerCase();
+                return (
+                  (apiLangName && apiLangName === libLangName) ||
+                  (apiLangNativeName && apiLangNativeName === libLangNativeName)
+                );
+              });
             }
           }
           return apiLang?._id;
@@ -329,7 +335,17 @@ const TeacherJoinCoursePage = () => {
                     <span>
                       {formData.languages.length === 0
                         ? 'Select languages...'
-                        : `${formData.languages.length} language${formData.languages.length > 1 ? 's' : ''} selected`}
+                        : (() => {
+                            const names = formData.languages
+                              .map((lwp) => {
+                                const lang = libraryLanguages.find((l) => l.code === lwp.code);
+                                return lang ? getLanguageValue(lang.name) : lwp.code;
+                              })
+                              .filter(Boolean);
+                            const shown = names.slice(0, 2).join(', ');
+                            const extra = names.length - 2;
+                            return extra > 0 ? `${shown} +${extra}` : shown;
+                          })()}
                     </span>
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>

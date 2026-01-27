@@ -1,9 +1,9 @@
 import express from "express";
-import { joinCourse, getMyCourses, exitCourse } from "../../controllers/teacherCourseController.js";
+import { joinCourse, getMyCourses, exitCourse, updateCourseRequest } from "../../controllers/teacherCourseController.js";
 import { verifyToken } from "../../middlewares/authMiddleware.js";
 import { requirePermission } from "../../middlewares/permissionMiddleware.js";
 import { validateRequest } from "../../middlewares/validateRequest.js";
-import { createTeacherCourseSchema } from "../../validations/teacherCourseValidation.js";
+import { createTeacherCourseSchema, updateTeacherCourseSchema } from "../../validations/teacherCourseValidation.js";
 import Course from "../../models/courseModel.js";
 import Language from "../../models/languageModel.js";
 
@@ -50,6 +50,14 @@ router.post(
 
 // Get my course requests
 router.get("/my-courses", requirePermission("teacher_courses.view"), getMyCourses);
+
+// Update a course request
+router.patch(
+  "/my-courses/:id",
+  requirePermission("teacher_courses.update"),
+  validateRequest(updateTeacherCourseSchema),
+  updateCourseRequest
+);
 
 // Exit/Leave a course
 router.delete("/my-courses/:id", requirePermission("teacher_courses.delete"), exitCourse);

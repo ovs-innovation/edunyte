@@ -123,7 +123,7 @@ const Categories = () => {
                         {categories.map((item, index) => (
                            <SwiperSlide key={item._id} className="swiper-slide">
                               <div className="categories__item">
-                                 <Link to={`/courses?category=${item._id}`}>
+                                 <Link to={`/courses?category=${item.slug || item._id}`}>
                                     {item.image ? (
                                        <div className="icon">
                                           <img src={item.image} alt={item.name} style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '50%' }} />
