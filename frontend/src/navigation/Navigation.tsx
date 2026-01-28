@@ -47,6 +47,7 @@ import StudentReview from '../pages/StudentReview';
 import StudentAttempt from '../pages/StudentAttempt';
 import StudentHistory from '../pages/StudentHistory';
 import StudentSetting from '../pages/StudentSetting';
+import BookingCheckout from '../pages/BookingCheckout';
 import NotFound from '../pages/NotFound';
 import ProtectedRoute from '../components/common/ProtectedRoute';
 
@@ -101,6 +102,7 @@ const AppNavigation = () => {
                <Route path="/student-attempts" element={<ProtectedRoute><StudentAttempt /></ProtectedRoute>} />
                <Route path="/student-history" element={<ProtectedRoute><StudentHistory /></ProtectedRoute>} />
                <Route path="/student-setting" element={<ProtectedRoute><StudentSetting /></ProtectedRoute>} />
+        <Route path="/booking/checkout" element={<ProtectedRoute><BookingCheckout /></ProtectedRoute>} />
         {/* <Route path="/blog-details/:id" element={<DynamicBlogDeatils />} /> */}
         <Route path="*" element={<NotFound />} />
       </Routes>

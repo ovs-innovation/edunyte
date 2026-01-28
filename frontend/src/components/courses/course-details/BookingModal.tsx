@@ -137,6 +137,7 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
     onConfirm({
       availabilityId: selectedSlot._id,
       teacherCourseId: teacher._id,
+      teacherId: typeof teacher.teacherId === 'object' ? teacher.teacherId._id : '',
       courseId,
       duration: selectedDuration,
       date: selectedSlot.date,

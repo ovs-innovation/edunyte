@@ -454,7 +454,8 @@ const TeachersSelection = () => {
   };
 
   const handleBookingConfirm = (bookingData: any) => {
-    navigate(`/booking/confirm`, { state: bookingData });
+    // Next step: Pricing & Checkout (Stripe)
+    navigate(`/booking/checkout`, { state: bookingData });
   };
 
   const handleSendMessage = (teacher: TeacherCourse) => {

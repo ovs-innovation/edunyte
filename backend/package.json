@@ -35,7 +35,8 @@
     "pg-sdk-node": "https://phonepe.mycloudrepo.io/public/repositories/phonepe-pg-sdk-node/releases/v2/phonepe-pg-sdk-node.tgz",
     "qrcode": "^1.5.4",
     "razorpay": "^2.9.6",
-    "redis": "^4.7.1"
+    "redis": "^4.7.1",
+    "stripe": "^20.2.0"
   },
   "devDependencies": {
     "jest": "^29.7.0",

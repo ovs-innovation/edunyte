@@ -63,60 +63,51 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    // Lesson details (timezone-safe; `scheduledAt` stored as UTC Date)
+    lesson: {
+      duration: { type: Number, required: true },
+      scheduledAt: { type: Date, required: true, index: true },
+      timezone: { type: String, required: true },
+    },
+
     /**
      * Pricing snapshot (security + refund safe)
      *
      * WHY:
-     * - We never trust client-calculated prices.
-     * - We must be able to refund using the ORIGINAL exchange rate snapshot
-     *   (not live rates), to avoid financial discrepancies.
+     * - Never trust client prices.
+     * - Refunds must use stored snapshot (NOT live FX).
      */
     pricingSnapshot: {
-      // Canonical base amount used for all accounting.
-      baseAmountUSD: {
-        type: Number,
-        required: true,
-        min: 0,
-      },
-      baseCurrency: {
-        type: String,
-        default: "USD",
-        uppercase: true,
-      },
-      // What the student actually paid (or will pay) to the gateway.
+      baseAmountUSD: { type: Number, required: true, min: 0 },
+      platformFeeUSD: { type: Number, required: true, min: 0 },
       studentPaid: {
         amount: { type: Number, required: true, min: 0 },
         currency: { type: String, required: true, uppercase: true, trim: true },
       },
-      // Teacher payout amount in teacher's currency (based on teacher's original pricing snapshot).
-      teacherPayout: {
-        amount: { type: Number, required: true, min: 0 },
-        currency: { type: String, required: true, uppercase: true, trim: true },
-      },
-      /**
-       * Exchange rate snapshot.
-       * Format: { USD_INR: 83.12, USD_AED: 3.67, ... }
-       */
-      exchangeRates: {
-        type: mongoose.Schema.Types.Mixed,
-        default: {},
-      },
-      timestamp: {
-        type: Date,
-        required: true,
-      },
+      exchangeRatesUsed: { type: mongoose.Schema.Types.Mixed, default: {} },
+      chargedAt: { type: Date, required: true },
     },
-    // Payment status
-    paymentStatus: {
-      type: String,
-      enum: ["pending", "paid", "failed", "refunded"],
-      default: "pending",
-      index: true,
+
+    payout: {
+      teacherAmountUSD: { type: Number, required: true, min: 0 },
+      teacherCurrency: { type: String, required: true, uppercase: true, trim: true },
+      status: { type: String, enum: ["pending", "paid", "failed"], default: "pending", index: true },
     },
-    paymentId: {
-      type: String,
-      default: "",
+
+    payment: {
+      stripePaymentIntentId: { type: String, required: true, index: true },
+      status: { type: String, enum: ["pending", "paid", "failed", "refunded"], default: "paid", index: true },
     },
+
+    meeting: {
+      provider: { type: String, enum: ["zoom"], default: "zoom" },
+      meetingId: { type: String, default: "" },
+      joinUrlStudent: { type: String, default: "" },
+      joinUrlTeacher: { type: String, default: "" },
+    },
+    // Legacy fields retained for older codepaths (read-only; should not be set anymore)
+    paymentStatus: { type: String, enum: ["pending", "paid", "failed", "refunded"], default: "paid", index: true },
+    paymentId: { type: String, default: "" },
     // Booking status
     status: {
       type: String,
@@ -173,7 +164,8 @@ const bookingSchema = new mongoose.Schema(
 bookingSchema.index({ studentId: 1, status: 1, sessionDate: 1 });
 bookingSchema.index({ teacherId: 1, status: 1, sessionDate: 1 });
 bookingSchema.index({ sessionDate: 1, status: 1 });
-bookingSchema.index({ paymentStatus: 1 });
+// Idempotency: one booking per Stripe PaymentIntent
+bookingSchema.index({ "payment.stripePaymentIntentId": 1 }, { unique: true, sparse: true });
 
 export default mongoose.model("Booking", bookingSchema);
 

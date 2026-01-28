@@ -83,9 +83,22 @@ const availabilitySchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["available", "booked", "blocked", "cancelled"],
+      // `held` is a temporary lock during checkout (Preply-style).
+      enum: ["available", "held", "booked", "blocked", "cancelled"],
       default: "available",
       index: true,
+    },
+    /**
+     * Temporary checkout lock (slot reservation)
+     *
+     * WHY:
+     * - Prevent double booking while student is paying.
+     * - Webhook can validate payment is for the same held slot + student.
+     */
+    hold: {
+      byStudentId: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null, index: true },
+      until: { type: Date, default: null, index: true },
+      stripePaymentIntentId: { type: String, default: "", index: true },
     },
     // If booked, reference to booking
     bookingId: {

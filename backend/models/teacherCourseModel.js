@@ -79,14 +79,14 @@ const teacherCourseSchema = new mongoose.Schema(
         uppercase: true,
       },
       teacherPrice: {
-        type: Number,
-        required: true,
-        min: 0,
-      },
+      type: Number,
+      required: true,
+      min: 0,
+    },
       teacherCurrency: {
-        type: String,
+      type: String,
         required: true,
-        uppercase: true,
+      uppercase: true,
         trim: true,
       },
       // Snapshot: units of teacherCurrency per 1 USD at the time teacher set the price.

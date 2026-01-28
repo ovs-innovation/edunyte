@@ -23,6 +23,7 @@ import publicCourseRoutes from "./routes/student/publicCourseRoutes.js";
 import studentBookingRoutes from "./routes/student/bookingRoutes.js";
 import currencyRoutes from "./routes/currencyRoutes.js";
 import translationRoutes from "./routes/translationRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
 import { ensureDefaultRoles } from "./controllers/roleController.js";
 
 
@@ -40,6 +41,8 @@ const __dirname = path.dirname(__filename);
 app.set("trust proxy", 1);
 
 // Middleware
+// Stripe webhook requires the raw body to verify signatures.
+app.use("/api/payments/stripe/webhook", express.raw({ type: "application/json" }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
@@ -63,6 +66,7 @@ app.use("/api/public/courses", publicCourseRoutes);
 app.use("/api/bookings", studentBookingRoutes);
 app.use("/api/currency", currencyRoutes);
 app.use("/api/translate", translationRoutes);
+app.use("/api/payments", paymentRoutes);
 app.use(errorHandler);
 
 export default app;

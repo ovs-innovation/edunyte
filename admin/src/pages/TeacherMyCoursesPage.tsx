@@ -146,7 +146,7 @@ const TeacherMyCoursesPage = () => {
     if (!Array.isArray(languagesArr)) return 'Unknown';
     return languagesArr
       .map((lang) => {
-        if (typeof lang === 'string') return 'Unknown';
+      if (typeof lang === 'string') return 'Unknown';
         const code = lang.code || '';
         const lib = code
           ? libraryLanguageByCode.get(code) ||
@@ -540,16 +540,16 @@ const TeacherMyCoursesPage = () => {
                               Edit
                             </Button>
                           )}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleExitCourse(request._id)}
-                            disabled={exitingId === request._id}
-                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                          >
-                            <LogOut className="h-4 w-4 mr-1" />
-                            {exitingId === request._id ? 'Exiting...' : 'Exit'}
-                          </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleExitCourse(request._id)}
+                          disabled={exitingId === request._id}
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        >
+                          <LogOut className="h-4 w-4 mr-1" />
+                          {exitingId === request._id ? 'Exiting...' : 'Exit'}
+                        </Button>
                         </div>
                       </TableCell>
                     </TableRow>
