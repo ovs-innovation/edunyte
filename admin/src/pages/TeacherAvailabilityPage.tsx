@@ -44,13 +44,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Check, ChevronsUpDown, ChevronDown } from 'lucide-react';
+import { Check, ChevronsUpDown } from 'lucide-react';
 import { getAllTimezones, getUserTimezone } from '@/utils/timezoneData';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
 
 const TeacherAvailabilityPage = () => {
   const { currentRole } = useRole();
@@ -65,7 +60,6 @@ const TeacherAvailabilityPage = () => {
   const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
   const [timezones] = useState(() => getAllTimezones());
   const [timezoneOpen, setTimezoneOpen] = useState(false);
-  const [priceBreakdownOpen, setPriceBreakdownOpen] = useState(false); // Default: hidden
   const [formData, setFormData] = useState({
     date: '',
     startTime: '',
@@ -149,7 +143,7 @@ const TeacherAvailabilityPage = () => {
     });
   };
 
-  // Calculate price preview (dynamic meeting platform cost based on duration)
+  // Calculate teacher price for selected duration
   const calculatePricePreview = () => {
     if (!selectedCourseId || !formData.duration) return null;
     
@@ -157,27 +151,13 @@ const TeacherAvailabilityPage = () => {
       tc => typeof tc.courseId !== 'string' && tc.courseId._id === selectedCourseId
     );
     if (!teacherCourse) return null;
-
-    const PLATFORM_MARGIN_PERCENT = 20; 
-    const MEETING_PLATFORM_COST_PER_MINUTE = 0.01; 
-    const MEETING_PLATFORM_BASE_COST = 0.10;  
     
     const durationInHours = formData.duration / 60;
     const teacherPricePerHour = teacherCourse.price;
     const teacherPriceForSession = teacherPricePerHour * durationInHours;
-    const platformMargin = (teacherPriceForSession * PLATFORM_MARGIN_PERCENT) / 100;
-    // Dynamic meeting platform cost: base cost + (cost per minute * duration)
-    const meetingPlatformCost = MEETING_PLATFORM_BASE_COST + (MEETING_PLATFORM_COST_PER_MINUTE * formData.duration);
-    const totalPrice = teacherPriceForSession + platformMargin + meetingPlatformCost;
 
     return {
-      teacherPrice: parseFloat(teacherPriceForSession.toFixed(2)),
-      platformMargin: parseFloat(platformMargin.toFixed(2)),
-      platformMarginPercent: PLATFORM_MARGIN_PERCENT,
-      meetingPlatformCost: parseFloat(meetingPlatformCost.toFixed(2)),
-      meetingPlatformCostPerMinute: MEETING_PLATFORM_COST_PER_MINUTE,
-      meetingPlatformBaseCost: MEETING_PLATFORM_BASE_COST,
-      totalPrice: parseFloat(totalPrice.toFixed(2)),
+      price: parseFloat(teacherPriceForSession.toFixed(2)),
       currency: teacherCourse.currency || 'USD',
     };
   };
@@ -689,66 +669,17 @@ const TeacherAvailabilityPage = () => {
               </Popover>
             </div>
 
-            {/* Price Preview - Total Price Always Visible, Breakdown Hidden by Default */}
+            {/* Price Preview - Teacher Price Only */}
             {pricePreview && (
               <div className="p-4 bg-muted/50 rounded-lg border-2 border-muted">
-                {/* Total Price - Always Visible */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Student Will Pay</p>
-                    <p className="text-lg font-semibold text-primary mt-1">
-                      {pricePreview.currency} {pricePreview.totalPrice.toFixed(2)}
-                    </p>
-                  </div>
-                  <Collapsible open={priceBreakdownOpen} onOpenChange={setPriceBreakdownOpen}>
-                    <CollapsibleTrigger asChild>
-                      <Button variant="ghost" size="sm" className="text-xs">
-                        {priceBreakdownOpen ? 'Hide' : 'Show'} Breakdown
-                        <ChevronDown className={cn(
-                          "ml-1 h-3 w-3 transition-transform",
-                          priceBreakdownOpen && "rotate-180"
-                        )} />
-                      </Button>
-                    </CollapsibleTrigger>
-                  </Collapsible>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Your Price ({formData.duration} min)</p>
+                  <p className="text-lg font-semibold text-primary mt-1">
+                    {pricePreview.currency} {pricePreview.price.toFixed(2)}
+                  </p>
                 </div>
-
-                {/* Price Breakdown - Collapsible (Hidden by Default) */}
-                <Collapsible open={priceBreakdownOpen} onOpenChange={setPriceBreakdownOpen}>
-                  <CollapsibleContent>
-                    <div className="space-y-2 pt-4 mt-4 border-t border-border">
-                      <Label className="text-sm font-semibold">Session Price Preview</Label>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Teacher Price ({formData.duration} min):</span>
-                          <span className="font-medium">{pricePreview.currency} {pricePreview.teacherPrice.toFixed(2)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Platform Margin ({pricePreview.platformMarginPercent}%):</span>
-                          <span className="font-medium">{pricePreview.currency} {pricePreview.platformMargin.toFixed(2)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">
-                            Meeting Platform Cost ({formData.duration} min):
-                          </span>
-                          <div className="text-right">
-                            <span className="font-medium block">
-                              {pricePreview.currency} {pricePreview.meetingPlatformCost.toFixed(2)}
-                            </span>
-                            {pricePreview.meetingPlatformBaseCost !== undefined && pricePreview.meetingPlatformCostPerMinute !== undefined && (
-                              <span className="text-xs text-muted-foreground">
-                                ({pricePreview.currency} {pricePreview.meetingPlatformBaseCost.toFixed(2)} base + {pricePreview.currency} {pricePreview.meetingPlatformCostPerMinute.toFixed(2)}/min)
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-
                 <p className="text-xs text-muted-foreground mt-3 pt-2 border-t border-border/50">
-                  This is the total price students will pay for booking this session.
+                  This is your price for this {formData.duration}-minute session.
                 </p>
               </div>
             )}

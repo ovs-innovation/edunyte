@@ -57,28 +57,10 @@ export const createAvailability = async (req, res, next) => {
       });
     }
 
-    // Calculate price for this session slot
-    // Price = (Teacher price per hour * duration in hours) + Platform margin + Meeting platform cost (dynamic based on duration)
-    const PLATFORM_MARGIN_PERCENT = parseFloat(process.env.PLATFORM_MARGIN_PERCENT || "20"); // Default 20%
-    const MEETING_PLATFORM_COST_PER_MINUTE = parseFloat(process.env.MEETING_PLATFORM_COST_PER_MINUTE || "0.01"); // Default $0.01 per minute
-    const MEETING_PLATFORM_BASE_COST = parseFloat(process.env.MEETING_PLATFORM_BASE_COST || "0.10"); // Base cost per session
-    
+    // Calculate teacher price for this session slot (per selected duration)
     const durationInHours = duration / 60; // Convert minutes to hours
     const teacherPricePerHour = teacherCourse.price;
     const teacherPriceForSession = teacherPricePerHour * durationInHours;
-    const platformMargin = (teacherPriceForSession * PLATFORM_MARGIN_PERCENT) / 100;
-    // Dynamic meeting platform cost: base cost + (cost per minute * duration)
-    const meetingPlatformCost = MEETING_PLATFORM_BASE_COST + (MEETING_PLATFORM_COST_PER_MINUTE * duration);
-    const totalPrice = teacherPriceForSession + platformMargin + meetingPlatformCost;
-
-    const priceBreakdown = {
-      teacherPrice: parseFloat(teacherPriceForSession.toFixed(2)),
-      platformMargin: parseFloat(platformMargin.toFixed(2)),
-      platformMarginPercent: PLATFORM_MARGIN_PERCENT,
-      meetingPlatformCost: parseFloat(meetingPlatformCost.toFixed(2)),
-      meetingPlatformCostPerMinute: MEETING_PLATFORM_COST_PER_MINUTE,
-      meetingPlatformBaseCost: MEETING_PLATFORM_BASE_COST,
-    };
 
     const endTimeUTC = new Date(startTimeUTC.getTime() + duration * 60 * 1000);
 
@@ -91,9 +73,8 @@ export const createAvailability = async (req, res, next) => {
       duration,
       startTimeUTC,
       endTimeUTC,
-      price: parseFloat(totalPrice.toFixed(2)),
+      price: parseFloat(teacherPriceForSession.toFixed(2)),
       currency: teacherCourse.currency || getBaseCurrency(),
-      priceBreakdown,
       timezone: effectiveTimezone,
       isRecurring: isRecurring || false,
       recurringPattern: isRecurring ? recurringPattern : null,
@@ -131,30 +112,12 @@ export const bulkCreateAvailability = async (req, res, next) => {
       return res.status(403).json({ message: "You must have at least one approved language for this course before setting availability" });
     }
 
-    // Calculate price configuration
-    const PLATFORM_MARGIN_PERCENT = parseFloat(process.env.PLATFORM_MARGIN_PERCENT || "20"); // Default 20%
-    const MEETING_PLATFORM_COST_PER_MINUTE = parseFloat(process.env.MEETING_PLATFORM_COST_PER_MINUTE || "0.01"); // Default $0.01 per minute
-    const MEETING_PLATFORM_BASE_COST = parseFloat(process.env.MEETING_PLATFORM_BASE_COST || "0.10"); // Base cost per session
-
     const createdSlots = [];
     for (const slotData of slots) {
-      // Calculate price for this session slot
+      // Calculate teacher price for this session slot (per selected duration)
       const durationInHours = slotData.duration / 60; // Convert minutes to hours
       const teacherPricePerHour = teacherCourse.price;
       const teacherPriceForSession = teacherPricePerHour * durationInHours;
-      const platformMargin = (teacherPriceForSession * PLATFORM_MARGIN_PERCENT) / 100;
-      // Dynamic meeting platform cost: base cost + (cost per minute * duration)
-      const meetingPlatformCost = MEETING_PLATFORM_BASE_COST + (MEETING_PLATFORM_COST_PER_MINUTE * slotData.duration);
-      const totalPrice = teacherPriceForSession + platformMargin + meetingPlatformCost;
-
-      const priceBreakdown = {
-        teacherPrice: parseFloat(teacherPriceForSession.toFixed(2)),
-        platformMargin: parseFloat(platformMargin.toFixed(2)),
-        platformMarginPercent: PLATFORM_MARGIN_PERCENT,
-        meetingPlatformCost: parseFloat(meetingPlatformCost.toFixed(2)),
-        meetingPlatformCostPerMinute: MEETING_PLATFORM_COST_PER_MINUTE,
-        meetingPlatformBaseCost: MEETING_PLATFORM_BASE_COST,
-      };
 
       const slotDate = new Date(slotData.date);
       const effectiveTimezone = slotData.timezone || teacherCourse.timezone || "UTC";
@@ -184,9 +147,8 @@ export const bulkCreateAvailability = async (req, res, next) => {
         duration: slotData.duration,
         startTimeUTC,
         endTimeUTC,
-        price: parseFloat(totalPrice.toFixed(2)),
+        price: parseFloat(teacherPriceForSession.toFixed(2)),
         currency: teacherCourse.currency || getBaseCurrency(),
-        priceBreakdown,
         timezone: effectiveTimezone,
         isRecurring: slotData.isRecurring || false,
         recurringPattern: slotData.isRecurring ? slotData.recurringPattern : null,
@@ -226,9 +188,23 @@ export const getMyAvailability = async (req, res, next) => {
     const availabilities = await Availability.find(query)
       .populate("courseId", "name description")
       .populate("bookingId", "studentId status")
-      .sort({ date: 1, startTime: 1 });
+      .sort({ date: 1, startTimeUTC: 1, startTime: 1 });
 
-    res.json({ availabilities, count: availabilities.length });
+    // For teacher dashboard we want to show the teacher's own earnings (teacherPrice)
+    // and hide internal platform breakdown details.
+    const sanitized = availabilities.map((av) => {
+      const obj = av.toObject();
+      if (
+        obj.priceBreakdown &&
+        typeof obj.priceBreakdown.teacherPrice === "number"
+      ) {
+        obj.price = obj.priceBreakdown.teacherPrice;
+      }
+      delete obj.priceBreakdown;
+      return obj;
+    });
+
+    res.json({ availabilities: sanitized, count: sanitized.length });
   } catch (err) {
     next(err);
   }
@@ -318,7 +294,6 @@ export const getCourseAvailability = async (req, res, next) => {
       const avObj = av.toObject();
       const sourceTimezone = av.timezone || "UTC";
 
-      // Prefer UTC instants if available
       if (av.startTimeUTC) {
         const tz = targetTimezone || sourceTimezone;
         avObj.startTime = utcDateToLocalTime(av.startTimeUTC, tz);
@@ -326,7 +301,6 @@ export const getCourseAvailability = async (req, res, next) => {
         avObj.displayTimezone = tz;
         avObj.originalTimezone = sourceTimezone;
       } else if (targetTimezone) {
-        // Legacy fallback: convert from local wall time using helper
         try {
           avObj.startTime = convertTimeBetweenTimezones(av.date, av.startTime, sourceTimezone, targetTimezone);
           avObj.endTime = convertTimeBetweenTimezones(av.date, av.endTime, sourceTimezone, targetTimezone);
