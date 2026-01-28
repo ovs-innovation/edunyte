@@ -20,13 +20,11 @@ export const createAvailability = async (req, res, next) => {
     const teacherId = req.user.id;
     const { courseId, date, startTime, endTime, duration, timezone, isRecurring, recurringPattern, recurringEndDate } = req.body;
 
-    // Verify course exists
     const course = await Course.findById(courseId);
     if (!course) {
       return res.status(404).json({ message: "Course not found" });
     }
 
-    // Verify teacher has at least one approved teacherCourse for this course
     const teacherCourse = await TeacherCourse.findOne({
       teacherId,
       courseId,
@@ -37,14 +35,9 @@ export const createAvailability = async (req, res, next) => {
     }
 
     const slotDate = new Date(date);
-
-    // Determine teacher's working timezone for this slot
     const effectiveTimezone = timezone || teacherCourse.timezone || "UTC";
-
-    // Compute absolute UTC instants
     const startTimeUTC = toUTCDate(slotDate, startTime, effectiveTimezone);
 
-    // Prevent duplicate slot for same teacher, course, date and startTime
     const existingSlot = await Availability.findOne({
       teacherId,
       courseId,
@@ -57,8 +50,7 @@ export const createAvailability = async (req, res, next) => {
       });
     }
 
-    // Calculate teacher price for this session slot (per selected duration)
-    const durationInHours = duration / 60; // Convert minutes to hours
+    const durationInHours = duration / 60; 
     const teacherPricePerHour = teacherCourse.price;
     const teacherPriceForSession = teacherPricePerHour * durationInHours;
 
@@ -96,13 +88,11 @@ export const bulkCreateAvailability = async (req, res, next) => {
     const teacherId = req.user.id;
     const { courseId, slots } = req.body;
 
-    // Verify course exists
     const course = await Course.findById(courseId);
     if (!course) {
       return res.status(404).json({ message: "Course not found" });
     }
 
-    // Verify teacher has at least one approved teacherCourse for this course
     const teacherCourse = await TeacherCourse.findOne({
       teacherId,
       courseId,
@@ -114,8 +104,7 @@ export const bulkCreateAvailability = async (req, res, next) => {
 
     const createdSlots = [];
     for (const slotData of slots) {
-      // Calculate teacher price for this session slot (per selected duration)
-      const durationInHours = slotData.duration / 60; // Convert minutes to hours
+      const durationInHours = slotData.duration / 60; 
       const teacherPricePerHour = teacherCourse.price;
       const teacherPriceForSession = teacherPricePerHour * durationInHours;
 
@@ -123,7 +112,6 @@ export const bulkCreateAvailability = async (req, res, next) => {
       const effectiveTimezone = slotData.timezone || teacherCourse.timezone || "UTC";
       const startTimeUTC = toUTCDate(slotDate, slotData.startTime, effectiveTimezone);
 
-      // Skip creation if a slot already exists for this teacher, course and startTimeUTC
       const existingSlot = await Availability.findOne({
         teacherId,
         courseId,
@@ -131,8 +119,6 @@ export const bulkCreateAvailability = async (req, res, next) => {
         status: { $ne: "cancelled" },
       });
       if (existingSlot) {
-        // Just skip duplicates; front-end can infer from count if needed
-        // eslint-disable-next-line no-continue
         continue;
       }
 
@@ -190,8 +176,6 @@ export const getMyAvailability = async (req, res, next) => {
       .populate("bookingId", "studentId status")
       .sort({ date: 1, startTimeUTC: 1, startTime: 1 });
 
-    // For teacher dashboard we want to show the teacher's own earnings (teacherPrice)
-    // and hide internal platform breakdown details.
     const sanitized = availabilities.map((av) => {
       const obj = av.toObject();
       if (
@@ -222,18 +206,16 @@ export const getAvailableSlots = async (req, res, next) => {
       return res.status(400).json({ message: "Invalid teacher course ID" });
     }
 
-    // Verify teacherCourse is approved
     const teacherCourse = await TeacherCourse.findById(teacherCourseId);
     if (!teacherCourse || teacherCourse.status !== "approved") {
       return res.status(404).json({ message: "Teacher course not found or not approved" });
     }
 
-    // Get availability slots for the course (not specific to language)
     const query = {
       teacherId: teacherCourse.teacherId,
       courseId: teacherCourse.courseId,
       status: "available",
-      date: { $gte: new Date() }, // Only future dates
+      date: { $gte: new Date() }, 
     };
 
     if (startDate) {
@@ -352,7 +334,6 @@ export const updateAvailability = async (req, res, next) => {
     if (timezone !== undefined) availability.timezone = timezone;
     if (status !== undefined) availability.status = status;
     
-    // Recalculate price if duration changes
     if (duration !== undefined && duration !== availability.duration) {
       const teacherCourse = await TeacherCourse.findOne({
         teacherId: availability.teacherId,
@@ -368,8 +349,7 @@ export const updateAvailability = async (req, res, next) => {
         const durationInHours = duration / 60;
         const teacherPricePerHour = teacherCourse.price;
         const teacherPriceForSession = teacherPricePerHour * durationInHours;
-        const platformMargin = (teacherPriceForSession * PLATFORM_MARGIN_PERCENT) / 100;
-        // Dynamic meeting platform cost: base cost + (cost per minute * duration)
+        const platformMargin = (teacherPriceForSession * PLATFORM_MARGIN_PERCENT) / 100;  
         const meetingPlatformCost = MEETING_PLATFORM_BASE_COST + (MEETING_PLATFORM_COST_PER_MINUTE * duration);
         const totalPrice = teacherPriceForSession + platformMargin + meetingPlatformCost;
 
