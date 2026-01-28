@@ -164,8 +164,37 @@ const TeacherAvailabilityPage = () => {
 
   const pricePreview = calculatePricePreview();
 
+  const addMinutesToTime = (time: string, minutesToAdd: number) => {
+    // time: "HH:mm"
+    const [hh, mm] = time.split(':').map((v) => parseInt(v, 10));
+    if (!Number.isFinite(hh) || !Number.isFinite(mm) || !Number.isFinite(minutesToAdd)) return '';
+    const total = hh * 60 + mm + minutesToAdd;
+    const normalized = ((total % (24 * 60)) + (24 * 60)) % (24 * 60);
+    const newH = Math.floor(normalized / 60);
+    const newM = normalized % 60;
+    return `${String(newH).padStart(2, '0')}:${String(newM).padStart(2, '0')}`;
+  };
+
+  // Keep endTime in sync with startTime + duration
+  useEffect(() => {
+    if (!formData.startTime || !formData.duration) {
+      if (formData.endTime) {
+        setFormData((prev) => ({ ...prev, endTime: '' }));
+      }
+      return;
+    }
+    const computedEndTime = addMinutesToTime(formData.startTime, formData.duration);
+    if (computedEndTime && computedEndTime !== formData.endTime) {
+      setFormData((prev) => ({ ...prev, endTime: computedEndTime }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.startTime, formData.duration]);
+
   const handleSubmit = async () => {
-    if (!selectedCourseId || !formData.date || !formData.startTime || !formData.endTime) {
+    const computedEndTime =
+      formData.startTime && formData.duration ? addMinutesToTime(formData.startTime, formData.duration) : '';
+
+    if (!selectedCourseId || !formData.date || !formData.startTime || !computedEndTime) {
       toast({
         title: 'Validation Error',
         description: 'Please fill in all required fields',
@@ -179,7 +208,7 @@ const TeacherAvailabilityPage = () => {
         courseId: selectedCourseId,
         date: formData.date,
         startTime: formData.startTime,
-        endTime: formData.endTime,
+        endTime: computedEndTime,
         duration: formData.duration,
         timezone: formData.timezone,
       });
@@ -583,27 +612,6 @@ const TeacherAvailabilityPage = () => {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="startTime">Start Time *</Label>
-                <Input
-                  id="startTime"
-                  type="time"
-                  value={formData.startTime}
-                  onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="endTime">End Time *</Label>
-                <Input
-                  id="endTime"
-                  type="time"
-                  value={formData.endTime}
-                  onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                />
-              </div>
-            </div>
-
             <div className="space-y-2">
               <Label htmlFor="duration">Duration (minutes)</Label>
               <Select
@@ -618,6 +626,22 @@ const TeacherAvailabilityPage = () => {
                   <SelectItem value="50">50 minutes</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="startTime">Start Time *</Label>
+                <Input
+                  id="startTime"
+                  type="time"
+                  value={formData.startTime}
+                  onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="endTime">End Time</Label>
+                <Input id="endTime" type="time" value={formData.endTime} readOnly disabled />
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -688,7 +712,7 @@ const TeacherAvailabilityPage = () => {
             <Button variant="outline" onClick={handleCloseDialog}>
               Cancel
             </Button>
-            <Button onClick={handleSubmit} disabled={!formData.date || !formData.startTime || !formData.endTime}>
+            <Button onClick={handleSubmit} disabled={!formData.date || !formData.startTime}>
               Create Slot
             </Button>
           </DialogFooter>
