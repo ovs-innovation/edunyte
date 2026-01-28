@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../../../contexts/AuthContext';
 import type { TeacherCourse } from '../../../services/courseService';
+import { useCurrency } from '../../../hooks/useCurrency';
 
 interface AvailabilitySlot {
   _id: string;
@@ -9,16 +9,12 @@ interface AvailabilitySlot {
   startTime: string;
   endTime: string;
   duration: number;
-  price: number;
-  currency: string;
+  pricing?: { baseAmountUSD: number; baseCurrency: 'USD' };
+  // Derived convenience fields (USD base) – display only
+  price?: number;
+  currency?: string;
   timezone: string;
   displayTimezone?: string;
-  priceBreakdown?: {
-    teacherPrice: number;
-    platformMargin: number;
-    platformMarginPercent: number;
-    meetingPlatformCost: number;
-  };
 }
 
 interface BookingModalProps {
@@ -31,7 +27,7 @@ interface BookingModalProps {
 
 const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: BookingModalProps) => {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { currency: selectedCurrency, convertAndFormatPrice } = useCurrency();
   const [selectedDuration, setSelectedDuration] = useState<number>(50);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedSlot, setSelectedSlot] = useState<AvailabilitySlot | null>(null);
@@ -69,7 +65,17 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
       }
       
       const data = await response.json();
-      const filtered = (data.availabilities || []).filter((av: AvailabilitySlot) => av.duration === selectedDuration);
+      const normalized: AvailabilitySlot[] = (data.availabilities || []).map((av: any) => ({
+        ...av,
+        price:
+          typeof av?.price === 'number'
+            ? av.price
+            : typeof av?.pricing?.baseAmountUSD === 'number'
+              ? av.pricing.baseAmountUSD
+              : undefined,
+        currency: typeof av?.currency === 'string' ? av.currency : 'USD',
+      }));
+      const filtered = normalized.filter((av: AvailabilitySlot) => av.duration === selectedDuration);
       setAvailabilities(filtered);
     } catch (err) {
       console.error('Failed to load availability:', err);
@@ -78,13 +84,7 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
     }
   };
 
-  const formatPrice = (price: number, currency: string) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: currency || 'INR',
-      minimumFractionDigits: 0,
-    }).format(price);
-  };
+  void convertAndFormatPrice; // loaded for currency rates; price formatting is handled elsewhere in this modal
 
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
@@ -142,8 +142,8 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
       date: selectedSlot.date,
       startTime: selectedSlot.startTime,
       endTime: selectedSlot.endTime,
-      price: selectedSlot.price,
-      currency: selectedSlot.currency,
+      // Security: client must never send calculated prices.
+      selectedCurrency,
       timezone: studentTimezone,
     });
   };

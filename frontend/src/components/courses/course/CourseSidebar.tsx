@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Rating } from 'react-simple-star-rating';
 import { fetchCategories, type Category } from "../../../services/categoryService";
 import { useTranslation } from "react-i18next";
 

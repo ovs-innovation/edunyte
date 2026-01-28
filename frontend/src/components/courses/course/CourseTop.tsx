@@ -55,10 +55,10 @@ const CourseTop = ({ startOffset, endOffset, totalItems, courses, setCourses, ha
             });
             break;
          case 'price':
-            sortedCourses = sortedCourses.sort((a, b) => 0);
+            // Price sorting not implemented for courses list; keep current order
             break;
          case 'rating':
-            sortedCourses = sortedCourses.sort((a, b) => 0);
+            // Rating sorting not implemented for courses list; keep current order
             break;
          default:
             sortedCourses = courses;

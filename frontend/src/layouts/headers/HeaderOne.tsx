@@ -49,23 +49,8 @@ const HeaderOne = () => {
       return null;
    };
 
-   const renderAvatar = (size: number = 40) => {
+   const renderAvatar = () => {
       const avatarUrl = getUserAvatar();
-      const avatarStyle: React.CSSProperties = {
-         display: 'flex',
-         alignItems: 'center',
-         justifyContent: 'center',
-         width: `${size}px`,
-         height: `${size}px`,
-         borderRadius: '50%',
-         background: avatarUrl ? 'transparent' : '#6c5ce7',
-         color: '#fff',
-         textDecoration: 'none',
-         fontSize: `${size * 0.35}px`,
-         fontWeight: '600',
-         overflow: 'hidden',
-         objectFit: 'cover' as const
-      };
 
       if (avatarUrl) {
          return (
@@ -156,7 +141,7 @@ const HeaderOne = () => {
                                                 }}
                                                 title={user?.name || t("common.my_account")}
                                              >
-                                                {renderAvatar(40)}
+                                                {renderAvatar()}
                                              </Link>
                                              <span style={{ color: '#ccc' }}>|</span>
                                              <button 
@@ -200,7 +185,7 @@ const HeaderOne = () => {
                                        }}
                                        title={user?.name || t("common.my_account")}
                                     >
-                                       {renderAvatar(40)}
+                                       {renderAvatar()}
                                     </Link>
                                  ) : (
                                     <Link to="/login" onClick={handleUserClick}><InjectableSvg src="/assets/img/icons/user.svg" alt="" className="injectable" /></Link>

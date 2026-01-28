@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Plus, Calendar, Clock, Trash2, Edit, BookOpen, Languages } from 'lucide-react';
@@ -144,25 +144,41 @@ const TeacherAvailabilityPage = () => {
   };
 
   // Calculate teacher price for selected duration
+  const selectedTeacherCourse = useMemo(() => {
+    if (!selectedCourseId) return null;
+    return (
+      teacherCourses.find(
+        (tc) => typeof tc.courseId !== 'string' && tc.courseId._id === selectedCourseId
+      ) || null
+    );
+  }, [selectedCourseId, teacherCourses]);
+
   const calculatePricePreview = () => {
     if (!selectedCourseId || !formData.duration) return null;
     
-    const teacherCourse = teacherCourses.find(
-      tc => typeof tc.courseId !== 'string' && tc.courseId._id === selectedCourseId
-    );
-    if (!teacherCourse) return null;
+    if (!selectedTeacherCourse) return null;
     
     const durationInHours = formData.duration / 60;
-    const teacherPricePerHour = teacherCourse.price;
+    const teacherPricePerHour = selectedTeacherCourse.pricing?.teacherPrice || 0;
     const teacherPriceForSession = teacherPricePerHour * durationInHours;
 
     return {
       price: parseFloat(teacherPriceForSession.toFixed(2)),
-      currency: teacherCourse.currency || 'USD',
+      currency: selectedTeacherCourse.pricing?.teacherCurrency || 'USD',
     };
   };
 
   const pricePreview = calculatePricePreview();
+
+  const getSlotTeacherPriceLabel = (slot: ApiAvailability) => {
+    const baseAmountUSD = slot?.pricing?.baseAmountUSD;
+    if (typeof baseAmountUSD !== 'number') return '';
+    if (selectedTeacherCourse?.pricing?.exchangeRateAtCreation && selectedTeacherCourse?.pricing?.teacherCurrency) {
+      const amount = baseAmountUSD * selectedTeacherCourse.pricing.exchangeRateAtCreation;
+      return `${selectedTeacherCourse.pricing.teacherCurrency} ${amount.toFixed(2)}`;
+    }
+    return `USD ${baseAmountUSD.toFixed(2)}`;
+  };
 
   const addMinutesToTime = (time: string, minutesToAdd: number) => {
     // time: "HH:mm"
@@ -486,9 +502,9 @@ const TeacherAvailabilityPage = () => {
                               >
                                 <div className="font-medium">{slot.startTime}</div>
                                 <div className="text-muted-foreground">{slot.duration}m</div>
-                                {slot.price && (
+                                {slot?.pricing?.baseAmountUSD !== undefined && (
                                   <div className="text-primary font-semibold text-xs">
-                                    {slot.currency || 'USD'} {slot.price}
+                                    {getSlotTeacherPriceLabel(slot)}
                                   </div>
                                 )}
                               </div>
@@ -555,12 +571,10 @@ const TeacherAvailabilityPage = () => {
                               <span className="text-muted-foreground">Duration:</span>
                               <span className="font-medium">{slot.duration} mins</span>
                             </div>
-                            {slot.price && (
+                            {slot?.pricing?.baseAmountUSD !== undefined && (
                               <div className="flex items-center justify-between text-sm">
                                 <span className="text-muted-foreground">Price:</span>
-                                <span className="font-semibold text-primary">
-                                  {slot.currency || 'USD'} {slot.price}
-                                </span>
+                                <span className="font-semibold text-primary">{getSlotTeacherPriceLabel(slot)}</span>
                               </div>
                             )}
                             <div className="flex items-center justify-between text-sm">

@@ -63,16 +63,48 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    // Pricing
-    price: {
-      type: Number,
-      required: true,
-      min: 0,
-    },
-    currency: {
-      type: String,
-      default: "INR",
-      uppercase: true,
+    /**
+     * Pricing snapshot (security + refund safe)
+     *
+     * WHY:
+     * - We never trust client-calculated prices.
+     * - We must be able to refund using the ORIGINAL exchange rate snapshot
+     *   (not live rates), to avoid financial discrepancies.
+     */
+    pricingSnapshot: {
+      // Canonical base amount used for all accounting.
+      baseAmountUSD: {
+        type: Number,
+        required: true,
+        min: 0,
+      },
+      baseCurrency: {
+        type: String,
+        default: "USD",
+        uppercase: true,
+      },
+      // What the student actually paid (or will pay) to the gateway.
+      studentPaid: {
+        amount: { type: Number, required: true, min: 0 },
+        currency: { type: String, required: true, uppercase: true, trim: true },
+      },
+      // Teacher payout amount in teacher's currency (based on teacher's original pricing snapshot).
+      teacherPayout: {
+        amount: { type: Number, required: true, min: 0 },
+        currency: { type: String, required: true, uppercase: true, trim: true },
+      },
+      /**
+       * Exchange rate snapshot.
+       * Format: { USD_INR: 83.12, USD_AED: 3.67, ... }
+       */
+      exchangeRates: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {},
+      },
+      timestamp: {
+        type: Date,
+        required: true,
+      },
     },
     // Payment status
     paymentStatus: {

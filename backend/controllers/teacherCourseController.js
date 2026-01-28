@@ -4,8 +4,9 @@ import Language from "../models/languageModel.js";
 import User from "../models/userModel.js";
 import mongoose from "mongoose";
 import { normalizeLanguageValue, getLanguageValue } from "../utils/languageHelper.js";
-import { convertCurrency, getBaseCurrency } from "../utils/currencyHelper.js";
+import { getBaseCurrency } from "../utils/currencyHelper.js";
 import iso6391 from "iso-639-1";
+import { buildTeacherCoursePricing, computeSlotBaseAmountUSD } from "../utils/pricingHelper.js";
 
 /**
  * TeacherCourse Controller
@@ -195,11 +196,31 @@ const resolveLanguageIds = async ({ languageIds, languageCodes, languages }) => 
 export const joinCourse = async (req, res, next) => {
   try {
     const teacherId = req.user.id;
-    const { courseId, languageIds, languageCodes, languages: languagesPayload, price, currency, timezone, introductionVideo, experience, bio, aboutCourse } = req.body;
-    const baseCurrency = getBaseCurrency();
-    const teacherCurrency = (currency || baseCurrency).toUpperCase();
-    const originalPrice = typeof price === "number" ? price : 0;
-    const priceInBase = await convertCurrency(originalPrice, teacherCurrency, baseCurrency);
+    // Teacher inputs (new API): teacherPrice + teacherCurrency
+    // Backward compatible: price + currency
+    const {
+      courseId,
+      languageIds,
+      languageCodes,
+      languages: languagesPayload,
+      teacherPrice,
+      teacherCurrency,
+      price, // legacy
+      currency, // legacy
+      timezone,
+      introductionVideo,
+      experience,
+      bio,
+      aboutCourse,
+    } = req.body;
+
+    const baseCurrency = getBaseCurrency(); // "USD"
+    const resolvedTeacherPrice = typeof teacherPrice === "number" ? teacherPrice : (typeof price === "number" ? price : 0);
+    const resolvedTeacherCurrency = (teacherCurrency || currency || baseCurrency).toString().toUpperCase();
+    const pricing = await buildTeacherCoursePricing({
+      teacherPrice: resolvedTeacherPrice,
+      teacherCurrency: resolvedTeacherCurrency,
+    });
 
     // Verify user is a teacher
     const user = await User.findById(teacherId);
@@ -264,11 +285,7 @@ export const joinCourse = async (req, res, next) => {
       existing.status = "pending";
       existing.languageIds = resolvedLanguageIds;
       existing.languageProficiencies = languageProficiencies;
-      existing.price = priceInBase;
-      existing.currency = baseCurrency;
-      existing.baseCurrency = baseCurrency;
-      existing.teacherCurrency = teacherCurrency;
-      existing.originalPrice = originalPrice;
+      existing.pricing = pricing;
       existing.timezone = timezone || "UTC";
       existing.introductionVideo = introductionVideo || "";
       existing.experience = normalizeLanguageValue(experience);
@@ -295,11 +312,7 @@ export const joinCourse = async (req, res, next) => {
       courseId,
       languageIds: resolvedLanguageIds,
       languageProficiencies,
-      price: priceInBase,
-      currency: baseCurrency,
-      baseCurrency,
-      teacherCurrency,
-      originalPrice,
+      pricing,
       timezone: timezone || "UTC",
       introductionVideo: introductionVideo || "",
       experience: normalizeLanguageValue(experience),
@@ -368,7 +381,20 @@ export const updateCourseRequest = async (req, res, next) => {
   try {
     const teacherId = req.user.id;
     const { id } = req.params;
-    const { languageIds, languageCodes, languages, price, currency, timezone, introductionVideo, experience, bio, aboutCourse } = req.body;
+    const {
+      languageIds,
+      languageCodes,
+      languages,
+      teacherPrice,
+      teacherCurrency,
+      price, // legacy
+      currency, // legacy
+      timezone,
+      introductionVideo,
+      experience,
+      bio,
+      aboutCourse,
+    } = req.body;
     const baseCurrency = getBaseCurrency();
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -429,15 +455,18 @@ export const updateCourseRequest = async (req, res, next) => {
         proficiency: proficiencyByCode.get(lang.code) || "native",
       }));
     }
-    if (price !== undefined || currency !== undefined) {
-      const teacherCurrency = (currency || teacherCourse.teacherCurrency || baseCurrency).toUpperCase();
-      const originalPrice = typeof price === "number" ? price : teacherCourse.originalPrice || 0;
-      const priceInBase = await convertCurrency(originalPrice, teacherCurrency, baseCurrency);
-      teacherCourse.price = priceInBase;
-      teacherCourse.currency = baseCurrency;
-      teacherCourse.baseCurrency = baseCurrency;
-      teacherCourse.teacherCurrency = teacherCurrency;
-      teacherCourse.originalPrice = originalPrice;
+    if (teacherPrice !== undefined || teacherCurrency !== undefined || price !== undefined || currency !== undefined) {
+      const resolvedTeacherPrice =
+        typeof teacherPrice === "number"
+          ? teacherPrice
+          : typeof price === "number"
+            ? price
+            : teacherCourse?.pricing?.teacherPrice || 0;
+      const resolvedTeacherCurrency = (teacherCurrency || currency || teacherCourse?.pricing?.teacherCurrency || baseCurrency).toString().toUpperCase();
+      teacherCourse.pricing = await buildTeacherCoursePricing({
+        teacherPrice: resolvedTeacherPrice,
+        teacherCurrency: resolvedTeacherCurrency,
+      });
     }
     if (timezone !== undefined) {
       teacherCourse.timezone = timezone;
@@ -741,7 +770,8 @@ export const getCourseTeachers = async (req, res, next) => {
       .populate("teacherId", "name email")
       .populate("courseId", "name description")
       .populate("languageIds", "name code nativeName")
-      .sort({ price: 1 });
+      // Sort by cheapest in USD base
+      .sort({ "pricing.basePriceUSD": 1 });
 
     const teacherCoursesData = teacherCourses.map((tc) => {
       const tcObj = tc.toObject();
@@ -785,7 +815,8 @@ export const getCourseTeachersBySlug = async (req, res, next) => {
       .populate("teacherId", "name email")
       .populate("courseId", "name description")
       .populate("languageIds", "name code nativeName")
-      .sort({ price: 1 });
+      // Sort by cheapest in USD base
+      .sort({ "pricing.basePriceUSD": 1 });
 
     // Get teacher profiles and availability for each teacher
     const TeacherProfile = (await import("../models/teacherProfileModel.js")).default;
@@ -864,8 +895,16 @@ export const getCourseTeachersBySlug = async (req, res, next) => {
           startTime: av.startTime,
           endTime: av.endTime,
           duration: av.duration,
-          price: av.price,
-          currency: av.currency,
+          // Base amount in USD (display-only conversions happen on client)
+          pricing: av.pricing?.baseAmountUSD !== undefined
+            ? av.pricing
+            : {
+                baseAmountUSD: computeSlotBaseAmountUSD({
+                  basePriceUSDPerHour: tcObj?.pricing?.basePriceUSD || 0,
+                  durationMinutes: av.duration,
+                }),
+                baseCurrency,
+              },
           timezone: av.timezone,
         }));
 

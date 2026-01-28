@@ -4,8 +4,12 @@ import TeacherCourse from "../models/teacherCourseModel.js";
 import User from "../models/userModel.js";
 import mongoose from "mongoose";
 import { generateMeeting } from "../utils/meetingGateway.js";
-import { convertPriceForCheckout } from "../middlewares/currencyMiddleware.js";
-import { getBaseCurrency } from "../utils/currencyHelper.js";
+import {
+  computeSlotBaseAmountUSD,
+  getUsdToCurrencyRateOrThrow,
+  buildUsdExchangeRateSnapshot,
+  roundMoney2,
+} from "../utils/pricingHelper.js";
 
 /**
  * Booking Controller
@@ -18,7 +22,14 @@ import { getBaseCurrency } from "../utils/currencyHelper.js";
 export const createBooking = async (req, res, next) => {
   try {
     const studentId = req.user.id;
-    const { availabilityId, studentNotes, currency: requestedCurrency } = req.body;
+    // Client should never send any calculated prices.
+    // We accept only the selected currency (display/checkout currency).
+    const {
+      availabilityId,
+      studentNotes,
+      selectedCurrency,
+      currency: requestedCurrencyLegacy,
+    } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(availabilityId)) {
       return res.status(400).json({ message: "Invalid availability ID" });
@@ -79,20 +90,39 @@ export const createBooking = async (req, res, next) => {
       "zoom"
     );
 
-    // Price conversion: All prices in DB are stored in USD (base currency)
-    // Convert to requested currency for payment gateway
-    const usdPrice = availability.price || teacherCourse.price; // Price in USD from DB
-    const targetCurrency = (requestedCurrency || 'USD').toUpperCase();
-    
-    let convertedPrice = usdPrice;
-    if (targetCurrency !== 'USD') {
-      try {
-        convertedPrice = await convertPriceForCheckout(usdPrice, targetCurrency);
-      } catch (error) {
-        console.error('Error converting price for checkout:', error);
-        // Fallback to USD if conversion fails
-      }
-    }
+    // SECURITY CRITICAL:
+    // - Amount is calculated ONLY on server from USD base + Redis rates.
+    const baseAmountUSD =
+      availability?.pricing?.baseAmountUSD !== undefined
+        ? Number(availability.pricing.baseAmountUSD)
+        : computeSlotBaseAmountUSD({
+            basePriceUSDPerHour: teacherCourse?.pricing?.basePriceUSD || 0,
+            durationMinutes: availability.duration,
+          });
+
+    const targetCurrency = (selectedCurrency || requestedCurrencyLegacy || "USD").toString().toUpperCase();
+    const { rate: studentRate } = await getUsdToCurrencyRateOrThrow(targetCurrency);
+    const studentAmount = roundMoney2(baseAmountUSD * studentRate);
+
+    const teacherCurrency = (teacherCourse?.pricing?.teacherCurrency || "USD").toString().toUpperCase();
+    const teacherPayoutAmount = roundMoney2(
+      (Number(teacherCourse?.pricing?.teacherPrice || 0) * availability.duration) / 60
+    );
+
+    // Snapshot exchange rates for refund safety (do NOT use live rates later)
+    const exchangeRatesSnapshot = buildUsdExchangeRateSnapshot({
+      [targetCurrency]: studentRate,
+      [teacherCurrency]: teacherCourse?.pricing?.exchangeRateAtCreation || 1,
+    });
+
+    const pricingSnapshot = {
+      baseAmountUSD: Number(baseAmountUSD),
+      baseCurrency: "USD",
+      studentPaid: { amount: studentAmount, currency: targetCurrency },
+      teacherPayout: { amount: teacherPayoutAmount, currency: teacherCurrency },
+      exchangeRates: exchangeRatesSnapshot,
+      timestamp: new Date(),
+    };
 
     // Create booking
     // Store USD price in DB, but use converted price for payment
@@ -108,8 +138,7 @@ export const createBooking = async (req, res, next) => {
       endTime: availability.endTime,
       duration: availability.duration,
       timezone: availability.timezone,
-      price: usdPrice, // Store USD price in DB
-      currency: 'USD', // Always USD in DB
+      pricingSnapshot,
       studentNotes: studentNotes || "",
       status: "scheduled",
       paymentStatus: "pending",
@@ -118,12 +147,12 @@ export const createBooking = async (req, res, next) => {
       meetingPassword: meetingDetails.password || "",
     });
 
-    // Return booking with converted price for payment gateway
+    // Return booking with backend-calculated amounts for payment gateway
     const bookingResponse = booking.toObject();
-    bookingResponse.paymentPrice = convertedPrice; // Price for payment gateway
-    bookingResponse.paymentCurrency = targetCurrency; // Currency for payment gateway
-    bookingResponse.basePrice = usdPrice; // Original USD price
-    bookingResponse.baseCurrency = 'USD';
+    bookingResponse.paymentPrice = studentAmount;
+    bookingResponse.paymentCurrency = targetCurrency;
+    bookingResponse.baseAmountUSD = baseAmountUSD;
+    bookingResponse.baseCurrency = "USD";
 
     // Update availability status
     availability.status = "booked";
@@ -139,16 +168,16 @@ export const createBooking = async (req, res, next) => {
 
     // Convert booking to object and add payment info
     const bookingObj = booking.toObject();
-    bookingObj.paymentPrice = convertedPrice;
+    bookingObj.paymentPrice = studentAmount;
     bookingObj.paymentCurrency = targetCurrency;
-    bookingObj.basePrice = usdPrice;
-    bookingObj.baseCurrency = 'USD';
+    bookingObj.baseAmountUSD = baseAmountUSD;
+    bookingObj.baseCurrency = "USD";
 
     res.status(201).json({ 
       booking: bookingObj, 
       message: "Booking created successfully",
       payment: {
-        amount: convertedPrice,
+        amount: studentAmount,
         currency: targetCurrency,
       }
     });
@@ -179,7 +208,7 @@ export const getMyBookings = async (req, res, next) => {
       .populate("teacherId", "name email")
       .populate("courseId", "name description")
       .populate("languageId", "name code")
-      .populate("teacherCourseId", "price currency")
+      .populate("teacherCourseId", "pricing timezone")
       .sort({ sessionDate: 1, startTime: 1 });
 
     res.json({ bookings, count: bookings.length });
@@ -210,7 +239,7 @@ export const getTeacherBookings = async (req, res, next) => {
       .populate("studentId", "name email")
       .populate("courseId", "name description")
       .populate("languageId", "name code")
-      .populate("teacherCourseId", "price currency")
+      .populate("teacherCourseId", "pricing timezone")
       .sort({ sessionDate: 1, startTime: 1 });
 
     res.json({ bookings, count: bookings.length });
@@ -236,7 +265,7 @@ export const getBooking = async (req, res, next) => {
       .populate("teacherId", "name email")
       .populate("courseId", "name description")
       .populate("languageId", "name code")
-      .populate("teacherCourseId", "price currency timezone");
+      .populate("teacherCourseId", "pricing timezone");
 
     if (!booking) {
       return res.status(404).json({ message: "Booking not found" });

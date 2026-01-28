@@ -53,36 +53,27 @@ const availabilitySchema = new mongoose.Schema(
       // Duration in minutes (e.g., 25, 50, 60)
       enum: [15, 25, 30, 45, 50, 60, 90, 120],
     },
-    // Calculated price for this session slot
-    price: {
-      type: Number,
-      required: true,
-      min: 0,
-      // Price includes: (teacher price per hour * duration) + platform margin + meeting platform cost
-    },
-    currency: {
-      type: String,
-      required: true,
-      default: "INR",
-      uppercase: true,
-    },
-    // Breakdown of price calculation (for transparency)
-    priceBreakdown: {
-      teacherPrice: {
+    /**
+     * Pricing snapshot for this slot (USD base only)
+     *
+     * WHY:
+     * - Availability must be stable even if teacher updates their pricing later.
+     * - Checkout must be server-calculated from a USD base amount.
+     *
+     * NOTE:
+     * - We intentionally DO NOT store student currency / converted amounts here.
+     * - We also intentionally do NOT store a `price`/`currency` pair to avoid ambiguity.
+     */
+    pricing: {
+      baseAmountUSD: {
         type: Number,
-        // Teacher's price per hour * (duration / 60)
+        required: true,
+        min: 0,
       },
-      platformMargin: {
-        type: Number,
-        // Platform margin amount
-      },
-      platformMarginPercent: {
-        type: Number,
-        // Platform margin percentage (e.g., 20 for 20%)
-      },
-      meetingPlatformCost: {
-        type: Number,
-        // Meeting platform cost per session (Zoom, Google Meet, WebRTC, etc.)
+      baseCurrency: {
+        type: String,
+        default: "USD",
+        uppercase: true,
       },
     },
     timezone: {

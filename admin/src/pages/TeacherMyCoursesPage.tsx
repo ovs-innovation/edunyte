@@ -212,8 +212,9 @@ const TeacherMyCoursesPage = () => {
     
     setFormData({
       languages: languagesWithProf,
-      price: (typeof request.originalPrice === 'number' ? request.originalPrice : request.price)?.toString() || '',
-      currency: (request.teacherCurrency || request.currency || 'USD'),
+      // Teacher input pricing (not student-converted)
+      price: (typeof request?.pricing?.teacherPrice === 'number' ? request.pricing.teacherPrice : 0)?.toString() || '',
+      currency: (request?.pricing?.teacherCurrency || 'USD'),
       introductionVideo: request.introductionVideo || '',
       experience: getLanguageValue(request.experience) || '',
       bio: getLanguageValue(request.bio) || '',
@@ -257,8 +258,8 @@ const TeacherMyCoursesPage = () => {
       await TeacherCourseJoinAPI.updateCourse(editingId, {
         languageCodes: formData.languages.map((l) => l.code),
         languages: payloadLanguages,
-        price: parseFloat(formData.price),
-        currency: formData.currency,
+        teacherPrice: parseFloat(formData.price),
+        teacherCurrency: formData.currency,
         introductionVideo: formData.introductionVideo,
         experience: formData.experience,
         bio: formData.bio,
@@ -493,12 +494,10 @@ const TeacherMyCoursesPage = () => {
                       </TableCell>
                       <TableCell>
                         <span className="font-medium">
-                          {typeof request.teacherCurrency === 'string'
-                            ? request.teacherCurrency
-                            : (typeof request.currency === 'string' ? request.currency : 'USD')}{' '}
-                          {typeof request.originalPrice === 'number'
-                            ? request.originalPrice.toFixed(2)
-                            : (typeof request.price === 'number' ? request.price.toFixed(2) : '0.00')}
+                          {request?.pricing?.teacherCurrency || 'USD'}{' '}
+                          {typeof request?.pricing?.teacherPrice === 'number'
+                            ? request.pricing.teacherPrice.toFixed(2)
+                            : '0.00'}
                         </span>
                       </TableCell>
                       <TableCell>

@@ -20,8 +20,12 @@ export const createTeacherCourseSchema = z.object({
     code: z.string().min(1, "Language code is required"),
     proficiency: z.enum(["native", "c2", "c1", "b2", "b1", "a2", "a1"]).optional().default("native"),
   })).min(1, "At least one language is required").optional(),
-  price: z.number().min(0, "Price must be non-negative"),
-  currency: z.string().optional().default("INR"),
+  // New pricing fields (teacher input)
+  teacherPrice: z.number().min(0, "Teacher price must be non-negative").optional(),
+  teacherCurrency: z.string().optional(),
+  // Legacy fields (backward compatibility with older UI clients)
+  price: z.number().min(0, "Price must be non-negative").optional(),
+  currency: z.string().optional(),
   timezone: z.string().optional().default("UTC"),
   introductionVideo: z.union([
     z.string().url("Invalid video URL"),
@@ -38,6 +42,14 @@ export const createTeacherCourseSchema = z.object({
 }, {
   message: "At least one language is required",
   path: ["languageIds"],
+}).refine((data) => {
+  // Require teacher pricing input (new) or legacy pricing input
+  const hasNew = typeof data.teacherPrice === "number" && !!data.teacherCurrency;
+  const hasLegacy = typeof data.price === "number" && !!data.currency;
+  return hasNew || hasLegacy;
+}, {
+  message: "Teacher pricing is required",
+  path: ["teacherPrice"],
 });
 
 export const updateTeacherCourseSchema = z.object({
@@ -47,6 +59,9 @@ export const updateTeacherCourseSchema = z.object({
     code: z.string().min(1, "Language code is required"),
     proficiency: z.enum(["native", "c2", "c1", "b2", "b1", "a2", "a1"]).optional().default("native"),
   })).min(1, "At least one language is required").optional(),
+  teacherPrice: z.number().min(0, "Teacher price must be non-negative").optional(),
+  teacherCurrency: z.string().optional(),
+  // Legacy fields (backward compatibility)
   price: z.number().min(0, "Price must be non-negative").optional(),
   currency: z.string().optional(),
   timezone: z.string().optional(),

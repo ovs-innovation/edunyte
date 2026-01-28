@@ -270,7 +270,14 @@ const TeachersList = () => {
                 <div className="teacher-pricing text-lg-end">
                   <div className="mb-4">
                     <div className="h3 mb-0 fw-bold text-primary">
-                      {formatPrice(teacher.price, teacher.currency)}
+                      {formatPrice(
+                        typeof teacher.price === 'number'
+                          ? teacher.price
+                          : typeof teacher?.pricing?.basePriceUSD === 'number'
+                            ? teacher.pricing.basePriceUSD
+                            : 0,
+                        typeof teacher.currency === 'string' ? teacher.currency : 'USD'
+                      )}
                     </div>
                     <small className="text-muted">{t('common.per_lesson')}</small>
                   </div>

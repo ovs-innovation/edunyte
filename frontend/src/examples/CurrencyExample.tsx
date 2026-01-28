@@ -5,18 +5,18 @@
 import React, { useState, useEffect } from 'react';
 import { useCurrency } from '../hooks/useCurrency';
 import CurrencySelector from '../components/common/CurrencySelector';
-import { convertAndFormatPrice, formatPrice } from '../services/currencyService';
+import { convertAndFormatPrice } from '../services/currencyService';
 
 // Example 1: Using the useCurrency hook
-export const CourseCard: React.FC<{ courseId: string; usdPrice: number }> = ({ courseId, usdPrice }) => {
-  const { currency, convertAndFormatPrice, isLoading } = useCurrency();
+export const CourseCard: React.FC<{ usdPrice: number }> = ({ usdPrice }) => {
+  const { convertAndFormatPrice, isLoading } = useCurrency();
   const [displayPrice, setDisplayPrice] = useState<string>('');
 
   useEffect(() => {
     if (!isLoading) {
       convertAndFormatPrice(usdPrice).then(setDisplayPrice);
     }
-  }, [currency, usdPrice, convertAndFormatPrice, isLoading]);
+  }, [usdPrice, convertAndFormatPrice, isLoading]);
 
   return (
     <div className="course-card">
@@ -46,8 +46,8 @@ export const CheckoutButton: React.FC<{ courseId: string; usdPrice: number }> = 
   const handleCheckout = async () => {
     setIsProcessing(true);
     try {
-      // Convert price to selected currency
-      const convertedPrice = await convertPrice(usdPrice);
+      // NOTE: In production, backend must calculate the final amount (do not trust client-calculated prices).
+      await convertPrice(usdPrice);
 
       // Send to backend with currency
       const response = await fetch('/api/bookings', {
@@ -84,7 +84,7 @@ export const CheckoutButton: React.FC<{ courseId: string; usdPrice: number }> = 
 
 // Example 4: Full page with currency selector
 export const CoursePage: React.FC = () => {
-  const { currency, formatPrice, isLoading } = useCurrency();
+  const { formatPrice, isLoading } = useCurrency();
   const coursePriceUSD = 99.99;
 
   return (

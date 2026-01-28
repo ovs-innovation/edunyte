@@ -243,7 +243,11 @@ const TeacherApprovalPage = () => {
                       <div>
                         <p className="font-medium text-foreground">{getTeacherName(request.teacherId)}</p>
                         <p className="text-xs text-muted-foreground">
-                          Price: {typeof request.currency === 'string' ? request.currency : 'USD'} {typeof request.price === 'number' ? request.price.toFixed(2) : String(request.price || '0.00')} | Timezone: {request.timezone || 'UTC'}
+                          Price: {request?.pricing?.teacherCurrency || 'USD'}{' '}
+                          {typeof request?.pricing?.teacherPrice === 'number'
+                            ? request.pricing.teacherPrice.toFixed(2)
+                            : '0.00'}{' '}
+                          | Timezone: {request.timezone || 'UTC'}
                         </p>
                         {request.experience && (
                           <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
@@ -334,7 +338,10 @@ const TeacherApprovalPage = () => {
                     </TableCell>
                     <TableCell>
                       <span className="font-medium">
-                        {typeof request.currency === 'string' ? request.currency : 'USD'} {typeof request.price === 'number' ? request.price.toFixed(2) : String(request.price || '0.00')}
+                        {request?.pricing?.teacherCurrency || 'USD'}{' '}
+                        {typeof request?.pricing?.teacherPrice === 'number'
+                          ? request.pricing.teacherPrice.toFixed(2)
+                          : '0.00'}
                       </span>
                     </TableCell>
                     <TableCell>

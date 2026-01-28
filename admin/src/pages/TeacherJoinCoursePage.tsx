@@ -169,8 +169,9 @@ const TeacherJoinCoursePage = () => {
             nativeName: lib?.nativeName,
           };
         }),
-        price: parseFloat(formData.price),
-        currency: formData.currency,
+        // Teacher pricing input (server converts once and stores USD base)
+        teacherPrice: parseFloat(formData.price),
+        teacherCurrency: formData.currency,
         introductionVideo: formData.introductionVideo,
         experience: formData.experience,
         bio: formData.bio,

@@ -4,8 +4,8 @@ import Course from "../models/courseModel.js";
 import Booking from "../models/bookingModel.js";
 import User from "../models/userModel.js";
 import mongoose from "mongoose";
-import { convertCurrency, getBaseCurrency } from "../utils/currencyHelper.js";
 import { convertTimeBetweenTimezones, toUTCDate, utcDateToLocalTime } from "../utils/timezoneHelper.js";
+import { computeSlotBaseAmountUSD } from "../utils/pricingHelper.js";
 
 /**
  * Availability Controller
@@ -50,9 +50,11 @@ export const createAvailability = async (req, res, next) => {
       });
     }
 
-    const durationInHours = duration / 60; 
-    const teacherPricePerHour = teacherCourse.price;
-    const teacherPriceForSession = teacherPricePerHour * durationInHours;
+    // Store ONLY USD base pricing snapshot (no student conversions, no platform breakdown)
+    const baseAmountUSD = computeSlotBaseAmountUSD({
+      basePriceUSDPerHour: teacherCourse?.pricing?.basePriceUSD || 0,
+      durationMinutes: duration,
+    });
 
     const endTimeUTC = new Date(startTimeUTC.getTime() + duration * 60 * 1000);
 
@@ -65,8 +67,10 @@ export const createAvailability = async (req, res, next) => {
       duration,
       startTimeUTC,
       endTimeUTC,
-      price: parseFloat(teacherPriceForSession.toFixed(2)),
-      currency: teacherCourse.currency || getBaseCurrency(),
+      pricing: {
+        baseAmountUSD,
+        baseCurrency: "USD",
+      },
       timezone: effectiveTimezone,
       isRecurring: isRecurring || false,
       recurringPattern: isRecurring ? recurringPattern : null,
@@ -104,9 +108,10 @@ export const bulkCreateAvailability = async (req, res, next) => {
 
     const createdSlots = [];
     for (const slotData of slots) {
-      const durationInHours = slotData.duration / 60; 
-      const teacherPricePerHour = teacherCourse.price;
-      const teacherPriceForSession = teacherPricePerHour * durationInHours;
+      const baseAmountUSD = computeSlotBaseAmountUSD({
+        basePriceUSDPerHour: teacherCourse?.pricing?.basePriceUSD || 0,
+        durationMinutes: slotData.duration,
+      });
 
       const slotDate = new Date(slotData.date);
       const effectiveTimezone = slotData.timezone || teacherCourse.timezone || "UTC";
@@ -133,8 +138,10 @@ export const bulkCreateAvailability = async (req, res, next) => {
         duration: slotData.duration,
         startTimeUTC,
         endTimeUTC,
-        price: parseFloat(teacherPriceForSession.toFixed(2)),
-        currency: teacherCourse.currency || getBaseCurrency(),
+        pricing: {
+          baseAmountUSD,
+          baseCurrency: "USD",
+        },
         timezone: effectiveTimezone,
         isRecurring: slotData.isRecurring || false,
         recurringPattern: slotData.isRecurring ? slotData.recurringPattern : null,
@@ -175,20 +182,7 @@ export const getMyAvailability = async (req, res, next) => {
       .populate("courseId", "name description")
       .populate("bookingId", "studentId status")
       .sort({ date: 1, startTimeUTC: 1, startTime: 1 });
-
-    const sanitized = availabilities.map((av) => {
-      const obj = av.toObject();
-      if (
-        obj.priceBreakdown &&
-        typeof obj.priceBreakdown.teacherPrice === "number"
-      ) {
-        obj.price = obj.priceBreakdown.teacherPrice;
-      }
-      delete obj.priceBreakdown;
-      return obj;
-    });
-
-    res.json({ availabilities: sanitized, count: sanitized.length });
+    res.json({ availabilities, count: availabilities.length });
   } catch (err) {
     next(err);
   }
@@ -342,27 +336,13 @@ export const updateAvailability = async (req, res, next) => {
       });
       
       if (teacherCourse) {
-        const PLATFORM_MARGIN_PERCENT = parseFloat(process.env.PLATFORM_MARGIN_PERCENT || "20");
-        const MEETING_PLATFORM_COST_PER_MINUTE = parseFloat(process.env.MEETING_PLATFORM_COST_PER_MINUTE || "0.01");
-        const MEETING_PLATFORM_BASE_COST = parseFloat(process.env.MEETING_PLATFORM_BASE_COST || "0.10");
-        
-        const durationInHours = duration / 60;
-        const teacherPricePerHour = teacherCourse.price;
-        const teacherPriceForSession = teacherPricePerHour * durationInHours;
-        const platformMargin = (teacherPriceForSession * PLATFORM_MARGIN_PERCENT) / 100;  
-        const meetingPlatformCost = MEETING_PLATFORM_BASE_COST + (MEETING_PLATFORM_COST_PER_MINUTE * duration);
-        const totalPrice = teacherPriceForSession + platformMargin + meetingPlatformCost;
-
         availability.duration = duration;
-        availability.price = parseFloat(totalPrice.toFixed(2));
-        availability.currency = teacherCourse.currency || getBaseCurrency();
-        availability.priceBreakdown = {
-          teacherPrice: parseFloat(teacherPriceForSession.toFixed(2)),
-          platformMargin: parseFloat(platformMargin.toFixed(2)),
-          platformMarginPercent: PLATFORM_MARGIN_PERCENT,
-          meetingPlatformCost: parseFloat(meetingPlatformCost.toFixed(2)),
-          meetingPlatformCostPerMinute: MEETING_PLATFORM_COST_PER_MINUTE,
-          meetingPlatformBaseCost: MEETING_PLATFORM_BASE_COST,
+        availability.pricing = {
+          baseAmountUSD: computeSlotBaseAmountUSD({
+            basePriceUSDPerHour: teacherCourse?.pricing?.basePriceUSD || 0,
+            durationMinutes: duration,
+          }),
+          baseCurrency: "USD",
         };
       } else {
         availability.duration = duration;
