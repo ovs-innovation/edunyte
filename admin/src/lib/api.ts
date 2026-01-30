@@ -667,10 +667,18 @@ export interface ApiBooking {
   paymentStatus: "pending" | "paid" | "failed" | "refunded";
   paymentId?: string;
   status: "scheduled" | "completed" | "cancelled" | "no_show";
+  // Legacy fields (for backward compatibility)
   meetingType: "zoom" | "google_meet" | "teams" | "custom";
   meetingUrl: string;
   meetingId: string;
   meetingPassword: string;
+  // New meeting object with dynamic Zoom links
+  meeting?: {
+    provider: "zoom";
+    meetingId: string;
+    joinUrlStudent: string;
+    joinUrlTeacher: string;
+  };
   cancelledBy?: ApiUser | string;
   cancelledAt?: string;
   cancellationReason?: string;

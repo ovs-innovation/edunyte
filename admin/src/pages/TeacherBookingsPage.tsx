@@ -241,7 +241,18 @@ const TeacherBookingsPage = () => {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {booking.meetingUrl ? (
+                      {booking.meeting?.joinUrlTeacher ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open(booking.meeting?.joinUrlTeacher, '_blank')}
+                          className="gap-2"
+                        >
+                          <Video className="h-4 w-4" />
+                          <ExternalLink className="h-3 w-3" />
+                          Join Meeting
+                        </Button>
+                      ) : booking.meetingUrl ? (
                         <Button
                           variant="outline"
                           size="sm"
