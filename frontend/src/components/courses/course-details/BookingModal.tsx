@@ -134,18 +134,43 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
 
   const handleConfirm = () => {
     if (!selectedSlot) return;
+    
+    // Extract teacher information
+    const teacherObj = typeof teacher.teacherId === 'object' ? teacher.teacherId : null;
+    const teacherId = teacherObj?._id || '';
+    const teacherName = teacherObj?.name || '';
+    
+    // Get course information from teacher object if available
+    const courseObj = typeof teacher.courseId === 'object' ? teacher.courseId : null;
+    // Safely handle both string and object types for name/description
+    const courseName = typeof courseObj?.name === 'object' 
+      ? (courseObj.name as any)?.en || '' 
+      : courseObj?.name || '';
+    const courseDescription = typeof courseObj?.description === 'object'
+      ? (courseObj.description as any)?.en || ''
+      : courseObj?.description || '';
+    
     onConfirm({
       availabilityId: selectedSlot._id,
       teacherCourseId: teacher._id,
-      teacherId: typeof teacher.teacherId === 'object' ? teacher.teacherId._id : '',
+      teacherId,
       courseId,
       duration: selectedDuration,
       date: selectedSlot.date,
       startTime: selectedSlot.startTime,
       endTime: selectedSlot.endTime,
-      // Security: client must never send calculated prices.
       selectedCurrency,
       timezone: studentTimezone,
+      // Additional info for checkout page display
+      teacherName,
+      teacherPhoto: teacher.teacherProfile?.photo || '',
+      teacherRating: teacher.teacherProfile?.rating || 0,
+      teacherReviews: teacher.teacherProfile?.totalReviews || 0,
+      teacherStudents: teacher.teacherProfile?.totalStudents || 0,
+      teacherLessons: (teacher.teacherProfile as any)?.totalLessons || 0,
+      teacherYearsTeaching: (teacher.teacherProfile as any)?.yearsTeaching || 0,
+      courseName,
+      courseDescription,
     });
   };
 
