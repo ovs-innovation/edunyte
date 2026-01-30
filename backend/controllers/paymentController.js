@@ -78,6 +78,8 @@ export const createCheckoutPaymentIntent = async (req, res, next) => {
         studentId: String(studentId),
         courseId: String(courseId),
         availabilityId: String(availabilityId),
+        teacherCourseId: String(teacherCourse._id),
+        languageId: String(teacherCourse.languageIds?.[0] || ""),
         duration: String(d),
         baseAmountUSD: String(amounts.lessonAmountUSD),
         platformFeeUSD: String(amounts.platformFeeUSD),
@@ -128,11 +130,13 @@ export const stripeWebhook = async (req, res, next) => {
     const studentId = meta.studentId;
     const courseId = meta.courseId;
     const availabilityId = meta.availabilityId;
+    const teacherCourseId = meta.teacherCourseId;
+    const languageId = meta.languageId;
     const duration = Number(meta.duration || 0);
     const baseAmountUSD = Number(meta.baseAmountUSD || 0);
     const platformFeeUSD = Number(meta.platformFeeUSD || 0);
 
-    if (!teacherId || !studentId || !courseId || !availabilityId) {
+    if (!teacherId || !studentId || !courseId || !availabilityId || !teacherCourseId || !languageId) {
       return res.json({ received: true });
     }
 
@@ -144,13 +148,28 @@ export const stripeWebhook = async (req, res, next) => {
     const availability = await Availability.findById(availabilityId);
     if (!availability) return res.json({ received: true });
 
-    if (
-      availability.status !== "held" ||
-      String(availability.hold?.byStudentId || "") !== String(studentId) ||
-      String(availability.hold?.stripePaymentIntentId || "") !== String(pi.id) ||
-      (availability.hold?.until && new Date(availability.hold.until) < new Date())
-    ) {
-      return res.json({ received: true });
+    // Environment-aware validation
+    const isProduction = process.env.NODE_ENV === "production";
+    
+    if (isProduction) {
+      // Production: strict validation requiring "held" status
+      if (
+        availability.status !== "held" ||
+        String(availability.hold?.byStudentId || "") !== String(studentId) ||
+        String(availability.hold?.stripePaymentIntentId || "") !== String(pi.id) ||
+        (availability.hold?.until && new Date(availability.hold.until) < new Date())
+      ) {
+        return res.json({ received: true });
+      }
+    } else {
+      // Development: allow "available" status, prevent already booked slots
+      if (availability.status === "booked" || availability.bookingId) {
+        return res.json({ received: true });
+      }
+      // In dev, status should be "available" or "held"
+      if (availability.status !== "available" && availability.status !== "held") {
+        return res.json({ received: true });
+      }
     }
 
     availability.status = "booked";
@@ -174,10 +193,10 @@ export const stripeWebhook = async (req, res, next) => {
     const booking = await Booking.create({
       studentId,
       teacherId,
-      teacherCourseId: null,
+      teacherCourseId,
       availabilityId,
       courseId,
-      languageId: meta.languageId || undefined,
+      languageId,
       sessionDate: availability.date,
       startTime: availability.startTime,
       endTime: availability.endTime,
