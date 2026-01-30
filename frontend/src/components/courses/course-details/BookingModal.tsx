@@ -346,6 +346,7 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
               <div className="d-flex gap-2 flex-wrap">
                 {weekDates.map((date, idx) => {
                   const isSelected = date.toDateString() === selectedDate.toDateString();
+                  const slotsCount = getSlotsForDate(date).length;
                   return (
                     <button
                       key={idx}
@@ -366,6 +367,9 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
                     >
                       <div className="small">{formatDate(date).split(' ')[0]}</div>
                       <div className="fw-bold">{date.getDate()}</div>
+                      <div className="small" style={{ fontSize: '10px', marginTop: '2px' }}>
+                        {slotsCount} {slotsCount === 1 ? 'slot' : 'slots'}
+                      </div>
                     </button>
                   );
                 })}

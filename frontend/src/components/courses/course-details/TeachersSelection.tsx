@@ -347,15 +347,9 @@ const TeachersSelection = () => {
     return '';
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-  };
 
-  const formatTime = (timeString: string) => {
-    const [hours, minutes] = timeString.split(':');
-    return `${hours.padStart(2, '0')}:${minutes}`;
-  };
+
+
 
   const getPriceRanges = () => {
     if (teachers.length === 0) return [];
@@ -1312,8 +1306,6 @@ const TeachersSelection = () => {
                       courseName = (courseId.name as any).en || String(courseId.name);
                     }
                   }
-                  const availabilityCount = Array.isArray(teacher.availability) ? teacher.availability.length : 0;
-                  const isHovered = hoveredTeacher === teacher._id;
                   const isSelected = selectedTeacher?._id === teacher._id;
 
                   return (
@@ -1649,52 +1641,6 @@ const TeachersSelection = () => {
                         </div>
                       </div>
                       
-                      {isHovered && availabilityCount > 0 && (
-                        <div
-                          className="availability-popup mt-3 p-3 border rounded"
-                          style={{
-                            backgroundColor: '#f8f9fa',
-                            position: 'absolute',
-                            left: '0',
-                            right: '0',
-                            top: '100%',
-                            zIndex: 10,
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                            marginTop: '8px',
-                          }}
-                          onMouseEnter={() => setHoveredTeacher(teacher._id)}
-                          onMouseLeave={() => setHoveredTeacher(null)}
-                        >
-                          <h6 className="mb-2 fw-semibold">{t('common.available_slots')}:</h6>
-                          <div className="d-flex flex-wrap gap-2">
-                            {teacher.availability.slice(0, 8).map((slot) => (
-                              <button
-                                key={slot._id}
-                                className="btn btn-outline-primary btn-sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleBookTrial(teacher);
-                                }}
-                                style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '6px' }}
-                              >
-                                {formatDate(slot.date)} {formatTime(slot.startTime)}
-                              </button>
-                            ))}
-                            {availabilityCount > 8 && (
-                              <button
-                                className="btn btn-link btn-sm p-0 text-primary"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleViewSchedule(teacher);
-                                }}
-                                style={{ fontSize: '11px', textDecoration: 'none' }}
-                              >
-                                {t('common.view_full_schedule')} →
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      )}
                     </div>
                   );
                 })
