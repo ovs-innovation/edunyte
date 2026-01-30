@@ -101,22 +101,49 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
 
   const getWeekDates = () => {
     const dates: Date[] = [];
-    const startOfWeek = new Date(currentWeek);
-    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+    const startDate = new Date(currentWeek);
+    startDate.setHours(0, 0, 0, 0);
+    
+    // Start from currentWeek and show next 7 days
     for (let i = 0; i < 7; i++) {
-      const date = new Date(startOfWeek);
-      date.setDate(startOfWeek.getDate() + i);
+      const date = new Date(startDate);
+      date.setDate(startDate.getDate() + i);
       dates.push(date);
     }
     return dates;
   };
 
   const getSlotsForDate = (date: Date) => {
-    const dateStr = date.toISOString().split('T')[0];
-    return availabilities.filter((av) => {
-      const avDate = new Date(av.date).toISOString().split('T')[0];
-      return avDate === dateStr;
+    // Normalize both dates to YYYY-MM-DD format for comparison
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
+    
+    const filtered = availabilities.filter((av) => {
+      const avDate = new Date(av.date);
+      const avYear = avDate.getUTCFullYear();
+      const avMonth = String(avDate.getUTCMonth() + 1).padStart(2, '0');
+      const avDay = String(avDate.getUTCDate()).padStart(2, '0');
+      const avDateStr = `${avYear}-${avMonth}-${avDay}`;
+      
+      return avDateStr === dateStr;
     });
+    
+    return filtered;
+  };
+
+  const getTimeIcon = (timeGroup: string) => {
+    switch (timeGroup) {
+      case 'Morning':
+        return '🌅';
+      case 'Afternoon':
+        return '☀️';
+      case 'Evening':
+        return '🌙';
+      default:
+        return '🕐';
+    }
   };
 
   const groupSlotsByTime = (slots: AvailabilitySlot[]) => {
@@ -287,8 +314,20 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
                     onClick={() => {
                       const newWeek = new Date(currentWeek);
                       newWeek.setDate(newWeek.getDate() - 7);
-                      setCurrentWeek(newWeek);
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      // Only allow navigation if new week is not in the past
+                      if (newWeek >= today) {
+                        setCurrentWeek(newWeek);
+                      }
                     }}
+                    disabled={(() => {
+                      const prevWeek = new Date(currentWeek);
+                      prevWeek.setDate(prevWeek.getDate() - 7);
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      return prevWeek < today;
+                    })()}
                   >
                     <i className="fas fa-chevron-left"></i>
                   </button>
@@ -307,7 +346,6 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
               <div className="d-flex gap-2 flex-wrap">
                 {weekDates.map((date, idx) => {
                   const isSelected = date.toDateString() === selectedDate.toDateString();
-                  const slotsCount = getSlotsForDate(date).length;
                   return (
                     <button
                       key={idx}
@@ -328,11 +366,6 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
                     >
                       <div className="small">{formatDate(date).split(' ')[0]}</div>
                       <div className="fw-bold">{date.getDate()}</div>
-                      {slotsCount > 0 && (
-                        <div className="small" style={{ fontSize: '10px' }}>
-                          {slotsCount} {t('common.slots')}
-                        </div>
-                      )}
                     </button>
                   );
                 })}
@@ -362,7 +395,10 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
               <div className="mb-4">
                 {Object.entries(groupedSlots).map(([group, slots]) => (
                   <div key={group} className="mb-3">
-                    <h6 className="fw-semibold mb-2">{group}</h6>
+                    <h6 className="fw-semibold mb-2">
+                      <span style={{ fontSize: '18px', marginRight: '8px' }}>{getTimeIcon(group)}</span>
+                      {group}
+                    </h6>
                     <div className="d-flex flex-wrap gap-2">
                       {slots.map((slot) => {
                         const isSelected = selectedSlot?._id === slot._id;
