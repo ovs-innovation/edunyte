@@ -42,18 +42,12 @@ const sidebar_data: DataType[] = [
             icon: "skillgro-label",
             title: "Wishlist",
          },
-         {
-            id: 5,
-            link: "/student-review",
-            icon: "skillgro-book-2",
-            title: "Reviews",
-         },
-         {
-            id: 6,
-            link: "/student-attempts",
-            icon: "skillgro-question",
-            title: "My Quiz Attempts",
-         },
+         // {
+         //    id: 5,
+         //    link: "/student-review",
+         //    icon: "skillgro-book-2",
+         //    title: "Reviews",
+         // },
          {
             id: 7,
             link: "/student-history",

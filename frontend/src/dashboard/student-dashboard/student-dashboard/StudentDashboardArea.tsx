@@ -74,7 +74,7 @@ const StudentDashboardArea = () => {
 
   return (
     <section className="dashboard__area section-pb-120">
-      <div className="container">
+      <div className="container ">
         <DashboardBannerTwo totalLessons={stats.total} completedLessons={stats.completed} />
         <div className="dashboard__inner-wrap">
           <div className="row">
@@ -194,11 +194,12 @@ const StudentDashboardArea = () => {
               {/* My Lessons Section */}
               <div className="card shadow-sm border-0">
                 <div className="card-body p-4">
-                  <div className="d-flex justify-content-between align-items-center mb-4">
+                  <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
                     <h5 className="fw-bold mb-0">My Lessons</h5>
                     <button
                       className="btn btn-outline-primary btn-sm"
                       onClick={() => navigate('/courses')}
+                      style={{ whiteSpace: 'nowrap' }}
                     >
                       <i className="flaticon-add me-1"></i>
                       Schedule New Lesson

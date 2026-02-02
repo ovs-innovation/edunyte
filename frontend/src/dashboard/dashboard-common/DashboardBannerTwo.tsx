@@ -27,7 +27,14 @@ const DashboardBannerTwo = ({ totalLessons = 0, completedLessons = 0 }: Dashboar
 
   return (
     <div className="dashboard__top-wrap">
-      <div className="dashboard__top-bg"></div>
+      <div 
+        className="dashboard__top-bg"
+        style={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      ></div>
       <div className="dashboard__instructor-info">
         <div className="dashboard__instructor-info-left">
           <div className="thumb">
