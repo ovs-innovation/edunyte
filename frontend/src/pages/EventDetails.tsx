@@ -5,7 +5,7 @@ import SEO from '../components/SEO';
 const EventDetails = () => {
    return (
       <Wrapper>
-         <SEO pageTitle={'SkillGro Event Details'} />
+         <SEO pageTitle={'Edunyte Event Details'} />
          <EventDetailsMain />
       </Wrapper>
    );

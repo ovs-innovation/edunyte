@@ -5,7 +5,7 @@ import SEO from '../components/SEO';
 const InstructorSetting = () => {
    return (
       <Wrapper>
-         <SEO pageTitle={'SkillGro Instructor Setting'} />
+         <SEO pageTitle={'Edunyte Instructor Setting'} />
          <InstructorSettingMain />
       </Wrapper>
    );

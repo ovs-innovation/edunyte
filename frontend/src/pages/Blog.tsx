@@ -5,7 +5,7 @@ import SEO from '../components/SEO';
 const Blog = () => {
    return (
       <Wrapper>
-         <SEO pageTitle={'SkillGro Blog'} />
+         <SEO pageTitle={'Edunyte Blog'} />
          <BlogMain />
       </Wrapper>
    );

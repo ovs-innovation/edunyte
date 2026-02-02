@@ -5,7 +5,7 @@ import SEO from '../components/SEO';
 const HomeFive = () => {
   return (
     <Wrapper>
-      <SEO pageTitle={'SkillGro Home Five'} />
+      <SEO pageTitle={'Edunyte Home Five'} />
       <HomeFiveMain />
     </Wrapper>
   );

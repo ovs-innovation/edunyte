@@ -5,7 +5,7 @@ import SEO from '../components/SEO';
 const CheckOut = () => {
    return (
       <Wrapper>
-         <SEO pageTitle={'SkillGro CheckOut'} />
+         <SEO pageTitle={'Edunyte CheckOut'} />
          <CheckOutMain />
       </Wrapper>
    );

@@ -5,7 +5,7 @@ import SEO from '../components/SEO';
 const Contact = () => {
    return (
       <Wrapper>
-         <SEO pageTitle={'SkillGro Contact'} />
+         <SEO pageTitle={'Edunyte Contact'} />
          <ContactMain />
       </Wrapper>
    );

@@ -8,7 +8,7 @@ const Testimonial = () => {
           <div className="col-xl-5">
             <div className="section__title text-center mb-50">
               <span className="sub-title">Our Testimonials</span>
-              <h2 className="title">What Students Think and Say About SkillGrow</h2>
+              <h2 className="title">What Students Think and Say About Edunyte</h2>
             </div>
           </div>
         </div>

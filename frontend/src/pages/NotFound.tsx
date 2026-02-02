@@ -5,7 +5,7 @@ import SEO from '../components/SEO';
 const NotFound = () => {
    return (
       <Wrapper>
-         <SEO pageTitle={'SkillGro NotFound'} />
+         <SEO pageTitle={'Edunyte NotFound'} />
          <NotFoundMain />
       </Wrapper>
    );

@@ -5,7 +5,7 @@ import SEO from '../components/SEO';
 const StudentReview = () => {
    return (
       <Wrapper>
-         <SEO pageTitle={'SkillGro Student Review'} />
+         <SEO pageTitle={'Edunyte Student Review'} />
          <StudentReviewMain />
       </Wrapper>
    );
