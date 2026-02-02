@@ -164,30 +164,7 @@ export interface ApiTeacherProfile {
   updatedAt?: string;
 }
 
-export interface ApiStudentProfile {
-  _id: string;
-  userId: ApiUser | string;
-  enrolledCourses: Array<{
-    courseId: string;
-    enrolledAt: string;
-    progress: number;
-    completed: boolean;
-  }>;
-  progress: {
-    totalCourses: number;
-    completedCourses: number;
-    inProgressCourses: number;
-    totalHoursSpent: number;
-  };
-  certificates: Array<{
-    courseId: string;
-    certificateId: string;
-    issuedAt: string;
-    certificateUrl: string;
-  }>;
-  createdAt?: string;
-  updatedAt?: string;
-}
+
 
 export const TeacherProfileAPI = {
   getMyProfile: () => apiFetch<{ profile: ApiTeacherProfile }>("/teacher-profiles/me"),
@@ -233,42 +210,65 @@ export const TeacherProfileAPI = {
     }),
 };
 
+export interface ApiStudentProfile {
+  _id: string;
+  userId: ApiUser | string;
+  photo?: string;
+  phone?: string;
+  country?: string;
+  state?: string;
+  city?: string;
+  timezone?: string;
+  socialLinks?: {
+    facebook?: string;
+    twitter?: string;
+    linkedin?: string;
+    website?: string;
+    github?: string;
+  };
+  progress: {
+    totalCourses: number;
+    totalHoursSpent: number;
+    totalLessonsBooked: number;
+    totalLessonsCompleted: number;
+  };
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export const StudentProfileAPI = {
   getMyProfile: () => apiFetch<{ profile: ApiStudentProfile }>("/student-profiles/me"),
   getProfile: (userId: string) => apiFetch<{ profile: ApiStudentProfile }>(`/student-profiles/${userId}`),
   list: () => apiFetch<{ profiles: ApiStudentProfile[]; count: number }>("/student-profiles"),
   update: (userId: string, payload: {
-    progress?: Partial<ApiStudentProfile["progress"]>;
+    photo?: string;
+    phone?: string;
+    country?: string;
+    state?: string;
+    city?: string;
+    timezone?: string;
+    socialLinks?: Partial<ApiStudentProfile["socialLinks"]>;
   }) =>
     apiFetch<{ profile: ApiStudentProfile }>(`/student-profiles/${userId}`, {
       method: "PATCH",
       body: JSON.stringify(payload),
     }),
   updateMyProfile: (payload: {
-    progress?: Partial<ApiStudentProfile["progress"]>;
+    photo?: string;
+    phone?: string;
+    country?: string;
+    state?: string;
+    city?: string;
+    timezone?: string;
+    socialLinks?: Partial<ApiStudentProfile["socialLinks"]>;
   }) =>
     apiFetch<{ profile: ApiStudentProfile }>("/student-profiles/me", {
       method: "PATCH",
       body: JSON.stringify(payload),
     }),
-  enrollCourse: (courseId: string) =>
-    apiFetch<{ profile: ApiStudentProfile }>("/student-profiles/me/enroll", {
-      method: "POST",
-      body: JSON.stringify({ courseId }),
-    }),
-  updateCourseProgress: (courseId: string, progress?: number, completed?: boolean) =>
-    apiFetch<{ profile: ApiStudentProfile }>("/student-profiles/me/progress", {
-      method: "PATCH",
-      body: JSON.stringify({ courseId, progress, completed }),
-    }),
-  addCertificate: (userId: string, payload: {
-    courseId: string;
-    certificateId: string;
-    certificateUrl?: string;
-  }) =>
-    apiFetch<{ profile: ApiStudentProfile }>(`/student-profiles/${userId}/certificates`, {
-      method: "POST",
-      body: JSON.stringify(payload),
+  recalculateProgress: (userId: string) =>
+    apiFetch<{ profile: ApiStudentProfile; progress: any }>((`/student-profiles/${userId}/recalculate-progress`), {
+      method: "POST"
     }),
 };
 

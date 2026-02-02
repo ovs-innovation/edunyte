@@ -8,6 +8,7 @@ const studentProfileSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    // Contact & Location Info
     photo: {
       type: String,
       default: "",
@@ -16,87 +17,60 @@ const studentProfileSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    country: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    state: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    city: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     timezone: {
       type: String,
       trim: true,
       default: "UTC",
     },
-    enrolledCourses: [
-      {
-        courseId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Course",
-        },
-        enrolledAt: {
-          type: Date,
-          default: Date.now,
-        },
-        progress: {
-          type: Number,
-          default: 0,
-          min: 0,
-          max: 100,
-        },
-        completed: {
-          type: Boolean,
-          default: false,
-        },
-        lastAccessed: {
-          type: Date,
-          default: Date.now,
-        },
+    // Social Links
+    socialLinks: {
+      facebook: {
+        type: String,
+        default: "",
       },
-    ],
-    wishlist: [
-      {
-        courseId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Course",
-        },
-        addedAt: {
-          type: Date,
-          default: Date.now,
-        },
+      twitter: {
+        type: String,
+        default: "",
       },
-    ],
+      linkedin: {
+        type: String,
+        default: "",
+      },
+      website: {
+        type: String,
+        default: "",
+      },
+      github: {
+        type: String,
+        default: "",
+      },
+    },
+    // Learning Progress (calculated from bookings)
     progress: {
-      totalCourses: { type: Number, default: 0 },
-      completedCourses: { type: Number, default: 0 },
-      inProgressCourses: { type: Number, default: 0 },
+      totalCourses: { type: Number, default: 0 }, // Unique courses booked
       totalHoursSpent: { type: Number, default: 0 },
+      totalLessonsBooked: { type: Number, default: 0 },
       totalLessonsCompleted: { type: Number, default: 0 },
     },
-    certificates: [
-      {
-        courseId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Course",
-        },
-        certificateId: { type: String, required: true },
-        issuedAt: { type: Date, default: Date.now },
-        certificateUrl: { type: String, default: "" },
-        courseName: { type: String, default: "" },
-      },
-    ],
-    notes: [
-      {
-        courseId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Course",
-        },
-        lessonId: {
-          type: mongoose.Schema.Types.ObjectId,
-        },
-        content: { type: String, required: true },
-        timestamp: { type: Number, default: 0 },
-        createdAt: { type: Date, default: Date.now },
-      },
-    ],
   },
   { timestamps: true }
 );
 
 studentProfileSchema.index({ userId: 1 });
-studentProfileSchema.index({ "enrolledCourses.courseId": 1 });
 
 export default mongoose.model("StudentProfile", studentProfileSchema);

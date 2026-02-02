@@ -24,12 +24,12 @@ const sidebar_data: DataType[] = [
             icon: "fas fa-home",
             title: "Dashboard",
          },
-         {
-            id: 2,
-            link: "/student-profile",
-            icon: "skillgro-avatar",
-            title: "My Profile",
-         },
+         // {
+         //    id: 2,
+         //    link: "/student-profile",
+         //    icon: "skillgro-avatar",
+         //    title: "My Profile",
+         // },
          {
             id: 3,
             link: "/student-enrolled-courses",
