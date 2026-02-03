@@ -1,114 +1,213 @@
 "use client";
-import { Link } from "react-router-dom";
+import React, { useState, useMemo, useEffect } from "react";
+import Select from "react-select";
+import { Country, State, City } from "country-state-city";
+import { useAuth } from "../../../contexts/AuthContext";
+import { toast } from "react-toastify";
 
 const InstructorSettingProfile = ({ style }: any) => {
-   return (
-      <>
-         {style ? (
-            <div
-               className="instructor__cover-bg"
-               style={{ backgroundImage: `url(/assets/img/bg/student_bg.jpg)` }}
-            >
-               <div className="instructor__cover-info">
-                  <div className="instructor__cover-info-left">
-                     <div className="thumb">
-                        <img src="/assets/img/courses/details_instructors01.jpg" alt="img" />
-                     </div>
-                     <button title="Upload Photo">
-                        <i className="fas fa-camera"></i>
-                     </button>
-                  </div>
-                  <div className="instructor__cover-info-right">
-                     <Link to="#" className="btn btn-two arrow-btn">
-                        Edit Cover Photo
-                     </Link>
-                  </div>
-               </div>
-            </div>
-         ) : (
-            <div
-               className="instructor__cover-bg"
-               style={{ backgroundImage: `url(/assets/img/bg/instructor_dashboard_bg.jpg)` }}
-            >
-               <div className="instructor__cover-info">
-                  <div className="instructor__cover-info-left">
-                     <div className="thumb">
-                        <img src="/assets/img/courses/details_instructors02.jpg" alt="img" />
-                     </div>
-                     <button title="Upload Photo">
-                        <i className="fas fa-camera"></i>
-                     </button>
-                  </div>
-                  <div className="instructor__cover-info-right">
-                     <Link to="#" className="btn btn-two arrow-btn">
-                        Edit Cover Photo
-                     </Link>
-                  </div>
-               </div>
-            </div>
-         )}
+   const { user, token } = useAuth();
+   const [name, setName] = useState("");
+   const [phone, setPhone] = useState("");
+   const [selectedCountry, setSelectedCountry] = useState<any>(null);
+   const [selectedState, setSelectedState] = useState<any>(null);
+   const [selectedCity, setSelectedCity] = useState<any>(null);
+   const [selectedTimezone, setSelectedTimezone] = useState<any>(null);
 
-         <div className="instructor__profile-form-wrap">
-            <form onSubmit={(e) => e.preventDefault()} className="instructor__profile-form">
-               <div className="row">
-                  <div className="col-md-6">
-                     <div className="form-grp">
-                        <label htmlFor="firstname">First Name</label>
-                        <input id="firstname" type="text" defaultValue="John" />
-                     </div>
-                  </div>
-                  <div className="col-md-6">
-                     <div className="form-grp">
-                        <label htmlFor="lastname">Last Name</label>
-                        <input id="lastname" type="text" defaultValue="Due" />
-                     </div>
-                  </div>
-                  <div className="col-md-6">
-                     <div className="form-grp">
-                        <label htmlFor="username">User Name</label>
-                        <input id="username" type="text" defaultValue="johndue" />
-                     </div>
-                  </div>
-                  <div className="col-md-6">
-                     <div className="form-grp">
-                        <label htmlFor="phonenumber">Phone Number</label>
-                        <input id="phonenumber" type="tel" defaultValue="+1-202-555-0174" />
-                     </div>
-                  </div>
-                  <div className="col-md-6">
-                     <div className="form-grp">
-                        <label htmlFor="skill">Skill/Occupation</label>
-                        <input id="skill" type="text" defaultValue="Full Stack Developer" />
-                     </div>
-                  </div>
-                  <div className="col-md-6">
-                     <div className="form-grp select-grp">
-                        <label htmlFor="displayname">Display Name Publicly As</label>
-                        <select id="displayname" name="displayname">
-                           <option value="Emily Hannah">Emily Hannah</option>
-                           <option value="John">John</option>
-                           <option value="Due">Due</option>
-                           <option value="Due John">Due John</option>
-                           <option value="johndue">johndue</option>
-                        </select>
-                     </div>
+   const countries = useMemo(() => Country.getAllCountries().map(c => ({ label: c.name, value: c.isoCode })), []);
+   const states = useMemo(() => {
+       if (!selectedCountry) return [];
+       return State.getStatesOfCountry(selectedCountry.value).map(s => ({ label: s.name, value: s.isoCode }));
+   }, [selectedCountry]);
+   const cities = useMemo(() => {
+       if (!selectedState || !selectedCountry) return [];
+       return City.getCitiesOfState(selectedCountry.value, selectedState.value).map(c => ({ label: c.name, value: c.name }));
+   }, [selectedState, selectedCountry]);
+   
+   const timezones = useMemo(() => (Intl as any).supportedValuesOf('timeZone').map((tz: string) => ({ label: tz, value: tz })), []);
+
+   useEffect(() => {
+      const fetchProfile = async () => {
+         try {
+            const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+            const response = await fetch(`${API_URL}/student-profiles/me`, {
+               headers: {
+                  'Authorization': `Bearer ${token}`
+               }
+            });
+            const data = await response.json();
+            
+            if (data.profile) {
+               const profile = data.profile;
+               
+               // Set User Data
+               setName(profile.userId?.name || user?.name || "");
+               setPhone(profile.phone || "");
+               
+               // Set Location Data
+               if (profile.country) {
+                  const foundCountry = Country.getAllCountries().find(c => c.name === profile.country);
+                  if (foundCountry) {
+                     const countryOption = { label: foundCountry.name, value: foundCountry.isoCode };
+                     setSelectedCountry(countryOption);
+                     
+                     if (profile.state) {
+                        const foundState = State.getStatesOfCountry(foundCountry.isoCode).find(s => s.name === profile.state);
+                        if (foundState) {
+                           const stateOption = { label: foundState.name, value: foundState.isoCode };
+                           setSelectedState(stateOption);
+                           
+                           if (profile.city) {
+                              // City value is name in our options
+                              setSelectedCity({ label: profile.city, value: profile.city });
+                           }
+                        }
+                     }
+                  }
+               }
+               
+               if (profile.timezone) {
+                  setSelectedTimezone({ label: profile.timezone, value: profile.timezone });
+               }
+            }
+         } catch (error) {
+            console.error("Failed to fetch profile:", error);
+         }
+      };
+
+      if (user?.id && token) {
+         fetchProfile();
+      } else if (user?.name) {
+         setName(user.name);
+      }
+   }, [user, token]);
+
+   const handleUpdate = async () => {
+      try {
+         const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+         const payload = {
+            phone,
+            country: selectedCountry?.label,
+            state: selectedState?.label,
+            city: selectedCity?.label,
+            timezone: selectedTimezone?.value
+         };
+
+         const response = await fetch(`${API_URL}/student-profiles/me`, {
+            method: 'PATCH',
+            headers: {
+               'Content-Type': 'application/json',
+               'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+         });
+
+         if (response.ok) {
+            toast.success("Profile updated successfully");
+         } else {
+            const error = await response.json();
+            toast.error(error.message || "Failed to update profile");
+         }
+      } catch (error) {
+         console.error(error);
+         toast.error("An error occurred while updating profile");
+      }
+   };
+
+   return (
+      <div className="instructor__profile-form-wrap">
+         <form onSubmit={(e) => { e.preventDefault(); handleUpdate(); }} className="instructor__profile-form">
+            <div className="row">
+               <div className="col-md-6">
+                  <div className="form-grp">
+                     <label htmlFor="name">Full Name</label>
+                     <input 
+                        id="name" 
+                        type="text" 
+                        placeholder="Full Name" 
+                        readOnly 
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                     />
                   </div>
                </div>
-               <div className="form-grp">
-                  <label htmlFor="bio">Bio</label>
-                  <textarea
-                     id="bio"
-                     defaultValue="I'm the Front-End Developer for #ThemeGenix in New York, OR. I am passionate about UI effects, animations, and creating intuitive, dynamic user experiences."
-                  />
+               <div className="col-md-6">
+                  <div className="form-grp">
+                     <label htmlFor="phonenumber">Phone Number</label>
+                     <input 
+                        id="phonenumber" 
+                        type="tel" 
+                        placeholder="Phone Number" 
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                     />
+                  </div>
                </div>
-               <div className="submit-btn mt-25">
-                  <button type="submit" className="btn">
-                     Update Info
-                  </button>
+               <div className="col-md-6">
+                  <div className="form-grp">
+                     <label>Country</label>
+                     <Select
+                        options={countries}
+                        value={selectedCountry}
+                        onChange={(option) => {
+                           setSelectedCountry(option);
+                           setSelectedState(null);
+                           setSelectedCity(null);
+                        }}
+                        classNamePrefix="react-select"
+                        placeholder="Select Country"
+                     />
+                  </div>
                </div>
-            </form>
-         </div>
-      </>
+               <div className="col-md-6">
+                  <div className="form-grp">
+                     <label>State</label>
+                     <Select
+                        options={states}
+                        value={selectedState}
+                        onChange={(option) => {
+                           setSelectedState(option);
+                           setSelectedCity(null);
+                        }}
+                        isDisabled={!selectedCountry}
+                        classNamePrefix="react-select"
+                        placeholder="Select State"
+                     />
+                  </div>
+               </div>
+               <div className="col-md-6">
+                  <div className="form-grp">
+                     <label>City</label>
+                     <Select
+                        options={cities}
+                        value={selectedCity}
+                        onChange={setSelectedCity}
+                        isDisabled={!selectedState}
+                        classNamePrefix="react-select"
+                        placeholder="Select City"
+                     />
+                  </div>
+               </div>
+               <div className="col-md-6">
+                  <div className="form-grp">
+                     <label>Timezone</label>
+                     <Select
+                        options={timezones}
+                        value={selectedTimezone}
+                        onChange={setSelectedTimezone}
+                        classNamePrefix="react-select"
+                        placeholder="Select Timezone"
+                     />
+                  </div>
+               </div>
+            </div>
+            <div className="submit-btn mt-25">
+               <button type="submit" className="btn">
+                  Update Info
+               </button>
+            </div>
+         </form>
+      </div>
    );
 };
 

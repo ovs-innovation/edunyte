@@ -1,19 +1,19 @@
 import DashboardBreadcrumb from '../../../components/common/breadcrumb/DashboardBreadcrumb'
 import FooterOne from '../../../layouts/footers/FooterOne'
 import HeaderOne from '../../../layouts/headers/HeaderOne'
-import StudentEnrolledCoursesArea from './StudentEnrolledCoursesArea'
+import MyLessionsArea from './MyLessionsArea'
 
-const StudentEnrolledCourses = () => {
+const MyLessons = () => {
    return (
       <>
          <HeaderOne />
          <main className="main-area fix">
             <DashboardBreadcrumb />
-            <StudentEnrolledCoursesArea />
+            <MyLessionsArea />
          </main>
          <FooterOne />
       </>
    )
 }
 
-export default StudentEnrolledCourses
+export default MyLessons

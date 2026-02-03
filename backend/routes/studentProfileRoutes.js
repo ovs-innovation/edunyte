@@ -1,5 +1,7 @@
 import express from "express";
 import {
+  getMyProfile,
+  updateMyProfile,
   getStudentProfile,
   listStudentProfiles,
   updateStudentProfile,
@@ -11,6 +13,8 @@ import { requirePermission } from "../middlewares/permissionMiddleware.js";
 
 const router = express.Router();
 
+router.get("/me", verifyToken, getMyProfile);
+router.patch("/me", verifyToken, updateMyProfile);
 router.get("/:userId", verifyToken, requirePermission("students.view"), getStudentProfile);
 router.get("/", verifyToken, requirePermission("students.view"), listStudentProfiles);
 router.patch("/:userId", verifyToken, requirePermission("students.edit"), updateStudentProfile);

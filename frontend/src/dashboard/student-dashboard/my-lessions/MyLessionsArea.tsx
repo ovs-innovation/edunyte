@@ -1,6 +1,6 @@
 import DashboardBannerTwo from "../../dashboard-common/DashboardBannerTwo"
 import DashboardSidebarTwo from "../../dashboard-common/DashboardSidebarTwo"
-import InstructorEnrolledCourseContent from "../../instructor-dashboard/instructor-enrolled-courses/InstructorEnrolledCourseContent"
+import InstructorEnrolledLessionContent from "../../instructor-dashboard/instructor-enrolled-courses/InstructorEnrolledLessionContent"
 
 const StudentEnrolledCoursesArea = () => {
    return (
@@ -10,7 +10,7 @@ const StudentEnrolledCoursesArea = () => {
             <div className="dashboard__inner-wrap">
                <div className="row">
                   <DashboardSidebarTwo />
-                  <InstructorEnrolledCourseContent />
+                  <InstructorEnrolledLessionContent />
                </div>
             </div>
          </div>

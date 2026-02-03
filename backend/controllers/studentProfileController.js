@@ -2,6 +2,18 @@ import StudentProfile from "../models/studentProfileModel.js";
 import User from "../models/userModel.js";
 import Booking from "../models/bookingModel.js";
 
+// wrapper to get own profile
+export const getMyProfile = async (req, res, next) => {
+  req.params.userId = req.user.id;
+  return getStudentProfile(req, res, next);
+};
+
+// wrapper to update own profile
+export const updateMyProfile = async (req, res, next) => {
+  req.params.userId = req.user.id;
+  return updateStudentProfile(req, res, next);
+};
+
 export const getStudentProfile = async (req, res, next) => {
   try {
     const { userId } = req.params;

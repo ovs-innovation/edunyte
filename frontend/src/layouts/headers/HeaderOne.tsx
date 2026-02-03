@@ -123,7 +123,7 @@ const HeaderOne = () => {
                                        {isAuthenticated ? (
                                           <div className="user-menu" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                              <Link 
-                                                to="/student-dashboard" 
+                                                to="/my-dashboard" 
                                                 className="user-avatar" 
                                                 style={{ 
                                                    display: 'flex', 
@@ -168,7 +168,7 @@ const HeaderOne = () => {
                               <div className="mobile-login-btn">
                                  {isAuthenticated ? (
                                     <Link 
-                                       to="/student-dashboard"
+                                       to="/my-dashboard"
                                        style={{ 
                                           display: 'flex', 
                                           alignItems: 'center', 

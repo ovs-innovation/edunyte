@@ -20,25 +20,25 @@ const sidebar_data: DataType[] = [
       sidebar_details: [
          {
             id: 1,
-            link: "/student-dashboard",
+            link: "/my-dashboard",
             icon: "fas fa-home",
             title: "Dashboard",
          },
          // {
          //    id: 2,
-         //    link: "/student-profile",
+         //    link: "/my-profile",
          //    icon: "skillgro-avatar",
          //    title: "My Profile",
          // },
-         {
-            id: 3,
-            link: "/student-enrolled-courses",
-            icon: "skillgro-book",
-            title: "Enrolled Courses",
-         },
+         // {
+         //    id: 3,
+         //    link: "/my-lessions",
+         //    icon: "skillgro-book",
+         //    title: "My Lessions",
+         // },
          {
             id: 4,
-            link: "/student-wishlist",
+            link: "/my-wishlist",
             icon: "skillgro-label",
             title: "Wishlist",
          },
@@ -50,7 +50,7 @@ const sidebar_data: DataType[] = [
          // },
          {
             id: 7,
-            link: "/student-history",
+            link: "/my-history",
             icon: "skillgro-satchel",
             title: "Order History",
          },
@@ -63,9 +63,9 @@ const sidebar_data: DataType[] = [
       sidebar_details: [
          {
             id: 1,
-            link: "/student-setting",
+            link: "/my-profile-setting",
             icon: "skillgro-settings",
-            title: "Settings",
+            title: "Profile Settings",
          },
          {
             id: 2,
