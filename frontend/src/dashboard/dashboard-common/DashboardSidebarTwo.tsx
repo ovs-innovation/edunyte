@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface DataType {
    id: number;
@@ -10,13 +11,14 @@ interface DataType {
       link: string;
       icon: string;
       title: string;
+      action?: string;
    }[];
 };
 
 const sidebar_data: DataType[] = [
    {
       id: 1,
-      title: "Welcome, Emily Hannah",
+      title: "Welcome, User",
       sidebar_details: [
          {
             id: 1,
@@ -69,15 +71,22 @@ const sidebar_data: DataType[] = [
          },
          {
             id: 2,
-            link: "/",
+            link: "#",
             icon: "skillgro-logout",
             title: "Logout",
+            action: "logout"
          },
       ],
    },
 ];
 
 const DashboardSidebarTwo = () => {
+   const { user, logout } = useAuth();
+
+   const handleLogout = (e: React.MouseEvent) => {
+      e.preventDefault();
+      logout();
+   };
 
    return (
       <div className="col-lg-3">
@@ -85,16 +94,25 @@ const DashboardSidebarTwo = () => {
             {sidebar_data.map((item) => (
                <React.Fragment key={item.id}>
                   <div className={`dashboard__sidebar-title mb-20 ${item.class_name}`}>
-                     <h6 className="title">{item.title}</h6>
+                     <h6 className="title">
+                        {item.id === 1 ? `Welcome, ${user?.name || 'Student'}` : item.title}
+                     </h6>
                   </div>
                   <nav className="dashboard__sidebar-menu">
                      <ul className="list-wrap">
                         {item.sidebar_details.map((list) => (
                            <li key={list.id}>
-                              <Link to={list.link}>
-                                 <i className={list.icon}></i>
-                                 {list.title}
-                              </Link>
+                              {list.action === 'logout' ? (
+                                 <Link to={list.link} onClick={handleLogout}>
+                                    <i className={list.icon}></i>
+                                    {list.title}
+                                 </Link>
+                              ) : (
+                                 <Link to={list.link}>
+                                    <i className={list.icon}></i>
+                                    {list.title}
+                                 </Link>
+                              )}
                            </li>
                         ))}
                      </ul>

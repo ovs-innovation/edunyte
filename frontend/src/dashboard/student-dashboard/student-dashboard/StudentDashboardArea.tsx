@@ -4,6 +4,11 @@ import { useAuth } from '../../../contexts/AuthContext'
 import { getMyBookings, Booking } from '../../../services/bookingService'
 import DashboardBannerTwo from '../../dashboard-common/DashboardBannerTwo'
 import DashboardSidebarTwo from '../../dashboard-common/DashboardSidebarTwo'
+import { Calendar, momentLocalizer } from 'react-big-calendar'
+import moment from 'moment'
+import 'react-big-calendar/lib/css/react-big-calendar.css'
+
+const localizer = momentLocalizer(moment)
 
 const StudentDashboardArea = () => {
   const navigate = useNavigate()
@@ -12,6 +17,7 @@ const StudentDashboardArea = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'upcoming' | 'completed'>('upcoming')
+  const [view, setView] = useState<'list' | 'calendar'>('list')
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -69,6 +75,14 @@ const StudentDashboardArea = () => {
       time: date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
     }
   }
+
+  const calendarEvents = bookings.map(b => ({
+    id: b._id,
+    title: `${getCourseName(b)} with ${getTeacherName(b)}`,
+    start: new Date(b.lesson.scheduledAt),
+    end: new Date(new Date(b.lesson.scheduledAt).getTime() + (b.duration * 60 * 1000)),
+    resource: b
+  }))
 
   const nextLesson = upcomingBookings[0]
 
@@ -196,216 +210,247 @@ const StudentDashboardArea = () => {
                 <div className="card-body p-4">
                   <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
                     <h5 className="fw-bold mb-0">My Lessons</h5>
-                    <button
-                      className="btn btn-outline-primary btn-sm"
-                      onClick={() => navigate('/courses')}
-                      style={{ whiteSpace: 'nowrap' }}
-                    >
-                      <i className="flaticon-add me-1"></i>
-                      Schedule New Lesson
-                    </button>
+                    <div className="d-flex align-items-center gap-4">
+                       <div 
+                         className={`d-flex align-items-center gap-2 cursor-pointer ${view === 'list' ? 'text-primary' : 'text-muted'}`} 
+                         onClick={() => setView('list')}
+                         style={{ cursor: 'pointer', borderBottom: view === 'list' ? '2px solid var(--tg-theme-primary)' : 'none', paddingBottom: '4px' }}
+                       >
+                          <i className="flaticon-list"></i>
+                          <span className="fw-medium">List</span>
+                       </div>
+                       <div 
+                         className={`d-flex align-items-center gap-2 cursor-pointer ${view === 'calendar' ? 'text-primary' : 'text-muted'}`} 
+                         onClick={() => setView('calendar')}
+                         style={{ cursor: 'pointer', borderBottom: view === 'calendar' ? '2px solid var(--tg-theme-primary)' : 'none', paddingBottom: '4px' }}
+                       >
+                          <i className="flaticon-calendar"></i>
+                          <span className="fw-medium">Calendar</span>
+                       </div>
+                    </div>
                   </div>
 
-                  {/* Tabs */}
-                  <ul className="nav nav-tabs mb-4">
-                    <li className="nav-item">
-                      <button
-                        className={`nav-link ${activeTab === 'upcoming' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('upcoming')}
-                      >
-                        Upcoming ({stats.upcoming})
-                      </button>
-                    </li>
-                    <li className="nav-item">
-                      <button
-                        className={`nav-link ${activeTab === 'completed' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('completed')}
-                      >
-                        Completed ({stats.completed})
-                      </button>
-                    </li>
-                  </ul>
-
-                  {/* Loading State */}
-                  {loading && (
-                    <div className="text-center py-5">
-                      <div className="spinner-border text-primary" role="status">
-                        <span className="visually-hidden">Loading...</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Error State */}
-                  {error && (
-                    <div className="alert alert-danger">
-                      {error}
-                    </div>
-                  )}
-
-                  {/* Lessons List */}
-                  {!loading && !error && (
-                    <div className="lessons-list">
-                      {activeTab === 'upcoming' && upcomingBookings.length === 0 && (
-                        <div className="text-center py-5">
-                          <i className="flaticon-calendar" style={{ fontSize: '48px', color: '#ddd' }}></i>
-                          <p className="text-muted mt-3">No upcoming lessons</p>
+                  {view === 'list' ? (
+                    <>
+                      {/* Tabs */}
+                      <ul className="nav nav-tabs mb-4">
+                        <li className="nav-item">
                           <button
-                            className="btn btn-primary mt-2"
-                            onClick={() => navigate('/courses')}
+                            className={`nav-link ${activeTab === 'upcoming' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('upcoming')}
                           >
-                            Browse Courses
+                            Upcoming ({stats.upcoming})
                           </button>
-                        </div>
-                      )}
+                        </li>
+                        <li className="nav-item">
+                          <button
+                            className={`nav-link ${activeTab === 'completed' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('completed')}
+                          >
+                            Completed ({stats.completed})
+                          </button>
+                        </li>
+                      </ul>
 
-                      {activeTab === 'completed' && completedBookings.length === 0 && (
+                      {/* Loading State */}
+                      {loading && (
                         <div className="text-center py-5">
-                          <i className="flaticon-book" style={{ fontSize: '48px', color: '#ddd' }}></i>
-                          <p className="text-muted mt-3">No completed lessons yet</p>
+                          <div className="spinner-border text-primary" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                          </div>
                         </div>
                       )}
 
-                      {activeTab === 'upcoming' && upcomingBookings.map((booking) => {
-                        const { time } = formatDateTime(booking.lesson.scheduledAt)
-                        return (
-                          <div key={booking._id} className="card mb-3 border">
-                            <div className="card-body p-3">
-                              <div className="row align-items-center">
-                                <div className="col-md-2 text-center mb-3 mb-md-0">
-                                  <div className="text-primary small fw-semibold">
-                                    {new Date(booking.lesson.scheduledAt).toLocaleDateString('en-US', { month: 'short' }).toUpperCase()}
-                                  </div>
-                                  <div className="fw-bold" style={{ fontSize: '28px' }}>
-                                    {new Date(booking.lesson.scheduledAt).getDate()}
-                                  </div>
-                                  <div className="small text-muted">{time}</div>
-                                </div>
-                                <div className="col-md-6 mb-3 mb-md-0">
-                                  <div className="d-flex gap-3 align-items-center">
-                                    <div className="flex-shrink-0">
-                                      {(booking.teacherId as any)?.profilePicture ? (
-                                        <img
-                                          src={(booking.teacherId as any).profilePicture}
-                                          alt={getTeacherName(booking)}
-                                          className="rounded-circle"
-                                          style={{ width: 50, height: 50, objectFit: 'cover' }}
-                                        />
-                                      ) : (
-                                        <div
-                                          className="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center"
-                                          style={{ width: 50, height: 50 }}
-                                        >
-                                          <span className="text-primary fw-bold">
-                                            {getTeacherName(booking).charAt(0)}
-                                          </span>
-                                        </div>
-                                      )}
-                                    </div>
-                                    <div>
-                                      <h6 className="fw-bold mb-2">{getTeacherName(booking)}</h6>
-                                      <div className="d-flex flex-wrap gap-3 align-items-center">
-                                        <span className="text-muted small d-inline-flex align-items-center">
-                                          <i className="flaticon-book me-1" style={{ fontSize: '14px' }}></i>
-                                          {getCourseName(booking)}
-                                        </span>
-                                        <span className="text-muted small d-inline-flex align-items-center">
-                                          <i className="flaticon-clock me-1" style={{ fontSize: '14px' }}></i>
-                                          {booking.duration} min
-                                        </span>
-                                        {booking.languageId && typeof booking.languageId === 'object' && (
-                                          <span className="text-muted small d-inline-flex align-items-center">
-                                            <i className="flaticon-translate me-1" style={{ fontSize: '14px' }}></i>
-                                            <span>{((booking.languageId as any).name?.en || (booking.languageId as any).name)}</span>
-                                          </span>
-                                        )}
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="col-md-4 text-md-end">
-                                  {booking.meeting?.joinUrlStudent && (
-                                    <a
-                                      href={booking.meeting.joinUrlStudent}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="btn btn-primary btn-sm w-100 w-md-auto"
-                                    >
-                                      <i className="flaticon-video-camera me-1"></i>
-                                      Join
-                                    </a>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        )
-                      })}
+                      {/* Error State */}
+                      {error && (
+                        <div className="alert alert-danger">
+                          {error}
+                        </div>
+                      )}
 
-                      {activeTab === 'completed' && completedBookings.map((booking) => {
-                        const { time } = formatDateTime(booking.lesson.scheduledAt)
-                        return (
-                          <div key={booking._id} className="card mb-3 border">
-                            <div className="card-body p-3">
-                              <div className="row align-items-center">
-                                <div className="col-md-2 text-center mb-3 mb-md-0">
-                                  <div className="text-muted small fw-semibold">
-                                    {new Date(booking.lesson.scheduledAt).toLocaleDateString('en-US', { month: 'short' }).toUpperCase()}
-                                  </div>
-                                  <div className="fw-bold text-muted" style={{ fontSize: '28px' }}>
-                                    {new Date(booking.lesson.scheduledAt).getDate()}
-                                  </div>
-                                  <div className="small text-muted">{time}</div>
-                                </div>
-                                <div className="col-md-7 mb-3 mb-md-0">
-                                  <div className="d-flex gap-3 align-items-center">
-                                    <div className="flex-shrink-0">
-                                      {(booking.teacherId as any)?.profilePicture ? (
-                                        <img
-                                          src={(booking.teacherId as any).profilePicture}
-                                          alt={getTeacherName(booking)}
-                                          className="rounded-circle"
-                                          style={{ width: 50, height: 50, objectFit: 'cover' }}
-                                        />
-                                      ) : (
-                                        <div
-                                          className="rounded-circle bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center"
-                                          style={{ width: 50, height: 50 }}
-                                        >
-                                          <span className="text-secondary fw-bold">
-                                            {getTeacherName(booking).charAt(0)}
-                                          </span>
-                                        </div>
-                                      )}
+                      {/* Lessons List */}
+                      {!loading && !error && (
+                        <div className="lessons-list">
+                          {activeTab === 'upcoming' && upcomingBookings.length === 0 && (
+                            <div className="text-center py-5">
+                              <i className="flaticon-calendar" style={{ fontSize: '48px', color: '#ddd' }}></i>
+                              <p className="text-muted mt-3">No upcoming lessons</p>
+                              <button
+                                className="btn btn-primary mt-2"
+                                onClick={() => navigate('/courses')}
+                              >
+                                Browse Courses
+                              </button>
+                            </div>
+                          )}
+
+                          {activeTab === 'completed' && completedBookings.length === 0 && (
+                            <div className="text-center py-5">
+                              <i className="flaticon-book" style={{ fontSize: '48px', color: '#ddd' }}></i>
+                              <p className="text-muted mt-3">No completed lessons yet</p>
+                            </div>
+                          )}
+
+                          {activeTab === 'upcoming' && upcomingBookings.map((booking) => {
+                            const { time } = formatDateTime(booking.lesson.scheduledAt)
+                            return (
+                              <div key={booking._id} className="card mb-3 border">
+                                <div className="card-body p-3">
+                                  <div className="row align-items-center">
+                                    <div className="col-md-2 text-center mb-3 mb-md-0">
+                                      <div className="text-primary small fw-semibold">
+                                        {new Date(booking.lesson.scheduledAt).toLocaleDateString('en-US', { month: 'short' }).toUpperCase()}
+                                      </div>
+                                      <div className="fw-bold" style={{ fontSize: '28px' }}>
+                                        {new Date(booking.lesson.scheduledAt).getDate()}
+                                      </div>
+                                      <div className="small text-muted">{time}</div>
                                     </div>
-                                    <div>
-                                      <h6 className="fw-bold mb-2">{getTeacherName(booking)}</h6>
-                                      <div className="d-flex flex-wrap gap-3 align-items-center">
-                                        <span className="text-muted small d-inline-flex align-items-center">
-                                          <i className="flaticon-book me-1" style={{ fontSize: '14px' }}></i>
-                                          {getCourseName(booking)}
-                                        </span>
-                                        <span className="text-muted small d-inline-flex align-items-center">
-                                          <i className="flaticon-clock me-1" style={{ fontSize: '14px' }}></i>
-                                          {booking.duration} min
-                                        </span>
-                                        {booking.languageId && typeof booking.languageId === 'object' && (
-                                          <span className="text-muted small d-inline-flex align-items-center">
-                                            <i className="flaticon-translate me-1" style={{ fontSize: '14px' }}></i>
-                                            <span>{((booking.languageId as any).name?.en || (booking.languageId as any).name)}</span>
-                                          </span>
-                                        )}
+                                    <div className="col-md-6 mb-3 mb-md-0">
+                                      <div className="d-flex gap-3 align-items-center">
+                                        <div className="flex-shrink-0">
+                                          {(booking.teacherId as any)?.profilePicture ? (
+                                            <img
+                                              src={(booking.teacherId as any).profilePicture}
+                                              alt={getTeacherName(booking)}
+                                              className="rounded-circle"
+                                              style={{ width: 50, height: 50, objectFit: 'cover' }}
+                                            />
+                                          ) : (
+                                            <div
+                                              className="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center"
+                                              style={{ width: 50, height: 50 }}
+                                            >
+                                              <span className="text-primary fw-bold">
+                                                {getTeacherName(booking).charAt(0)}
+                                              </span>
+                                            </div>
+                                          )}
+                                        </div>
+                                        <div>
+                                          <h6 className="fw-bold mb-2">{getTeacherName(booking)}</h6>
+                                          <div className="d-flex flex-wrap gap-3 align-items-center">
+                                            <span className="text-muted small d-inline-flex align-items-center">
+                                              <i className="flaticon-book me-1" style={{ fontSize: '14px' }}></i>
+                                              {getCourseName(booking)}
+                                            </span>
+                                            <span className="text-muted small d-inline-flex align-items-center">
+                                              <i className="flaticon-clock me-1" style={{ fontSize: '14px' }}></i>
+                                              {booking.duration} min
+                                            </span>
+                                            {booking.languageId && typeof booking.languageId === 'object' && (
+                                              <span className="text-muted small d-inline-flex align-items-center">
+                                                <i className="flaticon-translate me-1" style={{ fontSize: '14px' }}></i>
+                                                <span>{((booking.languageId as any).name?.en || (booking.languageId as any).name)}</span>
+                                              </span>
+                                            )}
+                                          </div>
+                                        </div>
                                       </div>
                                     </div>
+                                    <div className="col-md-4 text-md-end">
+                                      {booking.meeting?.joinUrlStudent && (
+                                        <a
+                                          href={booking.meeting.joinUrlStudent}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="btn btn-primary btn-sm w-100 w-md-auto"
+                                        >
+                                          <i className="flaticon-video-camera me-1"></i>
+                                          Join
+                                        </a>
+                                      )}
+                                    </div>
                                   </div>
                                 </div>
-                                <div className="col-md-3 text-md-end">
-                                  <span className="badge bg-secondary">Completed</span>
+                              </div>
+                            )
+                          })}
+
+                          {activeTab === 'completed' && completedBookings.map((booking) => {
+                            const { time } = formatDateTime(booking.lesson.scheduledAt)
+                            return (
+                              <div key={booking._id} className="card mb-3 border">
+                                <div className="card-body p-3">
+                                  <div className="row align-items-center">
+                                    <div className="col-md-2 text-center mb-3 mb-md-0">
+                                      <div className="text-muted small fw-semibold">
+                                        {new Date(booking.lesson.scheduledAt).toLocaleDateString('en-US', { month: 'short' }).toUpperCase()}
+                                      </div>
+                                      <div className="fw-bold text-muted" style={{ fontSize: '28px' }}>
+                                        {new Date(booking.lesson.scheduledAt).getDate()}
+                                      </div>
+                                      <div className="small text-muted">{time}</div>
+                                    </div>
+                                    <div className="col-md-7 mb-3 mb-md-0">
+                                      <div className="d-flex gap-3 align-items-center">
+                                        <div className="flex-shrink-0">
+                                          {(booking.teacherId as any)?.profilePicture ? (
+                                            <img
+                                              src={(booking.teacherId as any).profilePicture}
+                                              alt={getTeacherName(booking)}
+                                              className="rounded-circle"
+                                              style={{ width: 50, height: 50, objectFit: 'cover' }}
+                                            />
+                                          ) : (
+                                            <div
+                                              className="rounded-circle bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center"
+                                              style={{ width: 50, height: 50 }}
+                                            >
+                                              <span className="text-secondary fw-bold">
+                                                {getTeacherName(booking).charAt(0)}
+                                              </span>
+                                            </div>
+                                          )}
+                                        </div>
+                                        <div>
+                                          <h6 className="fw-bold mb-2">{getTeacherName(booking)}</h6>
+                                          <div className="d-flex flex-wrap gap-3 align-items-center">
+                                            <span className="text-muted small d-inline-flex align-items-center">
+                                              <i className="flaticon-book me-1" style={{ fontSize: '14px' }}></i>
+                                              {getCourseName(booking)}
+                                            </span>
+                                            <span className="text-muted small d-inline-flex align-items-center">
+                                              <i className="flaticon-clock me-1" style={{ fontSize: '14px' }}></i>
+                                              {booking.duration} min
+                                            </span>
+                                            {booking.languageId && typeof booking.languageId === 'object' && (
+                                              <span className="text-muted small d-inline-flex align-items-center">
+                                                <i className="flaticon-translate me-1" style={{ fontSize: '14px' }}></i>
+                                                <span>{((booking.languageId as any).name?.en || (booking.languageId as any).name)}</span>
+                                              </span>
+                                            )}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div className="col-md-3 text-md-end">
+                                      <span className="badge bg-secondary">Completed</span>
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          </div>
-                        )
-                      })}
+                            )
+                          })}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div style={{ height: 600 }}>
+                       <Calendar
+                          localizer={localizer}
+                          events={calendarEvents}
+                          startAccessor="start"
+                          endAccessor="end"
+                          style={{ height: '100%' }}
+                          defaultView="month"
+                          views={['month', 'week', 'day', 'agenda']}
+                          eventPropGetter={(event) => ({
+                              style: {
+                                 backgroundColor: event.resource.status === 'completed' ? '#6c757d' : 'var(--tg-theme-primary)',
+                              }
+                          })}
+                       />
                     </div>
                   )}
                 </div>
@@ -417,5 +462,4 @@ const StudentDashboardArea = () => {
     </section>
   )
 }
-
 export default StudentDashboardArea
