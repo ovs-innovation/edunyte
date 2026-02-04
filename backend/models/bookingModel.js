@@ -63,28 +63,51 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    // Pricing
-    price: {
-      type: Number,
-      required: true,
-      min: 0,
+    // Lesson details (timezone-safe; `scheduledAt` stored as UTC Date)
+    lesson: {
+      duration: { type: Number, required: true },
+      scheduledAt: { type: Date, required: true, index: true },
+      timezone: { type: String, required: true },
     },
-    currency: {
-      type: String,
-      default: "INR",
-      uppercase: true,
+
+    /**
+     * Pricing snapshot (security + refund safe)
+     *
+     * WHY:
+     * - Never trust client prices.
+     * - Refunds must use stored snapshot (NOT live FX).
+     */
+    pricingSnapshot: {
+      baseAmountUSD: { type: Number, required: true, min: 0 },
+      platformFeeUSD: { type: Number, required: true, min: 0 },
+      studentPaid: {
+        amount: { type: Number, required: true, min: 0 },
+        currency: { type: String, required: true, uppercase: true, trim: true },
+      },
+      exchangeRatesUsed: { type: mongoose.Schema.Types.Mixed, default: {} },
+      chargedAt: { type: Date, required: true },
     },
-    // Payment status
-    paymentStatus: {
-      type: String,
-      enum: ["pending", "paid", "failed", "refunded"],
-      default: "pending",
-      index: true,
+
+    payout: {
+      teacherAmountUSD: { type: Number, required: true, min: 0 },
+      teacherCurrency: { type: String, required: true, uppercase: true, trim: true },
+      status: { type: String, enum: ["pending", "paid", "failed"], default: "pending", index: true },
     },
-    paymentId: {
-      type: String,
-      default: "",
+
+    payment: {
+      stripePaymentIntentId: { type: String, required: true, index: true },
+      status: { type: String, enum: ["pending", "paid", "failed", "refunded"], default: "paid", index: true },
     },
+
+    meeting: {
+      provider: { type: String, enum: ["zoom"], default: "zoom" },
+      meetingId: { type: String, default: "" },
+      joinUrlStudent: { type: String, default: "" },
+      joinUrlTeacher: { type: String, default: "" },
+    },
+    // Legacy fields retained for older codepaths (read-only; should not be set anymore)
+    paymentStatus: { type: String, enum: ["pending", "paid", "failed", "refunded"], default: "paid", index: true },
+    paymentId: { type: String, default: "" },
     // Booking status
     status: {
       type: String,
@@ -141,7 +164,8 @@ const bookingSchema = new mongoose.Schema(
 bookingSchema.index({ studentId: 1, status: 1, sessionDate: 1 });
 bookingSchema.index({ teacherId: 1, status: 1, sessionDate: 1 });
 bookingSchema.index({ sessionDate: 1, status: 1 });
-bookingSchema.index({ paymentStatus: 1 });
+// Idempotency: one booking per Stripe PaymentIntent
+bookingSchema.index({ "payment.stripePaymentIntentId": 1 }, { unique: true, sparse: true });
 
 export default mongoose.model("Booking", bookingSchema);
 

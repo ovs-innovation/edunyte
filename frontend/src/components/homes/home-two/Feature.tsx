@@ -13,7 +13,7 @@ const Feature = ({ style }: FeatureProps) => {
                <div className="col-xl-6 col-lg-8">
                   <div className="section__title text-center mb-40">
                      <span className="sub-title">Our Top Features</span>
-                     <h2 className="title">Achieve Your Goal With SkillGrow</h2>
+                     <h2 className="title">Achieve Your Goal With Edunyte</h2>
                      <p>when an unknown printer took a galley of type and scrambled make <br /> specimen book has survived not only five centuries</p>
                   </div>
                </div>

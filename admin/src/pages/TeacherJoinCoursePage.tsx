@@ -101,12 +101,10 @@ const TeacherJoinCoursePage = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [coursesData, languagesData] = await Promise.all([
+      const [coursesData] = await Promise.all([
         TeacherCourseJoinAPI.getAvailableCourses(),
-        TeacherCourseJoinAPI.getLanguages(),
       ]);
       setCourses(coursesData.courses || []);
-      setLanguages(languagesData.languages || []);
     } catch (err: any) {
       toast({ title: 'Failed to load data', description: err?.message, variant: 'destructive' });
     } finally {
@@ -158,46 +156,22 @@ const TeacherJoinCoursePage = () => {
 
     setSubmitting(true);
     try {
-      // Map language codes to language IDs from API
-      const languageIds = formData.languages.map(l => l.code)
-        .map((code) => {
-          // Try to match by code first (case-insensitive)
-          let apiLang = languages.find((l) => l.code?.toLowerCase() === code.toLowerCase());
-          // If no match by code, try to match by name
-          if (!apiLang) {
-            const libLang = libraryLanguages.find((l) => l.code === code);
-            if (libLang) {
-              apiLang = languages.find((l) => {
-                const apiLangName = getLanguageValue(l.name)?.toLowerCase();
-                const apiLangNativeName = getLanguageValue(l.nativeName)?.toLowerCase();
-                const libLangName = getLanguageValue(libLang.name)?.toLowerCase();
-                const libLangNativeName = getLanguageValue(libLang.nativeName)?.toLowerCase();
-                return (
-                  (apiLangName && apiLangName === libLangName) ||
-                  (apiLangNativeName && apiLangNativeName === libLangNativeName)
-                );
-              });
-            }
-          }
-          return apiLang?._id;
-        })
-        .filter((id): id is string => !!id);
-
-      if (languageIds.length === 0) {
-        toast({
-          title: 'Invalid languages',
-          description: 'Please select valid languages',
-          variant: 'destructive',
-        });
-        setSubmitting(false);
-        return;
-      }
+      const languageCodes = formData.languages.map((l) => l.code).filter(Boolean);
 
       const result = await TeacherCourseJoinAPI.joinCourse({
         courseId: formData.courseId,
-        languageIds: languageIds,
-        price: parseFloat(formData.price),
-        currency: formData.currency,
+        languageCodes,
+        languages: formData.languages.map((l) => {
+          const lib = libraryLanguages.find((x) => x.code === l.code);
+          return {
+            ...l,
+            name: lib?.name,
+            nativeName: lib?.nativeName,
+          };
+        }),
+        // Teacher pricing input (server converts once and stores USD base)
+        teacherPrice: parseFloat(formData.price),
+        teacherCurrency: formData.currency,
         introductionVideo: formData.introductionVideo,
         experience: formData.experience,
         bio: formData.bio,

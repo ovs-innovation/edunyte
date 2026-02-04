@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { fetchCourses, type Course } from "../../../services/courseService";
 import { fetchCategories, type Category } from "../../../services/categoryService";
+import { useWishlist } from "../../../contexts/WishlistContext";
 
 const setting = {
   slidesPerView: 4,
@@ -52,6 +53,7 @@ const CourseArea = ({ style }: CourseProps) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const { toggleWishlist, isInWishlist } = useWishlist();
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -161,6 +163,17 @@ const CourseArea = ({ style }: CourseProps) => {
                             <Link to={`/courses?category=${selectedCategory || ''}`}>{item.category || t('common.categories')}</Link>
                           </li>
                           <li className="avg-rating"><i className="fas fa-star"></i> (5.0 {t('common.reviews')})</li>
+                          <li style={{marginLeft: 'auto'}}>
+                            <button
+                               onClick={(e) => {
+                                  e.preventDefault();
+                                  toggleWishlist(item._id);
+                               }}
+                               style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: 0 }}
+                            >
+                               <i className={isInWishlist(item._id) ? "fas fa-heart" : "far fa-heart"} style={{ color: isInWishlist(item._id) ? "#e91e63" : "#666", fontSize: '18px' }}></i>
+                            </button>
+                          </li>
                         </ul>
                         <h5 className="title"><Link to={`/course/${item.slug || item._id}`}>{item.name}</Link></h5>
                         {item.description && <p className="info">{item.description}</p>}

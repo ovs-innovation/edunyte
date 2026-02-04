@@ -25,6 +25,7 @@ const availabilitySchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+    // Legacy local-time fields (kept for backward compatibility)
     startTime: {
       type: String,
       required: true,
@@ -35,42 +36,44 @@ const availabilitySchema = new mongoose.Schema(
       required: true,
       // Format: "HH:mm" in teacher's timezone
     },
+    // UTC absolute instants – source of truth for all time calculations
+    startTimeUTC: {
+      type: Date,
+      default: null,
+      index: true,
+    },
+    endTimeUTC: {
+      type: Date,
+      default: null,
+      index: true,
+    },
     duration: {
       type: Number,
       required: true,
       // Duration in minutes (e.g., 25, 50, 60)
       enum: [15, 25, 30, 45, 50, 60, 90, 120],
     },
-    // Calculated price for this session slot
-    price: {
-      type: Number,
-      required: true,
-      min: 0,
-      // Price includes: (teacher price per hour * duration) + platform margin + meeting platform cost
-    },
-    currency: {
-      type: String,
-      required: true,
-      default: "INR",
-      uppercase: true,
-    },
-    // Breakdown of price calculation (for transparency)
-    priceBreakdown: {
-      teacherPrice: {
+    /**
+     * Pricing snapshot for this slot (USD base only)
+     *
+     * WHY:
+     * - Availability must be stable even if teacher updates their pricing later.
+     * - Checkout must be server-calculated from a USD base amount.
+     *
+     * NOTE:
+     * - We intentionally DO NOT store student currency / converted amounts here.
+     * - We also intentionally do NOT store a `price`/`currency` pair to avoid ambiguity.
+     */
+    pricing: {
+      baseAmountUSD: {
         type: Number,
-        // Teacher's price per hour * (duration / 60)
+        required: true,
+        min: 0,
       },
-      platformMargin: {
-        type: Number,
-        // Platform margin amount
-      },
-      platformMarginPercent: {
-        type: Number,
-        // Platform margin percentage (e.g., 20 for 20%)
-      },
-      meetingPlatformCost: {
-        type: Number,
-        // Meeting platform cost per session (Zoom, Google Meet, WebRTC, etc.)
+      baseCurrency: {
+        type: String,
+        default: "USD",
+        uppercase: true,
       },
     },
     timezone: {
@@ -80,9 +83,22 @@ const availabilitySchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["available", "booked", "blocked", "cancelled"],
+      // `held` is a temporary lock during checkout (Preply-style).
+      enum: ["available", "held", "booked", "blocked", "cancelled"],
       default: "available",
       index: true,
+    },
+    /**
+     * Temporary checkout lock (slot reservation)
+     *
+     * WHY:
+     * - Prevent double booking while student is paying.
+     * - Webhook can validate payment is for the same held slot + student.
+     */
+    hold: {
+      byStudentId: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null, index: true },
+      until: { type: Date, default: null, index: true },
+      stripePaymentIntentId: { type: String, default: "", index: true },
     },
     // If booked, reference to booking
     bookingId: {
@@ -114,6 +130,7 @@ availabilitySchema.index({ teacherId: 1, date: 1, status: 1 });
 availabilitySchema.index({ courseId: 1, date: 1 });
 availabilitySchema.index({ teacherId: 1, courseId: 1, date: 1 });
 availabilitySchema.index({ date: 1, status: 1 });
+availabilitySchema.index({ teacherId: 1, courseId: 1, startTimeUTC: 1 });
 availabilitySchema.index({ bookingId: 1 });
 
 export default mongoose.model("Availability", availabilitySchema);

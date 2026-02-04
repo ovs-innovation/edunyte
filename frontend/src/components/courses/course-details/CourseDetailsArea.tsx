@@ -1,6 +1,6 @@
 import TeachersSelection from "./TeachersSelection"
 
-const CourseDetailsArea = ({ single_course }: any) => {
+const CourseDetailsArea = () => {
   return (
     <section className="courses__details-area">
       <TeachersSelection />

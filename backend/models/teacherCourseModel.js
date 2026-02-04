@@ -28,33 +28,73 @@ const teacherCourseSchema = new mongoose.Schema(
       required: true,
       default: [],
     },
-    price: {
+    languageProficiencies: {
+      type: [
+        {
+          languageId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Language",
+            required: true,
+          },
+          code: {
+            type: String,
+            required: true,
+            uppercase: true,
+            trim: true,
+          },
+          proficiency: {
+            type: String,
+            enum: ["native", "c2", "c1", "b2", "b1", "a2", "a1"],
+            default: "native",
+            required: true,
+          },
+        },
+      ],
+      default: [],
+    },
+    /**
+     * Pricing (industry-standard single source of truth)
+     *
+     * - Teacher enters (teacherPrice, teacherCurrency)
+     * - We fetch rate from Redis once and compute USD base once:
+     *   basePriceUSD = teacherPrice / exchangeRateAtCreation
+     *
+     * We store BOTH:
+     * - USD base (for consistent checkout, refunds, reporting)
+     * - Teacher input + FX snapshot (for payouts/auditability)
+     *
+     * IMPORTANT:
+     * - We NEVER store student-converted prices in DB.
+     * - We do NOT keep legacy fields: price, currency, originalPrice.
+     */
+    pricing: {
+      basePriceUSD: {
+        type: Number,
+        required: true,
+        min: 0,
+      },
+      baseCurrency: {
+        type: String,
+        default: "USD",
+        uppercase: true,
+      },
+      teacherPrice: {
       type: Number,
       required: true,
       min: 0,
     },
-    // Currency of the stored price in DB (always base currency: USD)
-    currency: {
+      teacherCurrency: {
       type: String,
-      default: "USD",
+        required: true,
       uppercase: true,
-    },
-    // Base currency metadata (explicit for clarity / migrations)
-    baseCurrency: {
-      type: String,
-      default: "USD",
-      uppercase: true,
-    },
-    // Teacher's submitted currency + amount (for display/auditing only)
-    teacherCurrency: {
-      type: String,
-      default: "USD",
-      uppercase: true,
-    },
-    originalPrice: {
-      type: Number,
-      min: 0,
-      default: 0,
+        trim: true,
+      },
+      // Snapshot: units of teacherCurrency per 1 USD at the time teacher set the price.
+      exchangeRateAtCreation: {
+        type: Number,
+        required: true,
+        min: 0,
+      },
     },
     experience: {
       type: mongoose.Schema.Types.Mixed,

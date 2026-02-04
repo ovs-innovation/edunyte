@@ -3,11 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { fetchCourseTeachers, type TeacherCourse } from '../../../services/courseService';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useWishlist } from '../../../contexts/WishlistContext';
 
 const TeachersList = () => {
   const { slug } = useParams<{ slug: string }>();
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
+  const { toggleWishlist, isInWishlist } = useWishlist();
   const navigate = useNavigate();
   const [teachers, setTeachers] = useState<TeacherCourse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -269,8 +271,30 @@ const TeachersList = () => {
               <div className="col-lg-4">
                 <div className="teacher-pricing text-lg-end">
                   <div className="mb-4">
+                    <div className="d-flex align-items-center justify-content-end">
                     <div className="h3 mb-0 fw-bold text-primary">
-                      {formatPrice(teacher.price, teacher.currency)}
+                      {formatPrice(
+                        typeof teacher.price === 'number'
+                          ? teacher.price
+                          : typeof teacher?.pricing?.basePriceUSD === 'number'
+                            ? teacher.pricing.basePriceUSD
+                            : 0,
+                        typeof teacher.currency === 'string' ? teacher.currency : 'USD'
+                      )}
+                    </div>
+                    <button 
+                         className="btn p-0 border-0 bg-transparent"
+                         onClick={(e) => {
+                           e.stopPropagation();
+                           e.preventDefault();
+                           toggleWishlist(typeof teacher.teacherId === 'object' ? teacher.teacherId._id : '');
+                         }}
+                         style={{ cursor: 'pointer', marginLeft: '10px' }}
+                    >
+                        <i className={`${isInWishlist(typeof teacher.teacherId === 'object' ? teacher.teacherId._id : '') ? 'fas' : 'far'} fa-heart`} 
+                           style={{ fontSize: '24px', color: isInWishlist(typeof teacher.teacherId === 'object' ? teacher.teacherId._id : '') ? '#e91e63' : '#ccc' }}>
+                        </i>
+                    </button>
                     </div>
                     <small className="text-muted">{t('common.per_lesson')}</small>
                   </div>

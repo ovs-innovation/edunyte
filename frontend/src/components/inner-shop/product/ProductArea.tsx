@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import ReactPaginate from "react-paginate";
 import { useDispatch } from "react-redux";
 import { Rating } from 'react-simple-star-rating';

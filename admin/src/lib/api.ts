@@ -164,30 +164,7 @@ export interface ApiTeacherProfile {
   updatedAt?: string;
 }
 
-export interface ApiStudentProfile {
-  _id: string;
-  userId: ApiUser | string;
-  enrolledCourses: Array<{
-    courseId: string;
-    enrolledAt: string;
-    progress: number;
-    completed: boolean;
-  }>;
-  progress: {
-    totalCourses: number;
-    completedCourses: number;
-    inProgressCourses: number;
-    totalHoursSpent: number;
-  };
-  certificates: Array<{
-    courseId: string;
-    certificateId: string;
-    issuedAt: string;
-    certificateUrl: string;
-  }>;
-  createdAt?: string;
-  updatedAt?: string;
-}
+
 
 export const TeacherProfileAPI = {
   getMyProfile: () => apiFetch<{ profile: ApiTeacherProfile }>("/teacher-profiles/me"),
@@ -233,42 +210,65 @@ export const TeacherProfileAPI = {
     }),
 };
 
+export interface ApiStudentProfile {
+  _id: string;
+  userId: ApiUser | string;
+  photo?: string;
+  phone?: string;
+  country?: string;
+  state?: string;
+  city?: string;
+  timezone?: string;
+  socialLinks?: {
+    facebook?: string;
+    twitter?: string;
+    linkedin?: string;
+    website?: string;
+    github?: string;
+  };
+  progress: {
+    totalCourses: number;
+    totalHoursSpent: number;
+    totalLessonsBooked: number;
+    totalLessonsCompleted: number;
+  };
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export const StudentProfileAPI = {
   getMyProfile: () => apiFetch<{ profile: ApiStudentProfile }>("/student-profiles/me"),
   getProfile: (userId: string) => apiFetch<{ profile: ApiStudentProfile }>(`/student-profiles/${userId}`),
   list: () => apiFetch<{ profiles: ApiStudentProfile[]; count: number }>("/student-profiles"),
   update: (userId: string, payload: {
-    progress?: Partial<ApiStudentProfile["progress"]>;
+    photo?: string;
+    phone?: string;
+    country?: string;
+    state?: string;
+    city?: string;
+    timezone?: string;
+    socialLinks?: Partial<ApiStudentProfile["socialLinks"]>;
   }) =>
     apiFetch<{ profile: ApiStudentProfile }>(`/student-profiles/${userId}`, {
       method: "PATCH",
       body: JSON.stringify(payload),
     }),
   updateMyProfile: (payload: {
-    progress?: Partial<ApiStudentProfile["progress"]>;
+    photo?: string;
+    phone?: string;
+    country?: string;
+    state?: string;
+    city?: string;
+    timezone?: string;
+    socialLinks?: Partial<ApiStudentProfile["socialLinks"]>;
   }) =>
     apiFetch<{ profile: ApiStudentProfile }>("/student-profiles/me", {
       method: "PATCH",
       body: JSON.stringify(payload),
     }),
-  enrollCourse: (courseId: string) =>
-    apiFetch<{ profile: ApiStudentProfile }>("/student-profiles/me/enroll", {
-      method: "POST",
-      body: JSON.stringify({ courseId }),
-    }),
-  updateCourseProgress: (courseId: string, progress?: number, completed?: boolean) =>
-    apiFetch<{ profile: ApiStudentProfile }>("/student-profiles/me/progress", {
-      method: "PATCH",
-      body: JSON.stringify({ courseId, progress, completed }),
-    }),
-  addCertificate: (userId: string, payload: {
-    courseId: string;
-    certificateId: string;
-    certificateUrl?: string;
-  }) =>
-    apiFetch<{ profile: ApiStudentProfile }>(`/student-profiles/${userId}/certificates`, {
-      method: "POST",
-      body: JSON.stringify(payload),
+  recalculateProgress: (userId: string) =>
+    apiFetch<{ profile: ApiStudentProfile; progress: any }>((`/student-profiles/${userId}/recalculate-progress`), {
+      method: "POST"
     }),
 };
 
@@ -430,11 +430,18 @@ export interface ApiTeacherCourse {
   teacherId: ApiUser | string;
   courseId: ApiCourse | string;
   languageIds: ApiLanguage[] | string[];
-  price: number;
-  currency: string;
-  baseCurrency?: string;
-  teacherCurrency?: string;
-  originalPrice?: number;
+  languageProficiencies?: Array<{
+    languageId: string | ApiLanguage;
+    code: string;
+    proficiency: "native" | "c2" | "c1" | "b2" | "b1" | "a2" | "a1";
+  }>;
+  pricing: {
+    basePriceUSD: number;
+    baseCurrency: "USD";
+    teacherPrice: number;
+    teacherCurrency: string;
+    exchangeRateAtCreation: number;
+  };
   timezone: string;
   experience: string;
   bio: string;
@@ -484,9 +491,16 @@ export const TeacherCourseJoinAPI = {
   getLanguages: () => apiFetch<{ languages: ApiLanguage[]; count: number }>("/teacher/languages"),
   joinCourse: (payload: {
     courseId: string;
-    languageIds: string[];
-    price: number;
-    currency?: string;
+    languageIds?: string[];
+    languageCodes?: string[];
+    languages?: Array<{
+      code: string;
+      proficiency: "native" | "c2" | "c1" | "b2" | "b1" | "a2" | "a1";
+      name?: any;
+      nativeName?: any;
+    }>;
+    teacherPrice: number;
+    teacherCurrency: string;
     timezone?: string;
     introductionVideo?: string;
     experience?: string;
@@ -503,8 +517,15 @@ export const TeacherCourseJoinAPI = {
   },
   updateCourse: (id: string, payload: {
     languageIds?: string[];
-    price?: number;
-    currency?: string;
+    languageCodes?: string[];
+    languages?: Array<{
+      code: string;
+      proficiency: "native" | "c2" | "c1" | "b2" | "b1" | "a2" | "a1";
+      name?: any;
+      nativeName?: any;
+    }>;
+    teacherPrice?: number;
+    teacherCurrency?: string;
     timezone?: string;
     introductionVideo?: string;
     experience?: string;
@@ -543,15 +564,9 @@ export interface ApiAvailability {
   startTime: string;
   endTime: string;
   duration: number;
-  price: number;
-  currency: string;
-  priceBreakdown?: {
-    teacherPrice: number;
-    platformMargin: number;
-    platformMarginPercent: number;
-    meetingPlatformCost: number;
-    meetingPlatformCostPerMinute?: number;
-    meetingPlatformBaseCost?: number;
+  pricing: {
+    baseAmountUSD: number;
+    baseCurrency: "USD";
   };
   timezone: string;
   status: "available" | "booked" | "blocked" | "cancelled";
@@ -641,15 +656,29 @@ export interface ApiBooking {
   endTime: string;
   duration: number;
   timezone: string;
-  price: number;
-  currency: string;
+  pricingSnapshot: {
+    baseAmountUSD: number;
+    baseCurrency: "USD";
+    studentPaid: { amount: number; currency: string };
+    teacherPayout: { amount: number; currency: string };
+    exchangeRates: Record<string, number>;
+    timestamp: string;
+  };
   paymentStatus: "pending" | "paid" | "failed" | "refunded";
   paymentId?: string;
   status: "scheduled" | "completed" | "cancelled" | "no_show";
+  // Legacy fields (for backward compatibility)
   meetingType: "zoom" | "google_meet" | "teams" | "custom";
   meetingUrl: string;
   meetingId: string;
   meetingPassword: string;
+  // New meeting object with dynamic Zoom links
+  meeting?: {
+    provider: "zoom";
+    meetingId: string;
+    joinUrlStudent: string;
+    joinUrlTeacher: string;
+  };
   cancelledBy?: ApiUser | string;
   cancelledAt?: string;
   cancellationReason?: string;

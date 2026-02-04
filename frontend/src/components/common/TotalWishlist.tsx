@@ -1,12 +1,11 @@
-import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
+import { useWishlist } from "../../contexts/WishlistContext";
 
 const TotalWishlist = () => {
-   const productItem = useSelector((state: RootState) => state.wishlist.wishlist);
+   const { itemCount } = useWishlist();
 
    return (
       <>
-         <span className="wishlist-count">{productItem.length}</span>
+         <span className="wishlist-count">{itemCount}</span>
       </>
    );
 }

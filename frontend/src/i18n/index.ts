@@ -35,7 +35,10 @@ const getInitialLanguage = (): string => {
 
 export const LANGUAGE_STORAGE_KEY = STORAGE_KEY
 
-const resources: Record<string, { translation: typeof en }> = {
+// NOTE:
+// We intentionally do NOT type all translations as `typeof en` because not all locale files
+// contain a complete keyset. i18next supports partial dictionaries and will fallback.
+const resources: Record<string, { translation: Record<string, any> }> = {
   en: { translation: en },
   hi: { translation: hi },
   es: { translation: es },
@@ -78,7 +81,7 @@ i18n.on('languageChanged', (lng) => {
   }
 })
 
-export const addLanguageResource = async (langCode: string, translations: typeof en) => {
+export const addLanguageResource = async (langCode: string, translations: Record<string, any>) => {
   i18n.addResourceBundle(langCode, 'translation', translations, true, true)
 }
 

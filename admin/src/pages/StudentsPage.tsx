@@ -23,20 +23,20 @@ const StudentsPage = () => {
       // Fetch user details for each student
       const studentsWithUsers = await Promise.all(
         (data.profiles || []).map(async (profile) => {
-          const userId = typeof profile.userId === 'string' ? profile.userId : profile.userId._id || profile.userId.id;
+          const userId = typeof profile.userId === 'string' ? profile.userId : (profile.userId as any)._id || profile.userId.id;
           try {
             const userData = await UsersAPI.list();
             const user = userData.users.find((u) => u.id === userId);
             return {
               ...profile,
-              userId: user || profile.userId,
+              userId: (user || profile.userId) as ApiUser,
             };
           } catch {
-            return { ...profile, userId: profile.userId };
+            return { ...profile, userId: profile.userId as ApiUser };
           }
         })
       );
-      setStudents(studentsWithUsers);
+      setStudents(studentsWithUsers as Array<ApiStudentProfile & { userId: ApiUser }>);
     } catch (err: any) {
       toast({ title: 'Failed to load students', description: err?.message, variant: 'destructive' });
     } finally {

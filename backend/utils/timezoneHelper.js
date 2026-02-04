@@ -1,3 +1,5 @@
+import { DateTime } from "luxon";
+
 /**
  * Timezone Helper Utilities
  * Converts times between different timezones
@@ -17,40 +19,27 @@ export const convertTimeBetweenTimezones = (date, time, fromTimezone, toTimezone
   }
 
   try {
-    const dateStr = date instanceof Date ? date.toISOString().split('T')[0] : new Date(date).toISOString().split('T')[0];
-    const [hours, minutes] = time.split(':');
-    
-    const dateTimeStr = `${dateStr}T${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}:00`;
-    const tempDate = new Date(dateTimeStr);
-    
-    const fromDateStr = tempDate.toLocaleString('en-US', {
-      timeZone: fromTimezone,
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-    });
+    const baseDate = date instanceof Date ? date : new Date(date);
+    const [hours, minutes] = time.split(":").map((v) => parseInt(v, 10) || 0);
 
-    const fromDate = new Date(fromDateStr.replace(/(\d+)\/(\d+)\/(\d+), (\d+):(\d+):(\d+)/, '$3-$1-$2T$4:$5:$6'));
+    // Treat year/month/day as wall-clock date in fromTimezone
+    const fromDateTime = DateTime.fromObject(
+      {
+        year: baseDate.getFullYear(),
+        month: baseDate.getMonth() + 1,
+        day: baseDate.getDate(),
+        hour: hours,
+        minute: minutes,
+        second: 0,
+        millisecond: 0,
+      },
+      { zone: fromTimezone }
+    );
 
-    const toTimeStr = fromDate.toLocaleString('en-US', {
-      timeZone: toTimezone,
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
-
-    const timeMatch = toTimeStr.match(/(\d{1,2}):(\d{2})/);
-    if (timeMatch) {
-      return `${timeMatch[1].padStart(2, '0')}:${timeMatch[2]}`;
-    }
-    
-    return time;
+    const toDateTime = fromDateTime.setZone(toTimezone);
+    return toDateTime.toFormat("HH:mm");
   } catch (err) {
-    console.error('Timezone conversion error:', err);
+    console.error("Timezone conversion error:", err);
     return time;
   }
 };
@@ -71,5 +60,38 @@ export const getTimezoneOffset = (timezone) => {
   } catch (err) {
     return 'UTC';
   }
+};
+
+/**
+ * Combine a calendar date + local time + source timezone into a UTC Date.
+ * This is the single source of truth for how we derive absolute instants.
+ */
+export const toUTCDate = (date, time, timezone) => {
+  const baseDate = date instanceof Date ? date : new Date(date);
+  const [hours, minutes] = (time || "00:00").split(":").map((v) => parseInt(v, 10) || 0);
+
+  const dt = DateTime.fromObject(
+    {
+      year: baseDate.getFullYear(),
+      month: baseDate.getMonth() + 1,
+      day: baseDate.getDate(),
+      hour: hours,
+      minute: minutes,
+      second: 0,
+      millisecond: 0,
+    },
+    { zone: timezone || "UTC" }
+  ).toUTC();
+
+  return dt.toJSDate();
+};
+
+/**
+ * Convert a UTC Date into a local time string ("HH:mm") in the target timezone.
+ */
+export const utcDateToLocalTime = (utcDate, timezone) => {
+  if (!utcDate) return "";
+  const dt = DateTime.fromJSDate(utcDate, { zone: "utc" }).setZone(timezone || "UTC");
+  return dt.toFormat("HH:mm");
 };
 

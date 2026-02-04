@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../../../contexts/AuthContext';
 import type { TeacherCourse } from '../../../services/courseService';
+import { useCurrency } from '../../../hooks/useCurrency';
 
 interface AvailabilitySlot {
   _id: string;
@@ -9,16 +9,12 @@ interface AvailabilitySlot {
   startTime: string;
   endTime: string;
   duration: number;
-  price: number;
-  currency: string;
+  pricing?: { baseAmountUSD: number; baseCurrency: 'USD' };
+  // Derived convenience fields (USD base) – display only
+  price?: number;
+  currency?: string;
   timezone: string;
   displayTimezone?: string;
-  priceBreakdown?: {
-    teacherPrice: number;
-    platformMargin: number;
-    platformMarginPercent: number;
-    meetingPlatformCost: number;
-  };
 }
 
 interface BookingModalProps {
@@ -31,7 +27,7 @@ interface BookingModalProps {
 
 const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: BookingModalProps) => {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { currency: selectedCurrency, convertAndFormatPrice } = useCurrency();
   const [selectedDuration, setSelectedDuration] = useState<number>(50);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedSlot, setSelectedSlot] = useState<AvailabilitySlot | null>(null);
@@ -59,7 +55,7 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
       endDate.setDate(endDate.getDate() + 30);
       const tz = tzOverride || studentTimezone;
 
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8085/api';
       const response = await fetch(
         `${API_BASE_URL}/public/courses/availability?courseId=${courseId}&teacherId=${teacherId}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&studentTimezone=${encodeURIComponent(tz)}`
       );
@@ -69,7 +65,17 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
       }
       
       const data = await response.json();
-      const filtered = (data.availabilities || []).filter((av: AvailabilitySlot) => av.duration === selectedDuration);
+      const normalized: AvailabilitySlot[] = (data.availabilities || []).map((av: any) => ({
+        ...av,
+        price:
+          typeof av?.price === 'number'
+            ? av.price
+            : typeof av?.pricing?.baseAmountUSD === 'number'
+              ? av.pricing.baseAmountUSD
+              : undefined,
+        currency: typeof av?.currency === 'string' ? av.currency : 'USD',
+      }));
+      const filtered = normalized.filter((av: AvailabilitySlot) => av.duration === selectedDuration);
       setAvailabilities(filtered);
     } catch (err) {
       console.error('Failed to load availability:', err);
@@ -78,13 +84,7 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
     }
   };
 
-  const formatPrice = (price: number, currency: string) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: currency || 'INR',
-      minimumFractionDigits: 0,
-    }).format(price);
-  };
+  void convertAndFormatPrice; // loaded for currency rates; price formatting is handled elsewhere in this modal
 
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
@@ -101,22 +101,49 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
 
   const getWeekDates = () => {
     const dates: Date[] = [];
-    const startOfWeek = new Date(currentWeek);
-    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+    const startDate = new Date(currentWeek);
+    startDate.setHours(0, 0, 0, 0);
+    
+    // Start from currentWeek and show next 7 days
     for (let i = 0; i < 7; i++) {
-      const date = new Date(startOfWeek);
-      date.setDate(startOfWeek.getDate() + i);
+      const date = new Date(startDate);
+      date.setDate(startDate.getDate() + i);
       dates.push(date);
     }
     return dates;
   };
 
   const getSlotsForDate = (date: Date) => {
-    const dateStr = date.toISOString().split('T')[0];
-    return availabilities.filter((av) => {
-      const avDate = new Date(av.date).toISOString().split('T')[0];
-      return avDate === dateStr;
+    // Normalize both dates to YYYY-MM-DD format for comparison
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
+    
+    const filtered = availabilities.filter((av) => {
+      const avDate = new Date(av.date);
+      const avYear = avDate.getUTCFullYear();
+      const avMonth = String(avDate.getUTCMonth() + 1).padStart(2, '0');
+      const avDay = String(avDate.getUTCDate()).padStart(2, '0');
+      const avDateStr = `${avYear}-${avMonth}-${avDay}`;
+      
+      return avDateStr === dateStr;
     });
+    
+    return filtered;
+  };
+
+  const getTimeIcon = (timeGroup: string) => {
+    switch (timeGroup) {
+      case 'Morning':
+        return '🌅';
+      case 'Afternoon':
+        return '☀️';
+      case 'Evening':
+        return '🌙';
+      default:
+        return '🕐';
+    }
   };
 
   const groupSlotsByTime = (slots: AvailabilitySlot[]) => {
@@ -134,17 +161,43 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
 
   const handleConfirm = () => {
     if (!selectedSlot) return;
+    
+    // Extract teacher information
+    const teacherObj = typeof teacher.teacherId === 'object' ? teacher.teacherId : null;
+    const teacherId = teacherObj?._id || '';
+    const teacherName = teacherObj?.name || '';
+    
+    // Get course information from teacher object if available
+    const courseObj = typeof teacher.courseId === 'object' ? teacher.courseId : null;
+    // Safely handle both string and object types for name/description
+    const courseName = typeof courseObj?.name === 'object' 
+      ? (courseObj.name as any)?.en || '' 
+      : courseObj?.name || '';
+    const courseDescription = typeof courseObj?.description === 'object'
+      ? (courseObj.description as any)?.en || ''
+      : courseObj?.description || '';
+    
     onConfirm({
       availabilityId: selectedSlot._id,
       teacherCourseId: teacher._id,
+      teacherId,
       courseId,
       duration: selectedDuration,
       date: selectedSlot.date,
       startTime: selectedSlot.startTime,
       endTime: selectedSlot.endTime,
-      price: selectedSlot.price,
-      currency: selectedSlot.currency,
+      selectedCurrency,
       timezone: studentTimezone,
+      // Additional info for checkout page display
+      teacherName,
+      teacherPhoto: teacher.teacherProfile?.photo || '',
+      teacherRating: teacher.teacherProfile?.rating || 0,
+      teacherReviews: teacher.teacherProfile?.totalReviews || 0,
+      teacherStudents: teacher.teacherProfile?.totalStudents || 0,
+      teacherLessons: (teacher.teacherProfile as any)?.totalLessons || 0,
+      teacherYearsTeaching: (teacher.teacherProfile as any)?.yearsTeaching || 0,
+      courseName,
+      courseDescription,
     });
   };
 
@@ -261,8 +314,20 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
                     onClick={() => {
                       const newWeek = new Date(currentWeek);
                       newWeek.setDate(newWeek.getDate() - 7);
-                      setCurrentWeek(newWeek);
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      // Only allow navigation if new week is not in the past
+                      if (newWeek >= today) {
+                        setCurrentWeek(newWeek);
+                      }
                     }}
+                    disabled={(() => {
+                      const prevWeek = new Date(currentWeek);
+                      prevWeek.setDate(prevWeek.getDate() - 7);
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      return prevWeek < today;
+                    })()}
                   >
                     <i className="fas fa-chevron-left"></i>
                   </button>
@@ -302,11 +367,9 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
                     >
                       <div className="small">{formatDate(date).split(' ')[0]}</div>
                       <div className="fw-bold">{date.getDate()}</div>
-                      {slotsCount > 0 && (
-                        <div className="small" style={{ fontSize: '10px' }}>
-                          {slotsCount} {t('common.slots')}
-                        </div>
-                      )}
+                      <div className="small" style={{ fontSize: '10px', marginTop: '2px' }}>
+                        {slotsCount} {slotsCount === 1 ? 'slot' : 'slots'}
+                      </div>
                     </button>
                   );
                 })}
@@ -336,7 +399,10 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
               <div className="mb-4">
                 {Object.entries(groupedSlots).map(([group, slots]) => (
                   <div key={group} className="mb-3">
-                    <h6 className="fw-semibold mb-2">{group}</h6>
+                    <h6 className="fw-semibold mb-2">
+                      <span style={{ fontSize: '18px', marginRight: '8px' }}>{getTimeIcon(group)}</span>
+                      {group}
+                    </h6>
                     <div className="d-flex flex-wrap gap-2">
                       {slots.map((slot) => {
                         const isSelected = selectedSlot?._id === slot._id;

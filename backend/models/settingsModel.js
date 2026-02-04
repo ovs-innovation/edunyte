@@ -12,6 +12,14 @@ const settingsSchema = new mongoose.Schema(
     ipWhitelist: { type: Boolean, default: false },
     themeColor: { type: String, default: "#1a73e8" },
     compactMode: { type: Boolean, default: false },
+    /**
+     * Platform fee percentage for bookings.
+     *
+     * WHY:
+     * - Must be configurable (not hardcoded).
+     * - Used by server-side pricing calculation (USD first), then converted for student currency.
+     */
+    platformFeePercent: { type: Number, default: 4, min: 0, max: 100 },
   },
   { timestamps: true }
 );

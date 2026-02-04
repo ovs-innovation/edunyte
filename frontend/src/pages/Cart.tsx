@@ -5,7 +5,7 @@ import SEO from '../components/SEO';
 const Cart = () => {
    return (
       <Wrapper>
-         <SEO pageTitle={'SkillGro Cart'} />
+         <SEO pageTitle={'Edunyte Cart'} />
          <CartMain />
       </Wrapper>
    );

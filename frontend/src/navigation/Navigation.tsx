@@ -41,12 +41,13 @@ import InstructorSetting from '../pages/InstructorSetting';
 import InstructorAttempt from '../pages/InstructorAttempt';
 import StudentDashboard from '../pages/StudentDashboard';
 import StudentProfile from '../pages/StudentProfile';
-import StudentEnrollCourse from '../pages/StudentEnrolledCourses';
+import MyLessions from '../pages/MyLessions';
 import StudentWishlist from '../pages/StudentWishlist';
 import StudentReview from '../pages/StudentReview';
 import StudentAttempt from '../pages/StudentAttempt';
 import StudentHistory from '../pages/StudentHistory';
 import StudentSetting from '../pages/StudentSetting';
+import BookingCheckout from '../pages/BookingCheckout';
 import NotFound from '../pages/NotFound';
 import ProtectedRoute from '../components/common/ProtectedRoute';
 
@@ -93,14 +94,15 @@ const AppNavigation = () => {
         <Route path="/instructor-quiz" element={<InstructorQuiz />} />
         <Route path="/instructor-assignment" element={<InstructorAssignment />} />
         <Route path="/instructor-setting" element={<InstructorSetting />} />
-               <Route path="/student-dashboard" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
-               <Route path="/student-profile" element={<ProtectedRoute><StudentProfile /></ProtectedRoute>} />
-               <Route path="/student-enrolled-courses" element={<ProtectedRoute><StudentEnrollCourse /></ProtectedRoute>} />
-               <Route path="/student-wishlist" element={<ProtectedRoute><StudentWishlist /></ProtectedRoute>} />
-               <Route path="/student-review" element={<ProtectedRoute><StudentReview /></ProtectedRoute>} />
-               <Route path="/student-attempts" element={<ProtectedRoute><StudentAttempt /></ProtectedRoute>} />
-               <Route path="/student-history" element={<ProtectedRoute><StudentHistory /></ProtectedRoute>} />
-               <Route path="/student-setting" element={<ProtectedRoute><StudentSetting /></ProtectedRoute>} />
+               <Route path="/my-dashboard" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
+               <Route path="/my-profile" element={<ProtectedRoute><StudentProfile /></ProtectedRoute>} />
+               <Route path="/my-lessions" element={<ProtectedRoute><MyLessions /></ProtectedRoute>} />
+               <Route path="/my-wishlist" element={<ProtectedRoute><StudentWishlist /></ProtectedRoute>} />
+               <Route path="/my-review" element={<ProtectedRoute><StudentReview /></ProtectedRoute>} />
+               <Route path="/my-attempts" element={<ProtectedRoute><StudentAttempt /></ProtectedRoute>} />
+               <Route path="/my-history" element={<ProtectedRoute><StudentHistory /></ProtectedRoute>} />
+               <Route path="/my-profile-setting" element={<ProtectedRoute><StudentSetting /></ProtectedRoute>} />
+        <Route path="/booking/checkout" element={<ProtectedRoute><BookingCheckout /></ProtectedRoute>} />
         {/* <Route path="/blog-details/:id" element={<DynamicBlogDeatils />} /> */}
         <Route path="*" element={<NotFound />} />
       </Routes>

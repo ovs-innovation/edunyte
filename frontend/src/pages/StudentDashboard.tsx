@@ -5,8 +5,8 @@ import SEO from '../components/SEO';
 const StudentDashboard = () => {
    return (
       <Wrapper>
-         <SEO pageTitle={'SkillGro Student Dashboard'} />
-         <StudentDashboardMain />
+         <SEO pageTitle={'Edunyte Student Dashboard'} />
+         <StudentDashboardMain  />
       </Wrapper>
    );
 };

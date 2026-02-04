@@ -4,12 +4,191 @@ import Language from "../models/languageModel.js";
 import User from "../models/userModel.js";
 import mongoose from "mongoose";
 import { normalizeLanguageValue, getLanguageValue } from "../utils/languageHelper.js";
-import { convertCurrency, getBaseCurrency } from "../utils/currencyHelper.js";
+import { getBaseCurrency } from "../utils/currencyHelper.js";
+import iso6391 from "iso-639-1";
+import { buildTeacherCoursePricing, computeSlotBaseAmountUSD } from "../utils/pricingHelper.js";
 
 /**
  * TeacherCourse Controller
  * Handles teacher course join requests and admin approvals
  */
+
+const getLanguageDisplayName = (code, langNameField) => {
+  const fromDoc = getLanguageValue(langNameField);
+  const upperCode = (code || "").toString().toUpperCase();
+  if (fromDoc && fromDoc.toString().toUpperCase() !== upperCode) {
+    return fromDoc;
+  }
+  const fromLib = iso6391.getName(upperCode.toLowerCase());
+  if (fromLib) return fromLib;
+  return upperCode || "Unknown";
+};
+
+const attachLanguagesView = (tcObj) => {
+  const rawLanguages = Array.isArray(tcObj.languageIds) ? tcObj.languageIds : [];
+  const rawProficiencies = Array.isArray(tcObj.languageProficiencies) ? tcObj.languageProficiencies : [];
+
+  const proficiencyByCode = new Map();
+  rawProficiencies.forEach((p) => {
+    if (!p) return;
+    const code = typeof p.code === "string" ? p.code.trim().toUpperCase() : "";
+    if (!code) return;
+    proficiencyByCode.set(code, typeof p.proficiency === "string" ? p.proficiency : "native");
+  });
+
+  const languages = rawLanguages
+    .map((lang) => {
+      if (!lang) return null;
+      const code = typeof lang.code === "string" ? lang.code.trim().toUpperCase() : "";
+      const name = getLanguageDisplayName(code, lang.name);
+      const nativeName = getLanguageValue(lang.nativeName) || name;
+      const proficiency = code ? (proficiencyByCode.get(code) || "native") : "native";
+
+      return {
+        languageId: lang._id ? lang._id.toString() : undefined,
+        code,
+        name,
+        nativeName,
+        proficiency,
+      };
+    })
+    .filter(Boolean);
+
+  delete tcObj.languageIds;
+  delete tcObj.languageProficiencies;
+  tcObj.languages = languages;
+  return tcObj;
+};
+
+const resolveLanguageIds = async ({ languageIds, languageCodes, languages }) => {
+  if (Array.isArray(languageIds) && languageIds.length > 0) {
+    return languageIds;
+  }
+
+  const derivedLanguages = Array.isArray(languages) ? languages : [];
+  const derivedCodesFromLanguages = derivedLanguages.map((l) => l?.code);
+  const derivedCodes = derivedCodesFromLanguages.length > 0 ? derivedCodesFromLanguages : languageCodes;
+
+  if (!Array.isArray(derivedCodes) || derivedCodes.length === 0) return [];
+
+  const codes = Array.from(new Set(
+    derivedCodes
+      .map((c) => (typeof c === "string" ? c.trim().toUpperCase() : ""))
+      .filter(Boolean)
+  ));
+
+  if (codes.length === 0) return [];
+
+  const payloadByCode = new Map();
+  derivedLanguages.forEach((l) => {
+    const code = typeof l?.code === "string" ? l.code.trim().toUpperCase() : "";
+    if (!code) return;
+    payloadByCode.set(code, {
+      name: l?.name,
+      nativeName: l?.nativeName,
+    });
+  });
+
+  const existing = await Language.find({ code: { $in: codes } });
+  const existingCodes = new Set(existing.map((l) => l.code));
+  const missingCodes = codes.filter((c) => !existingCodes.has(c));
+
+  if (missingCodes.length > 0) {
+    try {
+      await Language.insertMany(
+        missingCodes.map((code) => {
+          const payload = payloadByCode.get(code);
+          const rawName = payload?.name;
+          const rawNativeName = payload?.nativeName;
+
+          const name =
+            typeof rawName === "string"
+              ? { en: rawName }
+              : rawName && typeof rawName === "object"
+                ? rawName
+                : { en: code };
+
+          const nativeName =
+            typeof rawNativeName === "string"
+              ? { en: rawNativeName }
+              : rawNativeName && typeof rawNativeName === "object"
+                ? rawNativeName
+                : { en: code };
+
+          return {
+            code,
+            name,
+            nativeName,
+            status: "active",
+          };
+        }),
+        { ordered: false }
+      );
+    } catch (e) {
+      // Ignore duplicate key races; we'll re-fetch below
+    }
+  }
+
+  // Upgrade placeholder names (e.g. {en: "AB"}) when richer payload is provided
+  const updates = [];
+  existing.forEach((lang) => {
+    const payload = payloadByCode.get(lang.code);
+    if (!payload) return;
+    const currentNameEn = typeof lang?.name === "object" && lang.name?.en ? String(lang.name.en) : "";
+    const currentNativeEn = typeof lang?.nativeName === "object" && lang.nativeName?.en ? String(lang.nativeName.en) : "";
+    const desiredNameEn =
+      typeof payload?.name === "string"
+        ? String(payload.name)
+        : payload?.name?.en
+          ? String(payload.name.en)
+          : "";
+    const desiredNativeEn =
+      typeof payload?.nativeName === "string"
+        ? String(payload.nativeName)
+        : payload?.nativeName?.en
+          ? String(payload.nativeName.en)
+          : "";
+
+    const isPlaceholderName = currentNameEn && currentNameEn.toUpperCase() === lang.code;
+    const isPlaceholderNative = currentNativeEn && currentNativeEn.toUpperCase() === lang.code;
+
+    if ((isPlaceholderName && desiredNameEn && desiredNameEn !== currentNameEn) || (isPlaceholderNative && desiredNativeEn && desiredNativeEn !== currentNativeEn)) {
+      updates.push({
+        updateOne: {
+          filter: { _id: lang._id },
+          update: {
+            ...(isPlaceholderName && desiredNameEn
+              ? {
+                  name:
+                    typeof payload.name === "string"
+                      ? { en: payload.name }
+                      : payload.name,
+                }
+              : {}),
+            ...(isPlaceholderNative && desiredNativeEn
+              ? {
+                  nativeName:
+                    typeof payload.nativeName === "string"
+                      ? { en: payload.nativeName }
+                      : payload.nativeName,
+                }
+              : {}),
+          },
+        },
+      });
+    }
+  });
+  if (updates.length > 0) {
+    try {
+      await Language.bulkWrite(updates, { ordered: false });
+    } catch (e) {
+      // best-effort
+    }
+  }
+
+  const finalLanguages = await Language.find({ code: { $in: codes } });
+  return finalLanguages.map((l) => l._id.toString());
+};
 
 /**
  * Teacher: Join a course (create request)
@@ -17,11 +196,31 @@ import { convertCurrency, getBaseCurrency } from "../utils/currencyHelper.js";
 export const joinCourse = async (req, res, next) => {
   try {
     const teacherId = req.user.id;
-    const { courseId, languageIds, price, currency, timezone, introductionVideo, experience, bio, aboutCourse } = req.body;
-    const baseCurrency = getBaseCurrency();
-    const teacherCurrency = (currency || baseCurrency).toUpperCase();
-    const originalPrice = typeof price === "number" ? price : 0;
-    const priceInBase = await convertCurrency(originalPrice, teacherCurrency, baseCurrency);
+    // Teacher inputs (new API): teacherPrice + teacherCurrency
+    // Backward compatible: price + currency
+    const {
+      courseId,
+      languageIds,
+      languageCodes,
+      languages: languagesPayload,
+      teacherPrice,
+      teacherCurrency,
+      price, // legacy
+      currency, // legacy
+      timezone,
+      introductionVideo,
+      experience,
+      bio,
+      aboutCourse,
+    } = req.body;
+
+    const baseCurrency = getBaseCurrency(); // "USD"
+    const resolvedTeacherPrice = typeof teacherPrice === "number" ? teacherPrice : (typeof price === "number" ? price : 0);
+    const resolvedTeacherCurrency = (teacherCurrency || currency || baseCurrency).toString().toUpperCase();
+    const pricing = await buildTeacherCoursePricing({
+      teacherPrice: resolvedTeacherPrice,
+      teacherCurrency: resolvedTeacherCurrency,
+    });
 
     // Verify user is a teacher
     const user = await User.findById(teacherId);
@@ -39,19 +238,35 @@ export const joinCourse = async (req, res, next) => {
     }
 
     // Verify all languages exist and are active
-    if (!Array.isArray(languageIds) || languageIds.length === 0) {
+    const resolvedLanguageIds = await resolveLanguageIds({ languageIds, languageCodes, languages: languagesPayload });
+    if (!Array.isArray(resolvedLanguageIds) || resolvedLanguageIds.length === 0) {
       return res.status(400).json({ message: "At least one language is required" });
     }
 
-    const languages = await Language.find({ _id: { $in: languageIds } });
-    if (languages.length !== languageIds.length) {
+    const dbLanguages = await Language.find({ _id: { $in: resolvedLanguageIds } });
+    if (dbLanguages.length !== resolvedLanguageIds.length) {
       return res.status(404).json({ message: "One or more languages not found" });
     }
 
-    const inactiveLanguages = languages.filter((lang) => lang.status !== "active");
+    const inactiveLanguages = dbLanguages.filter((lang) => lang.status !== "active");
     if (inactiveLanguages.length > 0) {
       return res.status(400).json({ message: "One or more languages are not active" });
     }
+
+    const proficiencyByCode = new Map();
+    if (Array.isArray(req.body.languages)) {
+      req.body.languages.forEach((l) => {
+        const code = typeof l?.code === "string" ? l.code.trim().toUpperCase() : "";
+        if (!code) return;
+        const p = typeof l?.proficiency === "string" ? l.proficiency : "native";
+        proficiencyByCode.set(code, p);
+      });
+    }
+    const languageProficiencies = dbLanguages.map((lang) => ({
+      languageId: lang._id,
+      code: lang.code,
+      proficiency: proficiencyByCode.get(lang.code) || "native",
+    }));
 
     // Check for existing request for this teacher-course combination
     const existing = await TeacherCourse.findOne({
@@ -68,12 +283,9 @@ export const joinCourse = async (req, res, next) => {
       }
       // If rejected, allow re-application
       existing.status = "pending";
-      existing.languageIds = languageIds;
-      existing.price = priceInBase;
-      existing.currency = baseCurrency;
-      existing.baseCurrency = baseCurrency;
-      existing.teacherCurrency = teacherCurrency;
-      existing.originalPrice = originalPrice;
+      existing.languageIds = resolvedLanguageIds;
+      existing.languageProficiencies = languageProficiencies;
+      existing.pricing = pricing;
       existing.timezone = timezone || "UTC";
       existing.introductionVideo = introductionVideo || "";
       existing.experience = normalizeLanguageValue(experience);
@@ -90,6 +302,7 @@ export const joinCourse = async (req, res, next) => {
       existingObj.experience = getLanguageValue(existingObj.experience);
       existingObj.bio = getLanguageValue(existingObj.bio);
       existingObj.aboutCourse = getLanguageValue(existingObj.aboutCourse);
+      attachLanguagesView(existingObj);
       return res.json({ teacherCourse: existingObj, message: "Request resubmitted successfully" });
     }
 
@@ -97,12 +310,9 @@ export const joinCourse = async (req, res, next) => {
     const teacherCourse = await TeacherCourse.create({
       teacherId,
       courseId,
-      languageIds,
-      price: priceInBase,
-      currency: baseCurrency,
-      baseCurrency,
-      teacherCurrency,
-      originalPrice,
+      languageIds: resolvedLanguageIds,
+      languageProficiencies,
+      pricing,
       timezone: timezone || "UTC",
       introductionVideo: introductionVideo || "",
       experience: normalizeLanguageValue(experience),
@@ -121,6 +331,7 @@ export const joinCourse = async (req, res, next) => {
     tcObj.experience = getLanguageValue(tcObj.experience);
     tcObj.bio = getLanguageValue(tcObj.bio);
     tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
+    attachLanguagesView(tcObj);
     res.status(201).json({ teacherCourse: tcObj });
   } catch (err) {
     if (err.code === 11000) {
@@ -153,6 +364,7 @@ export const getMyCourses = async (req, res, next) => {
       tcObj.experience = getLanguageValue(tcObj.experience);
       tcObj.bio = getLanguageValue(tcObj.bio);
       tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
+      attachLanguagesView(tcObj);
       return tcObj;
     });
 
@@ -169,7 +381,20 @@ export const updateCourseRequest = async (req, res, next) => {
   try {
     const teacherId = req.user.id;
     const { id } = req.params;
-    const { languageIds, price, currency, timezone, introductionVideo, experience, bio, aboutCourse } = req.body;
+    const {
+      languageIds,
+      languageCodes,
+      languages,
+      teacherPrice,
+      teacherCurrency,
+      price, // legacy
+      currency, // legacy
+      timezone,
+      introductionVideo,
+      experience,
+      bio,
+      aboutCourse,
+    } = req.body;
     const baseCurrency = getBaseCurrency();
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -198,18 +423,50 @@ export const updateCourseRequest = async (req, res, next) => {
     }
 
     // Update fields
-    if (languageIds !== undefined) {
-      teacherCourse.languageIds = languageIds;
+    if (languageIds !== undefined || languageCodes !== undefined || languages !== undefined) {
+      const resolvedLanguageIds = await resolveLanguageIds({ languageIds, languageCodes, languages });
+      if (!Array.isArray(resolvedLanguageIds) || resolvedLanguageIds.length === 0) {
+        return res.status(400).json({ message: "At least one language is required" });
+      }
+
+      const langs = await Language.find({ _id: { $in: resolvedLanguageIds } });
+      if (langs.length !== resolvedLanguageIds.length) {
+        return res.status(404).json({ message: "One or more languages not found" });
+      }
+
+      const inactive = langs.filter((l) => l.status !== "active");
+      if (inactive.length > 0) {
+        return res.status(400).json({ message: "One or more languages are not active" });
+      }
+
+      teacherCourse.languageIds = resolvedLanguageIds;
+      const proficiencyByCode = new Map();
+      if (Array.isArray(req.body.languages)) {
+        req.body.languages.forEach((l) => {
+          const code = typeof l?.code === "string" ? l.code.trim().toUpperCase() : "";
+          if (!code) return;
+          const p = typeof l?.proficiency === "string" ? l.proficiency : "native";
+          proficiencyByCode.set(code, p);
+        });
+      }
+      teacherCourse.languageProficiencies = langs.map((lang) => ({
+        languageId: lang._id,
+        code: lang.code,
+        proficiency: proficiencyByCode.get(lang.code) || "native",
+      }));
     }
-    if (price !== undefined || currency !== undefined) {
-      const teacherCurrency = (currency || teacherCourse.teacherCurrency || baseCurrency).toUpperCase();
-      const originalPrice = typeof price === "number" ? price : teacherCourse.originalPrice || 0;
-      const priceInBase = await convertCurrency(originalPrice, teacherCurrency, baseCurrency);
-      teacherCourse.price = priceInBase;
-      teacherCourse.currency = baseCurrency;
-      teacherCourse.baseCurrency = baseCurrency;
-      teacherCourse.teacherCurrency = teacherCurrency;
-      teacherCourse.originalPrice = originalPrice;
+    if (teacherPrice !== undefined || teacherCurrency !== undefined || price !== undefined || currency !== undefined) {
+      const resolvedTeacherPrice =
+        typeof teacherPrice === "number"
+          ? teacherPrice
+          : typeof price === "number"
+            ? price
+            : teacherCourse?.pricing?.teacherPrice || 0;
+      const resolvedTeacherCurrency = (teacherCurrency || currency || teacherCourse?.pricing?.teacherCurrency || baseCurrency).toString().toUpperCase();
+      teacherCourse.pricing = await buildTeacherCoursePricing({
+        teacherPrice: resolvedTeacherPrice,
+        teacherCurrency: resolvedTeacherCurrency,
+      });
     }
     if (timezone !== undefined) {
       teacherCourse.timezone = timezone;
@@ -244,6 +501,7 @@ export const updateCourseRequest = async (req, res, next) => {
     teacherCourseObj.experience = getLanguageValue(teacherCourseObj.experience);
     teacherCourseObj.bio = getLanguageValue(teacherCourseObj.bio);
     teacherCourseObj.aboutCourse = getLanguageValue(teacherCourseObj.aboutCourse);
+    attachLanguagesView(teacherCourseObj);
 
     res.json({ teacherCourse: teacherCourseObj, message: "Course request updated successfully" });
   } catch (err) {
@@ -335,6 +593,7 @@ export const getTeacherCourseRequests = async (req, res, next) => {
       tcObj.experience = getLanguageValue(tcObj.experience);
       tcObj.bio = getLanguageValue(tcObj.bio);
       tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
+      attachLanguagesView(tcObj);
       return tcObj;
     });
 
@@ -372,7 +631,7 @@ export const approveTeacherCourse = async (req, res, next) => {
     await teacherCourse.populate([
       { path: "teacherId", select: "name email" },
       { path: "courseId", select: "name description category image status" },
-      { path: "languageIds", select: "name code" },
+      { path: "languageIds", select: "name code nativeName" },
       { path: "reviewedBy", select: "name email" },
     ]);
 
@@ -380,6 +639,7 @@ export const approveTeacherCourse = async (req, res, next) => {
     tcObj.experience = getLanguageValue(tcObj.experience);
     tcObj.bio = getLanguageValue(tcObj.bio);
     tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
+    attachLanguagesView(tcObj);
     res.json({ teacherCourse: tcObj, message: "Request approved successfully" });
   } catch (err) {
     next(err);
@@ -416,7 +676,7 @@ export const rejectTeacherCourse = async (req, res, next) => {
     await teacherCourse.populate([
       { path: "teacherId", select: "name email" },
       { path: "courseId", select: "name description category image status" },
-      { path: "languageIds", select: "name code" },
+      { path: "languageIds", select: "name code nativeName" },
       { path: "reviewedBy", select: "name email" },
     ]);
 
@@ -424,6 +684,7 @@ export const rejectTeacherCourse = async (req, res, next) => {
     tcObj.experience = getLanguageValue(tcObj.experience);
     tcObj.bio = getLanguageValue(tcObj.bio);
     tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
+    attachLanguagesView(tcObj);
     res.json({ teacherCourse: tcObj, message: "Request rejected successfully" });
   } catch (err) {
     next(err);
@@ -509,7 +770,8 @@ export const getCourseTeachers = async (req, res, next) => {
       .populate("teacherId", "name email")
       .populate("courseId", "name description")
       .populate("languageIds", "name code nativeName")
-      .sort({ price: 1 });
+      // Sort by cheapest in USD base
+      .sort({ "pricing.basePriceUSD": 1 });
 
     const teacherCoursesData = teacherCourses.map((tc) => {
       const tcObj = tc.toObject();
@@ -553,7 +815,8 @@ export const getCourseTeachersBySlug = async (req, res, next) => {
       .populate("teacherId", "name email")
       .populate("courseId", "name description")
       .populate("languageIds", "name code nativeName")
-      .sort({ price: 1 });
+      // Sort by cheapest in USD base
+      .sort({ "pricing.basePriceUSD": 1 });
 
     // Get teacher profiles and availability for each teacher
     const TeacherProfile = (await import("../models/teacherProfileModel.js")).default;
@@ -632,8 +895,16 @@ export const getCourseTeachersBySlug = async (req, res, next) => {
           startTime: av.startTime,
           endTime: av.endTime,
           duration: av.duration,
-          price: av.price,
-          currency: av.currency,
+          // Base amount in USD (display-only conversions happen on client)
+          pricing: av.pricing?.baseAmountUSD !== undefined
+            ? av.pricing
+            : {
+                baseAmountUSD: computeSlotBaseAmountUSD({
+                  basePriceUSDPerHour: tcObj?.pricing?.basePriceUSD || 0,
+                  durationMinutes: av.duration,
+                }),
+                baseCurrency,
+              },
           timezone: av.timezone,
         }));
 

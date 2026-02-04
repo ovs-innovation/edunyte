@@ -44,10 +44,11 @@ export function StudentTable({ students, loading, onEdit, onView }: Props) {
         <TableHeader>
           <TableRow className="border-border hover:bg-transparent">
             <TableHead className="text-muted-foreground">Student</TableHead>
-            <TableHead className="text-muted-foreground">Enrolled Courses</TableHead>
-            <TableHead className="text-muted-foreground">Progress</TableHead>
-            <TableHead className="text-muted-foreground">Completed</TableHead>
-            <TableHead className="text-muted-foreground">Certificates</TableHead>
+            <TableHead className="text-muted-foreground">Country</TableHead>
+            <TableHead className="text-muted-foreground">Courses</TableHead>
+            <TableHead className="text-muted-foreground">Lessons Booked</TableHead>
+            <TableHead className="text-muted-foreground">Lessons Completed</TableHead>
+            <TableHead className="text-muted-foreground">Completion %</TableHead>
             <TableHead className="text-muted-foreground">Hours Spent</TableHead>
             <TableHead className="text-muted-foreground text-right">Actions</TableHead>
           </TableRow>
@@ -55,7 +56,7 @@ export function StudentTable({ students, loading, onEdit, onView }: Props) {
         <TableBody>
           {!loading && students.length === 0 && (
             <TableRow>
-              <TableCell colSpan={7} className="text-center text-muted-foreground">
+              <TableCell colSpan={8} className="text-center text-muted-foreground">
                 No students found
               </TableCell>
             </TableRow>
@@ -64,10 +65,14 @@ export function StudentTable({ students, loading, onEdit, onView }: Props) {
             const user = typeof student.userId === 'object' ? student.userId : null;
             const progress = student.progress || {
               totalCourses: 0,
-              completedCourses: 0,
-              inProgressCourses: 0,
               totalHoursSpent: 0,
+              totalLessonsBooked: 0,
+              totalLessonsCompleted: 0,
             };
+            const completionPercentage = progress.totalLessonsBooked > 0 
+              ? Math.round((progress.totalLessonsCompleted / progress.totalLessonsBooked) * 100) 
+              : 0;
+
             return (
               <TableRow
                 key={student._id}
@@ -86,36 +91,36 @@ export function StudentTable({ students, loading, onEdit, onView }: Props) {
                   </div>
                 </TableCell>
                 <TableCell>
+                  {student.country || '—'}
+                </TableCell>
+                <TableCell>
                   <Badge variant="outline" className="font-medium">
                     {progress.totalCourses}
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-primary transition-all"
-                        style={{
-                          width: `${progress.totalCourses > 0 ? (progress.completedCourses / progress.totalCourses) * 100 : 0}%`,
-                        }}
-                      />
-                    </div>
-                    <span className="text-xs text-muted-foreground min-w-[3rem]">
-                      {progress.totalCourses > 0
-                        ? Math.round((progress.completedCourses / progress.totalCourses) * 100)
-                        : 0}%
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className="bg-success/20 text-success border-success/30">
-                    {progress.completedCourses}
+                  <Badge variant="secondary" className="font-medium">
+                   {progress.totalLessonsBooked}
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center gap-1">
-                    <Award className="h-4 w-4 text-warning" />
-                    <span className="font-medium">{student.certificates?.length || 0}</span>
+                  <Badge variant="outline" className="bg-success/20 text-success border-success/30">
+                    {progress.totalLessonsCompleted}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden w-20">
+                      <div
+                        className="h-full bg-primary transition-all"
+                        style={{
+                          width: `${completionPercentage}%`,
+                        }}
+                      />
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      {completionPercentage}%
+                    </span>
                   </div>
                 </TableCell>
                 <TableCell className="text-muted-foreground">

@@ -1,6 +1,6 @@
 import DashboardBanner from "../../dashboard-common/DashboardBanner"
 import DashboardSidebar from "../../dashboard-common/DashboardSidebar"
-import InstructorEnrolledCourseContent from "./InstructorEnrolledCourseContent"
+import InstructorEnrolledCourseContent from "./InstructorEnrolledLessionContent"
 
 const InstructorEnrolledCourseArea = ({ style }: any) => {
 

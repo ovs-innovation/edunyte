@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8085/api'
 
 export interface Course {
   _id: string
@@ -78,8 +78,11 @@ export interface AvailabilitySlot {
   startTime: string
   endTime: string
   duration: number
-  price: number
-  currency: string
+  // New pricing source of truth (USD base)
+  pricing?: { baseAmountUSD: number; baseCurrency: 'USD' }
+  // Derived convenience fields for UI display (USD base only; never trust for checkout)
+  price?: number
+  currency?: string
   timezone: string
 }
 
@@ -101,8 +104,16 @@ export interface TeacherCourse {
     code: string
     nativeName?: string
   }>
-  price: number
-  currency: string
+  pricing?: {
+    basePriceUSD: number
+    baseCurrency: 'USD'
+    teacherPrice: number
+    teacherCurrency: string
+    exchangeRateAtCreation: number
+  }
+  // Derived convenience fields for UI display (USD base only; never trust for checkout)
+  price?: number
+  currency?: string
   timezone: string
   experience: string
   bio: string
@@ -145,7 +156,29 @@ export const fetchCourseTeachers = async (
     throw new Error('Failed to fetch teachers')
   }
 
-  return await response.json()
+  const data = await response.json()
+  const teachers = (data.teachers || []).map((t: any) => {
+    const basePriceUSD = typeof t?.pricing?.basePriceUSD === 'number' ? t.pricing.basePriceUSD : undefined
+    return {
+      ...t,
+      // Keep existing UI working: treat `price` as USD base for display-only conversions.
+      price: typeof t.price === 'number' ? t.price : basePriceUSD,
+      currency: typeof t.currency === 'string' ? t.currency : 'USD',
+      availability: Array.isArray(t.availability)
+        ? t.availability.map((av: any) => ({
+            ...av,
+            price:
+              typeof av.price === 'number'
+                ? av.price
+                : typeof av?.pricing?.baseAmountUSD === 'number'
+                  ? av.pricing.baseAmountUSD
+                  : undefined,
+            currency: typeof av.currency === 'string' ? av.currency : 'USD',
+          }))
+        : [],
+    }
+  })
+  return { ...data, teachers }
 }
 
 export interface AvailabilityResponse {
@@ -155,16 +188,12 @@ export interface AvailabilityResponse {
     startTime: string
     endTime: string
     duration: number
-    price: number
-    currency: string
+    pricing?: { baseAmountUSD: number; baseCurrency: 'USD' }
+    // Derived convenience fields for UI display (USD base only)
+    price?: number
+    currency?: string
     timezone: string
     displayTimezone?: string
-    priceBreakdown?: {
-      teacherPrice: number
-      platformMargin: number
-      platformMarginPercent: number
-      meetingPlatformCost: number
-    }
   }>
   count: number
 }
@@ -199,6 +228,17 @@ export const fetchCourseAvailability = async (
     throw new Error('Failed to fetch availability')
   }
 
-  return await response.json()
+  const data = await response.json()
+  const availabilities = (data.availabilities || []).map((av: any) => ({
+    ...av,
+    price:
+      typeof av.price === 'number'
+        ? av.price
+        : typeof av?.pricing?.baseAmountUSD === 'number'
+          ? av.pricing.baseAmountUSD
+          : undefined,
+    currency: typeof av.currency === 'string' ? av.currency : 'USD',
+  }))
+  return { ...data, availabilities }
 }
 

@@ -67,7 +67,7 @@ const Event = () => {
             </div>
 
             <div className="event__bottom-content">
-               <h6 className="title">The Latest Events from skillgrow
+               <h6 className="title">The Latest Events from Edunyte
                   <Link to="/events">View All <BtnArrow /></Link>
                </h6>
             </div>

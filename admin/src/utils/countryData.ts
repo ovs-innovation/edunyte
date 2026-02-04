@@ -33,9 +33,12 @@ const countryDataCache = new Map<string, CountryData>();
 function getCurrencyForCountry(countryCode: string): string {
   try {
     const countryInfo = countriesListData[countryCode as keyof typeof countriesListData];
-    if (countryInfo?.currency) {
-      const currency = currencyCodes.code(countryInfo.currency);
-      return currency?.code || countryInfo.currency || 'USD';
+    const rawCurrency = countryInfo?.currency;
+    const currencyCode =
+      Array.isArray(rawCurrency) ? (rawCurrency[0] as string | undefined) : (rawCurrency as string | undefined);
+    if (currencyCode) {
+      const currency = currencyCodes.code(currencyCode);
+      return currency?.code || currencyCode || 'USD';
     }
   } catch {
   }
@@ -59,7 +62,12 @@ function getLanguagesForCountry(countryCode: string): string[] {
 function getPhoneCodeForCountry(countryCode: string): string | undefined {
   try {
     const countryInfo = countriesListData[countryCode as keyof typeof countriesListData];
-    return countryInfo?.phone;
+    const rawPhone = countryInfo?.phone as unknown;
+    if (!rawPhone) return undefined;
+    if (Array.isArray(rawPhone)) {
+      return String(rawPhone[0]);
+    }
+    return String(rawPhone);
   } catch {
     return undefined;
   }
@@ -125,10 +133,13 @@ export function getCurrencies(): Array<{ code: string; name: string }> {
 }
 
 export function getLanguages(): Array<{ code: string; name: string; nativeName: string }> {
-  return iso6391.getAllCodes().map((code) => ({
-    code,
-    name: iso6391.getName(code) || code,
-    nativeName: iso6391.getNativeName(code) || code,
-  }));
+  return iso6391.getAllCodes().map((code) => {
+    const upperCode = code.toUpperCase();
+    return {
+      code: upperCode,
+      name: iso6391.getName(code) || upperCode,
+      nativeName: iso6391.getNativeName(code) || upperCode,
+    };
+  });
 }
 

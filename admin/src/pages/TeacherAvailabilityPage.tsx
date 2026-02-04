@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Plus, Calendar, Clock, Trash2, Edit, BookOpen, Languages } from 'lucide-react';
@@ -44,13 +44,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Check, ChevronsUpDown, ChevronDown } from 'lucide-react';
+import { Check, ChevronsUpDown } from 'lucide-react';
 import { getAllTimezones, getUserTimezone } from '@/utils/timezoneData';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
 
 const TeacherAvailabilityPage = () => {
   const { currentRole } = useRole();
@@ -65,7 +60,6 @@ const TeacherAvailabilityPage = () => {
   const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
   const [timezones] = useState(() => getAllTimezones());
   const [timezoneOpen, setTimezoneOpen] = useState(false);
-  const [priceBreakdownOpen, setPriceBreakdownOpen] = useState(false); // Default: hidden
   const [formData, setFormData] = useState({
     date: '',
     startTime: '',
@@ -149,43 +143,74 @@ const TeacherAvailabilityPage = () => {
     });
   };
 
-  // Calculate price preview (dynamic meeting platform cost based on duration)
+  // Calculate teacher price for selected duration
+  const selectedTeacherCourse = useMemo(() => {
+    if (!selectedCourseId) return null;
+    return (
+      teacherCourses.find(
+        (tc) => typeof tc.courseId !== 'string' && tc.courseId._id === selectedCourseId
+      ) || null
+    );
+  }, [selectedCourseId, teacherCourses]);
+
   const calculatePricePreview = () => {
     if (!selectedCourseId || !formData.duration) return null;
     
-    const teacherCourse = teacherCourses.find(
-      tc => typeof tc.courseId !== 'string' && tc.courseId._id === selectedCourseId
-    );
-    if (!teacherCourse) return null;
-
-    const PLATFORM_MARGIN_PERCENT = 20; 
-    const MEETING_PLATFORM_COST_PER_MINUTE = 0.01; 
-    const MEETING_PLATFORM_BASE_COST = 0.10;  
+    if (!selectedTeacherCourse) return null;
     
     const durationInHours = formData.duration / 60;
-    const teacherPricePerHour = teacherCourse.price;
+    const teacherPricePerHour = selectedTeacherCourse.pricing?.teacherPrice || 0;
     const teacherPriceForSession = teacherPricePerHour * durationInHours;
-    const platformMargin = (teacherPriceForSession * PLATFORM_MARGIN_PERCENT) / 100;
-    // Dynamic meeting platform cost: base cost + (cost per minute * duration)
-    const meetingPlatformCost = MEETING_PLATFORM_BASE_COST + (MEETING_PLATFORM_COST_PER_MINUTE * formData.duration);
-    const totalPrice = teacherPriceForSession + platformMargin + meetingPlatformCost;
 
     return {
-      teacherPrice: parseFloat(teacherPriceForSession.toFixed(2)),
-      platformMargin: parseFloat(platformMargin.toFixed(2)),
-      platformMarginPercent: PLATFORM_MARGIN_PERCENT,
-      meetingPlatformCost: parseFloat(meetingPlatformCost.toFixed(2)),
-      meetingPlatformCostPerMinute: MEETING_PLATFORM_COST_PER_MINUTE,
-      meetingPlatformBaseCost: MEETING_PLATFORM_BASE_COST,
-      totalPrice: parseFloat(totalPrice.toFixed(2)),
-      currency: teacherCourse.currency || 'USD',
+      price: parseFloat(teacherPriceForSession.toFixed(2)),
+      currency: selectedTeacherCourse.pricing?.teacherCurrency || 'USD',
     };
   };
 
   const pricePreview = calculatePricePreview();
 
+  const getSlotTeacherPriceLabel = (slot: ApiAvailability) => {
+    const baseAmountUSD = slot?.pricing?.baseAmountUSD;
+    if (typeof baseAmountUSD !== 'number') return '';
+    if (selectedTeacherCourse?.pricing?.exchangeRateAtCreation && selectedTeacherCourse?.pricing?.teacherCurrency) {
+      const amount = baseAmountUSD * selectedTeacherCourse.pricing.exchangeRateAtCreation;
+      return `${selectedTeacherCourse.pricing.teacherCurrency} ${amount.toFixed(2)}`;
+    }
+    return `USD ${baseAmountUSD.toFixed(2)}`;
+  };
+
+  const addMinutesToTime = (time: string, minutesToAdd: number) => {
+    // time: "HH:mm"
+    const [hh, mm] = time.split(':').map((v) => parseInt(v, 10));
+    if (!Number.isFinite(hh) || !Number.isFinite(mm) || !Number.isFinite(minutesToAdd)) return '';
+    const total = hh * 60 + mm + minutesToAdd;
+    const normalized = ((total % (24 * 60)) + (24 * 60)) % (24 * 60);
+    const newH = Math.floor(normalized / 60);
+    const newM = normalized % 60;
+    return `${String(newH).padStart(2, '0')}:${String(newM).padStart(2, '0')}`;
+  };
+
+  // Keep endTime in sync with startTime + duration
+  useEffect(() => {
+    if (!formData.startTime || !formData.duration) {
+      if (formData.endTime) {
+        setFormData((prev) => ({ ...prev, endTime: '' }));
+      }
+      return;
+    }
+    const computedEndTime = addMinutesToTime(formData.startTime, formData.duration);
+    if (computedEndTime && computedEndTime !== formData.endTime) {
+      setFormData((prev) => ({ ...prev, endTime: computedEndTime }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.startTime, formData.duration]);
+
   const handleSubmit = async () => {
-    if (!selectedCourseId || !formData.date || !formData.startTime || !formData.endTime) {
+    const computedEndTime =
+      formData.startTime && formData.duration ? addMinutesToTime(formData.startTime, formData.duration) : '';
+
+    if (!selectedCourseId || !formData.date || !formData.startTime || !computedEndTime) {
       toast({
         title: 'Validation Error',
         description: 'Please fill in all required fields',
@@ -199,7 +224,7 @@ const TeacherAvailabilityPage = () => {
         courseId: selectedCourseId,
         date: formData.date,
         startTime: formData.startTime,
-        endTime: formData.endTime,
+        endTime: computedEndTime,
         duration: formData.duration,
         timezone: formData.timezone,
       });
@@ -259,17 +284,28 @@ const TeacherAvailabilityPage = () => {
     return acc;
   }, {} as Record<string, ApiAvailability[]>);
 
-  // Get week dates
   const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 }); // Monday
   const weekDates = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
-  // Get slots for a specific date
   const getSlotsForDate = (date: Date) => {
     const dateKey = format(date, 'yyyy-MM-dd');
     return groupedByDate[dateKey] || [];
   };
 
   const selectedCourse = courses.find((c) => c._id === selectedCourseId);
+
+  const getDisplayLanguageName = (lang: any): string => {
+    if (!lang) return 'Unknown';
+    if (typeof lang === 'string') return lang;
+
+    if (typeof lang.name === 'string' && lang.name.trim()) return lang.name;
+    if (typeof lang.nativeName === 'string' && lang.nativeName.trim()) return lang.nativeName;
+
+    const nameFromObj = getLanguageValue(lang.name);
+    if (nameFromObj) return nameFromObj;
+
+    return (lang.code || 'Unknown') as string;
+  };
 
   return (
     <AdminLayout>
@@ -316,12 +352,20 @@ const TeacherAvailabilityPage = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {courses.map((course) => {
-                    // Get all languages for this course
+                    // Get all languages for this course from joined teacherCourses
                     const courseLanguages = teacherCourses
-                      .filter(tc => typeof tc.courseId !== 'string' && tc.courseId._id === course._id)
-                      .flatMap(tc => Array.isArray(tc.languageIds) ? tc.languageIds.map(l => typeof l === 'string' ? 'Unknown' : (getLanguageValue(l.name) || l.code || 'Unknown')) : []);
+                      .filter((tc) => typeof tc.courseId !== 'string' && tc.courseId._id === course._id)
+                      .flatMap((tc) => {
+                        const langs =
+                          Array.isArray((tc as any).languages) && (tc as any).languages.length > 0
+                            ? (tc as any).languages
+                            : Array.isArray(tc.languageIds)
+                              ? tc.languageIds
+                              : [];
+                        return langs.map((l: any) => getDisplayLanguageName(l));
+                      });
                     const uniqueLanguages = Array.from(new Set(courseLanguages));
-                    
+
                     return (
                       <SelectItem key={course._id} value={course._id}>
                         <div className="flex items-center gap-2">
@@ -353,8 +397,16 @@ const TeacherAvailabilityPage = () => {
                       <span className="font-semibold text-foreground">Languages:</span>
                       <div className="flex items-center gap-1 flex-wrap">
                         {teacherCourses
-                          .filter(tc => typeof tc.courseId !== 'string' && tc.courseId._id === selectedCourseId)
-                          .flatMap(tc => Array.isArray(tc.languageIds) ? tc.languageIds.map(l => typeof l === 'string' ? 'Unknown' : (getLanguageValue(l.name) || l.code || 'Unknown')) : [])
+                          .filter((tc) => typeof tc.courseId !== 'string' && tc.courseId._id === selectedCourseId)
+                          .flatMap((tc) => {
+                            const langs =
+                              Array.isArray((tc as any).languages) && (tc as any).languages.length > 0
+                                ? (tc as any).languages
+                                : Array.isArray(tc.languageIds)
+                                  ? tc.languageIds
+                                  : [];
+                            return langs.map((l: any) => getDisplayLanguageName(l));
+                          })
                           .filter((v, i, a) => a.indexOf(v) === i)
                           .map((lang, idx) => (
                             <Badge key={idx} variant="secondary" className="text-xs">
@@ -450,9 +502,9 @@ const TeacherAvailabilityPage = () => {
                               >
                                 <div className="font-medium">{slot.startTime}</div>
                                 <div className="text-muted-foreground">{slot.duration}m</div>
-                                {slot.price && (
+                                {slot?.pricing?.baseAmountUSD !== undefined && (
                                   <div className="text-primary font-semibold text-xs">
-                                    {slot.currency || 'USD'} {slot.price}
+                                    {getSlotTeacherPriceLabel(slot)}
                                   </div>
                                 )}
                               </div>
@@ -519,12 +571,10 @@ const TeacherAvailabilityPage = () => {
                               <span className="text-muted-foreground">Duration:</span>
                               <span className="font-medium">{slot.duration} mins</span>
                             </div>
-                            {slot.price && (
+                            {slot?.pricing?.baseAmountUSD !== undefined && (
                               <div className="flex items-center justify-between text-sm">
                                 <span className="text-muted-foreground">Price:</span>
-                                <span className="font-semibold text-primary">
-                                  {slot.currency || 'USD'} {slot.price}
-                                </span>
+                                <span className="font-semibold text-primary">{getSlotTeacherPriceLabel(slot)}</span>
                               </div>
                             )}
                             <div className="flex items-center justify-between text-sm">
@@ -576,6 +626,22 @@ const TeacherAvailabilityPage = () => {
               />
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="duration">Duration (minutes)</Label>
+              <Select
+                value={formData.duration.toString()}
+                onValueChange={(value) => setFormData({ ...formData, duration: parseInt(value) })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="25">25 minutes</SelectItem>
+                  <SelectItem value="50">50 minutes</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="startTime">Start Time *</Label>
@@ -587,36 +653,9 @@ const TeacherAvailabilityPage = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="endTime">End Time *</Label>
-                <Input
-                  id="endTime"
-                  type="time"
-                  value={formData.endTime}
-                  onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                />
+                <Label htmlFor="endTime">End Time</Label>
+                <Input id="endTime" type="time" value={formData.endTime} readOnly disabled />
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="duration">Duration (minutes)</Label>
-              <Select
-                value={formData.duration.toString()}
-                onValueChange={(value) => setFormData({ ...formData, duration: parseInt(value) })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="15">15 minutes</SelectItem>
-                  <SelectItem value="25">25 minutes</SelectItem>
-                  <SelectItem value="30">30 minutes</SelectItem>
-                  <SelectItem value="45">45 minutes</SelectItem>
-                  <SelectItem value="50">50 minutes</SelectItem>
-                  <SelectItem value="60">60 minutes</SelectItem>
-                  <SelectItem value="90">90 minutes</SelectItem>
-                  <SelectItem value="120">120 minutes</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
 
             <div className="space-y-2">
@@ -668,66 +707,17 @@ const TeacherAvailabilityPage = () => {
               </Popover>
             </div>
 
-            {/* Price Preview - Total Price Always Visible, Breakdown Hidden by Default */}
+            {/* Price Preview - Teacher Price Only */}
             {pricePreview && (
               <div className="p-4 bg-muted/50 rounded-lg border-2 border-muted">
-                {/* Total Price - Always Visible */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Student Will Pay</p>
-                    <p className="text-lg font-semibold text-primary mt-1">
-                      {pricePreview.currency} {pricePreview.totalPrice.toFixed(2)}
-                    </p>
-                  </div>
-                  <Collapsible open={priceBreakdownOpen} onOpenChange={setPriceBreakdownOpen}>
-                    <CollapsibleTrigger asChild>
-                      <Button variant="ghost" size="sm" className="text-xs">
-                        {priceBreakdownOpen ? 'Hide' : 'Show'} Breakdown
-                        <ChevronDown className={cn(
-                          "ml-1 h-3 w-3 transition-transform",
-                          priceBreakdownOpen && "rotate-180"
-                        )} />
-                      </Button>
-                    </CollapsibleTrigger>
-                  </Collapsible>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Your Price ({formData.duration} min)</p>
+                  <p className="text-lg font-semibold text-primary mt-1">
+                    {pricePreview.currency} {pricePreview.price.toFixed(2)}
+                  </p>
                 </div>
-
-                {/* Price Breakdown - Collapsible (Hidden by Default) */}
-                <Collapsible open={priceBreakdownOpen} onOpenChange={setPriceBreakdownOpen}>
-                  <CollapsibleContent>
-                    <div className="space-y-2 pt-4 mt-4 border-t border-border">
-                      <Label className="text-sm font-semibold">Session Price Preview</Label>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Teacher Price ({formData.duration} min):</span>
-                          <span className="font-medium">{pricePreview.currency} {pricePreview.teacherPrice.toFixed(2)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Platform Margin ({pricePreview.platformMarginPercent}%):</span>
-                          <span className="font-medium">{pricePreview.currency} {pricePreview.platformMargin.toFixed(2)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">
-                            Meeting Platform Cost ({formData.duration} min):
-                          </span>
-                          <div className="text-right">
-                            <span className="font-medium block">
-                              {pricePreview.currency} {pricePreview.meetingPlatformCost.toFixed(2)}
-                            </span>
-                            {pricePreview.meetingPlatformBaseCost !== undefined && pricePreview.meetingPlatformCostPerMinute !== undefined && (
-                              <span className="text-xs text-muted-foreground">
-                                ({pricePreview.currency} {pricePreview.meetingPlatformBaseCost.toFixed(2)} base + {pricePreview.currency} {pricePreview.meetingPlatformCostPerMinute.toFixed(2)}/min)
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-
                 <p className="text-xs text-muted-foreground mt-3 pt-2 border-t border-border/50">
-                  This is the total price students will pay for booking this session.
+                  This is your price for this {formData.duration}-minute session.
                 </p>
               </div>
             )}
@@ -736,7 +726,7 @@ const TeacherAvailabilityPage = () => {
             <Button variant="outline" onClick={handleCloseDialog}>
               Cancel
             </Button>
-            <Button onClick={handleSubmit} disabled={!formData.date || !formData.startTime || !formData.endTime}>
+            <Button onClick={handleSubmit} disabled={!formData.date || !formData.startTime}>
               Create Slot
             </Button>
           </DialogFooter>

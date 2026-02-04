@@ -1,6 +1,6 @@
 import DashboardBannerTwo from "../../dashboard-common/DashboardBannerTwo"
 import DashboardSidebarTwo from "../../dashboard-common/DashboardSidebarTwo"
-import InstructorHistoryContent from "../../instructor-dashboard/instructor-history/InstructorHistoryContent"
+import StudentHistoryContent from "./StudentHistoryContent"
 
 const StudentHistoryArea = () => {
    return (
@@ -10,7 +10,7 @@ const StudentHistoryArea = () => {
             <div className="dashboard__inner-wrap">
                <div className="row">
                   <DashboardSidebarTwo />
-                  <InstructorHistoryContent />
+                  <StudentHistoryContent />
                </div>
             </div>
          </div>

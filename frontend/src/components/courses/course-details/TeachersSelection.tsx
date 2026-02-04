@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchCourseTeachers, fetchCourses, type TeacherCourse, type Course } from '../../../services/courseService';
+import { fetchCourseTeachers, fetchCourses, fetchCourse, type TeacherCourse, type Course } from '../../../services/courseService';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useWishlist } from '../../../contexts/WishlistContext';
 import { useCurrency } from '../../../hooks/useCurrency';
 import BookingModal from './BookingModal';
 import * as Flags from 'country-flag-icons/react/3x2';
@@ -37,7 +38,7 @@ const TeachersSelection = () => {
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
   const [bookingTeacher, setBookingTeacher] = useState<TeacherCourse | null>(null);
   const [expandedBios, setExpandedBios] = useState<Set<string>>(new Set());
-  const [favoriteTeachers, setFavoriteTeachers] = useState<Set<string>>(new Set());
+  const { toggleWishlist, isInWishlist } = useWishlist();
   const [videoModalOpen, setVideoModalOpen] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string>('');
   const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
@@ -49,6 +50,7 @@ const TeachersSelection = () => {
   const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
   const [languageSearch, setLanguageSearch] = useState('');
   const [displayPrices, setDisplayPrices] = useState<Record<string, { amount: number; formatted: string }>>({});
+ 
   const [filters, setFilters] = useState<FilterState>({
     priceRange: '',
     country: '',
@@ -60,6 +62,19 @@ const TeachersSelection = () => {
     language: '',
   });
 
+  // Fetch specific course details
+  useEffect(() => {
+     if (!slug) return;
+     const loadOneCourse = async () => {
+        try {
+           const { course } = await fetchCourse(slug as string);
+           setCurrentCourse(course);
+        } catch (error) {
+           console.error("Failed to load course details:", error);
+        }
+     };
+     loadOneCourse();
+  }, [slug]);
 
 
   useEffect(() => {
@@ -67,10 +82,6 @@ const TeachersSelection = () => {
       try {
         const response = await fetchCourses({ status: 'active' });
         setCourses(response.courses);
-        const current = response.courses.find((c) => c.slug === slug);
-        if (current) {
-          setCurrentCourse(current);
-        }
       } catch (err) {
         console.error('Failed to load courses:', err);
       }
@@ -347,15 +358,9 @@ const TeachersSelection = () => {
     return '';
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-  };
 
-  const formatTime = (timeString: string) => {
-    const [hours, minutes] = timeString.split(':');
-    return `${hours.padStart(2, '0')}:${minutes}`;
-  };
+
+
 
   const getPriceRanges = () => {
     if (teachers.length === 0) return [];
@@ -394,8 +399,42 @@ const TeachersSelection = () => {
     return Array.from(countries).sort();
   };
 
+  const languageDisplayNames =
+    typeof Intl !== 'undefined' && (Intl as any).DisplayNames
+      ? new (Intl as any).DisplayNames(['en'], { type: 'language' })
+      : null;
+
+  const formatLanguageLabel = (lang: { _id?: string; name?: string; code?: string; nativeName?: string }) => {
+    if (!lang) return '';
+    const code = (lang.code || '').toString().toUpperCase();
+    let label = (lang.nativeName || lang.name || '').toString().trim();
+
+    // If label is missing or just the code, try to resolve via Intl.DisplayNames
+    if ((!label || label.toUpperCase() === code) && languageDisplayNames && code) {
+      try {
+        const resolved = languageDisplayNames.of(code.toLowerCase());
+        if (resolved) {
+          label = resolved.toString();
+        }
+      } catch {
+        // ignore and fall back
+      }
+    }
+
+    if (!label) {
+      label = code || '';
+    }
+
+    // Append code in parentheses for clarity
+    if (code && !label.toLowerCase().includes(`(${code.toLowerCase()}`)) {
+      return `${label} (${code})`;
+    }
+
+    return label;
+  };
+
   const getLanguages = () => {
-    const languageMap = new Map<string, { _id: string; name: string; code: string; nativeName?: string }>();
+    const languageMap = new Map<string, { _id: string; name?: string; code?: string; nativeName?: string }>();
     teachers.forEach((teacher) => {
       if (teacher.languageIds) {
         teacher.languageIds.forEach((lang) => {
@@ -405,7 +444,7 @@ const TeachersSelection = () => {
         });
       }
     });
-    return Array.from(languageMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+    return Array.from(languageMap.values()).sort((a, b) => formatLanguageLabel(a).localeCompare(formatLanguageLabel(b)));
   };
 
   const popularLanguages = ['Hindi', 'Tamil', 'Telugu', 'Kannada', 'Marathi', 'English'];
@@ -420,7 +459,8 @@ const TeachersSelection = () => {
   };
 
   const handleBookingConfirm = (bookingData: any) => {
-    navigate(`/booking/confirm`, { state: bookingData });
+    // Next step: Pricing & Checkout (Stripe)
+    navigate(`/booking/checkout`, { state: bookingData });
   };
 
   const handleSendMessage = (teacher: TeacherCourse) => {
@@ -452,15 +492,8 @@ const TeachersSelection = () => {
 
   const toggleFavorite = (teacherId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setFavoriteTeachers((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(teacherId)) {
-        newSet.delete(teacherId);
-      } else {
-        newSet.add(teacherId);
-      }
-      return newSet;
-    });
+    e.preventDefault();
+    toggleWishlist(teacherId);
   };
 
   if (loading) {
@@ -1023,9 +1056,14 @@ const TeachersSelection = () => {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
                     {filters.language ? (
-                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {languages.find(l => l._id === filters.language || l.name === filters.language)?.name || filters.language}
-                      </span>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {(() => {
+                        const lang = languages.find(
+                          (l) => l._id === filters.language || formatLanguageLabel(l) === filters.language
+                        );
+                        return lang ? formatLanguageLabel(lang) : filters.language || 'Also speaks';
+                      })()}
+                    </span>
                     ) : (
                       <span style={{ color: '#999' }}>Also speaks</span>
                     )}
@@ -1098,9 +1136,14 @@ const TeachersSelection = () => {
                       {languages.filter((lang) => {
                         if (!languageSearch) return true;
                         const searchLower = languageSearch.toLowerCase();
-                        return lang.name.toLowerCase().includes(searchLower) || 
-                               (lang.nativeName && lang.nativeName.toLowerCase().includes(searchLower)) ||
-                               lang.code.toLowerCase().includes(searchLower);
+                        const name = (lang.name || '').toString().toLowerCase();
+                        const nativeName = (lang.nativeName || '').toString().toLowerCase();
+                        const code = (lang.code || '').toString().toLowerCase();
+                        return (
+                          name.includes(searchLower) ||
+                          nativeName.includes(searchLower) ||
+                          code.includes(searchLower)
+                        );
                       }).length > 0 && (
                         <>
                           {popularLanguages.length > 0 && (
@@ -1108,12 +1151,18 @@ const TeachersSelection = () => {
                               <div style={{ padding: '12px 16px 8px', fontSize: '14px', fontWeight: '600', color: '#1a1a1a' }}>Popular</div>
                               {languages
                                 .filter((lang) => {
-                                  if (!popularLanguages.includes(lang.name)) return false;
+                                  const langName = (lang.name || '').toString();
+                                  if (!popularLanguages.includes(langName)) return false;
                                   if (!languageSearch) return true;
                                   const searchLower = languageSearch.toLowerCase();
-                                  return lang.name.toLowerCase().includes(searchLower) || 
-                                         (lang.nativeName && lang.nativeName.toLowerCase().includes(searchLower)) ||
-                                         lang.code.toLowerCase().includes(searchLower);
+                                  const name = (lang.name || '').toString().toLowerCase();
+                                  const nativeName = (lang.nativeName || '').toString().toLowerCase();
+                                  const code = (lang.code || '').toString().toLowerCase();
+                                  return (
+                                    name.includes(searchLower) ||
+                                    nativeName.includes(searchLower) ||
+                                    code.includes(searchLower)
+                                  );
                                 })
                                 .map((lang) => (
                                   <div
@@ -1143,7 +1192,7 @@ const TeachersSelection = () => {
                                       }
                                     }}
                                   >
-                                    <span style={{ fontSize: '14px', flex: 1 }}>{lang.name}</span>
+                                    <span style={{ fontSize: '14px', flex: 1 }}>{formatLanguageLabel(lang)}</span>
                                     {filters.language === lang._id && (
                                       <i className="fas fa-check" style={{ color: '#e91e63', fontSize: '12px' }}></i>
                                     )}
@@ -1153,12 +1202,18 @@ const TeachersSelection = () => {
                           )}
                           {languages
                             .filter((lang) => {
-                              if (popularLanguages.includes(lang.name)) return false;
+                              const langName = (lang.name || '').toString();
+                              if (popularLanguages.includes(langName)) return false;
                               if (!languageSearch) return true;
                               const searchLower = languageSearch.toLowerCase();
-                              return lang.name.toLowerCase().includes(searchLower) || 
-                                     (lang.nativeName && lang.nativeName.toLowerCase().includes(searchLower)) ||
-                                     lang.code.toLowerCase().includes(searchLower);
+                              const name = (lang.name || '').toString().toLowerCase();
+                              const nativeName = (lang.nativeName || '').toString().toLowerCase();
+                              const code = (lang.code || '').toString().toLowerCase();
+                              return (
+                                name.includes(searchLower) ||
+                                nativeName.includes(searchLower) ||
+                                code.includes(searchLower)
+                              );
                             })
                             .map((lang) => (
                               <div
@@ -1188,7 +1243,7 @@ const TeachersSelection = () => {
                                   }
                                 }}
                               >
-                                <span style={{ fontSize: '14px', flex: 1 }}>{lang.name}</span>
+                                    <span style={{ fontSize: '14px', flex: 1 }}>{formatLanguageLabel(lang)}</span>
                                 {filters.language === lang._id && (
                                   <i className="fas fa-check" style={{ color: '#e91e63', fontSize: '12px' }}></i>
                                 )}
@@ -1240,7 +1295,12 @@ const TeachersSelection = () => {
                 filteredTeachers.map((teacher) => {
                   const teacherId = typeof teacher.teacherId === 'object' ? teacher.teacherId : { name: '', _id: '' };
                   const teacherName = String(teacherId.name || '');
-                  const languages = Array.isArray(teacher.languageIds) ? teacher.languageIds : [];
+                  const languages =
+                    Array.isArray((teacher as any).languages) && (teacher as any).languages.length > 0
+                      ? (teacher as any).languages
+                      : Array.isArray(teacher.languageIds)
+                        ? teacher.languageIds
+                        : [];
                   const courseId = typeof teacher.courseId === 'object' ? teacher.courseId : null;
                   let courseName = '';
                   if (courseId && courseId.name) {
@@ -1250,8 +1310,6 @@ const TeachersSelection = () => {
                       courseName = (courseId.name as any).en || String(courseId.name);
                     }
                   }
-                  const availabilityCount = Array.isArray(teacher.availability) ? teacher.availability.length : 0;
-                  const isHovered = hoveredTeacher === teacher._id;
                   const isSelected = selectedTeacher?._id === teacher._id;
 
                   return (
@@ -1281,31 +1339,7 @@ const TeachersSelection = () => {
                               {t('common.per_hour')}
                             </small>
                           </div>
-                          <button
-                            className="btn btn-link p-0"
-                            onClick={(e) => toggleFavorite(teacher._id, e)}
-                            style={{
-                              width: '28px',
-                              height: '28px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              border: 'none',
-                              background: 'transparent',
-                              cursor: 'pointer',
-                              flexShrink: 0,
-                              marginTop: '2px',
-                            }}
-                          >
-                            <i
-                              className={favoriteTeachers.has(teacher._id) ? 'fas fa-heart' : 'far fa-heart'}
-                              style={{
-                                fontSize: '18px',
-                                color: favoriteTeachers.has(teacher._id) ? '#e91e63' : '#999',
-                                transition: 'color 0.2s',
-                              }}
-                            ></i>
-                          </button>
+
                         </div>
                       </div>
 
@@ -1428,20 +1462,33 @@ const TeachersSelection = () => {
                           <div className="mb-2 small text-muted d-flex align-items-center gap-2">
                             <i className="fas fa-language" style={{ fontSize: '14px', color: '#666' }}></i>
                             <span>{t('common.speaks')}: </span>
-                            {languages.map((lang, idx) => {
-                              let langName = '';
-                              if (typeof lang === 'object' && lang !== null) {
-                                langName = String(lang.nativeName || lang.name || '');
-                              } else {
-                                langName = String(lang || '');
+                            {languages.map(
+                              (
+                                lang: { _id?: string; name?: string; code?: string; nativeName?: string; proficiency?: string },
+                                idx: number
+                              ) => {
+                                const baseLabel = formatLanguageLabel(lang);
+                                const proficiency = lang.proficiency;
+                                let profLabel = '';
+                                if (proficiency) {
+                                  const value = proficiency.toLowerCase();
+                                  if (value === 'native') profLabel = 'Native';
+                                  else if (value === 'c2') profLabel = 'Proficient C2';
+                                  else if (value === 'c1') profLabel = 'Advanced C1';
+                                  else if (value === 'b2') profLabel = 'Upper Intermediate B2';
+                                  else if (value === 'b1') profLabel = 'Intermediate B1';
+                                  else if (value === 'a2') profLabel = 'Elementary A2';
+                                  else if (value === 'a1') profLabel = 'Beginner A1';
+                                }
+                                const fullLabel = profLabel ? `${baseLabel} – ${profLabel}` : baseLabel;
+                                return (
+                                  <span key={lang._id || idx}>
+                                    {fullLabel}
+                                    {idx < languages.length - 1 && ', '}
+                                  </span>
+                                );
                               }
-                              return (
-                                <span key={lang?._id || idx}>
-                                  {langName}
-                                  {idx < languages.length - 1 && ', '}
-                                </span>
-                              );
-                            })}
+                            )}
                           </div>
                           {teacher.experience && (
                             <p className="small text-muted mb-2" style={{ lineHeight: '1.6' }}>
@@ -1503,30 +1550,7 @@ const TeachersSelection = () => {
                               {t('common.per_hour')}
                             </small>
                           </div>
-                          <button
-                            className="btn btn-link p-0"
-                            onClick={(e) => toggleFavorite(teacher._id, e)}
-                            style={{
-                              width: '32px',
-                              height: '32px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              border: 'none',
-                              background: 'transparent',
-                              cursor: 'pointer',
-                              flexShrink: 0,
-                            }}
-                          >
-                            <i
-                              className={favoriteTeachers.has(teacher._id) ? 'fas fa-heart' : 'far fa-heart'}
-                              style={{
-                                fontSize: '20px',
-                                color: favoriteTeachers.has(teacher._id) ? '#e91e63' : '#999',
-                                transition: 'color 0.2s',
-                              }}
-                            />
-                          </button>
+
                         </div>
                         <div className="d-flex flex-column gap-2" style={{ minWidth: '160px' }}>
                           <button
@@ -1574,52 +1598,6 @@ const TeachersSelection = () => {
                         </div>
                       </div>
                       
-                      {isHovered && availabilityCount > 0 && (
-                        <div
-                          className="availability-popup mt-3 p-3 border rounded"
-                          style={{
-                            backgroundColor: '#f8f9fa',
-                            position: 'absolute',
-                            left: '0',
-                            right: '0',
-                            top: '100%',
-                            zIndex: 10,
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                            marginTop: '8px',
-                          }}
-                          onMouseEnter={() => setHoveredTeacher(teacher._id)}
-                          onMouseLeave={() => setHoveredTeacher(null)}
-                        >
-                          <h6 className="mb-2 fw-semibold">{t('common.available_slots')}:</h6>
-                          <div className="d-flex flex-wrap gap-2">
-                            {teacher.availability.slice(0, 8).map((slot) => (
-                              <button
-                                key={slot._id}
-                                className="btn btn-outline-primary btn-sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleBookTrial(teacher);
-                                }}
-                                style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '6px' }}
-                              >
-                                {formatDate(slot.date)} {formatTime(slot.startTime)}
-                              </button>
-                            ))}
-                            {availabilityCount > 8 && (
-                              <button
-                                className="btn btn-link btn-sm p-0 text-primary"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleViewSchedule(teacher);
-                                }}
-                                style={{ fontSize: '11px', textDecoration: 'none' }}
-                              >
-                                {t('common.view_full_schedule')} →
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      )}
                     </div>
                   );
                 })

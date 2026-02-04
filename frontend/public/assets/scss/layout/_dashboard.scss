@@ -23,6 +23,7 @@
             z-index: 1;
             @media #{$xs} {
                 background-position: right center;
+                min-height: 240px;
             }
             &::before {
                 position: absolute;
@@ -56,8 +57,9 @@
         }
         @media #{$xs} {
             flex-wrap: wrap;
-            padding: 0 20px 30px;
+            padding: 0 20px 20px;
             gap: 15px;
+            align-items: center;
         }
         &-left {
             @include flexbox();
@@ -73,6 +75,10 @@
             & .thumb {
                 width: 120px;
                 height: 120px;
+                @media #{$xs} {
+                    width: 80px;
+                    height: 80px;
+                }
                 & img {
                     @include border-radius(50%);
                     width: 100%;
