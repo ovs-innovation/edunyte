@@ -23,7 +23,7 @@ const HeaderOne = () => {
    const { sticky } = UseSticky();
    const [isActive, setIsActive] = useState<boolean>(false);
    const { t } = useTranslation();
-   const { isAuthenticated, user, logout } = useAuth();
+   const { isAuthenticated, user } = useAuth();
    const navigate = useNavigate();
 
    const handleUserClick = (e: React.MouseEvent) => {
@@ -33,14 +33,7 @@ const HeaderOne = () => {
       }
    };
 
-   const getInitials = (name: string) => {
-      return name
-         .split(' ')
-         .map(n => n[0])
-         .join('')
-         .toUpperCase()
-         .slice(0, 2);
-   };
+
 
    const getUserAvatar = () => {
       if (user?.photo || user?.avatar || user?.image) {
@@ -66,17 +59,16 @@ const HeaderOne = () => {
                onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
-                  const parent = target.parentElement;
-                  if (parent) {
-                     parent.style.background = '#6c5ce7';
-                     parent.textContent = user?.name ? getInitials(user.name) : 'U';
-                  }
                }}
             />
          );
       }
 
-      return user?.name ? getInitials(user.name) : 'U';
+      return (
+         <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <InjectableSvg src="/assets/img/icons/user.svg" alt="User" className="injectable" />
+         </div>
+      );
    };
 
    return (
@@ -106,7 +98,7 @@ const HeaderOne = () => {
                                     </li>
                                     <li className="wishlist-icon">
                                        <Link 
-                                          to="/wishlist" 
+                                          to="/my-wishlist" 
                                           className="cart-count"
                                           onClick={(e) => {
                                              if (!isAuthenticated) {
@@ -121,43 +113,14 @@ const HeaderOne = () => {
                                     </li>
                                     <li className="header-btn login-btn">
                                        {isAuthenticated ? (
-                                          <div className="user-menu" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                          <div className="user-menu">
                                              <Link 
                                                 to="/my-dashboard" 
-                                                className="user-avatar" 
-                                                style={{ 
-                                                   display: 'flex', 
-                                                   alignItems: 'center', 
-                                                   justifyContent: 'center',
-                                                   width: '40px',
-                                                   height: '40px',
-                                                   borderRadius: '50%',
-                                                   background: getUserAvatar() ? 'transparent' : '#6c5ce7',
-                                                   color: '#fff',
-                                                   textDecoration: 'none',
-                                                   fontSize: '14px',
-                                                   fontWeight: '600',
-                                                   overflow: 'hidden'
-                                                }}
-                                                title={user?.name || t("common.my_account")}
+                                                className="user-avatar"
                                              >
                                                 {renderAvatar()}
                                              </Link>
-                                             <span style={{ color: '#ccc' }}>|</span>
-                                             <button 
-                                                onClick={logout} 
-                                                className="logout-btn"
-                                                style={{ 
-                                                   background: 'none', 
-                                                   border: 'none', 
-                                                   color: 'inherit', 
-                                                   cursor: 'pointer',
-                                                   padding: 0,
-                                                   fontSize: 'inherit'
-                                                }}
-                                             >
-                                                {t("common.logout")}
-                                             </button>
+
                                           </div>
                                        ) : (
                                           <Link to="/login">{t("common.login")}</Link>
@@ -176,8 +139,8 @@ const HeaderOne = () => {
                                           width: '40px',
                                           height: '40px',
                                           borderRadius: '50%',
-                                          background: getUserAvatar() ? 'transparent' : '#6c5ce7',
-                                          color: '#fff',
+                                          background: 'transparent',
+                                          color: 'var(--tg-theme-primary)',
                                           textDecoration: 'none',
                                           fontSize: '14px',
                                           fontWeight: '600',

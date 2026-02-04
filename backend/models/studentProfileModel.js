@@ -38,6 +38,10 @@ const studentProfileSchema = new mongoose.Schema(
       default: "UTC",
     },
     // Social Links
+    wishlist: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    }],
     socialLinks: {
       facebook: {
         type: String,

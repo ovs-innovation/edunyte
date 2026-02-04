@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchCourseTeachers, fetchCourses, type TeacherCourse, type Course } from '../../../services/courseService';
+import { fetchCourseTeachers, fetchCourses, fetchCourse, type TeacherCourse, type Course } from '../../../services/courseService';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useWishlist } from '../../../contexts/WishlistContext';
 import { useCurrency } from '../../../hooks/useCurrency';
 import BookingModal from './BookingModal';
 import * as Flags from 'country-flag-icons/react/3x2';
@@ -37,7 +38,7 @@ const TeachersSelection = () => {
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
   const [bookingTeacher, setBookingTeacher] = useState<TeacherCourse | null>(null);
   const [expandedBios, setExpandedBios] = useState<Set<string>>(new Set());
-  const [favoriteTeachers, setFavoriteTeachers] = useState<Set<string>>(new Set());
+  const { toggleWishlist, isInWishlist } = useWishlist();
   const [videoModalOpen, setVideoModalOpen] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string>('');
   const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
@@ -49,6 +50,7 @@ const TeachersSelection = () => {
   const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
   const [languageSearch, setLanguageSearch] = useState('');
   const [displayPrices, setDisplayPrices] = useState<Record<string, { amount: number; formatted: string }>>({});
+ 
   const [filters, setFilters] = useState<FilterState>({
     priceRange: '',
     country: '',
@@ -60,6 +62,19 @@ const TeachersSelection = () => {
     language: '',
   });
 
+  // Fetch specific course details
+  useEffect(() => {
+     if (!slug) return;
+     const loadOneCourse = async () => {
+        try {
+           const { course } = await fetchCourse(slug as string);
+           setCurrentCourse(course);
+        } catch (error) {
+           console.error("Failed to load course details:", error);
+        }
+     };
+     loadOneCourse();
+  }, [slug]);
 
 
   useEffect(() => {
@@ -67,10 +82,6 @@ const TeachersSelection = () => {
       try {
         const response = await fetchCourses({ status: 'active' });
         setCourses(response.courses);
-        const current = response.courses.find((c) => c.slug === slug);
-        if (current) {
-          setCurrentCourse(current);
-        }
       } catch (err) {
         console.error('Failed to load courses:', err);
       }
@@ -481,15 +492,8 @@ const TeachersSelection = () => {
 
   const toggleFavorite = (teacherId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setFavoriteTeachers((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(teacherId)) {
-        newSet.delete(teacherId);
-      } else {
-        newSet.add(teacherId);
-      }
-      return newSet;
-    });
+    e.preventDefault();
+    toggleWishlist(teacherId);
   };
 
   if (loading) {
@@ -1335,31 +1339,7 @@ const TeachersSelection = () => {
                               {t('common.per_hour')}
                             </small>
                           </div>
-                          <button
-                            className="btn btn-link p-0"
-                            onClick={(e) => toggleFavorite(teacher._id, e)}
-                            style={{
-                              width: '28px',
-                              height: '28px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              border: 'none',
-                              background: 'transparent',
-                              cursor: 'pointer',
-                              flexShrink: 0,
-                              marginTop: '2px',
-                            }}
-                          >
-                            <i
-                              className={favoriteTeachers.has(teacher._id) ? 'fas fa-heart' : 'far fa-heart'}
-                              style={{
-                                fontSize: '18px',
-                                color: favoriteTeachers.has(teacher._id) ? '#e91e63' : '#999',
-                                transition: 'color 0.2s',
-                              }}
-                            ></i>
-                          </button>
+
                         </div>
                       </div>
 
@@ -1570,30 +1550,7 @@ const TeachersSelection = () => {
                               {t('common.per_hour')}
                             </small>
                           </div>
-                          <button
-                            className="btn btn-link p-0"
-                            onClick={(e) => toggleFavorite(teacher._id, e)}
-                            style={{
-                              width: '32px',
-                              height: '32px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              border: 'none',
-                              background: 'transparent',
-                              cursor: 'pointer',
-                              flexShrink: 0,
-                            }}
-                          >
-                            <i
-                              className={favoriteTeachers.has(teacher._id) ? 'fas fa-heart' : 'far fa-heart'}
-                              style={{
-                                fontSize: '20px',
-                                color: favoriteTeachers.has(teacher._id) ? '#e91e63' : '#999',
-                                transition: 'color 0.2s',
-                              }}
-                            />
-                          </button>
+
                         </div>
                         <div className="d-flex flex-column gap-2" style={{ minWidth: '160px' }}>
                           <button

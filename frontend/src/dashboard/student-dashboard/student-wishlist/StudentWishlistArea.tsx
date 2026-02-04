@@ -1,6 +1,6 @@
 import DashboardBannerTwo from "../../dashboard-common/DashboardBannerTwo"
 import DashboardSidebarTwo from "../../dashboard-common/DashboardSidebarTwo"
-import InstructorWishlistContent from "../../instructor-dashboard/instructor-wishlist/InstructorWishlistContent"
+import StudentWishlistContent from "./StudentWishlistContent"
 
 const StudentWishlistArea = () => {
    return (
@@ -10,7 +10,7 @@ const StudentWishlistArea = () => {
             <div className="dashboard__inner-wrap">
                <div className="row">
                   <DashboardSidebarTwo />
-                  <InstructorWishlistContent />
+                  <StudentWishlistContent />
                </div>
             </div>
          </div>

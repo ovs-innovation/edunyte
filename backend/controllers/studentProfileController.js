@@ -1,6 +1,9 @@
 import StudentProfile from "../models/studentProfileModel.js";
 import User from "../models/userModel.js";
 import Booking from "../models/bookingModel.js";
+import TeacherProfile from "../models/teacherProfileModel.js";
+import Course from "../models/courseModel.js";
+import { getLanguageValue } from "../utils/languageHelper.js";
 
 // wrapper to get own profile
 export const getMyProfile = async (req, res, next) => {
@@ -269,4 +272,68 @@ export const getCourseProgress = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+};
+// Toggle Wishlist
+export const toggleWishlist = async (req, res, next) => {
+  try {
+    const { teacherId } = req.body; 
+    const studentId = req.user.id;
+
+    if (!teacherId) {
+        return res.status(400).json({ message: "Teacher ID is required" });
+    }
+
+    let profile = await StudentProfile.findOne({ userId: studentId });
+    if (!profile) {
+      profile = await StudentProfile.create({ userId: studentId });
+    }
+    
+    // Check if teacherId is already in wishlist using string comparison
+    const exists = profile.wishlist.some(id => id.toString() === teacherId);
+    let isAdded = false;
+    
+    if (!exists) {
+      profile.wishlist.push(teacherId);
+      isAdded = true;
+    } else {
+      // Filter out the teacherId
+      profile.wishlist = profile.wishlist.filter(id => id.toString() !== teacherId);
+      isAdded = false;
+    }
+    
+    await profile.save();
+    
+    res.json({ success: true, isAdded, wishlistCount: profile.wishlist.length });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Get Wishlist
+export const getWishlist = async (req, res, next) => {
+    try {
+        const studentId = req.user.id;
+        const profile = await StudentProfile.findOne({ userId: studentId });
+        
+        if (!profile || !profile.wishlist || profile.wishlist.length === 0) {
+            return res.json({ wishlist: [] });
+        }
+        
+        const wishlistTeachers = await TeacherProfile.find({ userId: { $in: profile.wishlist } })
+            .populate('userId', 'name email status role photo')
+            .lean();
+
+        // Fetch courses and normalize language fields
+        let wishlistCourses = await Course.find({ _id: { $in: profile.wishlist } }).lean();
+        wishlistCourses = wishlistCourses.map(course => ({
+            ...course,
+            name: getLanguageValue(course.name),
+            description: getLanguageValue(course.description),
+            slug: getLanguageValue(course.slug),
+        }));
+            
+        res.json({ wishlist: [...wishlistTeachers, ...wishlistCourses] });
+    } catch (err) {
+        next(err);
+    }
 };

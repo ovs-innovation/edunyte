@@ -7,12 +7,16 @@ import {
   updateStudentProfile,
   recalculateProgress,
   getCourseProgress,
+  toggleWishlist,
+  getWishlist,
 } from "../controllers/studentProfileController.js";
 import { verifyToken } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/permissionMiddleware.js";
 
 const router = express.Router();
 
+router.get("/wishlist", verifyToken, getWishlist);
+router.post("/wishlist", verifyToken, toggleWishlist);
 router.get("/me", verifyToken, getMyProfile);
 router.patch("/me", verifyToken, updateMyProfile);
 router.get("/:userId", verifyToken, requirePermission("students.view"), getStudentProfile);

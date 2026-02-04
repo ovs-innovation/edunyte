@@ -5,6 +5,7 @@ import { Provider } from 'react-redux'
 import store from './redux/store'
 import { CurrencyProvider } from './contexts/CurrencyContext'
 import { AuthProvider } from './contexts/AuthContext'
+import { WishlistProvider } from './contexts/WishlistContext'
 
 function App() {
 
@@ -12,13 +13,15 @@ function App() {
     <Provider store={store}>
       <BrowserRouter>
         <AuthProvider>
-          <CurrencyProvider>
-            <HelmetProvider>
-              <div className="main-page-wrapper">
-                <AppNavigation />
-              </div>
-            </HelmetProvider>
-          </CurrencyProvider>
+          <WishlistProvider>
+            <CurrencyProvider>
+              <HelmetProvider>
+                <div className="main-page-wrapper">
+                  <AppNavigation />
+                </div>
+              </HelmetProvider>
+            </CurrencyProvider>
+          </WishlistProvider>
         </AuthProvider>
       </BrowserRouter>
     </Provider>
