@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../../contexts/AuthContext'
 import { getMyBookings, Booking } from '../../../services/bookingService'
 import DashboardBannerTwo from '../../dashboard-common/DashboardBannerTwo'
@@ -12,6 +13,7 @@ const localizer = momentLocalizer(moment)
 
 const StudentDashboardArea = () => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const { token } = useAuth() as any
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
@@ -27,13 +29,13 @@ const StudentDashboardArea = () => {
         const data = await getMyBookings(token)
         setBookings(data)
       } catch (err: any) {
-        setError(err.message || 'Failed to load bookings')
+        setError(err.message || t('common.error_loading_data'))
       } finally {
         setLoading(false)
       }
     }
     fetchBookings()
-  }, [token])
+  }, [token, t])
 
   const now = new Date()
   const upcomingBookings = bookings.filter(b => {
@@ -54,18 +56,18 @@ const StudentDashboardArea = () => {
 
   const getTeacherName = (booking: Booking) => {
     if (booking.teacherId && typeof booking.teacherId === 'object') {
-      return (booking.teacherId as any).name || 'Teacher'
+      return (booking.teacherId as any).name || t('checkout.tutor')
     }
-    return 'Teacher'
+    return t('checkout.tutor')
   }
 
   const getCourseName = (booking: Booking) => {
     if (booking.courseId && typeof booking.courseId === 'object') {
       const courseObj = booking.courseId as any
       const name = courseObj.name
-      return typeof name === 'object' ? name.en : name || 'Course'
+      return typeof name === 'object' ? name.en : name || t('common.course')
     }
-    return 'Course'
+    return t('common.course')
   }
 
   const formatDateTime = (dateStr: string) => {
@@ -97,7 +99,7 @@ const StudentDashboardArea = () => {
               {/* Stats Overview */}
               <div className="dashboard__count-wrap mb-4">
                 <div className="dashboard__content-title mb-3">
-                  <h4 className="title">My Dashboard</h4>
+                  <h4 className="title">{t('dashboard.my_dashboard')}</h4>
                 </div>
                 <div className="row g-3">
                   <div className="col-lg-4 col-md-4 col-sm-6">
@@ -107,7 +109,7 @@ const StudentDashboardArea = () => {
                           <i className="flaticon-book" style={{ fontSize: '32px' }}></i>
                         </div>
                         <h3 className="fw-bold mb-1">{stats.total}</h3>
-                        <p className="text-muted mb-0 small">Total Lessons</p>
+                        <p className="text-muted mb-0 small">{t('dashboard.total_lessons')}</p>
                       </div>
                     </div>
                   </div>
@@ -118,7 +120,7 @@ const StudentDashboardArea = () => {
                           <i className="flaticon-clock" style={{ fontSize: '32px' }}></i>
                         </div>
                         <h3 className="fw-bold mb-1">{stats.upcoming}</h3>
-                        <p className="text-muted mb-0 small">Upcoming</p>
+                        <p className="text-muted mb-0 small">{t('dashboard.upcoming')}</p>
                       </div>
                     </div>
                   </div>
@@ -129,7 +131,7 @@ const StudentDashboardArea = () => {
                           <i className="flaticon-trophy" style={{ fontSize: '32px' }}></i>
                         </div>
                         <h3 className="fw-bold mb-1">{stats.completed}</h3>
-                        <p className="text-muted mb-0 small">Completed</p>
+                        <p className="text-muted mb-0 small">{t('dashboard.completed')}</p>
                       </div>
                     </div>
                   </div>
@@ -142,7 +144,7 @@ const StudentDashboardArea = () => {
                   <div className="card-body p-4">
                     <div className="d-flex justify-content-between align-items-start mb-3">
                       <div>
-                        <h6 className="text-muted text-uppercase small mb-1">Next Lesson</h6>
+                        <h6 className="text-muted text-uppercase small mb-1">{t('dashboard.next_lesson')}</h6>
                         <h5 className="fw-bold mb-0">{formatDateTime(nextLesson.lesson.scheduledAt).date}</h5>
                       </div>
                       <span className="badge bg-success px-3 py-2">{formatDateTime(nextLesson.lesson.scheduledAt).time}</span>
@@ -177,7 +179,7 @@ const StudentDashboardArea = () => {
                             </span>
                             <span className="text-muted small d-inline-flex align-items-center">
                               <i className="flaticon-clock me-1" style={{ fontSize: '14px' }}></i>
-                              <span>{nextLesson.duration} min</span>
+                              <span>{nextLesson.duration} {t('common.mins')}</span>
                             </span>
                             {nextLesson.languageId && typeof nextLesson.languageId === 'object' && (
                               <span className="text-muted small d-inline-flex align-items-center">
@@ -197,7 +199,7 @@ const StudentDashboardArea = () => {
                           style={{ minWidth: '150px', whiteSpace: 'nowrap' }}
                         >
                           <i className="flaticon-video-camera me-2"></i>
-                          Join Lesson
+                          {t('dashboard.join_lesson')}
                         </a>
                       )}
                     </div>
@@ -209,7 +211,7 @@ const StudentDashboardArea = () => {
               <div className="card shadow-sm border-0">
                 <div className="card-body p-4">
                   <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
-                    <h5 className="fw-bold mb-0">My Lessons</h5>
+                    <h5 className="fw-bold mb-0">{t('dashboard.my_lessons')}</h5>
                     <div className="d-flex align-items-center gap-4">
                        <div 
                          className={`d-flex align-items-center gap-2 cursor-pointer ${view === 'list' ? 'text-primary' : 'text-muted'}`} 
@@ -217,7 +219,7 @@ const StudentDashboardArea = () => {
                          style={{ cursor: 'pointer', borderBottom: view === 'list' ? '2px solid var(--tg-theme-primary)' : 'none', paddingBottom: '4px' }}
                        >
                           <i className="flaticon-list"></i>
-                          <span className="fw-medium">List</span>
+                          <span className="fw-medium">{t('dashboard.list')}</span>
                        </div>
                        <div 
                          className={`d-flex align-items-center gap-2 cursor-pointer ${view === 'calendar' ? 'text-primary' : 'text-muted'}`} 
@@ -225,7 +227,7 @@ const StudentDashboardArea = () => {
                          style={{ cursor: 'pointer', borderBottom: view === 'calendar' ? '2px solid var(--tg-theme-primary)' : 'none', paddingBottom: '4px' }}
                        >
                           <i className="flaticon-calendar"></i>
-                          <span className="fw-medium">Calendar</span>
+                          <span className="fw-medium">{t('dashboard.calendar')}</span>
                        </div>
                     </div>
                   </div>
@@ -239,7 +241,7 @@ const StudentDashboardArea = () => {
                             className={`nav-link ${activeTab === 'upcoming' ? 'active' : ''}`}
                             onClick={() => setActiveTab('upcoming')}
                           >
-                            Upcoming ({stats.upcoming})
+                            {t('dashboard.upcoming')} ({stats.upcoming})
                           </button>
                         </li>
                         <li className="nav-item">
@@ -247,7 +249,7 @@ const StudentDashboardArea = () => {
                             className={`nav-link ${activeTab === 'completed' ? 'active' : ''}`}
                             onClick={() => setActiveTab('completed')}
                           >
-                            Completed ({stats.completed})
+                            {t('dashboard.completed')} ({stats.completed})
                           </button>
                         </li>
                       </ul>
@@ -256,7 +258,7 @@ const StudentDashboardArea = () => {
                       {loading && (
                         <div className="text-center py-5">
                           <div className="spinner-border text-primary" role="status">
-                            <span className="visually-hidden">Loading...</span>
+                            <span className="visually-hidden">{t('common.loading')}</span>
                           </div>
                         </div>
                       )}
@@ -274,12 +276,12 @@ const StudentDashboardArea = () => {
                           {activeTab === 'upcoming' && upcomingBookings.length === 0 && (
                             <div className="text-center py-5">
                               <i className="flaticon-calendar" style={{ fontSize: '48px', color: '#ddd' }}></i>
-                              <p className="text-muted mt-3">No upcoming lessons</p>
+                              <p className="text-muted mt-3">{t('dashboard.no_upcoming_lessons')}</p>
                               <button
                                 className="btn btn-primary mt-2"
                                 onClick={() => navigate('/courses')}
                               >
-                                Browse Courses
+                                {t('dashboard.browse_courses')}
                               </button>
                             </div>
                           )}
@@ -287,7 +289,7 @@ const StudentDashboardArea = () => {
                           {activeTab === 'completed' && completedBookings.length === 0 && (
                             <div className="text-center py-5">
                               <i className="flaticon-book" style={{ fontSize: '48px', color: '#ddd' }}></i>
-                              <p className="text-muted mt-3">No completed lessons yet</p>
+                              <p className="text-muted mt-3">{t('dashboard.no_completed_lessons')}</p>
                             </div>
                           )}
 

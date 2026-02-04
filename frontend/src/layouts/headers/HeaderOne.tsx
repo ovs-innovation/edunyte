@@ -36,9 +36,9 @@ const HeaderOne = () => {
 
 
    const getUserAvatar = () => {
-      if (user?.photo || user?.avatar || user?.image) {
-         return user.photo || user.avatar || user.image;
-      }
+      // if (user?.photo || user?.avatar || user?.image) {
+      //    return user.photo || user.avatar || user.image;
+      // }
       return null;
    };
 
@@ -117,6 +117,14 @@ const HeaderOne = () => {
                                              <Link 
                                                 to="/my-dashboard" 
                                                 className="user-avatar"
+                                                style={{
+                                                   display: 'block',
+                                                   width: '50px',
+                                                   height: '50px',
+                                                   borderRadius: '50%',
+                                                   overflow: 'hidden',
+                                                   minWidth: '50px'
+                                                }}
                                              >
                                                 {renderAvatar()}
                                              </Link>
@@ -136,8 +144,8 @@ const HeaderOne = () => {
                                           display: 'flex', 
                                           alignItems: 'center', 
                                           justifyContent: 'center',
-                                          width: '40px',
-                                          height: '40px',
+                                          width: '50px',
+                                          height: '50px',
                                           borderRadius: '50%',
                                           background: 'transparent',
                                           color: 'var(--tg-theme-primary)',

@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import { useTranslation } from "react-i18next";
 
 interface DataType {
    id: number;
@@ -18,62 +19,44 @@ interface DataType {
 const sidebar_data: DataType[] = [
    {
       id: 1,
-      title: "Welcome, User",
+      title: "dashboard.welcome",
       sidebar_details: [
          {
             id: 1,
             link: "/my-dashboard",
             icon: "fas fa-home",
-            title: "Dashboard",
+            title: "dashboard.dashboard",
          },
-         // {
-         //    id: 2,
-         //    link: "/my-profile",
-         //    icon: "skillgro-avatar",
-         //    title: "My Profile",
-         // },
-         // {
-         //    id: 3,
-         //    link: "/my-lessions",
-         //    icon: "skillgro-book",
-         //    title: "My Lessions",
-         // },
          {
             id: 4,
             link: "/my-wishlist",
             icon: "skillgro-label",
-            title: "Wishlist",
+            title: "dashboard.wishlist",
          },
-         // {
-         //    id: 5,
-         //    link: "/student-review",
-         //    icon: "skillgro-book-2",
-         //    title: "Reviews",
-         // },
          {
             id: 7,
             link: "/my-history",
             icon: "skillgro-satchel",
-            title: "Order History",
+            title: "dashboard.order_history",
          },
       ],
    },
    {
       id: 2,
-      title: "User",
+      title: "common.my_account",
       class_name: "mt-30",
       sidebar_details: [
          {
             id: 1,
             link: "/my-profile-setting",
             icon: "skillgro-settings",
-            title: "Profile Settings",
+            title: "dashboard.profile_settings",
          },
          {
             id: 2,
             link: "#",
             icon: "skillgro-logout",
-            title: "Logout",
+            title: "dashboard.logout",
             action: "logout"
          },
       ],
@@ -82,6 +65,7 @@ const sidebar_data: DataType[] = [
 
 const DashboardSidebarTwo = () => {
    const { user, logout } = useAuth();
+   const { t } = useTranslation();
 
    const handleLogout = (e: React.MouseEvent) => {
       e.preventDefault();
@@ -95,7 +79,7 @@ const DashboardSidebarTwo = () => {
                <React.Fragment key={item.id}>
                   <div className={`dashboard__sidebar-title mb-20 ${item.class_name}`}>
                      <h6 className="title">
-                        {item.id === 1 ? `Welcome, ${user?.name || 'Student'}` : item.title}
+                        {item.id === 1 ? `${t('dashboard.welcome')}, ${user?.name || t('dashboard.student')}` : t(item.title)}
                      </h6>
                   </div>
                   <nav className="dashboard__sidebar-menu">
@@ -105,12 +89,12 @@ const DashboardSidebarTwo = () => {
                               {list.action === 'logout' ? (
                                  <Link to={list.link} onClick={handleLogout}>
                                     <i className={list.icon}></i>
-                                    {list.title}
+                                    {t(list.title)}
                                  </Link>
                               ) : (
                                  <Link to={list.link}>
-                                    <i className={list.icon}></i>
-                                    {list.title}
+                                     <i className={list.icon}></i>
+                                     {t(list.title)}
                                  </Link>
                               )}
                            </li>

@@ -34,6 +34,7 @@ interface AuthContextType {
   login: (credentials: LoginCredentials) => Promise<void>
   register: (userData: RegisterData) => Promise<void>
   logout: () => void
+  updateUserProfile: (data: any) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -111,6 +112,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     navigate('/login', { replace: true })
   }, [navigate])
 
+  const updateUserProfile = useCallback(async (data: any) => {
+      try {
+          const { updateProfile } = await import('../services/authService');
+          const updatedUser = await updateProfile(data);
+          setStoredUser(updatedUser);
+          setUser(updatedUser);
+      } catch (err) {
+          console.error("Failed to update profile", err);
+          throw err;
+      }
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -121,6 +134,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         login,
         register,
         logout,
+        updateUserProfile,
       }}
     >
       {children}

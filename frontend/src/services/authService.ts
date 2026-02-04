@@ -118,3 +118,33 @@ export const removeStoredUser = (): void => {
   }
 }
 
+export const updateProfile = async (data: any): Promise<AuthResponse['user']> => {
+  const token = getStoredToken()
+  
+  // Try student profile update
+  const response = await fetch(`${API_BASE_URL}/student-profiles/me`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(data),
+  })
+
+  const resData = await response.json()
+
+  if (!response.ok) {
+     throw new Error(resData.message || 'Update failed')
+  }
+  
+  const currentUser = getStoredUser();
+  // Merge profile data with user data
+  const updatedUser = {
+      ...currentUser,
+      ...resData.profile,
+      ...resData.user
+  } as AuthResponse['user'];
+  
+  return updatedUser;
+}
+
