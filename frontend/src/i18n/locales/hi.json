@@ -78,7 +78,6 @@
     "available_slots": "उपलब्ध स्लॉट",
     "view_full_schedule": "पूर्ण अनुसूची देखें",
     "per_lesson": "प्रति पाठ",
-    "book_trial_lesson": "ट्रायल पाठ बुक करें",
     "send_message": "संदेश भेजें",
     "watch_intro": "परिचय वीडियो देखें",
     "to_help_you_succeed": "आपकी सफलता में मदद करने के लिए",
@@ -94,7 +93,6 @@
     "no_teachers_found": "आपकी कसौटी से मेल खाने वाला कोई शिक्षक नहीं मिला",
     "no_video_available": "कोई परिचय वीडियो उपलब्ध नहीं है",
     "see_teacher_profile": "शिक्षक की प्रोफ़ाइल देखें",
-    "per_hour": "प्रति घंटा",
     "book_trial_lesson": "ट्रायल पाठ बुक करें",
     "to_discuss_level": "अपने स्तर और सीखने की योजना पर चर्चा करने के लिए",
     "lesson_duration": "पाठ की अवधि",
@@ -110,7 +108,8 @@
     "total": "कुल",
     "cancel": "रद्द करें",
     "continue": "जारी रखें",
-    "select_course": "पाठ्यक्रम चुनें"
+    "select_course": "पाठ्यक्रम चुनें",
+    "hour": "घंटा"
   }
 }
 

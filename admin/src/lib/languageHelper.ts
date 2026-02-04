@@ -15,7 +15,6 @@ export const getLanguageValue = (value: string | { en: string } | undefined, lan
     const firstKey = Object.keys(value)[0];
     return firstKey ? value[firstKey] : "";
   }
-  
   return "";
 };
 

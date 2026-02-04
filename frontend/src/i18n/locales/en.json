@@ -95,7 +95,6 @@
     "no_teachers_found": "No teachers found matching your criteria",
     "no_video_available": "No introduction video available",
     "see_teacher_profile": "See teacher's profile",
-    "per_hour": "Per hour",
     "to_discuss_level": "To discuss your level and learning plan",
     "lesson_duration": "Lesson duration",
     "mins": "mins",
@@ -110,7 +109,8 @@
     "total": "Total",
     "cancel": "Cancel",
     "continue": "Continue",
-    "select_course": "Select course"
+    "select_course": "Select course",
+    "hour": "hour"
   },
   "checkout": {
     "title": "Checkout",
