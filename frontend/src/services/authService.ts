@@ -148,3 +148,27 @@ export const updateProfile = async (data: any): Promise<AuthResponse['user']> =>
   return updatedUser;
 }
 
+export const validateToken = async (): Promise<AuthResponse['user'] | null> => {
+  const token = getStoredToken()
+  if (!token) return null
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/me`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    if (!response.ok) {
+        removeStoredToken();
+        removeStoredUser();
+        return null;
+    }
+
+    const data = await response.json()
+    return data.user || data
+  } catch (error) {
+    return null
+  }
+}
+

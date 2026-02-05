@@ -8,21 +8,23 @@ interface InjectableSvgProps {
 }
 
 const InjectableSvg: React.FC<InjectableSvgProps> = ({ src, alt = '', className = '' }) => {
-   const imgRef = useRef<HTMLImageElement>(null);
+   const containerRef = useRef<HTMLDivElement>(null);
 
    useEffect(() => {
       const fetchAndInjectSvg = async () => {
-         if (imgRef.current) {
-            try {
-               const response = await fetch(src);
-               const svgText = await response.text();
-               const div = document.createElement('div');
-               div.innerHTML = svgText;
-               const svgElement = div.querySelector('svg');
+         if (!containerRef.current) return;
+         try {
+            const response = await fetch(src);
+            const svgText = await response.text();
+            
+            if (containerRef.current) {
+               containerRef.current.innerHTML = svgText;
+               const svgElement = containerRef.current.querySelector('svg');
 
                if (svgElement) {
-                  svgElement.setAttribute('class', imgRef.current?.getAttribute('class') || '');
-                  imgRef.current?.replaceWith(svgElement);
+                  // svgElement.style.width = '100%';
+                  // svgElement.style.height = '100%';
+                  svgElement.setAttribute('class', (svgElement.getAttribute('class') || '') + ' injected-svg');
 
                   const vivusInstance = new Vivus(svgElement as unknown as HTMLElement, {
                      duration: 80,
@@ -31,24 +33,30 @@ const InjectableSvg: React.FC<InjectableSvgProps> = ({ src, alt = '', className 
 
                   vivusInstance.finish(); 
 
-                  svgElement.addEventListener('mouseenter', () => {
-                     if (vivusInstance) {
-                        vivusInstance.reset().play();
-                     } else {
-                        console.error('Vivus instance is not initialized.');
-                     }
+                  containerRef.current.addEventListener('mouseenter', () => {
+                     vivusInstance.reset().play();
                   });
                }
-            } catch (error) {
-               console.error('Error fetching and injecting SVG:', error);
             }
+         } catch (error) {
+            console.error('Error fetching and injecting SVG:', error);
          }
       };
 
       fetchAndInjectSvg();
    }, [src]);
 
-   return <img ref={imgRef} src={src} alt={alt} className={`injectable ${className}`} />;
+   return (
+      <div 
+         ref={containerRef} 
+         className={`injectable ${className}`} 
+         title={alt}
+         style={{ 
+            display: 'contents', 
+         }}
+      >
+      </div>
+   );
 };
 
 export default InjectableSvg;

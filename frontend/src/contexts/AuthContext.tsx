@@ -12,6 +12,7 @@ import {
   LoginCredentials,
   RegisterData,
   AuthResponse,
+  validateToken,
 } from '../services/authService'
 
 interface User {
@@ -58,13 +59,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    const initAuth = () => {
+    const initAuth = async () => {
       const storedToken = getStoredToken()
-      const storedUser = getStoredUser()
 
-      if (storedToken && storedUser) {
-        setToken(storedToken)
-        setUser(storedUser)
+      if (storedToken) {
+        try {
+            // Optimistically set user from storage while validating
+            const userFromStorage = getStoredUser();
+            if(userFromStorage) setUser(userFromStorage);
+            
+            const validatedUser = await validateToken()
+            
+            if (validatedUser) {
+                setToken(storedToken)
+                setUser(validatedUser)
+                setStoredUser(validatedUser)
+            } else {
+                // Token invalid
+                setToken(null)
+                setUser(null)
+                removeStoredToken()
+                removeStoredUser()
+            }
+        } catch (error) {
+            setToken(null)
+            setUser(null)
+            removeStoredToken()
+            removeStoredUser()
+        }
       }
       setIsLoading(false)
     }
