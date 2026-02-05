@@ -181,6 +181,16 @@ export const me = async (req, res, next) => {
       profileObj.bio = getLanguageValue(profileObj.bio);
       profileObj.aboutUs = getLanguageValue(profileObj.aboutUs);
       userData.profile = profileObj;
+      if (profileObj.profilePicture) userData.photo = profileObj.profilePicture;
+    } else if (user.role === "student") {
+      const StudentProfile = (await import("../models/studentProfileModel.js")).default;
+      let studentProfile = await StudentProfile.findOne({ userId: user._id });
+      if (!studentProfile) {
+        studentProfile = await StudentProfile.create({ userId: user._id });
+      }
+      const profileObj = studentProfile.toObject();
+      userData.profile = profileObj;
+      if (profileObj.photo) userData.photo = profileObj.photo;
     }
     
     res.json({ user: userData });

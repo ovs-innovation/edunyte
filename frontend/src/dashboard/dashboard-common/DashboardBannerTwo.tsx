@@ -16,6 +16,8 @@ const DashboardBannerTwo = ({ totalLessons = 0, completedLessons = 0 }: Dashboar
   const { t } = useTranslation()
   const [uploading, setUploading] = useState(false)
 
+  console.log("user", user)
+
   const getStudentName = () => {
     if (user?.firstName && user?.lastName) {
       return `${user.firstName} ${user.lastName}`
@@ -25,8 +27,6 @@ const DashboardBannerTwo = ({ totalLessons = 0, completedLessons = 0 }: Dashboar
 
   const getProfilePicture = () => {
     if (user?.photo) return user.photo;
-    if (user?.profilePicture) return user.profilePicture;
-    if (user?.avatar) return user.avatar;
     return "assets/img/courses/details_instructors02.jpg"
   }
 
