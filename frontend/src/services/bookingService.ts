@@ -95,3 +95,38 @@ export const cancelBooking = async (id: string, token: string): Promise<void> =>
     throw new Error('Failed to cancel booking')
   }
 }
+
+export const getAvailableSlots = async (teacherCourseId: string, token: string): Promise<any[]> => {
+  const response = await fetch(`${API_BASE_URL}/bookings/available-slots/${teacherCourseId}`, {
+    headers: {
+       'Authorization': `Bearer ${token}`,
+       'Content-Type': 'application/json',
+    },
+  });
+  
+  if (!response.ok) {
+     throw new Error('Failed to fetch slots');
+  }
+  
+  const data = await response.json();
+  return data.availabilities || [];
+}
+
+export const rescheduleBooking = async (bookingId: string, availabilityId: string, token: string): Promise<Booking> => {
+   const response = await fetch(`${API_BASE_URL}/bookings/${bookingId}/reschedule`, {
+      method: 'POST',
+      headers: {
+         'Authorization': `Bearer ${token}`,
+         'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ availabilityId }),
+   });
+   
+   if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.message || 'Failed to reschedule booking');
+   }
+   
+   const data = await response.json();
+   return data.booking;
+}
