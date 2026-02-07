@@ -110,7 +110,12 @@
     "cancel": "Cancel",
     "continue": "Continue",
     "select_course": "Select course",
-    "hour": "hour"
+    "hour": "hour",
+    "banner_title_prefix": "Beyond Languages — Learn Any Course From Teachers",
+    "banner_title_highlight": "Worldwide",
+    "banner_description": "Every teaching and learning journey is unique. We’re here to guide you every step of the way.",
+    "start_free_trial": "Start Trial",
+    "banner_features": "Learn, Practice & Grow Confidently"
   },
   "checkout": {
     "title": "Checkout",
