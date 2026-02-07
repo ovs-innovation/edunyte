@@ -209,7 +209,7 @@ export const joinCourse = async (req, res, next) => {
       currency, // legacy
       timezone,
       introductionVideo,
-      experience,
+
       bio,
       aboutCourse,
     } = req.body;
@@ -288,7 +288,7 @@ export const joinCourse = async (req, res, next) => {
       existing.pricing = pricing;
       existing.timezone = timezone || "UTC";
       existing.introductionVideo = introductionVideo || "";
-      existing.experience = normalizeLanguageValue(experience);
+
       existing.bio = normalizeLanguageValue(bio);
       existing.aboutCourse = normalizeLanguageValue(aboutCourse);
       existing.rejectionReason = "";
@@ -299,7 +299,7 @@ export const joinCourse = async (req, res, next) => {
         { path: "languageIds", select: "name code" },
       ]);
       const existingObj = existing.toObject();
-      existingObj.experience = getLanguageValue(existingObj.experience);
+
       existingObj.bio = getLanguageValue(existingObj.bio);
       existingObj.aboutCourse = getLanguageValue(existingObj.aboutCourse);
       attachLanguagesView(existingObj);
@@ -315,7 +315,7 @@ export const joinCourse = async (req, res, next) => {
       pricing,
       timezone: timezone || "UTC",
       introductionVideo: introductionVideo || "",
-      experience: normalizeLanguageValue(experience),
+
       bio: normalizeLanguageValue(bio),
       aboutCourse: normalizeLanguageValue(aboutCourse),
       status: "pending",
@@ -328,7 +328,7 @@ export const joinCourse = async (req, res, next) => {
     ]);
 
     const tcObj = teacherCourse.toObject();
-    tcObj.experience = getLanguageValue(tcObj.experience);
+
     tcObj.bio = getLanguageValue(tcObj.bio);
     tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
     attachLanguagesView(tcObj);
@@ -361,7 +361,7 @@ export const getMyCourses = async (req, res, next) => {
 
     const teacherCoursesData = teacherCourses.map((tc) => {
       const tcObj = tc.toObject();
-      tcObj.experience = getLanguageValue(tcObj.experience);
+
       tcObj.bio = getLanguageValue(tcObj.bio);
       tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
       attachLanguagesView(tcObj);
@@ -391,7 +391,7 @@ export const updateCourseRequest = async (req, res, next) => {
       currency, // legacy
       timezone,
       introductionVideo,
-      experience,
+
       bio,
       aboutCourse,
     } = req.body;
@@ -474,9 +474,7 @@ export const updateCourseRequest = async (req, res, next) => {
     if (introductionVideo !== undefined) {
       teacherCourse.introductionVideo = introductionVideo;
     }
-    if (experience !== undefined) {
-      teacherCourse.experience = normalizeLanguageValue(experience);
-    }
+
     if (bio !== undefined) {
       teacherCourse.bio = normalizeLanguageValue(bio);
     }
@@ -498,7 +496,7 @@ export const updateCourseRequest = async (req, res, next) => {
     ]);
 
     const teacherCourseObj = teacherCourse.toObject();
-    teacherCourseObj.experience = getLanguageValue(teacherCourseObj.experience);
+
     teacherCourseObj.bio = getLanguageValue(teacherCourseObj.bio);
     teacherCourseObj.aboutCourse = getLanguageValue(teacherCourseObj.aboutCourse);
     attachLanguagesView(teacherCourseObj);
@@ -590,7 +588,7 @@ export const getTeacherCourseRequests = async (req, res, next) => {
 
     const teacherCoursesData = teacherCourses.map((tc) => {
       const tcObj = tc.toObject();
-      tcObj.experience = getLanguageValue(tcObj.experience);
+
       tcObj.bio = getLanguageValue(tcObj.bio);
       tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
       attachLanguagesView(tcObj);
@@ -636,7 +634,7 @@ export const approveTeacherCourse = async (req, res, next) => {
     ]);
 
     const tcObj = teacherCourse.toObject();
-    tcObj.experience = getLanguageValue(tcObj.experience);
+
     tcObj.bio = getLanguageValue(tcObj.bio);
     tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
     attachLanguagesView(tcObj);
@@ -681,7 +679,7 @@ export const rejectTeacherCourse = async (req, res, next) => {
     ]);
 
     const tcObj = teacherCourse.toObject();
-    tcObj.experience = getLanguageValue(tcObj.experience);
+
     tcObj.bio = getLanguageValue(tcObj.bio);
     tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
     attachLanguagesView(tcObj);
@@ -775,7 +773,7 @@ export const getCourseTeachers = async (req, res, next) => {
 
     const teacherCoursesData = teacherCourses.map((tc) => {
       const tcObj = tc.toObject();
-      tcObj.experience = getLanguageValue(tcObj.experience);
+
       tcObj.bio = getLanguageValue(tcObj.bio);
       tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
       return tcObj;
@@ -830,7 +828,7 @@ export const getCourseTeachersBySlug = async (req, res, next) => {
     const teachersData = await Promise.all(
       teacherCourses.map(async (tc) => {
         const tcObj = tc.toObject();
-        tcObj.experience = getLanguageValue(tcObj.experience);
+  
         tcObj.bio = getLanguageValue(tcObj.bio);
         tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
 

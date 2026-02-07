@@ -1,17 +1,19 @@
 import { useNavigate } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 import { useWishlist } from "../../../contexts/WishlistContext"
 
 const StudentWishlistContent = () => {
    const { wishlist, loading, toggleWishlist } = useWishlist()
    const navigate = useNavigate()
+   const { t } = useTranslation()
 
-   if (loading) return <div>Loading...</div>
+   if (loading) return <div>{t('common.loading')}</div>
 
    return (
       <div className="col-lg-9">
          <div className="dashboard__content-wrap">
             <div className="dashboard__content-title">
-               <h4 className="title">My Wishlist</h4>
+               <h4 className="title">{t('dashboard.my_wishlist')}</h4>
             </div>
             <div className="row">
                {wishlist.length > 0 ? (
@@ -65,7 +67,7 @@ const StudentWishlistContent = () => {
                                        justifyContent: 'center',
                                        border: 'none'
                                     }}
-                                    title="Remove from wishlist"
+                                    title={t('dashboard.remove_from_wishlist')}
                                  >
                                     <i className="fas fa-trash-alt text-danger"></i>
                                  </button>
@@ -81,7 +83,7 @@ const StudentWishlistContent = () => {
                                     <div className="courses__item-bottom">
                                        <div className="button">
                                           <a onClick={() => navigate(`/course/${slug || courseId}`)}>
-                                             <span className="text">Book session</span>
+                                             <span className="text">{t('common.book_session')}</span>
                                              <i className="flaticon-arrow-right"></i>
                                           </a>
                                        </div>
@@ -93,7 +95,7 @@ const StudentWishlistContent = () => {
                      } else {
                         // Fallback/Legacy Teacher Display
                         const teacherId = item.userId?._id || item._id;
-                        const name = item.userId?.name || "Teacher";
+                        const name = item.userId?.name || t('checkout.tutor');
                         const photo = item.photo;
 
                         return (
@@ -130,7 +132,7 @@ const StudentWishlistContent = () => {
                                        justifyContent: 'center',
                                        border: 'none'
                                     }}
-                                    title="Remove from wishlist"
+                                    title={t('dashboard.remove_from_wishlist')}
                                  >
                                     <i className="fas fa-trash-alt text-danger"></i>
                                  </button>
@@ -152,7 +154,7 @@ const StudentWishlistContent = () => {
                   })
                ) : (
                   <div className="col-12">
-                     <p>Your wishlist is empty.</p>
+                     <p>{t('dashboard.wishlist_empty')}</p>
                   </div>
                )}
             </div>

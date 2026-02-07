@@ -1330,16 +1330,13 @@ const TeachersSelection = () => {
                       onClick={() => setSelectedTeacher(teacher)}
                     >
                       <div className="position-absolute price-wishlist-section-desktop" style={{ top: '20px', right: '20px', zIndex: 2, maxWidth: '200px' }}>
-                        <div className="d-flex align-items-start" style={{ gap: '12px' }}>
-                          <div className="text-end" style={{ maxWidth: '150px', wordBreak: 'break-word' }}>
-                            <div className="fw-bold text-primary mb-1" style={{ fontSize: '20px', lineHeight: '1.2' }}>
-                              {getFormattedTeacherPrice(teacher)}
-                            </div>
-                            <small className="text-muted d-block" style={{ fontSize: '11px' }}>
-                              {t('common.per_hour')}
-                            </small>
-                          </div>
-
+                        <div className="d-flex align-items-center justify-content-end" style={{ gap: '6px' }}>
+                          <span className="fw-bold text-primary" style={{ fontSize: '20px', lineHeight: '1' }}>
+                            {getFormattedTeacherPrice(teacher)}
+                          </span>
+                          <span className="text-muted" style={{ fontSize: '14px', lineHeight: '1' }}>
+                            / {t('common.hour')}
+                          </span>
                         </div>
                       </div>
 
@@ -1467,20 +1464,32 @@ const TeachersSelection = () => {
                                 lang: { _id?: string; name?: string; code?: string; nativeName?: string; proficiency?: string },
                                 idx: number
                               ) => {
-                                const baseLabel = formatLanguageLabel(lang);
+                                const code = (lang.code || '').toString().toUpperCase();
+                                let label = (lang.nativeName || lang.name || '').toString().trim();
+                                
+                                if ((!label || label.toUpperCase() === code) && languageDisplayNames && code) {
+                                  try {
+                                    const resolved = languageDisplayNames.of(code.toLowerCase());
+                                    if (resolved) label = resolved.toString();
+                                  } catch {}
+                                }
+                                if (!label) label = code;
+
                                 const proficiency = lang.proficiency;
                                 let profLabel = '';
                                 if (proficiency) {
                                   const value = proficiency.toLowerCase();
                                   if (value === 'native') profLabel = 'Native';
-                                  else if (value === 'c2') profLabel = 'Proficient C2';
-                                  else if (value === 'c1') profLabel = 'Advanced C1';
-                                  else if (value === 'b2') profLabel = 'Upper Intermediate B2';
-                                  else if (value === 'b1') profLabel = 'Intermediate B1';
-                                  else if (value === 'a2') profLabel = 'Elementary A2';
-                                  else if (value === 'a1') profLabel = 'Beginner A1';
+                                  else if (value === 'c2') profLabel = 'Proficient';
+                                  else if (value === 'c1') profLabel = 'Advanced';
+                                  else if (value === 'b2') profLabel = 'Upper Intermediate';
+                                  else if (value === 'b1') profLabel = 'Intermediate';
+                                  else if (value === 'a2') profLabel = 'Elementary';
+                                  else if (value === 'a1') profLabel = 'Beginner';
+                                  else profLabel = proficiency; 
                                 }
-                                const fullLabel = profLabel ? `${baseLabel} – ${profLabel}` : baseLabel;
+                                
+                                const fullLabel = profLabel ? `${label} (${profLabel})` : label;
                                 return (
                                   <span key={lang._id || idx}>
                                     {fullLabel}
@@ -1490,30 +1499,25 @@ const TeachersSelection = () => {
                               }
                             )}
                           </div>
-                          {teacher.experience && (
-                            <p className="small text-muted mb-2" style={{ lineHeight: '1.6' }}>
-                              {teacher.experience}
-                            </p>
-                          )}
                           {teacher.bio && (
                             <div className="mb-2">
                               <p className="small text-muted mb-1" style={{ lineHeight: '1.6' }}>
                                 {expandedBios.has(teacher._id)
                                   ? teacher.bio
-                                  : teacher.bio.length > 200
-                                  ? `${teacher.bio.substring(0, 200)}...`
+                                  : teacher.bio.length > 110
+                                  ? `${teacher.bio.substring(0, 110)}...`
                                   : teacher.bio}
                               </p>
-                              {teacher.bio.length > 200 && (
+                              {teacher.bio.length > 110 && (
                                 <button
-                                  className="btn btn-link p-0 text-primary"
-                                  style={{ fontSize: '13px', textDecoration: 'none' }}
+                                  className="p-0 border-0 bg-transparent"
+                                  style={{ fontSize: '13px', textDecoration: 'none', color: '#0056b3', cursor: 'pointer', outline: 'none', boxShadow: 'none' }}
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     toggleBio(teacher._id);
                                   }}
                                 >
-                                  {expandedBios.has(teacher._id) ? t('common.show_less') : t('common.learn_more')}
+                                  {expandedBios.has(teacher._id) ? t('common.show_less') : t('common.show_more') || 'Show more'}
                                 </button>
                               )}
                             </div>
@@ -1530,72 +1534,57 @@ const TeachersSelection = () => {
                               <span className="text-muted">
                                 {teacher.teacherProfile.totalStudents} {t('common.students')}
                               </span>
-                              {teacher.teacherProfile.experience > 0 && (
-                                <span className="text-muted">
-                                  {teacher.teacherProfile.experience} {t('common.years')} {t('common.experience')}
+                              {/* Mobile Price Display in Stats Row */}
+                              <div className="d-lg-none d-flex align-items-center gap-1 ms-auto">
+                                <span className="fw-bold text-primary" style={{ fontSize: '16px' }}>
+                                  {getFormattedTeacherPrice(teacher)}
                                 </span>
-                              )}
+                              </div>
                             </div>
                           )}
                         </div>
                       </div>
                       
-                      <div className="mt-3 pt-3 border-top price-buttons-mobile d-flex justify-content-between align-items-center flex-wrap gap-3">
-                        <div className="d-flex align-items-center gap-3">
-                          <div className="text-start">
-                            <div className="fw-bold text-primary mb-1" style={{ fontSize: '20px', lineHeight: '1.2' }}>
-                              {getFormattedTeacherPrice(teacher)}
-                            </div>
-                            <small className="text-muted d-block" style={{ fontSize: '11px' }}>
-                              {t('common.per_hour')}
-                            </small>
-                          </div>
-
-                        </div>
-                        <div className="d-flex flex-column gap-2" style={{ minWidth: '160px' }}>
-                          <button
-                            className="btn btn-sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleBookTrial(teacher);
-                            }}
-                            style={{
-                              backgroundColor: '#e91e63',
-                              borderColor: '#e91e63',
-                              fontSize: '13px',
-                              padding: '10px 20px',
-                              borderRadius: '8px',
-                              fontWeight: '500',
-                              color: '#fff',
-                              width: '100%',
-                              minWidth: '140px',
-                            }}
-                          >
-                            {t('common.book_trial_lesson')}
-                          </button>
-                          <button
-                            className="btn btn-sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleSendMessage(teacher);
-                            }}
-                            style={{
-                              backgroundColor: '#fff',
-                              borderColor: '#ddd',
-                              borderWidth: '1px',
-                              borderStyle: 'solid',
-                              fontSize: '13px',
-                              padding: '10px 20px',
-                              borderRadius: '8px',
-                              fontWeight: '500',
-                              color: '#1a1a1a',
-                              width: '100%',
-                              minWidth: '140px',
-                            }}
-                          >
-                            {t('common.send_message')}
-                          </button>
-                        </div>
+                      <div className="mt-3 pt-3 border-top price-buttons-mobile d-flex align-items-center gap-3">
+                        <button
+                          className="btn btn-sm d-flex align-items-center justify-content-center"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSendMessage(teacher);
+                          }}
+                          style={{
+                            backgroundColor: '#fff',
+                            borderColor: '#ddd',
+                            borderWidth: '1px',
+                            borderStyle: 'solid',
+                            width: '42px',
+                            height: '42px',
+                            borderRadius: '8px',
+                            color: '#1a1a1a',
+                            padding: 0,
+                            flexShrink: 0,
+                          }}
+                        >
+                          <i className="far fa-comment-dots" style={{ fontSize: '18px' }}></i>
+                        </button>
+                        <button
+                          className="btn btn-sm flex-grow-1"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleBookTrial(teacher);
+                          }}
+                          style={{
+                            backgroundColor: '#e91e63',
+                            borderColor: '#e91e63',
+                            fontSize: '14px',
+                            height: '42px',
+                            borderRadius: '8px',
+                            fontWeight: '600',
+                            color: '#fff',
+                          }}
+                        >
+                          {t('common.book_trial_lesson')}
+                        </button>
                       </div>
                       
                     </div>

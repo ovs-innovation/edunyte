@@ -83,7 +83,6 @@ const TeacherJoinCoursePage = () => {
     price: '',
     currency: 'INR',
     introductionVideo: '',
-    experience: '',
     bio: '',
     aboutCourse: '',
   });
@@ -120,7 +119,7 @@ const TeacherJoinCoursePage = () => {
       price: '',
       currency: 'INR',
       introductionVideo: '',
-      experience: '',
+
       bio: '',
       aboutCourse: '',
     });
@@ -136,14 +135,14 @@ const TeacherJoinCoursePage = () => {
       price: '',
       currency: 'INR',
       introductionVideo: '',
-      experience: '',
+
       bio: '',
       aboutCourse: '',
     });
   };
 
   const handleSubmit = async () => {
-    if (!formData.courseId || formData.languages.length === 0 || !formData.price || !formData.experience || !formData.bio || !formData.aboutCourse) {
+    if (!formData.courseId || formData.languages.length === 0 || !formData.price || !formData.bio || !formData.aboutCourse) {
       toast({
         title: 'Validation Error',
         description: 'Please fill in all required fields (Course, at least one Language, Price, Experience, Bio, and About Course)',
@@ -173,7 +172,6 @@ const TeacherJoinCoursePage = () => {
         teacherPrice: parseFloat(formData.price),
         teacherCurrency: formData.currency,
         introductionVideo: formData.introductionVideo,
-        experience: formData.experience,
         bio: formData.bio,
         aboutCourse: formData.aboutCourse,
       });
@@ -463,19 +461,7 @@ const TeacherJoinCoursePage = () => {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="experience">Experience / Qualifications *</Label>
-              <Textarea
-                id="experience"
-                value={formData.experience}
-                onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-                placeholder="e.g., 5 years of teaching experience, Certified Yoga Instructor, TEFL Certified..."
-                rows={3}
-              />
-              <p className="text-xs text-muted-foreground">
-                Describe your experience and qualifications specific to this course.
-              </p>
-            </div>
+
 
             <div className="space-y-2">
               <Label htmlFor="bio">Short Bio *</Label>
@@ -517,7 +503,7 @@ const TeacherJoinCoursePage = () => {
             <Button variant="outline" onClick={handleCloseDialog} disabled={submitting}>
               Cancel
             </Button>
-            <Button onClick={handleSubmit} disabled={submitting || formData.languages.length === 0 || !formData.price || !formData.experience || !formData.bio || !formData.aboutCourse}>
+            <Button onClick={handleSubmit} disabled={submitting || formData.languages.length === 0 || !formData.price || !formData.bio || !formData.aboutCourse}>
               {submitting ? 'Submitting...' : 'Submit Request'}
             </Button>
           </DialogFooter>

@@ -7,6 +7,7 @@ import {
   getMyBookings,
   getBooking,
   updateBookingStatus,
+  rescheduleBooking,
 } from "../../controllers/bookingController.js";
 import { verifyToken } from "../../middlewares/authMiddleware.js";
 import { validateRequest } from "../../middlewares/validateRequest.js";
@@ -38,6 +39,14 @@ router.patch(
   "/:id/status",
   validateRequest(updateBookingStatusSchema),
   updateBookingStatus
+);
+
+
+// Reschedule booking
+router.post(
+  "/:id/reschedule",
+  // validateRequest(rescheduleBookingSchema), // Optional: Add validation if needed
+  rescheduleBooking
 );
 
 export default router;

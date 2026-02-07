@@ -23,6 +23,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { CloudinaryImageUploader } from "@/components/ui/cloudinary-image-uploader";
 
 type Mode = "view" | "edit";
 
@@ -103,6 +104,7 @@ export function StudentProfileDialog({ open, mode, onClose, profile, userId, onS
     city: "",
     phone: "",
     timezone: "",
+    photo: "",
   });
   
   const [selectedCountryCode, setSelectedCountryCode] = useState("");
@@ -155,6 +157,7 @@ export function StudentProfileDialog({ open, mode, onClose, profile, userId, onS
       city: data.city || "",
       phone: data.phone || "",
       timezone: data.timezone || "",
+      photo: data.photo || "",
     });
     setSelectedCountryCode(cCode);
     setSelectedStateCode(sCode);
@@ -188,7 +191,7 @@ export function StudentProfileDialog({ open, mode, onClose, profile, userId, onS
   };
 
   const resetForm = () => {
-    setFormData({ country: "", state: "", city: "", phone: "", timezone: "" });
+    setFormData({ country: "", state: "", city: "", phone: "", timezone: "", photo: "" });
     setSelectedCountryCode("");
     setSelectedStateCode("");
     setSocialLinks({ facebook: "", twitter: "", linkedin: "", website: "", github: "" });
@@ -263,8 +266,34 @@ export function StudentProfileDialog({ open, mode, onClose, profile, userId, onS
             </div>
           </div>
           
+          
           <div className="w-full bg-muted rounded-full h-2.5 dark:bg-gray-700">
             <div className="bg-primary h-2.5 rounded-full" style={{ width: `${completionPercentage}%` }}></div>
+          </div>
+
+          {/* Profile Photo */}
+          <div className="space-y-2">
+             <Label>Profile Photo</Label>
+             {mode === "view" ? (
+               <div className="flex items-center gap-4">
+                 <div className="h-20 w-20 rounded-full overflow-hidden border border-border">
+                   <img 
+                      src={formData.photo || "/assets/img/defaults/user-avatar.png"} 
+                      alt="Profile" 
+                      className="h-full w-full object-cover"
+                      onError={(e) => { e.currentTarget.src = "https://ui-avatars.com/api/?name=" + (user?.name || "User"); }}
+                   />
+                 </div>
+               </div>
+             ) : (
+               <CloudinaryImageUploader
+                 imageUrl={formData.photo}
+                 onImageChange={(url) => setFormData(prev => ({ ...prev, photo: url || "" }))}
+                 folder="student-profiles"
+                 maxSize={2 * 1024 * 1024}
+                 className="w-full max-w-sm"
+               />
+             )}
           </div>
 
           {/* Location & Contact */}
@@ -338,7 +367,7 @@ export function StudentProfileDialog({ open, mode, onClose, profile, userId, onS
               ) : (
                 <SearchableSelect
                   value={formData.timezone}
-                  options={Intl.supportedValuesOf('timeZone').map(tz => ({ label: tz, value: tz }))}
+                  options={(Intl as any).supportedValuesOf ? (Intl as any).supportedValuesOf('timeZone').map((tz: any) => ({ label: tz, value: tz })) : []}
                   placeholder="Select Timezone"
                   onSelect={(val) => {
                     setFormData(prev => ({ ...prev, timezone: val }));

@@ -114,10 +114,35 @@ const CourseArea = () => {
                               currentItems.map((item) => (
                                  <div key={item._id} className="col">
                                     <div className="courses__item shine__animate-item">
-                                       <div className="courses__item-thumb">
+                                       <div className="courses__item-thumb" style={{ position: 'relative' }}>
                                           <Link to={`/course/${item.slug || item._id}`} className="shine__animate-link">
                                              <img src={item.image || '/assets/img/courses/course_default.jpg'} alt={item.name} />
                                           </Link>
+                                          <button
+                                             onClick={(e) => {
+                                                e.preventDefault();
+                                                toggleWishlist(item._id);
+                                             }}
+                                             className="wishlist-btn"
+                                             style={{
+                                                position: 'absolute',
+                                                top: '12px',
+                                                right: '12px',
+                                                zIndex: 9,
+                                                background: '#fff',
+                                                borderRadius: '50%',
+                                                width: '32px',
+                                                height: '32px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                                             }}
+                                          >
+                                             <i className={isInWishlist(item._id) ? "fas fa-heart" : "far fa-heart"} style={{ color: isInWishlist(item._id) ? "#e91e63" : "#1A202C", fontSize: '15px' }}></i>
+                                          </button>
                                        </div>
                                        <div className="courses__item-content">
                                           <ul className="courses__item-meta list-wrap">
@@ -125,17 +150,6 @@ const CourseArea = () => {
                                                 <Link to={`/courses?category=${selectedCategory || ''}`}>{item.category || t('common.categories')}</Link>
                                              </li>
                                              <li className="avg-rating"><i className="fas fa-star"></i> (5.0 {t('common.reviews')})</li>
-                                             <li style={{marginLeft: 'auto'}}>
-                                                <button
-                                                   onClick={(e) => {
-                                                      e.preventDefault();
-                                                      toggleWishlist(item._id);
-                                                   }}
-                                                   style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: 0 }}
-                                                >
-                                                   <i className={isInWishlist(item._id) ? "fas fa-heart" : "far fa-heart"} style={{ color: isInWishlist(item._id) ? "#e91e63" : "#666", fontSize: '18px' }}></i>
-                                                </button>
-                                             </li>
                                           </ul>
                                           <h5 className="title"><Link to={`/course/${item.slug || item._id}`}>{item.name}</Link></h5>
                                           {item.description && <p className="info">{item.description}</p>}
@@ -177,10 +191,35 @@ const CourseArea = () => {
                               currentItems.map((item) => (
                                  <div key={item._id} className="col">
                                     <div className="courses__item courses__item-three shine__animate-item">
-                                       <div className="courses__item-thumb">
+                                       <div className="courses__item-thumb" style={{ position: 'relative' }}>
                                           <Link to={`/course/${item.slug || item._id}`} className="shine__animate-link">
                                              <img src={item.image || '/assets/img/courses/course_default.jpg'} alt={item.name} />
                                           </Link>
+                                          <button
+                                             onClick={(e) => {
+                                                e.preventDefault();
+                                                toggleWishlist(item._id);
+                                             }}
+                                             className="wishlist-btn"
+                                             style={{
+                                                position: 'absolute',
+                                                top: '12px',
+                                                right: '12px',
+                                                zIndex: 9,
+                                                background: '#fff',
+                                                borderRadius: '50%',
+                                                width: '32px',
+                                                height: '32px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                                             }}
+                                          >
+                                             <i className={isInWishlist(item._id) ? "fas fa-heart" : "far fa-heart"} style={{ color: isInWishlist(item._id) ? "#e91e63" : "#1A202C", fontSize: '15px' }}></i>
+                                          </button>
                                        </div>
                                        <div className="courses__item-content">
                                           <ul className="courses__item-meta list-wrap">
@@ -189,17 +228,6 @@ const CourseArea = () => {
                                                 <div className="avg-rating">
                                                    <i className="fas fa-star"></i>  (5.0 {t('common.reviews')})
                                                 </div>
-                                             </li>
-                                             <li style={{marginLeft: 'auto'}}>
-                                                <button
-                                                   onClick={(e) => {
-                                                      e.preventDefault();
-                                                      toggleWishlist(item._id);
-                                                   }}
-                                                   style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: 0 }}
-                                                >
-                                                   <i className={isInWishlist(item._id) ? "fas fa-heart" : "far fa-heart"} style={{ color: isInWishlist(item._id) ? "#e91e63" : "#666", fontSize: '18px' }}></i>
-                                                </button>
                                              </li>
                                           </ul>
                                           <h5 className="title"><Link to={`/course/${item.slug || item._id}`}>{item.name}</Link></h5>

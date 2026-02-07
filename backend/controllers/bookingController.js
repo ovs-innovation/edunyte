@@ -10,6 +10,7 @@ import {
   buildUsdExchangeRateSnapshot,
   roundMoney2,
 } from "../utils/pricingHelper.js";
+import { toUTCDate } from "../utils/timezoneHelper.js";
 
 /**
  * Booking Controller
@@ -300,18 +301,24 @@ export const updateBookingStatus = async (req, res, next) => {
       return res.status(404).json({ message: "Booking not found" });
     }
 
-    // Verify user has permission (student or teacher)
     if (booking.studentId.toString() !== userId && booking.teacherId.toString() !== userId) {
       return res.status(403).json({ message: "You don't have permission to update this booking" });
     }
 
     if (status === "cancelled") {
+      const sessionStart = toUTCDate(booking.sessionDate, booking.startTime, booking.timezone);
+      const now = new Date();
+      const timeDiff = sessionStart.getTime() - now.getTime();
+      const hoursDiff = timeDiff / (1000 * 3600);
+      if (req.user.role === "student" && hoursDiff < 24) {
+        return res.status(400).json({ message: "Lessons can only be cancelled at least 24 hours in advance." });
+      }
+
       booking.status = "cancelled";
       booking.cancelledBy = userId;
       booking.cancelledAt = new Date();
       booking.cancellationReason = cancellationReason || "";
 
-      // Free up the availability slot
       const availability = await Availability.findById(booking.availabilityId);
       if (availability) {
         availability.status = "available";
@@ -374,3 +381,124 @@ export const updateMeetingDetails = async (req, res, next) => {
   }
 };
 
+
+/**
+ * Reschedule a booking
+ */
+export const rescheduleBooking = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+    const { availabilityId } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(availabilityId)) {
+      return res.status(400).json({ message: "Invalid ID(s)" });
+    }
+
+    const booking = await Booking.findById(id);
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    if (booking.studentId.toString() !== userId) {
+      return res.status(403).json({ message: "Permission denied" });
+    }
+
+    if (booking.status === "cancelled") {
+      return res.status(400).json({ message: "Cannot reschedule a cancelled booking" });
+    }
+
+    if (booking.status === "completed") {
+      return res.status(400).json({ message: "Cannot reschedule a completed booking" });
+    }
+
+    // Check 24h rule
+    const sessionStart = toUTCDate(booking.sessionDate, booking.startTime, booking.timezone);
+    const now = new Date();
+    const timeDiff = sessionStart.getTime() - now.getTime();
+    const hoursDiff = timeDiff / (1000 * 3600);
+
+    if (hoursDiff < 24) {
+      return res.status(400).json({ message: "Rescheduling is only allowed at least 24 hours in advance." });
+    }
+
+    // Get new availability
+    const newAvailability = await Availability.findById(availabilityId);
+    if (!newAvailability) {
+      return res.status(404).json({ message: "New slot not found" });
+    }
+    if (newAvailability.status !== "available") {
+      return res.status(400).json({ message: "Selected slot is not available" });
+    }
+    
+    // Ensure same teacher
+    if (newAvailability.teacherId.toString() !== booking.teacherId.toString()) {
+       return res.status(400).json({ message: "New slot must be with the same teacher" }); 
+    }
+
+    // Generate NEW meeting link
+    const teacher = await User.findById(booking.teacherId);
+    
+    const meetingDetails = await generateMeeting(
+      {
+        sessionDate: newAvailability.date,
+        startTime: newAvailability.startTime,
+        endTime: newAvailability.endTime,
+        duration: newAvailability.duration,
+      },
+      teacher ? teacher.email : "",
+      "zoom"
+    );
+
+    // Update OLD availability
+    const oldAvailability = await Availability.findById(booking.availabilityId);
+    if (oldAvailability) {
+      oldAvailability.status = "available";
+      oldAvailability.bookingId = null;
+      await oldAvailability.save();
+    }
+
+    // Update NEW availability
+    newAvailability.status = "booked";
+    newAvailability.bookingId = booking._id;
+    await newAvailability.save();
+
+    // Update Booking
+    booking.availabilityId = newAvailability._id;
+    booking.sessionDate = newAvailability.date;
+    booking.startTime = newAvailability.startTime;
+    booking.endTime = newAvailability.endTime;
+    booking.duration = newAvailability.duration;
+    
+    // Update meeting info
+    if (meetingDetails) {
+        booking.meetingUrl = meetingDetails.joinUrl || booking.meetingUrl;
+        booking.meetingId = meetingDetails.meetingId || booking.meetingId;
+        booking.meetingPassword = meetingDetails.password || booking.meetingPassword;
+    }
+
+    // Update timezone and lesson sub-document (CRITICAL for frontend display)
+    booking.timezone = newAvailability.timezone;
+    const newScheduledAt = toUTCDate(newAvailability.date, newAvailability.startTime, newAvailability.timezone);
+    
+    booking.lesson = {
+       duration: newAvailability.duration,
+       scheduledAt: newScheduledAt,
+       timezone: newAvailability.timezone
+    };
+    
+    await booking.save();
+    
+    await booking.populate([
+      { path: "studentId", select: "name email" },
+      { path: "teacherId", select: "name email" },
+      { path: "courseId", select: "name description" },
+      { path: "languageId", select: "name code" },
+    ]);
+
+    res.json({ booking, message: "Booking rescheduled successfully" });
+
+  } catch (err) {
+    next(err);
+  }
+};

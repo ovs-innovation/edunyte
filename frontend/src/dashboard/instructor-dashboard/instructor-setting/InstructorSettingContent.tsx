@@ -3,12 +3,13 @@ import InstructorSettingProfile from "./InstructorSettingProfile"
 import InstructorSettingPassword from "./InstructorSettingPassword"
 import InstructorSettingSocialShare from "./InstructorSettingSocialShare"
 import { useState } from "react"
-
-const tab_title: string[] = ["Profile", "Password", "Social Share"];
+import { useTranslation } from "react-i18next"
 
 const InstructorSettingContent = ({ style }: any) => {
-
+   const { t } = useTranslation()
    const [activeTab, setActiveTab] = useState(0);
+
+   const tab_title: string[] = [t("common.profile"), t("common.password"), t("dashboard.social_share")];
 
    const handleTabClick = (index: any) => {
       setActiveTab(index);
@@ -18,7 +19,7 @@ const InstructorSettingContent = ({ style }: any) => {
       <div className="col-lg-9">
          <div className="dashboard__content-wrap">
             <div className="dashboard__content-title">
-               <h4 className="title">Settings</h4>
+               <h4 className="title">{t('dashboard.settings')}</h4>
             </div>
             <div className="row">
                <div className="col-lg-12">

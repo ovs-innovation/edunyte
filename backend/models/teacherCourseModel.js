@@ -96,10 +96,7 @@ const teacherCourseSchema = new mongoose.Schema(
         min: 0,
       },
     },
-    experience: {
-      type: mongoose.Schema.Types.Mixed,
-      default: { en: "" },
-    },
+
     bio: {
       type: mongoose.Schema.Types.Mixed,
       default: { en: "" },
@@ -156,9 +153,7 @@ teacherCourseSchema.index(
 );
 
 teacherCourseSchema.pre("save", function (next) {
-  if (typeof this.experience === "string") {
-    this.experience = { en: this.experience };
-  }
+
   if (typeof this.bio === "string") {
     this.bio = { en: this.bio };
   }

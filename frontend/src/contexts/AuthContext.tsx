@@ -12,6 +12,7 @@ import {
   LoginCredentials,
   RegisterData,
   AuthResponse,
+  validateToken,
 } from '../services/authService'
 
 interface User {
@@ -34,6 +35,7 @@ interface AuthContextType {
   login: (credentials: LoginCredentials) => Promise<void>
   register: (userData: RegisterData) => Promise<void>
   logout: () => void
+  updateUserProfile: (data: any) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -57,13 +59,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    const initAuth = () => {
+    const initAuth = async () => {
       const storedToken = getStoredToken()
-      const storedUser = getStoredUser()
 
-      if (storedToken && storedUser) {
-        setToken(storedToken)
-        setUser(storedUser)
+      if (storedToken) {
+        try {
+            // Optimistically set user from storage while validating
+            const userFromStorage = getStoredUser();
+            if(userFromStorage) setUser(userFromStorage);
+            
+            const validatedUser = await validateToken()
+            
+            if (validatedUser) {
+                setToken(storedToken)
+                setUser(validatedUser)
+                setStoredUser(validatedUser)
+            } else {
+                // Token invalid
+                setToken(null)
+                setUser(null)
+                removeStoredToken()
+                removeStoredUser()
+            }
+        } catch (error) {
+            setToken(null)
+            setUser(null)
+            removeStoredToken()
+            removeStoredUser()
+        }
       }
       setIsLoading(false)
     }
@@ -111,6 +134,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     navigate('/login', { replace: true })
   }, [navigate])
 
+  const updateUserProfile = useCallback(async (data: any) => {
+      try {
+          const { updateProfile } = await import('../services/authService');
+          const updatedUser = await updateProfile(data);
+          setStoredUser(updatedUser);
+          setUser(updatedUser);
+      } catch (err) {
+          console.error("Failed to update profile", err);
+          throw err;
+      }
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -121,6 +156,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         login,
         register,
         logout,
+        updateUserProfile,
       }}
     >
       {children}

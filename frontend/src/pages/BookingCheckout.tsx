@@ -52,7 +52,7 @@ const CheckoutForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     const result = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}/student-dashboard`,
+        return_url: `${window.location.origin}/my-dashboard`,
       },
     })
 
