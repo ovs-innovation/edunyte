@@ -51,11 +51,19 @@ export const getStudentProfile = async (req, res, next) => {
 export const listStudentProfiles = async (req, res, next) => {
   try {
     const { status, search } = req.query;
-    let profiles = await StudentProfile.find()
+    
+    let query = {};
+    // If user is a teacher, filter by their students (who have booked them)
+    if (req.user.role === 'teacher') {
+      const bookings = await Booking.find({ teacherId: req.user.id }).distinct('studentId');
+      query.userId = { $in: bookings };
+    }
+
+    let profiles = await StudentProfile.find(query)
       .populate("userId", "name email status")
       .sort({ createdAt: -1 });
     
-    // Calculate progress for all students
+    // Calculate progress for fetched students
     for (const profile of profiles) {
       if (profile.userId && profile.userId._id) {
         await calculateStudentProgress(profile.userId._id);
@@ -63,7 +71,7 @@ export const listStudentProfiles = async (req, res, next) => {
     }
     
     // Reload profiles with updated progress
-    profiles = await StudentProfile.find()
+    profiles = await StudentProfile.find(query)
       .populate("userId", "name email status")
       .sort({ createdAt: -1 });
     
