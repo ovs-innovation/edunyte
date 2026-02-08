@@ -1,4 +1,7 @@
+import { useTranslation } from "react-i18next";
+
 const Newsletter = () => {
+   const { t } = useTranslation();
    return (
       <section className="newsletter__area">
          <div className="container">
@@ -12,11 +15,14 @@ const Newsletter = () => {
                </div>
                <div className="col-lg-8">
                   <div className="newsletter__content">
-                     <h2 className="title">Want to stay <span>informed</span> about <br /> new <span>courses & study?</span></h2>
+                     <h2 className="title">
+                        {t('common.newsletter_title_1')} <span>{t('common.newsletter_title_highlight_1')}</span> {t('common.newsletter_title_2')} <br /> 
+                        {t('common.newsletter_title_3')} <span>{t('common.newsletter_title_highlight_2')}</span>
+                     </h2>
                      <div className="newsletter__form">
                         <form onSubmit={(e) => e.preventDefault()}>
-                           <input type="email" placeholder="Type your e-mail" />
-                           <button type="submit" className="btn">Subscribe Now</button>
+                           <input type="email" placeholder={t('common.newsletter_placeholder')} />
+                           <button type="submit" className="btn">{t('common.subscribe_now')}</button>
                         </form>
                      </div>
                   </div>

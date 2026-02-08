@@ -124,7 +124,14 @@
     "about_list_1": "Expert instructors",
     "about_list_2": "Same course, multiple languages",
     "about_list_3": "Learn anytime, anywhere",
-    "enrolled_students": "Enrolled Students"
+    "enrolled_students": "Enrolled Students",
+    "newsletter_title_1": "Want to stay",
+    "newsletter_title_highlight_1": "informed",
+    "newsletter_title_2": "about",
+    "newsletter_title_3": "new",
+    "newsletter_title_highlight_2": "courses & study?",
+    "newsletter_placeholder": "Type your e-mail",
+    "subscribe_now": "Subscribe Now"
   },
   "checkout": {
     "title": "Checkout",
