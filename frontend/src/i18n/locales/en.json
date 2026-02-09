@@ -133,6 +133,238 @@
     "newsletter_placeholder": "Type your e-mail",
     "subscribe_now": "Subscribe Now"
   },
+  "home": {
+    "how_it_works": {
+      "subtitle": "How It Works",
+      "title": "How Learning Works on Our Platform",
+      "description": "Learn skills, languages, and professional courses in the language you're most comfortable with. Our platform is designed to make learning simple, flexible, and accessible for everyone — anytime, anywhere.",
+      "see_all_instructors": "See All Instructors",
+      "step1_title": "Choose Your Skill",
+      "step1_description": "Pick from languages, creative skills, professional courses, wellness, and more — all in one place.",
+      "step2_title": "Select Your Language",
+      "step2_description": "Learn in Hindi, English, or your preferred regional language for better understanding.",
+      "step3_title": "Learn at Your Pace",
+      "step3_description": "Access online, offline, live, or recorded classes — learn when it suits you.",
+      "step4_title": "Track Your Growth",
+      "step4_description": "Monitor progress, access learning materials, and earn certificates as you grow."
+    },
+    "counter": {
+      "active_students": "Active Students",
+      "experienced_tutors": "Experienced tutors",
+      "courses": "Courses",
+      "tutor_nationalities": "Tutor nationalities"
+    },
+    "faq": {
+      "subtitle": "Faq's",
+      "title": "Build Skills with Trusted Global Mentors",
+      "description": "Expert-led courses designed to help you grow faster and smarter.",
+      "questions": {
+        "q1": "Why should I choose Edunyte for learning?",
+        "a1": "Because Edunyte offers flexible, skill-based courses taught by expert instructors in multiple languages.",
+        "q2": "Can I learn skills in my local language?",
+        "a2": "Yes, courses are available in Hindi, English, and other regional languages for easy understanding.",
+        "q3": "Are the courses taught by certified experts?",
+        "a3": "Absolutely. All courses are delivered by verified and experienced professionals.",
+        "q4": "Is Edunyte affordable for students?",
+        "a4": "Yes, Edunyte provides high-quality education at student-friendly and affordable prices."
+      }
+    },
+    "features": {
+      "subtitle": "How Your Learning Journey Begins",
+      "title": "Take the First Step Toward Skills",
+      "description": "A simple learning experience that brings students and mentors together to learn, track progress, and succeed.",
+      "items": {
+        "home_1": {
+          "1": {
+            "title": "Guided by Skilled Professionals",
+            "desc": "Get hands-on training from experienced professionals."
+          },
+          "2": {
+            "title": "Skills Without Boundaries",
+            "desc": "Explore skills beyond limits and borders."
+          },
+          "3": {
+            "title": "Earn Online Certification",
+            "desc": "Complete courses and earn career-ready certifications."
+          },
+          "4": {
+            "title": "E-mail Marketing",
+            "desc": "Curated strategies and practical lessons to help you reach the right audience effectively."
+          }
+        },
+        "home_2": {
+          "1": {
+            "title": "Expert Tutors",
+            "desc": "when an unknown printer took a galley offe type and scrambled makes."
+          },
+          "2": {
+            "title": "Effective Courses",
+            "desc": "when an unknown printer took a galley offe type and scrambled makes."
+          },
+          "3": {
+            "title": "Earn Certificate",
+            "desc": "when an unknown printer took a galley offe type and scrambled makes."
+          }
+        },
+        "home_3": {
+          "1": {
+            "title": "Scholarship Facility",
+            "desc": "Eestuidar University we prepare you to launch your."
+          },
+          "2": {
+            "title": "Learn From Experts",
+            "desc": "Eestuidar University we prepare you to launch your."
+          },
+          "3": {
+            "title": "Graduation Courses",
+            "desc": "Eestuidar University we prepare you to launch your."
+          },
+          "4": {
+            "title": "Certificate Program",
+            "desc": "Eestuidar University we prepare you to launch your."
+          }
+        },
+        "home_4": {
+          "1": {
+            "title": "Support & Motivation",
+            "desc": "We are able to offer every yoga training experienced & best yoga trainer."
+          },
+          "2": {
+            "title": "Strong Body Life",
+            "desc": "We are able to offer every yoga training experienced & best yoga trainer."
+          },
+          "3": {
+            "title": "Increased Flexibility",
+            "desc": "We are able to offer every yoga training experienced & best yoga trainer."
+          }
+        },
+        "home_5": {
+          "1": {
+            "title": "Easy Class",
+            "desc": "Dear Psum Dolor Amettey Adipis Aecing Eiusmod Incididutt Reore"
+          },
+          "2": {
+            "title": "Safety & Security",
+            "desc": "Dear Psum Dolor Amettey Adipis Aecing Eiusmod Incididutt Reore"
+          },
+          "3": {
+            "title": "Skilled Teacher",
+            "desc": "Dear Psum Dolor Amettey Adipis Aecing Eiusmod Incididutt Reore"
+          },
+          "4": {
+            "title": "Clean Curriculum",
+            "desc": "Dear Psum Dolor Amettey Adipis Aecing Eiusmod Incididutt Reore"
+          }
+        },
+        "home_8": {
+          "1": {
+            "title": "Learn skills with 120k+",
+            "desc": "video courses."
+          },
+          "2": {
+            "title": "Choose courses",
+            "desc": "real-world experts."
+          },
+          "3": {
+            "title": "processional Tutors",
+            "desc": "video courses."
+          },
+          "4": {
+            "title": "Online Degrees",
+            "desc": "Study flexibly online"
+          }
+        }
+      }
+    },
+    "join_section": {
+      "join_as_instructor_title": "Join as an Instructor",
+      "join_as_instructor_description": "As a simple example, learning begins with effort, consistency, and the right guidance.",
+      "join_as_student_title": "Join as an student",
+      "join_as_student_description": "Join learners from around the world and grow together through live and online learning.",
+      "apply_now": "Apply Now"
+    },
+    "blog": {
+      "subtitle": "News & Blogs",
+      "title": "Our Latest News Feed",
+      "description": "when known printer took a galley of type scrambl edmake",
+      "items": {
+        "home_1": {
+          "1": {
+            "tag": "Marketing",
+            "title": "How To Become idiculously Self-Aware In 20 Minutes"
+          },
+          "2": {
+            "tag": "Students",
+            "title": "Get Started With UI Design With Tips To Speed"
+          },
+          "3": {
+            "tag": "Science",
+            "title": "Make Your Own Expanding Contracting Content"
+          },
+          "4": {
+            "tag": "Agency",
+            "title": "What we are capable to usually discovered"
+          }
+        },
+        "home_4": {
+          "1": {
+            "tag": "Practice",
+            "title": "Finding Zen: The Benefits of Yoga And Meditation For Mental Health"
+          },
+          "2": {
+            "tag": "Yoga",
+            "title": "The Benefits of Yoga And Meditation For Mental Health"
+          },
+          "3": {
+            "tag": "Modern Instruments",
+            "title": "The Benefits of Yoga And Meditation For Mental Health"
+          }
+        },
+        "home_5": {
+          "1": {
+            "tag": "Marketing",
+            "title": "Learn from Anywhere with Our eLearning Platform"
+          },
+          "2": {
+            "tag": "Agency",
+            "title": "platform has given me the bility to learn on my own schedule"
+          },
+          "3": {
+            "tag": "Play Ground",
+            "title": "learning platform where you can easily access course content"
+          }
+        },
+        "home_6": {
+          "1": {
+            "tag": "Marketing",
+            "title": "Learn from Anywhere with Our eLearning Platform"
+          },
+          "2": {
+            "tag": "Agency",
+            "title": "platform has given me the bility to learn on my own schedule"
+          },
+          "3": {
+            "tag": "Play Ground",
+            "title": "learning platform where you can easily access course content"
+          }
+        },
+        "home_8": {
+          "1": {
+            "tag": "Cooking",
+            "title": "Learn From Anywhere With Our ELearning Platform"
+          },
+          "2": {
+            "tag": "Food",
+            "title": "Learn From Anywhere With Our ELearning Platform"
+          },
+          "3": {
+            "tag": "Recipes",
+            "title": "Learn From Anywhere With Our ELearning Platform"
+          }
+        }
+      }
+    }
+  },
   "checkout": {
     "title": "Checkout",
     "your_tutor": "Your tutor",

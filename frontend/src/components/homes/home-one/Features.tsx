@@ -1,15 +1,18 @@
 import feature_data from "../../../data/home-data/FeatureData";
+import { useTranslation } from "react-i18next";
 
 const Features = () => {
+   const { t } = useTranslation();
+
    return (
       <section className="features__area">
          <div className="container">
             <div className="row justify-content-center">
                <div className="col-xl-6">
                   <div className="section__title white-title text-center mb-50">
-                     <span className="sub-title">How We Start Journey</span>
-                     <h2 className="title">Start your Learning Journey Today!</h2>
-                     <p>Groove’s intuitive shared inbox makesteam members together <br /> organize, prioritize and.In this episode.</p>
+                     <span className="sub-title">{t('home.features.subtitle')}</span>
+                     <h2 className="title">{t('home.features.title')}</h2>
+                     <p>{t('home.features.description')}</p>
                   </div>
                </div>
             </div>
@@ -21,8 +24,8 @@ const Features = () => {
                            <img src={item.icon ? item.icon : ""} className="injectable" alt="img" />
                         </div>
                         <div className="features__content">
-                           <h4 className="title">{item.title}</h4>
-                           <p>{item.desc}</p>
+                           <h4 className="title">{t(item.title)}</h4>
+                           <p>{t(item.desc)}</p>
                         </div>
                      </div>
                   </div>

@@ -1,11 +1,13 @@
 import feature_data from "../../../data/home-data/FeatureData";
 import InjectableSvg from "../../../hooks/InjectableSvg";
+import { useTranslation } from "react-i18next";
 
 interface FeatureProps {
    style: boolean;
 }
 
 const Feature = ({ style }: FeatureProps) => {
+   const { t } = useTranslation();
    return (
       <section className={`${style ? "features__area-three" : "features__area-two"} section-pt-120 section-pb-90`}>
          <div className="container">
@@ -28,9 +30,9 @@ const Feature = ({ style }: FeatureProps) => {
                                  <div className="features__icon-two">
                                     <InjectableSvg src={item.icon_2 ? item.icon_2 : ""} alt="img" className="injectable" />
                                  </div>
-                                 <h2 className="title">{item.title}</h2>
+                                 <h2 className="title">{t(item.title)}</h2>
                               </div>
-                              <p>{item.desc}</p>
+                              <p>{t(item.desc)}</p>
                            </div>
                            <div className="features__item-shape">
                               <InjectableSvg src="/assets/img/others/features_item_shape.svg" alt="img" className="injectable" />
