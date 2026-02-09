@@ -1,13 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { UserTable } from '@/components/users/UserTable';
 import { PermissionGate } from '@/components/PermissionGate';
 import { Button } from '@/components/ui/button';
-import { Plus, Download, Filter } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Plus, Download, Filter, Search } from 'lucide-react';
 import { UsersAPI, ApiUser } from '@/lib/api';
 import { UserFormDialog } from '@/components/users/UserFormDialog';
 import { useToast } from '@/hooks/use-toast';
 import { UserViewDialog } from '@/components/users/UserViewDialog';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const UsersPage = () => {
   const [users, setUsers] = useState<ApiUser[]>([]);
@@ -15,6 +24,8 @@ const UsersPage = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editUser, setEditUser] = useState<ApiUser | null>(null);
   const [viewUser, setViewUser] = useState<ApiUser | null>(null);
+  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const { toast } = useToast();
 
   const loadUsers = async () => {
@@ -51,6 +62,28 @@ const UsersPage = () => {
     }
   };
 
+  const filteredUsers = useMemo(() => {
+    return users.filter((user) => {
+      const matchesRole = selectedRoles.length === 0 || selectedRoles.includes(user.role);
+      const matchesSearch =
+        searchQuery === '' ||
+        user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesRole && matchesSearch;
+    });
+  }, [users, selectedRoles, searchQuery]);
+
+  const uniqueRoles = useMemo(() => {
+    const roles = new Set(users.map((u) => u.role));
+    return Array.from(roles);
+  }, [users]);
+
+  const toggleRole = (role: string) => {
+    setSelectedRoles((prev) =>
+      prev.includes(role) ? prev.filter((r) => r !== role) : [...prev, role]
+    );
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -63,10 +96,52 @@ const UsersPage = () => {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" className="gap-2">
-              <Filter className="h-4 w-4" />
-              Filter
-            </Button>
+            <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search users..."
+                className="pl-8 w-[200px] lg:w-[300px]"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Filter className="h-4 w-4" />
+                  Filter {selectedRoles.length > 0 && `(${selectedRoles.length})`}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>Filter by Role</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {uniqueRoles.map((role) => (
+                  <DropdownMenuCheckboxItem
+                    key={role}
+                    checked={selectedRoles.includes(role)}
+                    onCheckedChange={() => toggleRole(role)}
+                    className="capitalize"
+                  >
+                    {role.replace('_', ' ')}
+                  </DropdownMenuCheckboxItem>
+                ))}
+                {uniqueRoles.length === 0 && (
+                   <div className="p-2 text-sm text-muted-foreground text-center">No roles found</div>
+                )}
+                {selectedRoles.length > 0 && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuCheckboxItem
+                      checked={false}
+                      onCheckedChange={() => setSelectedRoles([])}
+                      className="justify-center text-center font-medium text-destructive focus:text-destructive"
+                    >
+                      Clear Filters
+                    </DropdownMenuCheckboxItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
             <PermissionGate permission="reports.export">
               <Button variant="outline" size="sm" className="gap-2">
                 <Download className="h-4 w-4" />
@@ -92,7 +167,7 @@ const UsersPage = () => {
         {/* Table */}
         <div className="animate-slide-up">
           <UserTable
-            users={users}
+            users={filteredUsers}
             loading={loading}
             onEdit={(user) => {
               setEditUser(user);

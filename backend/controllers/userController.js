@@ -2,6 +2,8 @@ import User from "../models/userModel.js";
 import { rolePermissions } from "../lib/roles.js";
 import Role from "../models/roleModel.js";
 import { resolveRoleKey } from "../lib/validateRole.js";
+import StudentProfile from "../models/studentProfileModel.js";
+import TeacherProfile from "../models/teacherProfileModel.js";
 
 const resolvePermissions = async (roleKey) => {
   const role = await Role.findOne({ key: roleKey });
@@ -45,6 +47,13 @@ export const createUser = async (req, res, next) => {
     const userRole = await resolveRoleKey(role);
     const userStatus = ["active", "inactive", "pending"].includes(status) ? status : "active";
     const user = await User.create({ name, email, password, role: userRole, status: userStatus });
+
+    if (user.role === "student") {
+      await StudentProfile.create({ userId: user._id });
+    } else if (user.role === "teacher") {
+      await TeacherProfile.create({ userId: user._id });
+    }
+
     const perms = await resolvePermissions(user.role);
     res.status(201).json({ user: toUserDto(user, perms) });
   } catch (err) {
@@ -70,6 +79,15 @@ export const updateUser = async (req, res, next) => {
     if (role) user.role = await resolveRoleKey(role);
     if (status && ["active", "inactive", "pending"].includes(status)) user.status = status;
     await user.save();
+
+    if (user.role === "student") {
+      const existing = await StudentProfile.findOne({ userId: user._id });
+      if (!existing) await StudentProfile.create({ userId: user._id });
+    } else if (user.role === "teacher") {
+      const existing = await TeacherProfile.findOne({ userId: user._id });
+      if (!existing) await TeacherProfile.create({ userId: user._id });
+    }
+
     const perms = await resolvePermissions(user.role);
     res.json({ user: toUserDto(user, perms) });
   } catch (err) {
@@ -82,6 +100,13 @@ export const deleteUser = async (req, res, next) => {
     const { id } = req.params;
     const user = await User.findById(id);
     if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (user.role === "student") {
+      await StudentProfile.findOneAndDelete({ userId: user._id });
+    } else if (user.role === "teacher") {
+      await TeacherProfile.findOneAndDelete({ userId: user._id });
+    }
+
     await user.deleteOne();
     res.json({ success: true });
   } catch (err) {

@@ -157,10 +157,10 @@
                 font-size: 35px;
             }
             @media #{$xs} {
-                font-size: 30px;
+                font-size: 24px;
             }
             @media #{$sm} {
-                font-size: 40px;
+                font-size: 32px;
             }
             & span:not(.svg-icon) {
                 color: var(--tg-theme-primary);
@@ -782,6 +782,7 @@
         }
         & .main-img {
             max-width: inherit;
+            margin-top: 50px;
             @media #{$xl} {
                 max-width: 100%;
             }

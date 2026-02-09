@@ -109,7 +109,28 @@
     "cancel": "रद्द करें",
     "continue": "जारी रखें",
     "select_course": "पाठ्यक्रम चुनें",
-    "hour": "घंटा"
+    "hour": "घंटा",
+    "banner_title_prefix": "भाषाओं से परे — शिक्षकों से कोई भी कोर्स सीखें",
+    "banner_title_highlight": "दुनिया भर में",
+    "banner_description": "हर शिक्षण और सीखने की यात्रा अनूठी है। हम हर कदम पर आपका मार्गदर्शन करने के लिए यहाँ हैं।",
+    "start_free_trial": "ट्रायल शुरू करें",
+    "banner_features": "सीखें, अभ्यास करें और आत्मविश्वास से बढ़ें",
+    "about_subtitle": "हमारे बारे में और जानें",
+    "about_title_1": "हजारों",
+    "about_title_highlight": "कोर्स",
+    "about_title_2": "अपनी भाषा में कौशल सीखें",
+    "about_description": "एक मंच। कई पाठ्यक्रम। हिंदी, अंग्रेजी और अन्य में पढ़ाया जाता है - ताकि सीखना आसान, स्वाभाविक और प्रभावी लगे।",
+    "about_list_1": "विशेषज्ञ प्रशिक्षक",
+    "about_list_2": "एक ही पाठ्यक्रम, कई भाषाएं",
+    "about_list_3": "कभी भी, कहीं भी सीखें",
+    "enrolled_students": "नामांकित छात्र",
+    "newsletter_title_1": "क्या आप",
+    "newsletter_title_highlight_1": "सूचित",
+    "newsletter_title_2": "रहना चाहते हैं",
+    "newsletter_title_3": "नए",
+    "newsletter_title_highlight_2": "पाठ्यक्रमों और अध्ययन के बारे में?",
+    "newsletter_placeholder": "अपना ईमेल टाइप करें",
+    "subscribe_now": "अभी सदस्यता लें"
   }
 }
 

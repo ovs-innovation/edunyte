@@ -10,7 +10,7 @@ import InstructorTwo from "./InstructorTwo"
 import Blog from "./Blog"
 import Categories from "./Categories"
 import HeaderOne from "../../../layouts/headers/HeaderOne"
-import BrandOne from "../../common/brands/BrandOne"
+// import BrandOne from "../../common/brands/BrandOne"
 import FooterOne from "../../../layouts/footers/FooterOne"
 
 const HomeOne = () => {
@@ -20,7 +20,7 @@ const HomeOne = () => {
          <main className="main-area fix">
             <Banner />
             <Categories />
-            <BrandOne />
+            {/* <BrandOne /> */}
             <About />
             <CourseArea style={false} />
             <Newsletter />
