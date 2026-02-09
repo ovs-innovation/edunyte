@@ -1,16 +1,18 @@
 import { Link } from "react-router-dom"
 import blog_data from "../../../data/home-data/BlogData"
+import { useTranslation } from "react-i18next";
 
 const Blog = () => {
+   const { t } = useTranslation();
    return (
       <section className="blog__post-area-five section-pt-140 section-pb-110">
          <div className="container">
             <div className="row justify-content-center">
                <div className="col-xl-6">
                   <div className="section__title text-center mb-50">
-                     <span className="sub-title">News & Blogs</span>
-                     <h2 className="title">Our Latest News Feed</h2>
-                     <p>when known printer took a galley of type scrambl edmake</p>
+                     <span className="sub-title">{t('home.blog.subtitle')}</span>
+                     <h2 className="title">{t('home.blog.title')}</h2>
+                     <p>{t('home.blog.description')}</p>
                   </div>
                </div>
             </div>
@@ -23,8 +25,8 @@ const Blog = () => {
                            <Link to="/blog-details" className="shine__animate-link"><img src={item.thumb} alt="img" /></Link>
                         </div>
                         <div className="blog__post-content-four">
-                           <Link to="blog" className="post-tag-three">{item.tag}</Link>
-                           <h2 className="title"><Link to="/blog-details">{item.title}</Link></h2>
+                           <Link to="/blog" className="post-tag-three">{t(item.tag)}</Link>
+                           <h2 className="title"><Link to="/blog-details">{t(item.title)}</Link></h2>
                            <div className="blog__post-meta">
                               <ul className="list-wrap">
                                  <li><i className="flaticon-user-1"></i>by <Link to="/blog-details">Admin</Link></li>

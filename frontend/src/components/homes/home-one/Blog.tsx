@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom"
 import blog_data from "../../../data/home-data/BlogData"
 
@@ -6,15 +7,16 @@ interface BlogProps {
 }
 
 const Blog = ({ style }: BlogProps) => {
+   const { t } = useTranslation();
    return (
       <section className={`blog__post-area ${style ? "blog__post-area-two" : ""}`}>
          <div className="container">
             <div className="row justify-content-center">
                <div className="col-lg-6">
                   <div className="section__title text-center mb-40">
-                     <span className="sub-title">News & Blogs</span>
-                     <h2 className="title">Our Latest News Feed</h2>
-                     <p>when known printer took a galley of type scrambl edmake</p>
+                     <span className="sub-title">{t('home.blog.subtitle')}</span>
+                     <h2 className="title">{t('home.blog.title')}</h2>
+                     <p>{t('home.blog.description')}</p>
                   </div>
                </div>
             </div>
@@ -25,7 +27,7 @@ const Blog = ({ style }: BlogProps) => {
                      <div className="blog__post-item shine__animate-item">
                         <div className="blog__post-thumb">
                            <Link to="/blog-details" className="shine__animate-link"><img src={item.thumb} alt="img" /></Link>
-                           <Link to="/blog" className="post-tag">{item.tag}</Link>
+                           <Link to="/blog" className="post-tag">{t(item.tag)}</Link>
                         </div>
                         <div className="blog__post-content">
                            <div className="blog__post-meta">
@@ -34,7 +36,7 @@ const Blog = ({ style }: BlogProps) => {
                                  <li><i className="flaticon-user-1"></i>by <Link to="/blog-details">Admin</Link></li>
                               </ul>
                            </div>
-                           <h4 className="title"><Link to="/blog-details">{item.title}</Link></h4>
+                           <h4 className="title"><Link to="/blog-details">{t(item.title)}</Link></h4>
                         </div>
                      </div>
                   </div>

@@ -3,7 +3,8 @@ import InjectableSvg from "../../../hooks/InjectableSvg";
 import MotionAnimation from "../../../hooks/MotionAnimation";
 import SvgAnimation from "../../../hooks/SvgAnimation";
 import CurvedCircle from "./CurvedCircle"
-import {useState, useEffect } from "react"
+import { useState, useEffect } from "react"
+import { useTranslation } from "react-i18next";
 
 interface faqItem {
    id: number;
@@ -14,25 +15,26 @@ interface faqItem {
 };
 
 const FaqArea = () => {
+   const { t } = useTranslation();
 
    const [faqData, setFaqData] = useState<faqItem[]>([]);
 
    useEffect(() => {
-       const initialFaqData: faqItem[] = faq_data.map((faq, index) => ({
-           ...faq,
-           showAnswer: index === 0,
-       }));
-       setFaqData(initialFaqData);
+      const initialFaqData: faqItem[] = faq_data.map((faq, index) => ({
+         ...faq,
+         showAnswer: index === 0,
+      }));
+      setFaqData(initialFaqData);
    }, []);
 
    const toggleAnswer = (index: number) => {
-       setFaqData((prevFaqData) => {
-           const updatedFaqData = prevFaqData.map((faq, i) => ({
-               ...faq,
-               showAnswer: i === index ? !faq.showAnswer : false,
-           }));
-           return updatedFaqData;
-       });
+      setFaqData((prevFaqData) => {
+         const updatedFaqData = prevFaqData.map((faq, i) => ({
+            ...faq,
+            showAnswer: i === index ? !faq.showAnswer : false,
+         }));
+         return updatedFaqData;
+      });
    };
 
    MotionAnimation();
@@ -62,26 +64,26 @@ const FaqArea = () => {
                <div className="col-lg-6">
                   <div className="faq__content">
                      <div className="section__title pb-10">
-                        <span className="sub-title">Faq’s</span>
-                        <h2 className="title">Build Skills with Trusted Global Mentors</h2>
+                        <span className="sub-title">{t('home.faq.subtitle')}</span>
+                        <h2 className="title">{t('home.faq.title')}</h2>
                      </div>
-                     <p> Expert-led courses designed to help you grow faster and smarter.</p>
+                     <p>{t('home.faq.description')}</p>
                      <div className="faq__wrap">
                         <div className="accordion" id="accordionExample">
                            {faqData.map((item, index) => (
                               <div key={item.id} className="accordion-item">
                                  <h2 className="accordion-header">
                                     <button className={`accordion-button  ${item.showAnswer ? "" : "collapsed"}`}
-                                            type="button" onClick={() => toggleAnswer(index)}>
-                                       {item.question}
+                                       type="button" onClick={() => toggleAnswer(index)}>
+                                       {t(item.question)}
                                     </button>
                                  </h2>
                                  {item.showAnswer && (
-                                 <div id={`collapse${item.id}`}  className="accordion-collapse collapse show">
-                                    <div className="accordion-body">
-                                       <p>{item.answer}</p>
+                                    <div id={`collapse${item.id}`} className="accordion-collapse collapse show">
+                                       <div className="accordion-body">
+                                          <p>{t(item.answer)}</p>
+                                       </div>
                                     </div>
-                                 </div>
                                  )}
                               </div>
                            ))}
