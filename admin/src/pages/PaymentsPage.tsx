@@ -224,7 +224,7 @@ const PaymentsPage = () => {
               <div>
                 <p className="text-sm text-muted-foreground">Total Revenue</p>
                 <p className="text-2xl font-bold text-foreground">
-                  {formatCurrency(stats.totalRevenue)}
+                  ${stats.totalRevenue.toFixed(2)}
                 </p>
               </div>
             </div>

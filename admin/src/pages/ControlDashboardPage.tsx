@@ -306,7 +306,7 @@ const ControlDashboardPage = () => {
                   {stats.revenueChange >= 0 ? '+' : ''}{stats.revenueChange}%
                 </Badge>
               </div>
-              <p className="mt-4 text-2xl font-bold text-foreground">₹{stats.totalRevenue.toLocaleString()}</p>
+              <p className="mt-4 text-2xl font-bold text-foreground">${stats.totalRevenue.toLocaleString()}</p>
               <p className="text-sm text-muted-foreground">Total Revenue</p>
               <p className="mt-1 text-xs text-muted-foreground/70">Last 30 days</p>
             </Card>
