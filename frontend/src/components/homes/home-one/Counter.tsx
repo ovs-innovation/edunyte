@@ -1,4 +1,5 @@
 import Count from "../../common/Count";
+import { useTranslation } from "react-i18next";
 
 interface DataType {
    id: number;
@@ -7,34 +8,36 @@ interface DataType {
    text: string;
 };
 
-const count_data: DataType[] = [
-   {
-      id: 1,
-      count: 45,
-      count_text: "K+",
-      text: "Active Students",
-   },
-   {
-      id: 2,
-      count: 89,
-      count_text: "+",
-      text: "Faculty Courses",
-   },
-   {
-      id: 3,
-      count: 156,
-      count_text: "K",
-      text: "Best Professors",
-   },
-   {
-      id: 4,
-      count: 42,
-      count_text: "K",
-      text: "Award Achieved",
-   },
-];
-
 const Counter = () => {
+   const { t } = useTranslation();
+
+   const count_data: DataType[] = [
+      {
+         id: 1,
+         count: 45,
+         count_text: "K+",
+         text: t('home.counter.active_students'),
+      },
+      {
+         id: 2,
+         count: 100,
+         count_text: "K+",
+         text: t('home.counter.experienced_tutors'),
+      },
+      {
+         id: 3,
+         count: 156,
+         count_text: "K+",
+         text: t('home.counter.courses'),
+      },
+      {
+         id: 4,
+         count: 120,
+         count_text: "K+",
+         text: t('home.counter.tutor_nationalities'),
+      },
+   ];
+
    return (
       <section className="fact__area">
          <div className="container">

@@ -2,11 +2,14 @@ import { Link } from "react-router-dom";
 import InjectableSvg from "../../../hooks/InjectableSvg";
 import SvgAnimation from "../../../hooks/SvgAnimation";
 import BtnArrow from "../../../svg/BtnArrow";
+import { useTranslation } from "react-i18next";
 
 interface InstructorTwoProps {
    style: boolean;
 }
+
 const InstructorTwo = ({ style }: InstructorTwoProps) => {
+   const { t } = useTranslation();
 
    const svgIconRef = SvgAnimation('/assets/img/instructor/instructor_shape02.svg');
    const svgIconRef2 = SvgAnimation('/assets/img/instructor/instructor_shape02.svg');
@@ -28,10 +31,10 @@ const InstructorTwo = ({ style }: InstructorTwoProps) => {
                            </div>
                         </div>
                         <div className="instructor__content-two">
-                           <h3 className="title"><Link to="/contact">Become a Instructor</Link></h3>
-                           <p>To take a trivial example, which of us undertakes physical exercise yes is this happen here.</p>
+                           <h3 className="title"><Link to="/contact">{t('home.join_section.join_as_instructor_title')}</Link></h3>
+                           <p>{t('home.join_section.join_as_instructor_description')}</p>
                            <div className="tg-button-wrap">
-                              <Link to="/contact" className="btn arrow-btn">Apply Now <BtnArrow /></Link>
+                              <Link to="/contact" className="btn arrow-btn">{t('home.join_section.apply_now')} <BtnArrow /></Link>
                            </div>
                         </div>
                      </div>
@@ -49,10 +52,10 @@ const InstructorTwo = ({ style }: InstructorTwoProps) => {
                            </div>
                         </div>
                         <div className="instructor__content-two">
-                           <h3 className="title"><Link to="/contact">Become a Student</Link></h3>
-                           <p>Join millions of people from around the world learning together. Online learning</p>
+                           <h3 className="title"><Link to="/contact">{t('home.join_section.join_as_student_title')}</Link></h3>
+                           <p>{t('home.join_section.join_as_student_description')}</p>
                            <div className="tg-button-wrap">
-                              <Link to="/contact" className="btn arrow-btn">Apply Now <BtnArrow /></Link>
+                              <Link to="/contact" className="btn arrow-btn">{t('home.join_section.apply_now')} <BtnArrow /></Link>
                            </div>
                         </div>
                      </div>
