@@ -21,19 +21,19 @@ const Counter = () => {
       {
          id: 2,
          count: 100,
-         count_text: "K",
+         count_text: "K+",
          text: t('home.counter.experienced_tutors'),
       },
       {
          id: 3,
          count: 156,
-         count_text: "",
+         count_text: "K+",
          text: t('home.counter.courses'),
       },
       {
          id: 4,
          count: 120,
-         count_text: "",
+         count_text: "K+",
          text: t('home.counter.tutor_nationalities'),
       },
    ];
