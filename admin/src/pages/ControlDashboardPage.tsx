@@ -17,7 +17,7 @@ import {
   Eye,
   Clock
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   ChartContainer,
   ChartTooltip,
@@ -38,17 +38,13 @@ import {
   LineChart,
   Line,
 } from 'recharts';
+import { useToast } from '@/hooks/use-toast';
 
-const enrollmentData = [
-  { month: 'Jan', enrollments: 120, revenue: 4500 },
-  { month: 'Feb', enrollments: 180, revenue: 6800 },
-  { month: 'Mar', enrollments: 250, revenue: 9200 },
-  { month: 'Apr', enrollments: 220, revenue: 8100 },
-  { month: 'May', enrollments: 310, revenue: 11500 },
-  { month: 'Jun', enrollments: 280, revenue: 10200 },
-  { month: 'Jul', enrollments: 350, revenue: 13000 },
-];
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8085/api';
 
+const getToken = () => localStorage.getItem('admin-auth-token') || sessionStorage.getItem('admin-auth-token');
+
+// Mock data for traffic (as per user request to exclude)
 const trafficData = [
   { day: 'Mon', visitors: 2400, pageViews: 4800 },
   { day: 'Tue', visitors: 1398, pageViews: 3200 },
@@ -59,21 +55,7 @@ const trafficData = [
   { day: 'Sun', visitors: 4300, pageViews: 8600 },
 ];
 
-const coursePerformanceData = [
-  { name: 'Web Development', students: 450, completion: 78, rating: 4.8 },
-  { name: 'Data Science', students: 380, completion: 65, rating: 4.6 },
-  { name: 'UI/UX Design', students: 290, completion: 82, rating: 4.9 },
-  { name: 'Mobile Dev', students: 210, completion: 71, rating: 4.5 },
-  { name: 'Cloud Computing', students: 180, completion: 68, rating: 4.7 },
-];
-
-const userDistribution = [
-  { name: 'Students', value: 4500, color: 'hsl(var(--primary))' },
-  { name: 'Teachers', value: 280, color: 'hsl(var(--chart-2))' },
-  { name: 'Admins', value: 25, color: 'hsl(var(--chart-3))' },
-  { name: 'Moderators', value: 45, color: 'hsl(var(--chart-4))' },
-];
-
+// Mock data for recent activity (as per user request to exclude)
 const recentActivity = [
   { id: 1, user: 'John Doe', action: 'Enrolled in Web Development', time: '2 min ago', type: 'enrollment' },
   { id: 2, user: 'Sarah Smith', action: 'Completed Data Science Course', time: '5 min ago', type: 'completion' },
@@ -90,45 +72,120 @@ const chartConfig = {
   students: { label: 'Students', color: 'hsl(var(--primary))' },
 };
 
+const COLORS = [
+  'hsl(var(--primary))',
+  'hsl(var(--chart-2))',
+  'hsl(var(--chart-3))',
+  'hsl(var(--chart-4))',
+];
+
 const ControlDashboardPage = () => {
-  const [dateRange, setDateRange] = useState('7d');
+  const [dateRange, setDateRange] = useState('30d');
   const [selectedCourse, setSelectedCourse] = useState('all');
   const [selectedInstructor, setSelectedInstructor] = useState('all');
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
-  const stats = [
-    { 
-      label: 'Active Users', 
-      value: '4,850', 
-      change: '+12.5%', 
-      trend: 'up',
-      icon: Users,
-      description: 'Currently online'
-    },
-    { 
-      label: 'Total Revenue', 
-      value: '₹ 128,450', 
-      change: '+8.2%', 
-      trend: 'up',
-      icon: DollarSign,
-      description: 'This month'
-    },
-    { 
-      label: 'Total Courses', 
-      value: '156', 
-      change: '+5', 
-      trend: 'up',
-      icon: BookOpen,
-      description: 'Published courses'
-    },
-    { 
-      label: 'Total Enrollments', 
-      value: '12,840', 
-      change: '+18.3%', 
-      trend: 'up',
-      icon: GraduationCap,
-      description: 'All time'
-    },
-  ];
+  // Real data states
+  const [stats, setStats] = useState({
+    activeUsers: 0,
+    totalRevenue: 0,
+    totalCourses: 0,
+    totalEnrollments: 0,
+    enrollmentChange: 0,
+    revenueChange: 0,
+  });
+  const [enrollmentData, setEnrollmentData] = useState<any[]>([]);
+  const [coursePerformanceData, setCoursePerformanceData] = useState<any[]>([]);
+  const [userDistribution, setUserDistribution] = useState<any[]>([]);
+  
+  // Dropdown options
+  const [courses, setCourses] = useState<any[]>([]);
+  const [teachers, setTeachers] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchDropdownData();
+  }, []);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [dateRange, selectedCourse, selectedInstructor]);
+
+  const fetchDropdownData = async () => {
+    try {
+      const token = getToken();
+      
+      // Fetch courses
+      const coursesRes = await fetch(`${API_URL}/admin/courses`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (coursesRes.ok) {
+        const coursesData = await coursesRes.json();
+        setCourses(coursesData.courses || []);
+      }
+
+      // Fetch teachers
+      const teachersRes = await fetch(`${API_URL}/teacher-profiles`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (teachersRes.ok) {
+        const teachersData = await teachersRes.json();
+        setTeachers(teachersData.profiles || []);
+      }
+    } catch (err) {
+      console.error('Failed to load dropdown data:', err);
+    }
+  };
+
+  const fetchDashboardData = async () => {
+    setLoading(true);
+    try {
+      const token = getToken();
+      const params = new URLSearchParams({
+        dateRange,
+        courseId: selectedCourse,
+        teacherId: selectedInstructor,
+      });
+
+      const response = await fetch(`${API_URL}/admin/dashboard/stats?${params}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error('Failed to load dashboard data');
+
+      const data = await response.json();
+      
+      setStats(data.stats);
+      setEnrollmentData(data.enrollmentData || []);
+      setCoursePerformanceData(data.coursePerformance || []);
+      
+      // Add colors to user distribution
+      const distributionWithColors = (data.userDistribution || []).map((item: any, index: number) => ({
+        ...item,
+        color: COLORS[index % COLORS.length]
+      }));
+      setUserDistribution(distributionWithColors);
+    } catch (err: any) {
+      toast({ title: 'Error', description: err?.message, variant: 'destructive' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getLanguageValue = (value: any) => {
+    if (!value) return '';
+    if (typeof value === 'string') return value;
+    return value.en || value[Object.keys(value)[0]] || '';
+  };
 
   return (
     <AdminLayout>
@@ -164,10 +221,11 @@ const ControlDashboardPage = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Courses</SelectItem>
-                <SelectItem value="web">Web Development</SelectItem>
-                <SelectItem value="data">Data Science</SelectItem>
-                <SelectItem value="design">UI/UX Design</SelectItem>
-                <SelectItem value="mobile">Mobile Dev</SelectItem>
+                {courses.map((course) => (
+                  <SelectItem key={course._id} value={course._id}>
+                    {getLanguageValue(course.name)}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
 
@@ -178,9 +236,11 @@ const ControlDashboardPage = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Instructors</SelectItem>
-                <SelectItem value="john">John Smith</SelectItem>
-                <SelectItem value="sarah">Sarah Johnson</SelectItem>
-                <SelectItem value="mike">Mike Wilson</SelectItem>
+                {teachers.map((teacher) => (
+                  <SelectItem key={teacher.userId._id} value={teacher.userId._id}>
+                    {teacher.userId.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
 
@@ -198,34 +258,99 @@ const ControlDashboardPage = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat, index) => (
-            <Card
-              key={stat.label}
-              className="border-border bg-card p-6 animate-slide-up hover:shadow-lg transition-shadow"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
+        {loading ? (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[1, 2, 3, 4].map((i) => (
+              <Card key={i} className="border-border bg-card p-6">
+                <div className="animate-pulse space-y-3">
+                  <div className="h-10 w-10 bg-muted rounded-lg"></div>
+                  <div className="h-8 bg-muted rounded w-24"></div>
+                  <div className="h-4 bg-muted rounded w-32"></div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <Card className="border-border bg-card p-6 animate-slide-up hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between">
                 <div className="rounded-lg bg-primary/10 p-2.5">
-                  <stat.icon className="h-5 w-5 text-primary" />
+                  <Users className="h-5 w-5 text-primary" />
                 </div>
                 <Badge 
                   variant="outline" 
-                  className={stat.trend === 'up' 
+                  className="border-emerald-500/30 bg-emerald-500/10 text-emerald-500"
+                >
+                  <TrendingUp className="mr-1 h-3 w-3" />
+                  Active
+                </Badge>
+              </div>
+              <p className="mt-4 text-2xl font-bold text-foreground">{stats.activeUsers.toLocaleString()}</p>
+              <p className="text-sm text-muted-foreground">Active Users</p>
+              <p className="mt-1 text-xs text-muted-foreground/70">Currently active</p>
+            </Card>
+
+            <Card className="border-border bg-card p-6 animate-slide-up hover:shadow-lg transition-shadow" style={{ animationDelay: '100ms' }}>
+              <div className="flex items-center justify-between">
+                <div className="rounded-lg bg-primary/10 p-2.5">
+                  <DollarSign className="h-5 w-5 text-primary" />
+                </div>
+                <Badge 
+                  variant="outline" 
+                  className={stats.revenueChange >= 0 
                     ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-500' 
                     : 'border-red-500/30 bg-red-500/10 text-red-500'
                   }
                 >
-                  {stat.trend === 'up' ? <TrendingUp className="mr-1 h-3 w-3" /> : <TrendingDown className="mr-1 h-3 w-3" />}
-                  {stat.change}
+                  {stats.revenueChange >= 0 ? <TrendingUp className="mr-1 h-3 w-3" /> : <TrendingDown className="mr-1 h-3 w-3" />}
+                  {stats.revenueChange >= 0 ? '+' : ''}{stats.revenueChange}%
                 </Badge>
               </div>
-              <p className="mt-4 text-2xl font-bold text-foreground">{stat.value}</p>
-              <p className="text-sm text-muted-foreground">{stat.label}</p>
-              <p className="mt-1 text-xs text-muted-foreground/70">{stat.description}</p>
+              <p className="mt-4 text-2xl font-bold text-foreground">₹{stats.totalRevenue.toLocaleString()}</p>
+              <p className="text-sm text-muted-foreground">Total Revenue</p>
+              <p className="mt-1 text-xs text-muted-foreground/70">Last 30 days</p>
             </Card>
-          ))}
-        </div>
+
+            <Card className="border-border bg-card p-6 animate-slide-up hover:shadow-lg transition-shadow" style={{ animationDelay: '200ms' }}>
+              <div className="flex items-center justify-between">
+                <div className="rounded-lg bg-primary/10 p-2.5">
+                  <BookOpen className="h-5 w-5 text-primary" />
+                </div>
+                <Badge 
+                  variant="outline" 
+                  className="border-emerald-500/30 bg-emerald-500/10 text-emerald-500"
+                >
+                  <TrendingUp className="mr-1 h-3 w-3" />
+                  Active
+                </Badge>
+              </div>
+              <p className="mt-4 text-2xl font-bold text-foreground">{stats.totalCourses.toLocaleString()}</p>
+              <p className="text-sm text-muted-foreground">Total Courses</p>
+              <p className="mt-1 text-xs text-muted-foreground/70">Published courses</p>
+            </Card>
+
+            <Card className="border-border bg-card p-6 animate-slide-up hover:shadow-lg transition-shadow" style={{ animationDelay: '300ms' }}>
+              <div className="flex items-center justify-between">
+                <div className="rounded-lg bg-primary/10 p-2.5">
+                  <GraduationCap className="h-5 w-5 text-primary" />
+                </div>
+                <Badge 
+                  variant="outline" 
+                  className={stats.enrollmentChange >= 0 
+                    ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-500' 
+                    : 'border-red-500/30 bg-red-500/10 text-red-500'
+                  }
+                >
+                  {stats.enrollmentChange >= 0 ? <TrendingUp className="mr-1 h-3 w-3" /> : <TrendingDown className="mr-1 h-3 w-3" />}
+                  {stats.enrollmentChange >= 0 ? '+' : ''}{stats.enrollmentChange}%
+                </Badge>
+              </div>
+              <p className="mt-4 text-2xl font-bold text-foreground">{stats.totalEnrollments.toLocaleString()}</p>
+              <p className="text-sm text-muted-foreground">Total Enrollments</p>
+              <p className="mt-1 text-xs text-muted-foreground/70">All time</p>
+            </Card>
+          </div>
+        )}
 
         {/* Charts Row 1 */}
         <div className="grid gap-6 lg:grid-cols-2">
