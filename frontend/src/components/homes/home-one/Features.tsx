@@ -7,9 +7,9 @@ const Features = () => {
             <div className="row justify-content-center">
                <div className="col-xl-6">
                   <div className="section__title white-title text-center mb-50">
-                     <span className="sub-title">How We Start Journey</span>
-                     <h2 className="title">Start your Learning Journey Today!</h2>
-                     <p>Groove’s intuitive shared inbox makesteam members together <br /> organize, prioritize and.In this episode.</p>
+                     <span className="sub-title">How Your Learning Journey Begins</span>
+                     <h2 className="title">Take the First Step Toward Skills</h2>
+                     <p>A simple learning experience that brings students and mentors together to learn, track progress, and succeed.</p>
                   </div>
                </div>
             </div>

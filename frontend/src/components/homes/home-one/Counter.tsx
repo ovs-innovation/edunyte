@@ -18,7 +18,7 @@ const count_data: DataType[] = [
       id: 2,
       count: 89,
       count_text: "+",
-      text: "Faculty Courses",
+      text: "Experienced tutors",
    },
    {
       id: 3,
@@ -30,7 +30,7 @@ const count_data: DataType[] = [
       id: 4,
       count: 42,
       count_text: "K",
-      text: "Award Achieved",
+      text: "Tutor nationalities",
    },
 ];
 

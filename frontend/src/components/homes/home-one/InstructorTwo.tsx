@@ -28,8 +28,8 @@ const InstructorTwo = ({ style }: InstructorTwoProps) => {
                            </div>
                         </div>
                         <div className="instructor__content-two">
-                           <h3 className="title"><Link to="/contact">Become a Instructor</Link></h3>
-                           <p>To take a trivial example, which of us undertakes physical exercise yes is this happen here.</p>
+                           <h3 className="title"><Link to="/contact">Join as an Instructor</Link></h3>
+                           <p>As a simple example, learning begins with effort, consistency, and the right guidance.</p>
                            <div className="tg-button-wrap">
                               <Link to="/contact" className="btn arrow-btn">Apply Now <BtnArrow /></Link>
                            </div>
@@ -49,8 +49,8 @@ const InstructorTwo = ({ style }: InstructorTwoProps) => {
                            </div>
                         </div>
                         <div className="instructor__content-two">
-                           <h3 className="title"><Link to="/contact">Become a Student</Link></h3>
-                           <p>Join millions of people from around the world learning together. Online learning</p>
+                           <h3 className="title"><Link to="/contact">Join as an student</Link></h3>
+                           <p>Join learners from around the world and grow together through live and online learning.</p>
                            <div className="tg-button-wrap">
                               <Link to="/contact" className="btn arrow-btn">Apply Now <BtnArrow /></Link>
                            </div>

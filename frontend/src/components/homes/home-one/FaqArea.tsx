@@ -63,9 +63,9 @@ const FaqArea = () => {
                   <div className="faq__content">
                      <div className="section__title pb-10">
                         <span className="sub-title">Faq’s</span>
-                        <h2 className="title">Start Learning From <br /> World’s Pro Instructors</h2>
+                        <h2 className="title">Build Skills with Trusted Global Mentors</h2>
                      </div>
-                     <p>Groove’s intuitive shared inbox makes it easy for team members to organize, prioritize and.In this episode.</p>
+                     <p> Expert-led courses designed to help you grow faster and smarter.</p>
                      <div className="faq__wrap">
                         <div className="accordion" id="accordionExample">
                            {faqData.map((item, index) => (
