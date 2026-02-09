@@ -1,5 +1,7 @@
 import TeacherProfile from "../models/teacherProfileModel.js";
 import User from "../models/userModel.js";
+import TeacherCourse from "../models/teacherCourseModel.js";
+import Booking from "../models/bookingModel.js";
 import { getLanguageValue, normalizeLanguageValue } from "../utils/languageHelper.js";
 
 export const getTeacherProfile = async (req, res, next) => {
@@ -17,6 +19,42 @@ export const getTeacherProfile = async (req, res, next) => {
       profile = await TeacherProfile.create({ userId });
       profile = await TeacherProfile.findById(profile._id).populate("userId", "name email status");
     }
+    
+    // Calculate stats
+    const totalCourses = await TeacherCourse.countDocuments({ teacherId: userId });
+    const publishedCourses = await TeacherCourse.countDocuments({ teacherId: userId, status: "approved" });
+    const uniqueStudents = await Booking.distinct("studentId", { teacherId: userId, paymentStatus: "paid" });
+    
+    // Calculate earnings from completed bookings
+    const completedBookings = await Booking.find({ 
+      teacherId: userId, 
+      status: "completed",
+      paymentStatus: "paid"
+    });
+    
+    let totalEarnings = 0;
+    let pendingPayout = 0;
+    
+    completedBookings.forEach(booking => {
+      if (booking.payout && booking.payout.teacherAmountUSD) {
+        totalEarnings += booking.payout.teacherAmountUSD;
+        if (booking.payout.status === "pending") {
+          pendingPayout += booking.payout.teacherAmountUSD;
+        }
+      }
+    });
+    
+    const paidAmount = totalEarnings - pendingPayout;
+    
+    // Update profile with calculated stats
+    profile.totalCourses = totalCourses;
+    profile.publishedCourses = publishedCourses;
+    profile.totalStudents = uniqueStudents.length;
+    profile.totalEarnings = totalEarnings;
+    profile.pendingPayout = pendingPayout;
+    profile.paidAmount = paidAmount;
+    await profile.save();
+    
     const profileObj = profile.toObject();
     profileObj.bio = getLanguageValue(profileObj.bio);
     profileObj.aboutUs = getLanguageValue(profileObj.aboutUs);
@@ -38,6 +76,42 @@ export const getMyTeacherProfile = async (req, res, next) => {
       profile = await TeacherProfile.create({ userId });
       profile = await TeacherProfile.findById(profile._id).populate("userId", "name email status");
     }
+    
+    // Calculate stats
+    const totalCourses = await TeacherCourse.countDocuments({ teacherId: userId });
+    const publishedCourses = await TeacherCourse.countDocuments({ teacherId: userId, status: "approved" });
+    const uniqueStudents = await Booking.distinct("studentId", { teacherId: userId, paymentStatus: "paid" });
+    
+    // Calculate earnings from completed bookings
+    const completedBookings = await Booking.find({ 
+      teacherId: userId, 
+      status: "completed",
+      paymentStatus: "paid"
+    });
+    
+    let totalEarnings = 0;
+    let pendingPayout = 0;
+    
+    completedBookings.forEach(booking => {
+      if (booking.payout && booking.payout.teacherAmountUSD) {
+        totalEarnings += booking.payout.teacherAmountUSD;
+        if (booking.payout.status === "pending") {
+          pendingPayout += booking.payout.teacherAmountUSD;
+        }
+      }
+    });
+    
+    const paidAmount = totalEarnings - pendingPayout;
+    
+    // Update profile with calculated stats
+    profile.totalCourses = totalCourses;
+    profile.publishedCourses = publishedCourses;
+    profile.totalStudents = uniqueStudents.length;
+    profile.totalEarnings = totalEarnings;
+    profile.pendingPayout = pendingPayout;
+    profile.paidAmount = paidAmount;
+    await profile.save();
+    
     const profileObj = profile.toObject();
     profileObj.bio = getLanguageValue(profileObj.bio);
     profileObj.aboutUs = getLanguageValue(profileObj.aboutUs);

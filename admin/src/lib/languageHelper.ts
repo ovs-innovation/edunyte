@@ -28,11 +28,15 @@ export const normalizeLanguageValue = (value: string | { en: string } | undefine
   }
   
   if (typeof value === "object" && value !== null) {
-    if (!value.en && Object.keys(value).length > 0) {
+    // If it already has 'en' property, return it
+    if (value.en) {
+      return { en: value.en };
+    }
+    // Otherwise, take the first value and map it to 'en'
+    if (Object.keys(value).length > 0) {
       const firstValue = Object.values(value)[0];
       return { en: typeof firstValue === "string" ? firstValue : "" };
     }
-    return value;
   }
   
   return { en: "" };

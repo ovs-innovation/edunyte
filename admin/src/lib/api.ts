@@ -184,8 +184,8 @@ export const TeacherProfileAPI = {
       body: JSON.stringify(payload),
     }),
   updateMyProfile: (payload: {
-    bio?: string;
-    aboutUs?: string;
+    bio?: string | { en: string };
+    aboutUs?: string | { en: string };
     photo?: string;
     expertise?: string[];
     experience?: number;

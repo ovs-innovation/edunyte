@@ -14,13 +14,6 @@ import { X, Plus, CheckCircle2, Clock, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CloudinaryImageUploader } from '@/components/ui/cloudinary-image-uploader';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
   Command,
   CommandEmpty,
   CommandGroup,
