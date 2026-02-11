@@ -37,10 +37,11 @@ const FooterCommon = () => {
                <h4 className="footer__widget-title">Our Company</h4>
                <div className="footer__link">
                   <ul className="list-wrap">
+                     <li><Link to="/about-us">About us</Link></li>
                      <li><Link to="/contact">Contact Us</Link></li>
                      <li><Link to="/instructor-details">Become Teacher</Link></li>
+                     <li><Link to="/registration">Become a Student</Link></li>
                      <li><Link to="/blog">Blog</Link></li>
-                     <li><Link to="/instructor-details">Instructor</Link></li>
                      <li><Link to="/events-details">Events</Link></li>
                   </ul>
                </div>
