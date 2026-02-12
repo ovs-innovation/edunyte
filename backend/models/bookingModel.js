@@ -1,9 +1,5 @@
 import mongoose from "mongoose";
 
-/**
- * Booking Model
- * Stores student-teacher session bookings
- */
 const bookingSchema = new mongoose.Schema(
   {
     studentId: {
@@ -41,7 +37,6 @@ const bookingSchema = new mongoose.Schema(
       ref: "Language",
       required: true,
     },
-    // Session details
     sessionDate: {
       type: Date,
       required: true,
@@ -63,20 +58,11 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    // Lesson details (timezone-safe; `scheduledAt` stored as UTC Date)
     lesson: {
       duration: { type: Number, required: true },
       scheduledAt: { type: Date, required: true, index: true },
       timezone: { type: String, required: true },
     },
-
-    /**
-     * Pricing snapshot (security + refund safe)
-     *
-     * WHY:
-     * - Never trust client prices.
-     * - Refunds must use stored snapshot (NOT live FX).
-     */
     pricingSnapshot: {
       baseAmountUSD: { type: Number, required: true, min: 0 },
       platformFeeUSD: { type: Number, required: true, min: 0 },
@@ -105,17 +91,14 @@ const bookingSchema = new mongoose.Schema(
       joinUrlStudent: { type: String, default: "" },
       joinUrlTeacher: { type: String, default: "" },
     },
-    // Legacy fields retained for older codepaths (read-only; should not be set anymore)
     paymentStatus: { type: String, enum: ["pending", "paid", "failed", "refunded"], default: "paid", index: true },
     paymentId: { type: String, default: "" },
-    // Booking status
     status: {
       type: String,
       enum: ["scheduled", "completed", "cancelled", "no_show"],
       default: "scheduled",
       index: true,
     },
-    // Meeting details
     meetingType: {
       type: String,
       enum: ["zoom", "google_meet", "teams", "custom"],
@@ -133,7 +116,6 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    // Cancellation
     cancelledBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -147,7 +129,6 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    // Notes
     studentNotes: {
       type: String,
       default: "",

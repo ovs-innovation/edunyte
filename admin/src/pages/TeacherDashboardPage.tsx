@@ -86,19 +86,19 @@ const TeacherDashboardPage = () => {
   const earnings = [
     { 
       label: 'Total Earnings', 
-      value: `₹${(profile?.totalEarnings || 0).toLocaleString()}`,
+      value: `$${(profile?.totalEarnings || 0).toLocaleString()}`,
       icon: DollarSign,
       color: 'text-emerald-500',
     },
     { 
       label: 'Pending Payout', 
-      value: `₹${(profile?.pendingPayout || 0).toLocaleString()}`,
+      value: `$${(profile?.pendingPayout || 0).toLocaleString()}`,
       icon: Clock,
       color: 'text-warning',
     },
     { 
       label: 'Paid Amount', 
-      value: `₹${(profile?.paidAmount || 0).toLocaleString()}`,
+      value: `$${(profile?.paidAmount || 0).toLocaleString()}`,
       icon: CheckCircle2,
       color: 'text-success',
     },
