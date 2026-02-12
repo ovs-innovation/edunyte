@@ -2,67 +2,41 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const About = () => {
-    const [activeTab, setActiveTab] = useState('tutors');
-    // const [activeMilestone, setActiveMilestone] = useState('2012-2015');
-
-    // const milestoneData = {
-    //     '2012-2015': {
-    //         year: '2012–2015',
-    //         title: "Laying the foundation",
-    //         desc: "Edunyte was founded with a simple mission. After launching the first version of the platform, the co-founders began hiring the initial team, expanded into international markets, and reached our first 3,000 tutors.",
-    //         image1: "/assets/img/others/h5_about_img02.jpg",
-    //         image2: "/assets/img/others/student_grp.png"
-    //     },
-    //     '2016-2018': {
-    //         year: '2016–2018',
-    //         title: "Expanding globally",
-    //         desc: "Edunyte scaled rapidly into a truly global marketplace for learners and tutors. The platform evolved beyond discovery, launching core tutor tools including scheduling and an integrated video classroom.",
-    //         image1: "/assets/img/others/h7_choose_img03.jpg",
-    //         image2: "/assets/img/others/h8_about_img01.jpg"
-    //     },
-    //     '2019-2023': {
-    //         year: '2019–2023',
-    //         title: "Leading the category",
-    //         desc: "Edunyte raised significant funding to double down on product innovation. We opened hubs in Barcelona and New York, becoming the global leader in online language tutoring.",
-    //         image1: "/assets/img/bg/h4_video_bg.jpg",
-    //         image2: "/assets/img/others/h6_testimonial_img.jpg"
-    //     },
-    //     '2024-2026+': {
-    //         year: '2024–2026+',
-    //         title: "AI & The Future",
-    //         desc: "Continuing to innovate with AI-powered lesson plans and smart matching. We are committed to powering the future of personalized learning for everyone, everywhere.",
-    //         image1: "/assets/img/others/h4_choose_img.jpg",
-    //         image2: "/assets/img/others/h7_testimonial_img.png"
-    //     }
-    // };
-
-    // const currentMilestone = milestoneData[activeMilestone as keyof typeof milestoneData];
+    const [activeTab, setActiveTab] = useState('teachers');
 
     const tabData = {
-        tutors: {
+        teachers: {
             image: "/assets/img/others/h7_testimonial_img.png",
             badge: "Teach",
             badgeColor: "#4CAF50",
-            title: "Tutors",
-            text: "Passionate experts who want to share their knowledge and help others grow. Our tutors are the heart of Edunyte, bringing real-world experience to the virtual classroom."
+            title: "Teach With Freedom. Grow With Purpose. Inspire With Impact.",
+            text: "Teachers are the foundation of Edunyte. We empower educators by giving them a platform where their skills are valued and their growth matters. Whether you’re an experienced professional or a passionate educator, Edunyte offers the flexibility, support, and respect you deserve. We provide flexible teaching schedules, access to motivated students, fair earnings, and long-term growth opportunities."
         },
-        learners: {
+        students: {
             image: "/assets/img/others/h6_testimonial_img.jpg",
             badge: "Learn",
             badgeColor: "#FFC107",
-            title: "Learners",
-            text: "Curious minds seeking new skills and personal development opportunities. Our learners come from all walks of life, united by a desire to reach their full potential."
+            title: "Learn Smarter. Progress Faster. Succeed Confidently.",
+            text: "Edunyte is designed around students — your pace, your goals, your future. We connect learners with expert educators who focus on understanding, not just syllabus completion. Whether you’re improving grades, preparing for exams, or building skills, Edunyte ensures learning feels clear, supportive, and effective with personalized learning paths and verified teachers."
         },
-        employees: {
+        values: {
             image: "/assets/img/others/h5_about_img02.jpg",
-            badge: "Build",
+            badge: "Values",
             badgeColor: "#2196F3",
-            title: "Employees",
-            text: "Dedicated professionals building the future of education together. From engineering to design, our team is committed to creating the best learning experience possible."
+            title: "Our Core Values",
+            text: (
+                <>
+                    <ul style={{ listStyleType: 'disc', paddingLeft: '20px', marginBottom: '0' }}>
+                        <li style={{ marginBottom: '10px' }}><strong>Student-First Learning</strong> – Every learner deserves personal attention.</li>
+                        <li style={{ marginBottom: '10px' }}><strong>Teacher Empowerment</strong> – Great teaching deserves great support.</li>
+                        <li style={{ marginBottom: '10px' }}><strong>Trust & Transparency</strong> – Clear communication at every step.</li>
+                        <li style={{ marginBottom: '0' }}><strong>Growth Mindset</strong> – Continuous learning for everyone.</li>
+                    </ul>
+                </>
+            )
         }
     };
 
-    // Helper for type safety if needed, but JS object access is fine here.
     const currentTab = tabData[activeTab as keyof typeof tabData];
 
     return (
@@ -79,7 +53,7 @@ const About = () => {
                                 color: '#0a0a0a',
                                 letterSpacing: '-1px',
                                 lineHeight: '1.2'
-                            }}>Powering people’s progress.</h2>
+                            }}>Where Students Learn Better & Teachers Grow Stronger</h2>
                             <p className="desc" style={{
                                 fontSize: '20px',
                                 marginBottom: '60px',
@@ -88,7 +62,7 @@ const About = () => {
                                 marginLeft: 'auto',
                                 marginRight: 'auto',
                                 lineHeight: '1.6'
-                            }}>Our mission is simple: connect people through learning, and help them go further than they thought possible.</p>
+                            }}>Edunyte is a modern education platform built to bring students and educators together in one meaningful learning ecosystem. We believe education works best when it’s personal, flexible, and human-led.</p>
                         </div>
                     </div>
 
@@ -101,7 +75,7 @@ const About = () => {
                                 aspectRatio: '16/9',
                                 backgroundColor: '#f0f0f0'
                             }}>
-                                <img src="/assets/img/bg/h4_video_bg.jpg" alt="Powering progress" style={{
+                                <img src="/assets/img/bg/h4_video_bg.jpg" alt="Edunyte Platform" style={{
                                     width: '100%',
                                     height: '100%',
                                     objectFit: 'cover'
@@ -124,22 +98,22 @@ const About = () => {
                                 display: 'inline-block',
                                 textTransform: 'none'
                             }}>
-                                Try Edunyte
+                                Join the Edunyte Community
                             </Link>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* Goals Section */}
+            {/* Purpose Section (formerly Goals) */}
             <section className="goals-area section-pb-120" style={{ backgroundColor: '#f9f9f9', paddingTop: '100px' }}>
                 <div className="container">
                     <div className="row justify-content-center text-center mb-60">
                         <div className="col-lg-8">
-                            <span style={{ color: '#5751E1', fontWeight: 700, display: 'block', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>Our Features</span>
-                            <h2 className="title" style={{ fontWeight: 800, fontSize: '42px', color: '#0a0a0a' }}>Achieve Your Goal With Edunyte</h2>
+                            <span style={{ color: '#5751E1', fontWeight: 700, display: 'block', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>Our Purpose</span>
+                            <h2 className="title" style={{ fontWeight: 800, fontSize: '42px', color: '#0a0a0a' }}>Education that works for real people</h2>
                             <p style={{ fontSize: '18px', color: '#666', marginTop: '15px' }}>
-                                Education is the most powerful weapon which you can use to change the world.
+                                We are shaping education with real goals, real support, and real results.
                             </p>
                         </div>
                     </div>
@@ -148,30 +122,30 @@ const About = () => {
                         <div className="col-lg-4 col-md-6">
                             <div className="goal-card" style={{ backgroundColor: '#E0F2F1', padding: '40px 30px', borderRadius: '20px', transition: 'all 0.3s ease', height: '100%', border: '1px solid rgba(0,0,0,0.05)' }}>
                                 <div className="icon mb-30" style={{ width: '70px', height: '70px', backgroundColor: '#009688', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '28px' }}>
-                                    <i className="fas fa-chalkboard-teacher"></i>
+                                    <i className="fas fa-user-graduate"></i>
                                 </div>
-                                <h3 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '15px' }}>Expert Tutors</h3>
-                                <p style={{ fontSize: '16px', lineHeight: '1.6', color: '#444' }}>Our tutors are highly qualified and experienced professionals who are passionate about teaching.</p>
+                                <h3 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '15px' }}>Student Confidence</h3>
+                                <p style={{ fontSize: '16px', lineHeight: '1.6', color: '#444' }}>Help students learn with confidence and clarity through personalized attention and verified educators.</p>
                             </div>
                         </div>
                         {/* Card 2 */}
                         <div className="col-lg-4 col-md-6">
                             <div className="goal-card" style={{ backgroundColor: '#EDE7F6', padding: '40px 30px', borderRadius: '20px', transition: 'all 0.3s ease', height: '100%', border: '1px solid rgba(0,0,0,0.05)' }}>
                                 <div className="icon mb-30" style={{ width: '70px', height: '70px', backgroundColor: '#673AB7', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '28px' }}>
-                                    <i className="fas fa-book-open"></i>
+                                    <i className="fas fa-chalkboard-teacher"></i>
                                 </div>
-                                <h3 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '15px' }}>Effective Courses</h3>
-                                <p style={{ fontSize: '16px', lineHeight: '1.6', color: '#444' }}>Our courses are designed to be engaging, interactive, and effective, helping you achieve your learning goals.</p>
+                                <h3 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '15px' }}>Teacher Support</h3>
+                                <p style={{ fontSize: '16px', lineHeight: '1.6', color: '#444' }}>Support teachers with opportunities, tools, and flexibility to focus on what they do best: teaching.</p>
                             </div>
                         </div>
                         {/* Card 3 */}
                         <div className="col-lg-4 col-md-6">
                             <div className="goal-card" style={{ backgroundColor: '#FFF8E1', padding: '40px 30px', borderRadius: '20px', transition: 'all 0.3s ease', height: '100%', border: '1px solid rgba(0,0,0,0.05)' }}>
                                 <div className="icon mb-30" style={{ width: '70px', height: '70px', backgroundColor: '#FFC107', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '28px' }}>
-                                    <i className="fas fa-certificate"></i>
+                                    <i className="fas fa-shield-alt"></i>
                                 </div>
-                                <h3 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '15px' }}>Earn Certificate</h3>
-                                <p style={{ fontSize: '16px', lineHeight: '1.6', color: '#444' }}>Earn a certificate upon completion of your course, validating your new skills and knowledge.</p>
+                                <h3 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '15px' }}>Trusted Environment</h3>
+                                <p style={{ fontSize: '16px', lineHeight: '1.6', color: '#444' }}>Create a trusted learning environment driven by quality, transparency, and results.</p>
                             </div>
                         </div>
                     </div>
@@ -183,9 +157,9 @@ const About = () => {
                 <div className="container">
                     <div className="row justify-content-center text-center mb-50">
                         <div className="col-lg-8">
-                            <h2 className="title" style={{ fontWeight: 800, fontSize: '42px', color: '#0a0a0a', marginBottom: '20px' }}>Powering our platform</h2>
+                            <h2 className="title" style={{ fontWeight: 800, fontSize: '42px', color: '#0a0a0a', marginBottom: '20px' }}>One Platform for Everyone</h2>
                             <p style={{ fontSize: '18px', color: '#666' }}>
-                                Pages and videos are personal for everyone, every time. See how we help everyone find their place.
+                                Whether you’re here to learn, teach, or grow — Edunyte welcomes you.
                             </p>
                         </div>
                     </div>
@@ -194,7 +168,7 @@ const About = () => {
                     <div className="row justify-content-center mb-40">
                         <div className="col-auto">
                             <div className="d-flex gap-4 p-2" style={{ borderBottom: '2px solid #eee' }}>
-                                {['tutors', 'learners', 'employees'].map((tab) => (
+                                {Object.keys(tabData).map((tab) => (
                                     <button
                                         key={tab}
                                         onClick={() => setActiveTab(tab)}
@@ -211,7 +185,7 @@ const About = () => {
                                             cursor: 'pointer'
                                         }}
                                     >
-                                        {tab}
+                                        {tab === 'values' ? 'Our Values' : tab}
                                     </button>
                                 ))}
                             </div>
@@ -226,7 +200,7 @@ const About = () => {
                                     <div className="position-relative" style={{ borderRadius: '20px', overflow: 'hidden', height: '350px' }}>
                                         <img
                                             src={currentTab.image}
-                                            alt={currentTab.title}
+                                            alt={typeof currentTab.title === 'string' ? currentTab.title : 'Edunyte Image'}
                                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                         />
                                         <div style={{
@@ -246,20 +220,24 @@ const About = () => {
                                     </div>
                                 </div>
                                 <div className="col-md-6 ps-md-5">
-                                    <h3 style={{ fontSize: '32px', fontWeight: 800, marginBottom: '20px', textTransform: 'capitalize' }}>{currentTab.title}</h3>
-                                    <p style={{ fontSize: '18px', lineHeight: '1.7', color: '#555', marginBottom: '30px' }}>
+                                    <h3 style={{ fontSize: '32px', fontWeight: 800, marginBottom: '20px', textTransform: 'capitalize' }}>
+                                        {currentTab.title}
+                                    </h3>
+                                    <div style={{ fontSize: '18px', lineHeight: '1.7', color: '#555', marginBottom: '30px' }}>
                                         {currentTab.text}
-                                    </p>
-                                    <Link to="/registration" style={{
-                                        fontWeight: 700,
-                                        color: '#5751E1',
-                                        fontSize: '16px',
-                                        textDecoration: 'none',
-                                        display: 'inline-flex',
-                                        alignItems: 'center'
-                                    }}>
-                                        Join as a {activeTab.slice(0, -1)} <i className="fas fa-arrow-right ms-2" style={{ transition: 'transform 0.3s' }}></i>
-                                    </Link>
+                                    </div>
+                                    {activeTab !== 'values' && (
+                                        <Link to="/registration" style={{
+                                            fontWeight: 700,
+                                            color: '#5751E1',
+                                            fontSize: '16px',
+                                            textDecoration: 'none',
+                                            display: 'inline-flex',
+                                            alignItems: 'center'
+                                        }}>
+                                            Join as a {activeTab.slice(0, -1)} <i className="fas fa-arrow-right ms-2" style={{ transition: 'transform 0.3s' }}></i>
+                                        </Link>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -311,9 +289,9 @@ const About = () => {
                 <div className="container">
                     <div className="row justify-content-center text-center mb-60">
                         <div className="col-lg-10">
-                            <h2 className="title" style={{ fontWeight: 800, fontSize: '42px', color: '#0a0a0a', marginBottom: '15px' }}>The story behind Edunyte</h2>
+                            <h2 className="title" style={{ fontWeight: 800, fontSize: '42px', color: '#0a0a0a', marginBottom: '15px' }}>Building the Future of Learning</h2>
                             <p style={{ fontSize: '18px', color: '#666' }}>
-                                It started with one learner. Now, millions are making real progress every day.
+                                Edunyte is more than a platform — it’s a growing community of learners and educators.
                             </p>
                         </div>
                     </div>
@@ -321,23 +299,26 @@ const About = () => {
                     <div className="row align-items-center">
                         <div className="col-lg-6 mb-5 mb-lg-0">
                             <div className="story-img" style={{ borderRadius: '24px', overflow: 'hidden' }}>
-                                <img src="/assets/img/others/h8_about_img01.jpg" alt="Founder" className="img-fluid w-100" style={{ objectFit: 'cover', minHeight: '500px' }} />
+                                <img src="/assets/img/others/h8_about_img01.jpg" alt="Story" className="img-fluid w-100" style={{ objectFit: 'cover', minHeight: '500px' }} />
                             </div>
                         </div>
                         <div className="col-lg-6 ps-lg-5">
                             <div className="story-content">
                                 <p style={{ fontSize: '18px', lineHeight: '1.8', color: '#555', marginBottom: '30px' }}>
-                                    Growing up, our founder realized that traditional education often left students behind. He knew how important personalized learning would be, but the tools available didn't get him there. So he built something that would.
+                                    Edunyte is a modern education platform built to bring students and educators together in one meaningful learning ecosystem. We believe education works best when it’s personal, flexible, and human-led.
                                 </p>
                                 <p style={{ fontSize: '18px', lineHeight: '1.8', color: '#555', marginBottom: '40px' }}>
-                                    In 2024, Edunyte launched: A human-led, AI-enabled platform designed to support meaningful progress for millions of learners worldwide. What began as a single idea is now a global marketplace, the largest of its kind.
+                                    Whether you’re here to learn, teach, or grow — Edunyte welcomes you. Success at Edunyte is built together.
                                 </p>
 
                                 <div className="mission-card" style={{ backgroundColor: '#F9F9F9', padding: '40px', borderRadius: '24px' }}>
-                                    <h3 style={{ fontSize: '24px', fontWeight: 800, marginBottom: '15px', color: '#0a0a0a' }}>Our vision & mission</h3>
-                                    <p style={{ fontSize: '16px', lineHeight: '1.7', color: '#666', marginBottom: '0' }}>
-                                        We combine the flexibility of online learning with personalized lessons from expert tutors to create life-changing experiences that power people’s progress.
-                                    </p>
+                                    <h3 style={{ fontSize: '24px', fontWeight: 800, marginBottom: '15px', color: '#0a0a0a' }}>How Edunyte Works</h3>
+                                    <ul style={{ fontSize: '16px', lineHeight: '1.7', color: '#666', paddingLeft: '20px', marginBottom: '0', listStyleType: 'decimal' }}>
+                                        <li style={{ marginBottom: '10px' }}><strong>Students choose subjects and goals</strong></li>
+                                        <li style={{ marginBottom: '10px' }}><strong>Teachers bring expertise and guidance</strong></li>
+                                        <li style={{ marginBottom: '10px' }}><strong>Learning happens through structured, engaging sessions</strong></li>
+                                        <li><strong>Progress is tracked, supported, and celebrated</strong></li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
@@ -345,108 +326,20 @@ const About = () => {
                 </div>
             </section>
 
-            {/* Milestones Section */}
-            {/* <section className="milestone-area section-pb-120" style={{ backgroundColor: '#fff', paddingTop: '50px' }}>
-                <div className="container">
-                    <div className="row justify-content-center text-center mb-50">
-                        <div className="col-lg-10">
-                            <h2 className="title" style={{ fontWeight: 800, fontSize: '42px', color: '#0a0a0a', marginBottom: '40px' }}>Edunyte milestones</h2>
-
-                            {/* Milestone Tabs */}
-                            {/* <div className="d-flex justify-content-center gap-4 flex-wrap mb-50 position-relative"> */}
-                                {/* Line through - visual only, hidden on mobile if messy */}
-                                {/* <div className="d-none d-md-block" style={{
-                                    position: 'absolute',
-                                    bottom: '0',
-                                    left: '0',
-                                    width: '100%',
-                                    height: '2px',
-                                    backgroundColor: '#eee',
-                                    zIndex: 0
-                                }}></div>
-
-                                {Object.keys(milestoneData).map((year) => (
-                                    <button
-                                        key={year}
-                                        onClick={() => setActiveMilestone(year)}
-                                        className="position-relative"
-                                        style={{
-                                            background: 'none',
-                                            border: 'none',
-                                            fontSize: '24px',
-                                            fontWeight: 800,
-                                            padding: '10px 20px',
-                                            color: activeMilestone === year ? '#ff6b8b' : '#0a0a0a',
-                                            borderBottom: activeMilestone === year ? '4px solid #ff6b8b' : '4px solid transparent',
-                                            cursor: 'pointer',
-                                            zIndex: 1,
-                                            opacity: activeMilestone === year ? 1 : 0.5,
-                                            transition: 'all 0.3s ease'
-                                        }}
-                                    >
-                                        {year}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="row align-items-center">
-                        <div className="col-lg-5 mb-5 mb-lg-0">
-                            <div className="milestone-content pe-lg-4">
-                                <span style={{
-                                    display: 'inline-block',
-                                    fontSize: '32px',
-                                    fontWeight: 800,
-                                    color: '#0a0a0a',
-                                    marginBottom: '10px'
-                                }}>
-                                    {currentMilestone.year}
-                                </span>
-                                <h3 style={{
-                                    fontSize: '36px',
-                                    fontWeight: 700,
-                                    marginBottom: '20px',
-                                    color: '#0a0a0a'
-                                }}>
-                                    {currentMilestone.title}
-                                </h3>
-                                <p style={{ fontSize: '18px', lineHeight: '1.7', color: '#555' }}>
-                                    {currentMilestone.desc}
-                                </p>
-                            </div>
-                        </div>
-                        <div className="col-lg-7">
-                            <div className="row gutter-20">
-                                <div className="col-6">
-                                    <div style={{ borderRadius: '20px', overflow: 'hidden', height: '300px' }}>
-                                        <img src={currentMilestone.image1} alt="Milestone 1" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                    </div>
-                                </div>
-                                <div className="col-6">
-                                    <div style={{ borderRadius: '20px', overflow: 'hidden', height: '300px', marginTop: '40px' }}>
-                                        <img src={currentMilestone.image2} alt="Milestone 2" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            // </section> */}
             <style>{`
-            .about-btn:hover {
-                transform: translate(2px, 2px);
-                box-shadow: 2px 2px 0px #0a0a0a !important;
-            }
-            .about-btn:active {
-                transform: translate(4px, 4px);
-                box-shadow: none !important;
-            }
-            .goal-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            }
-         `}</style>
+                .about-btn:hover {
+                    transform: translate(2px, 2px);
+                    box-shadow: 2px 2px 0px #0a0a0a !important;
+                }
+                .about-btn:active {
+                    transform: translate(4px, 4px);
+                    box-shadow: none !important;
+                }
+                .goal-card:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+                }
+            `}</style>
         </>
     )
 }

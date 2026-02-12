@@ -10,11 +10,11 @@ const Registration = () => {
          <HeaderOne />
          <main className="main-area fix">
             <BreadcrumbOne title={t('common.student_registration')} sub_title={t('common.student_registration')} />
-         <RegistrationArea />
-      </main>
-      <FooterOne style={false} style_2={false} />
-    </>
-  );
+            <RegistrationArea />
+         </main>
+         <FooterOne style={false} style_2={false} />
+      </>
+   );
 };
 
 export default Registration;

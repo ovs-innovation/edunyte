@@ -214,7 +214,7 @@ const InstructorDetailsArea = () => {
           <div className="col-lg-6">
             <div className="instructor__global-images">
               <img
-                src="/assets/img/instructor/instructor01.png"
+                src="/assets/img/instructor/instructor1.png"
                 alt="Tutors teaching students"
                 className="img-fluid"
               />
@@ -227,7 +227,7 @@ const InstructorDetailsArea = () => {
           <div className="col-lg-5">
             <div className="instructor__testimonial-image">
               <img
-                src="/assets/img/instructor/instructor02.png"
+                src="/assets/img/instructor/instructor2.png"
                 alt="Krista A. - English tutor"
                 className="img-fluid"
               />
@@ -237,7 +237,7 @@ const InstructorDetailsArea = () => {
           <div className="col-lg-7">
             <div className="instructor__testimonial-content">
               <blockquote className="testimonial-quote">
-                "Preply allowed me to make a living without leaving home!"
+                "Edunyte allowed me to make a living without leaving home!"
               </blockquote>
               <div className="testimonial-author">
                 <p className="author-name">Krista A.</p>
@@ -295,7 +295,7 @@ const InstructorDetailsArea = () => {
           <div className="row mt-80 mb-80">
             <div className="col-12">
               <div className="instructor__final-cta-split d-flex flex-wrap align-items-stretch" style={{ borderRadius: '16px', overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.1)', border: '2px solid #000' }}>
-                <div className="cta-image" style={{ flex: '1 1 50%', minHeight: '400px', backgroundImage: 'url(/assets/img/instructor/instructor01.png)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                <div className="cta-image" style={{ flex: '1 1 50%', minHeight: '400px', backgroundImage: 'url(/assets/img/instructor/instructor1.png)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
                 </div>
                 <div className="cta-content" style={{ flex: '1 1 50%', padding: '80px 60px', backgroundColor: '#36d6b2', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                   <h2 style={{ fontSize: '48px', fontWeight: 800, color: '#0a0a0a', marginBottom: '20px', lineHeight: 1.1 }}>Get paid to teach online</h2>
