@@ -28,6 +28,7 @@ import TeacherJoinCoursePage from "./pages/TeacherJoinCoursePage";
 import TeacherMyCoursesPage from "./pages/TeacherMyCoursesPage";
 import TeacherAvailabilityPage from "./pages/TeacherAvailabilityPage";
 import TeacherBookingsPage from "./pages/TeacherBookingsPage";
+import PaymentsPage from "./pages/PaymentsPage";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardRouter from "./components/DashboardRouter";
@@ -130,6 +131,14 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <ReviewModerationPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/payments"
+                  element={
+                    <ProtectedRoute>
+                      <PaymentsPage />
                     </ProtectedRoute>
                   }
                 />

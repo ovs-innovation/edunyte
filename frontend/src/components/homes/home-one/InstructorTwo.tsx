@@ -34,7 +34,7 @@ const InstructorTwo = ({ style }: InstructorTwoProps) => {
                            <h3 className="title"><Link to="/contact">{t('home.join_section.join_as_instructor_title')}</Link></h3>
                            <p>{t('home.join_section.join_as_instructor_description')}</p>
                            <div className="tg-button-wrap">
-                              <Link to="/contact" className="btn arrow-btn">{t('home.join_section.apply_now')} <BtnArrow /></Link>
+                              <Link to="/registration/tutor" className="btn arrow-btn">{t('home.join_section.apply_now')} <BtnArrow /></Link>
                            </div>
                         </div>
                      </div>
@@ -55,7 +55,7 @@ const InstructorTwo = ({ style }: InstructorTwoProps) => {
                            <h3 className="title"><Link to="/contact">{t('home.join_section.join_as_student_title')}</Link></h3>
                            <p>{t('home.join_section.join_as_student_description')}</p>
                            <div className="tg-button-wrap">
-                              <Link to="/contact" className="btn arrow-btn">{t('home.join_section.apply_now')} <BtnArrow /></Link>
+                              <Link to="/registration" className="btn arrow-btn">{t('home.join_section.apply_now')} <BtnArrow /></Link>
                            </div>
                         </div>
                      </div>

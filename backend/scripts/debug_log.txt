@@ -1,0 +1,15 @@
+--- Debug Session Start ---
+Debugging recording process for meeting ID: 85066803178
+ERROR: (node:17312) [MONGOOSE] Warning: Duplicate schema index on {"payment.stripePaymentIntentId":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ERROR: (node:17312) Warning: Setting the NODE_TLS_REJECT_UNAUTHORIZED environment variable to '0' makes TLS connections and HTTPS requests insecure by disabling certificate verification.
+MongoDB Connected
+
+🔍 Finding booking for meeting 85066803178
+✓ Found booking: 698d8a4c776fed51ca20d700
+
+🎬 Processing recording for booking 698d8a4c776fed51ca20d700, meeting 85066803178
+Fetching recording metadata from Zoom...
+ERROR: Zoom API Error for meeting 85066803178: 400 - {"code":4711,"message":"Invalid access token, does not contain scopes:[cloud_recording:read:list_recording_files, cloud_recording:read:list_recording_files:admin]."}
+ERROR: ✗ Failed to process recording for booking 698d8a4c776fed51ca20d700: Request failed with status code 400
+FAILURE: Recording processing failed or not ready.

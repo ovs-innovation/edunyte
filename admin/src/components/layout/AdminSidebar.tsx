@@ -24,6 +24,7 @@ import {
   ChevronDown,
   ChevronRight,
   Calendar,
+  DollarSign,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
@@ -45,7 +46,8 @@ const adminNavItems = [
   { to: '/reports', icon: FileText, label: 'Reports', permission: 'reports.view' as const },
   { to: '/support-tickets', icon: MessageSquare, label: 'Support', permission: 'users.view' as const },
   { to: '/announcements', icon: Bell, label: 'Announcements', permission: 'settings.view' as const },
-  { to: '/reviews', icon: Star, label: 'Reviews', permission: 'users.view' as const },
+  // { to: '/reviews', icon: Star, label: 'Reviews', permission: 'users.view' as const },
+  { to: '/payments', icon: DollarSign, label: 'Payments', permission: 'users.view' as const },
   { to: '/settings', icon: Settings, label: 'Settings', permission: 'settings.view' as const },
 ];
 

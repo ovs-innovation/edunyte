@@ -15,7 +15,7 @@ interface FormData {
    cpassword: string;
 }
 
-const RegistrationForm = () => {
+const RegistrationForm = ({ role }: { role?: string }) => {
    const { t } = useTranslation();
    const { register: registerUser } = useAuth();
    const [isLoading, setIsLoading] = useState(false);
@@ -42,9 +42,13 @@ const RegistrationForm = () => {
             name: `${data.fname} ${data.lname}`,
             email: data.email,
             password: data.password,
-            role: 'student',
+            role: role === 'tutor' ? 'teacher' : 'student',
          });
-         toast.success(t("common.registration_success"), { position: 'top-center' });
+         toast.success(role === 'tutor' 
+            ? t("common.registration_success_pending", "Registration successful. Please wait for admin approval.") 
+            : t("common.registration_success"), 
+            { position: 'top-center' }
+         );
          reset();
       } catch (error: any) {
          toast.error(error.message || 'Registration failed', { position: 'top-center' });

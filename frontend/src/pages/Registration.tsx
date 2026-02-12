@@ -2,11 +2,11 @@ import Wrapper from '../layouts/Wrapper';
 import RegistrationMain from '../components/inner-pages/registration';
 import SEO from '../components/SEO';
 
-const Registration = () => {
+const Registration = ({ role }: { role?: string }) => {
    return (
       <Wrapper>
          <SEO pageTitle={'Edunyte Registration'} />
-         <RegistrationMain />
+         <RegistrationMain role={role} />
       </Wrapper>
    );
 };

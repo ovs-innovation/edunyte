@@ -38,8 +38,25 @@ export const register = async (req, res, next) => {
       return res.status(409).json({ message: "Email already registered" });
     }
     const userRole = await resolveRoleKey(role || "super_admin");
-    const user = await User.create({ name, email, password, role: userRole });
+    
+    let status = "active";
+    // Set pending status for teachers/tutors by default
+    if (userRole === "teacher") {
+      status = "pending";
+    }
+    
+    const user = await User.create({ name, email, password, role: userRole, status });
     const perms = await resolvePermissions(user.role);
+    
+    // If pending, do not issue token
+    if (status === "pending") {
+      return res.status(201).json({ 
+        message: "Registration successful. Please wait for admin approval.", 
+        user: formatUser(user, perms),
+        status: "pending"
+      });
+    }
+
     const token = generateToken(user);
     res.status(201).json({ token, user: formatUser(user, perms) });
   } catch (err) {
