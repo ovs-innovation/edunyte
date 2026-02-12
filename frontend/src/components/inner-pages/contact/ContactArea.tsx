@@ -1,5 +1,5 @@
 import ContactForm from "../../../forms/ContactForm"
-import InjectableSvg from "../../../hooks/InjectableSvg"
+
 
 const ContactArea = () => {
    return (
@@ -11,31 +11,34 @@ const ContactArea = () => {
                      <ul className="list-wrap">
                         <li>
                            <div className="icon">
-                              <InjectableSvg src="assets/img/icons/map.svg" alt="img" className="injectable" />
+                              <i className="fas fa-user-graduate" style={{ fontSize: '24px', color: '#5751E1' }}></i>
                            </div>
                            <div className="content">
-                              <h4 className="title">Address</h4>
-                              <p>Awamileaug Drive, Kensington <br /> London, UK</p>
+                              <h4 className="title">Student Support</h4>
+                              <p>Need help with courses or account?</p>
+                              <a href="mailto:support@edunyte.com">support@edunyte.com</a>
+                              <p className="mb-0" style={{ fontSize: '14px', color: '#777', marginTop: '5px' }}>Mon – Fri, 9AM - 6PM (IST)</p>
                            </div>
                         </li>
                         <li>
                            <div className="icon">
-                              <InjectableSvg src="assets/img/icons/contact_phone.svg" alt="img" className="injectable" />
+                              <i className="fas fa-chalkboard-teacher" style={{ fontSize: '24px', color: '#5751E1' }}></i>
                            </div>
                            <div className="content">
-                              <h4 className="title">Phone</h4>
-                              <a href="tel:0123456789">+1 (800) 123 456 789</a>
-                              <a href="tel:0123456789">+1 (800) 123 456 789</a>
+                              <h4 className="title">Teacher Support</h4>
+                              <p>Joining questions or onboarding?</p>
+                              <a href="mailto:careers@edunyte.com">careers@edunyte.com</a>
+                              <p className="mb-0" style={{ fontSize: '14px', color: '#777', marginTop: '5px' }}>Mon – Fri, 9AM - 6PM (IST)</p>
                            </div>
                         </li>
                         <li>
                            <div className="icon">
-                              <InjectableSvg src="assets/img/icons/emial.svg" alt="img" className="injectable" />
+                              <i className="fas fa-handshake" style={{ fontSize: '24px', color: '#5751E1' }}></i>
                            </div>
                            <div className="content">
-                              <h4 className="title">E-mail Address</h4>
-                              <a href="mailto:info@gmail.com">info@gmail.com</a>
-                              <a href="mailto:info@gmail.com">info@gmail.com</a>
+                              <h4 className="title">Partnerships</h4>
+                              <p>Business opportunities?</p>
+                              <a href="mailto:partnerships@edunyte.com">partnerships@edunyte.com</a>
                            </div>
                         </li>
                      </ul>
