@@ -187,6 +187,7 @@ const TeacherBookingsPage = () => {
                   <TableHead className="text-muted-foreground">Student</TableHead>
                   <TableHead className="text-muted-foreground">Course</TableHead>
                   <TableHead className="text-muted-foreground">Date & Time</TableHead>
+                  <TableHead className="text-muted-foreground">Students</TableHead>
                   <TableHead className="text-muted-foreground">Status</TableHead>
                   <TableHead className="text-muted-foreground">Payment</TableHead>
                   <TableHead className="text-muted-foreground">Meeting</TableHead>
@@ -222,6 +223,15 @@ const TeacherBookingsPage = () => {
                             {booking.startTime} - {booking.endTime} ({booking.timezone})
                           </span>
                         </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <User className="h-3 w-3 text-muted-foreground" />
+                        <span className="font-semibold">{(booking as any).studentCount || 1}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {(booking as any).studentCount === 1 ? 'student' : 'students'}
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell>

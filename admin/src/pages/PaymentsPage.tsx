@@ -41,6 +41,7 @@ interface Payment {
   };
   sessionDate: string;
   duration: number;
+  studentCount?: number; // Number of students attending this lesson
   pricingSnapshot: {
     baseAmountUSD: number;
     platformFeeUSD: number;
@@ -321,6 +322,7 @@ const PaymentsPage = () => {
                   <TableHead>Student</TableHead>
                   <TableHead>Teacher</TableHead>
                   <TableHead>Course</TableHead>
+                  <TableHead>Students</TableHead>
                   <TableHead>Amount</TableHead>
                   <TableHead>Platform Fee</TableHead>
                   <TableHead>Teacher Payout</TableHead>
@@ -331,13 +333,13 @@ const PaymentsPage = () => {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center py-8">
+                    <TableCell colSpan={10} className="text-center py-8">
                       <div className="text-muted-foreground">Loading payments...</div>
                     </TableCell>
                   </TableRow>
                 ) : filteredPayments.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center py-8">
+                    <TableCell colSpan={10} className="text-center py-8">
                       <div className="text-muted-foreground">No payments found</div>
                     </TableCell>
                   </TableRow>
@@ -368,6 +370,14 @@ const PaymentsPage = () => {
                           <div className="truncate">{getCourseName(payment.courseId)}</div>
                           <div className="text-xs text-muted-foreground">
                             {payment.duration} min
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-center">
+                          <span className="font-semibold">{payment.studentCount || 1}</span>
+                          <div className="text-xs text-muted-foreground">
+                            {payment.studentCount === 1 ? 'student' : 'students'}
                           </div>
                         </div>
                       </TableCell>
