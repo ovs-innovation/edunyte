@@ -114,7 +114,7 @@ const InstructorDetailsArea = () => {
 
               {/* CTA Button */}
               <div className="instructor__cta-btn">
-                <Link to="/instructor/register" className="btn btn-primary">
+                <Link to="/registration/tutor" className="btn btn-primary">
                   Create a tutor profile now
                 </Link>
               </div>
@@ -204,7 +204,7 @@ const InstructorDetailsArea = () => {
               </ul>
 
               <div className="global-cta">
-                <Link to="/instructor/register" className="btn btn-primary">
+                <Link to="/registration/tutor" className="btn btn-primary">
                   Create a tutor profile now
                 </Link>
               </div>
@@ -244,7 +244,7 @@ const InstructorDetailsArea = () => {
                 <p className="author-role">English tutor</p>
               </div>
               <div className="testimonial-cta">
-                <Link to="/instructor/register" className="btn btn-primary">
+                <Link to="/registration/tutor" className="btn btn-primary">
                   Create a tutor profile now
                 </Link>
               </div>
@@ -303,7 +303,7 @@ const InstructorDetailsArea = () => {
                     Connect with thousands of learners around the world and teach from your living room
                   </p>
                   <div>
-                    <Link to="/instructor/register" className="btn" style={{ backgroundColor: '#0a0a0a', color: '#fff', padding: '18px 45px', borderRadius: '8px', fontSize: '18px', fontWeight: 700, border: 'none', minWidth: '200px' }}>
+                    <Link to="/registration/tutor" className="btn" style={{ backgroundColor: '#0a0a0a', color: '#fff', padding: '18px 45px', borderRadius: '8px', fontSize: '18px', fontWeight: 700, border: 'none', minWidth: '200px' }}>
                       Create a tutor profile now
                     </Link>
                   </div>

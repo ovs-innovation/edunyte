@@ -66,8 +66,8 @@ const AppNavigation = () => {
         <Route path="/course/:slug" element={<CourseDetails />} />
         <Route path="/lesson" element={<Lesson />} />
         <Route path="/about-us" element={<About />} />
-        <Route path="/instructors" element={<Instructor />} />
-        <Route path="/instructor-details" element={<InstructorDetails />} />
+        {/* <Route path="/all-instructors" element={<Instructor />} /> */}
+        <Route path="/instructor" element={<InstructorDetails />} />
         <Route path="/events" element={<Event />} />
         <Route path="/events-details" element={<EventDetails />} />
         <Route path="/shop" element={<Shop />} />
