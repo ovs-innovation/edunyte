@@ -184,6 +184,42 @@ const SettingsPage = () => {
 
           <Card className="border-border bg-card p-6 animate-slide-up" style={{ animationDelay: '100ms' }}>
             <div className="flex items-center gap-2 mb-4">
+              <svg className="h-5 w-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <h3 className="font-semibold text-foreground">Financial</h3>
+            </div>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="platformFee">Platform Fee Percentage (%)</Label>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Fee charged on each booking (applied to lesson price)
+                </p>
+                <Input
+                  id="platformFee"
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  value={settings.platformFeePercent ?? 4}
+                  onChange={(e) => {
+                    const value = parseFloat(e.target.value);
+                    if (!isNaN(value) && value >= 0 && value <= 100) {
+                      updateSetting('platformFeePercent', value);
+                    }
+                  }}
+                  className="bg-muted/50"
+                  placeholder="4.0"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Default: 4% • Current: {settings.platformFeePercent ?? 4}%
+                </p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="border-border bg-card p-6 animate-slide-up" style={{ animationDelay: '200ms' }}>
+            <div className="flex items-center gap-2 mb-4">
               <Bell className="h-5 w-5 text-primary" />
               <h3 className="font-semibold text-foreground">Notifications</h3>
             </div>
@@ -239,7 +275,7 @@ const SettingsPage = () => {
             </div>
           </Card>
 
-          <Card className="border-border bg-card p-6 animate-slide-up" style={{ animationDelay: '200ms' }}>
+          <Card className="border-border bg-card p-6 animate-slide-up" style={{ animationDelay: '300ms' }}>
             <div className="flex items-center gap-2 mb-4">
               <Shield className="h-5 w-5 text-primary" />
               <h3 className="font-semibold text-foreground">Security</h3>
@@ -296,7 +332,7 @@ const SettingsPage = () => {
             </div>
           </Card>
 
-          <Card className="border-border bg-card p-6 animate-slide-up" style={{ animationDelay: '300ms' }}>
+          <Card className="border-border bg-card p-6 animate-slide-up" style={{ animationDelay: '400ms' }}>
             <div className="flex items-center gap-2 mb-4">
               <Palette className="h-5 w-5 text-primary" />
               <h3 className="font-semibold text-foreground">Appearance</h3>

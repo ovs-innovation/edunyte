@@ -397,7 +397,12 @@
     "refund_policy_link": "Edunyte's Refund and Payment Policy",
     "missing_booking_details": "Missing booking details. Please select a slot again.",
     "failed_to_start": "Failed to start checkout",
-    "go_back": "Go back"
+    "go_back": "Go back",
+    "number_of_students": "Number of Students",
+    "students_attending": "Students attending this lesson",
+    "group_lesson_note": "Price will be calculated for {{count}} students",
+    "per_student": "Per Student",
+    "students_lowercase": "students"
   },
   "dashboard": {
     "lesson_booked": "Lessons Booked",

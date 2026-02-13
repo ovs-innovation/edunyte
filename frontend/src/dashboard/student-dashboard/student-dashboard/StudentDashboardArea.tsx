@@ -300,6 +300,12 @@ const StudentDashboardArea = () => {
                               <i className="flaticon-clock me-1" style={{ fontSize: '14px' }}></i>
                               <span>{nextLesson.duration} {t('common.mins')}</span>
                             </span>
+                            {nextLesson.studentCount && nextLesson.studentCount > 1 && (
+                              <span className="text-muted small d-inline-flex align-items-center">
+                                <i className="flaticon-user me-1" style={{ fontSize: '14px' }}></i>
+                                <span>{nextLesson.studentCount} {t('dashboard.students') || 'students'}</span>
+                              </span>
+                            )}
                             {nextLesson.languageId && typeof nextLesson.languageId === 'object' && (
                               <span className="text-muted small d-inline-flex align-items-center">
                                 <i className="flaticon-translate me-1" style={{ fontSize: '14px' }}></i>
@@ -520,6 +526,12 @@ const StudentDashboardArea = () => {
                                               <i className="flaticon-clock me-1" style={{ fontSize: '14px' }}></i>
                                               {booking.duration} min
                                             </span>
+                                            {booking.studentCount && booking.studentCount > 1 && (
+                                              <span className="text-muted small d-inline-flex align-items-center">
+                                                <i className="flaticon-user me-1" style={{ fontSize: '14px' }}></i>
+                                                <span>{booking.studentCount} {t('dashboard.students') || 'students'}</span>
+                                              </span>
+                                            )}
                                             {booking.languageId && typeof booking.languageId === 'object' && (
                                               <span className="text-muted small d-inline-flex align-items-center">
                                                 <i className="flaticon-translate me-1" style={{ fontSize: '14px' }}></i>
@@ -640,6 +652,12 @@ const StudentDashboardArea = () => {
                                               <i className="flaticon-clock me-1" style={{ fontSize: '14px' }}></i>
                                               {booking.duration} min
                                             </span>
+                                            {booking.studentCount && booking.studentCount > 1 && (
+                                              <span className="text-muted small d-inline-flex align-items-center">
+                                                <i className="flaticon-user me-1" style={ {fontSize: '14px' }}></i>
+                                                <span>{booking.studentCount} {t('dashboard.students') || 'students'}</span>
+                                              </span>
+                                            )}
                                             {booking.languageId && typeof booking.languageId === 'object' && (
                                               <span className="text-muted small d-inline-flex align-items-center">
                                                 <i className="flaticon-translate me-1" style={{ fontSize: '14px' }}></i>
