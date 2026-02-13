@@ -230,29 +230,39 @@
     }
 
     .switcher-dropdown {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 90%;
-      max-width: 320px;
-      max-height: 80vh;
-      overflow-y: auto;
-      z-index: 10001;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      position: relative;
+      top: auto;
+      left: auto;
+      transform: none;
+      width: 100%;
+      max-width: 100%;
+      max-height: none;
+      overflow-y: visible;
+      z-index: 10;
+      box-shadow: none;
       right: auto;
+      margin-top: 10px;
+      padding: 0;
+      border: none;
+      background: transparent;
+
+      .dropdown-section {
+        margin-bottom: 15px;
+      }
     }
 
     .nested-dropdown-menu {
-      position: fixed !important;
-      top: 50% !important;
-      left: 50% !important;
-      transform: translate(-50%, -50%) !important;
-      width: 85% !important;
-      max-width: 280px !important;
-      max-height: 60vh !important;
-      z-index: 10002 !important;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25) !important;
+      position: relative !important;
+      top: auto !important;
+      left: auto !important;
+      transform: none !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      max-height: none !important;
+      z-index: 10 !important;
+      box-shadow: none !important;
+      margin-top: 10px;
+      border: 1px solid #e0e0e0;
     }
   }
 }
@@ -266,21 +276,6 @@
       min-width: 260px;
     }
   }
-
-  .tgmobile__language-currency {
-    .language-currency-switcher {
-      .switcher-dropdown {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 90%;
-        max-width: 320px;
-        right: auto;
-        left: 50%;
-      }
-    }
-  }
 }
 
 .tgmenu__action {
@@ -292,4 +287,3 @@
   position: relative;
   overflow: visible;
 }
-
