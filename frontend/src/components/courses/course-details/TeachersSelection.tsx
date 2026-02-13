@@ -1523,9 +1523,6 @@ const TeachersSelection = () => {
                                   ({teacher.teacherProfile.totalReviews} {t('common.reviews')})
                                 </span>
                               </div>
-                              <span className="text-muted">
-                                {teacher.teacherProfile.totalStudents} {t('common.students')}
-                              </span>
                               {/* Mobile Price Display in Stats Row */}
                               <div className="d-lg-none d-flex align-items-center gap-1 ms-auto">
                                 <span className="fw-bold text-primary" style={{ fontSize: '16px' }}>
