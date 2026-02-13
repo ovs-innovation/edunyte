@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../../contexts/AuthContext'
@@ -140,6 +140,36 @@ const StudentDashboardArea = () => {
     setAvailableSlots([]);
     setSelectedSlotId(null);
   };
+
+  const handleShareLink = async (booking: Booking) => {
+    setOpenDropdownId(null);
+    const meetingUrl = booking.meeting?.joinUrlStudent;
+    
+    if (!meetingUrl) {
+      toast.error('No meeting link available to share');
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(meetingUrl);
+      toast.success('Meeting link copied to clipboard!');
+    } catch (err) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = meetingUrl;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        toast.success('Meeting link copied to clipboard!');
+      } catch (e) {
+        toast.error('Failed to copy link');
+      }
+      document.body.removeChild(textArea);
+    }
+  };
+
+
 
   const now = new Date()
   const upcomingBookings = bookings.filter(b => {
@@ -300,6 +330,12 @@ const StudentDashboardArea = () => {
                               <i className="flaticon-clock me-1" style={{ fontSize: '14px' }}></i>
                               <span>{nextLesson.duration} {t('common.mins')}</span>
                             </span>
+                            {nextLesson.studentCount && nextLesson.studentCount > 1 && (
+                              <span className="text-muted small d-inline-flex align-items-center">
+                                <i className="flaticon-user me-1" style={{ fontSize: '14px' }}></i>
+                                <span>{nextLesson.studentCount}</span>
+                              </span>
+                            )}
                             {nextLesson.languageId && typeof nextLesson.languageId === 'object' && (
                               <span className="text-muted small d-inline-flex align-items-center">
                                 <i className="flaticon-translate me-1" style={{ fontSize: '14px' }}></i>
@@ -341,28 +377,43 @@ const StudentDashboardArea = () => {
                                 </svg>
                              </button>
                              {openDropdownId === `${nextLesson._id}_next` && (
-                                <div className="dropdown-menu show" style={{ position: 'absolute', right: 0, top: '100%', marginTop: '5px', zIndex: 1000, minWidth: '180px', boxShadow: '0 5px 15px rgba(0,0,0,0.1)', padding: '8px 0', border: 'none', borderRadius: '8px' }}>
-                                   <button 
-                                     className="dropdown-item d-flex align-items-center gap-2 px-3 py-2" 
-                                     onClick={() => handleReschedule(nextLesson._id)}
-                                   >
-                                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-muted">
-                                        <path d="M11 4H4C3.44772 4 3 4.44772 3 5V20C3 20.5523 3.44772 21 4 21H19C19.5523 21 20 20.5523 20 20V13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        <path d="M18.5 2.5C18.8978 2.10217 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10217 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10217 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                      </svg>
-                                      <span>Reschedule</span>
-                                   </button>
-                                   <button 
-                                     className="dropdown-item d-flex align-items-center gap-2 px-3 py-2 text-danger" 
-                                     onClick={() => handleBookingCancel(nextLesson._id, nextLesson.lesson?.scheduledAt || nextLesson.sessionDate)}
-                                   >
-                                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-danger flex-shrink-0">
-                                        <path d="M3 6H5H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        <path d="M8 6V4C8 3.46957 8.21071 3 8.58579 2.62513C8.96086 2.25026 9.46957 2.03967 10 2.03967H14C14.5304 2.03967 15.0391 2.25026 15.4142 2.62513C15.7893 3 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                      </svg>
-                                      <span>Cancel Lesson</span>
-                                   </button>
-                                </div>
+                                 <div className="dropdown-menu show" style={{ position: 'absolute', right: 0, top: '100%', marginTop: '5px', zIndex: 1000, minWidth: '180px', boxShadow: '0 5px 15px rgba(0,0,0,0.1)', padding: '8px 0', border: 'none', borderRadius: '8px' }}>
+                                    {nextLesson.meeting?.joinUrlStudent && (
+                                      <button 
+                                        className="dropdown-item d-flex align-items-center gap-2 px-3 py-2" 
+                                        onClick={() => handleShareLink(nextLesson)}
+                                      >
+                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-muted">
+                                           <path d="M18 8C19.6569 8 21 6.65685 21 5C21 3.34315 19.6569 2 18 2C16.3431 2 15 3.34315 15 5C15 6.65685 16.3431 8 18 8Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                           <path d="M6 15C7.65685 15 9 13.6569 9 12C9 10.3431 7.65685 9 6 9C4.34315 9 3 10.3431 3 12C3 13.6569 4.34315 15 6 15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                           <path d="M18 22C19.6569 22 21 20.6569 21 19C21 17.3431 19.6569 16 18 16C16.3431 16 15 17.3431 15 19C15 20.6569 16.3431 22 18 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                           <path d="M8.59 13.51L15.42 17.49" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                           <path d="M15.41 6.51L8.59 10.49" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                         </svg>
+                                         <span>Share Link</span>
+                                      </button>
+                                    )}
+                                    <button 
+                                      className="dropdown-item d-flex align-items-center gap-2 px-3 py-2" 
+                                      onClick={() => handleReschedule(nextLesson._id)}
+                                    >
+                                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-muted">
+                                         <path d="M11 4H4C3.44772 4 3 4.44772 3 5V20C3 20.5523 3.44772 21 4 21H19C19.5523 21 20 20.5523 20 20V13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                         <path d="M18.5 2.5C18.8978 2.10217 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10217 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10217 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                       </svg>
+                                       <span>Reschedule</span>
+                                    </button>
+                                    <button 
+                                      className="dropdown-item d-flex align-items-center gap-2 px-3 py-2 text-danger" 
+                                      onClick={() => handleBookingCancel(nextLesson._id, nextLesson.lesson?.scheduledAt || nextLesson.sessionDate)}
+                                    >
+                                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-danger flex-shrink-0">
+                                         <path d="M3 6H5H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                         <path d="M8 6V4C8 3.46957 8.21071 3 8.58579 2.62513C8.96086 2.25026 9.46957 2.03967 10 2.03967H14C14.5304 2.03967 15.0391 2.25026 15.4142 2.62513C15.7893 3 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                       </svg>
+                                       <span>Cancel Lesson</span>
+                                    </button>
+                                 </div>
                              )}
                          </div>
                       </div>
@@ -520,6 +571,12 @@ const StudentDashboardArea = () => {
                                               <i className="flaticon-clock me-1" style={{ fontSize: '14px' }}></i>
                                               {booking.duration} min
                                             </span>
+                                            {booking.studentCount && booking.studentCount > 1 && (
+                                              <span className="text-muted small d-inline-flex align-items-center">
+                                                <i className="flaticon-user me-1" style={{ fontSize: '14px' }}></i>
+                                                <span>{booking.studentCount}</span>
+                                              </span>
+                                            )}
                                             {booking.languageId && typeof booking.languageId === 'object' && (
                                               <span className="text-muted small d-inline-flex align-items-center">
                                                 <i className="flaticon-translate me-1" style={{ fontSize: '14px' }}></i>
@@ -562,6 +619,21 @@ const StudentDashboardArea = () => {
                                              </button>
                                              {openDropdownId === `${booking._id}_list` && (
                                                 <div className="dropdown-menu show" style={{ position: 'absolute', right: 0, top: '100%', marginTop: '5px', zIndex: 1000, minWidth: '180px', boxShadow: '0 5px 15px rgba(0,0,0,0.1)', padding: '8px 0', border: 'none', borderRadius: '8px' }}>
+                                                   {booking.meeting?.joinUrlStudent && (
+                                                      <button 
+                                                        className="dropdown-item d-flex align-items-center gap-2 px-3 py-2" 
+                                                        onClick={() => handleShareLink(booking)}
+                                                      >
+                                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-muted">
+                                                           <path d="M18 8C19.6569 8 21 6.65685 21 5C21 3.34315 19.6569 2 18 2C16.3431 2 15 3.34315 15 5C15 6.65685 16.3431 8 18 8Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                           <path d="M6 15C7.65685 15 9 13.6569 9 12C9 10.3431 7.65685 9 6 9C4.34315 9 3 10.3431 3 12C3 13.6569 4.34315 15 6 15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                           <path d="M18 22C19.6569 22 21 20.6569 21 19C21 17.3431 19.6569 16 18 16C16.3431 16 15 17.3431 15 19C15 20.6569 16.3431 22 18 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                           <path d="M8.59 13.51L15.42 17.49" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                           <path d="M15.41 6.51L8.59 10.49" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                         </svg>
+                                                         <span>Share Link</span>
+                                                      </button>
+                                                    )}
                                                    <button 
                                                      className="dropdown-item d-flex align-items-center gap-2 px-3 py-2" 
                                                      onClick={() => handleReschedule(booking._id)}
@@ -640,6 +712,12 @@ const StudentDashboardArea = () => {
                                               <i className="flaticon-clock me-1" style={{ fontSize: '14px' }}></i>
                                               {booking.duration} min
                                             </span>
+                                            {booking.studentCount && booking.studentCount > 1 && (
+                                              <span className="text-muted small d-inline-flex align-items-center">
+                                                <i className="flaticon-user me-1" style={ {fontSize: '14px' }}></i>
+                                                <span>{booking.studentCount}</span>
+                                              </span>
+                                            )}
                                             {booking.languageId && typeof booking.languageId === 'object' && (
                                               <span className="text-muted small d-inline-flex align-items-center">
                                                 <i className="flaticon-translate me-1" style={{ fontSize: '14px' }}></i>

@@ -266,14 +266,6 @@ const TeacherDashboardPage = () => {
               <Button
                 variant="outline"
                 className="h-auto py-4 flex-col gap-2"
-                onClick={() => navigate('/analytics')}
-              >
-                <TrendingUp className="h-5 w-5" />
-                <span>Analytics</span>
-              </Button>
-              <Button
-                variant="outline"
-                className="h-auto py-4 flex-col gap-2"
                 onClick={() => navigate('/messages')}
               >
                 <MessageSquare className="h-5 w-5" />

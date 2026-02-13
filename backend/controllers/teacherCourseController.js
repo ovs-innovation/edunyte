@@ -690,6 +690,54 @@ export const rejectTeacherCourse = async (req, res, next) => {
 };
 
 /**
+ * Admin: Update a teacher-course (e.g., custom platform fee)
+ */
+export const updateTeacherCourse = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { customPlatformFeePercent } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid request ID" });
+    }
+
+    const teacherCourse = await TeacherCourse.findById(id);
+    if (!teacherCourse) {
+      return res.status(404).json({ message: "Teacher course not found" });
+    }
+
+    // Update custom platform fee if provided
+    if (customPlatformFeePercent !== undefined) {
+      const feePercent = parseFloat(customPlatformFeePercent);
+      if (isNaN(feePercent) || feePercent < 0 || feePercent > 100) {
+        return res.status(400).json({ message: "Platform fee must be between 0 and 100" });
+      }
+      console.log(`[TeacherCourse Update] Setting custom fee for ${id}: ${feePercent}%`);
+      teacherCourse.customPlatformFeePercent = feePercent;
+    }
+
+    await teacherCourse.save();
+    console.log(`[TeacherCourse Update] Saved custom fee: ${teacherCourse.customPlatformFeePercent}%`);
+    
+    await teacherCourse.populate([
+      { path: "teacherId", select: "name email" },
+      { path: "courseId", select: "name description category image status" },
+      { path: "languageIds", select: "name code nativeName" },
+      { path: "reviewedBy", select: "name email" },
+    ]);
+
+    const tcObj = teacherCourse.toObject();
+    tcObj.bio = getLanguageValue(tcObj.bio);
+    tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
+    attachLanguagesView(tcObj);
+    
+    res.json({ teacherCourse: tcObj, message: "Teacher course updated successfully" });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
  * Student: Get all available courses (only approved teacher-course mappings)
  */
 export const getAvailableCourses = async (req, res, next) => {

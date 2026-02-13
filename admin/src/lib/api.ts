@@ -116,6 +116,7 @@ export interface ApiSettings {
   ipWhitelist: boolean;
   themeColor: string;
   compactMode: boolean;
+  platformFeePercent?: number;
 }
 
 export const SettingsAPI = {
@@ -481,6 +482,11 @@ export const TeacherCoursesAPI = {
     apiFetch<{ teacherCourse: ApiTeacherCourse; message: string }>(`/admin/teacher-course/${id}/reject`, {
       method: "PATCH",
       body: JSON.stringify({ status: "rejected", rejectionReason }),
+    }),
+  update: (id: string, payload: { customPlatformFeePercent?: number }) =>
+    apiFetch<{ teacherCourse: ApiTeacherCourse; message: string }>(`/admin/teacher-course/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(payload),
     }),
 };
 

@@ -12,6 +12,7 @@ export interface Booking {
   endTime: string
   duration: number
   timezone: string
+  studentCount?: number // Number of students attending
   lesson: {
     duration: number
     scheduledAt: string

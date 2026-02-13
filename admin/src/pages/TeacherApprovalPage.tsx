@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { PermissionGate } from '@/components/PermissionGate';
 import { Button } from '@/components/ui/button';
-import { Download, Filter, CheckCircle2, XCircle, Video, ExternalLink } from 'lucide-react';
-import { TeacherCoursesAPI, ApiTeacherCourse, CoursesAPI, LanguagesAPI } from '@/lib/api';
+import { Download, Filter, CheckCircle2, XCircle, Video, ExternalLink, Edit, DollarSign, RefreshCw } from 'lucide-react';
+import { TeacherCoursesAPI, ApiTeacherCourse, CoursesAPI, LanguagesAPI, SettingsAPI, ApiSettings } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import { getLanguageValue } from '@/lib/languageHelper';
+import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -69,8 +70,27 @@ const TeacherApprovalPage = () => {
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<ApiTeacherCourse | null>(null);
   const [rejectionReason, setRejectionReason] = useState('');
+  const [settings, setSettings] = useState<ApiSettings | null>(null);
+  const [platformFeePercent, setPlatformFeePercent] = useState<number>(4);
+  const [feeDialogOpen, setFeeDialogOpen] = useState(false);
+  const [tempFeePercent, setTempFeePercent] = useState<number>(4);
+  const [customFeeDialogOpen, setCustomFeeDialogOpen] = useState(false);
+  const [selectedCourseForFee, setSelectedCourseForFee] = useState<ApiTeacherCourse | null>(null);
+  const [tempCustomFeePercent, setTempCustomFeePercent] = useState<number>(4);
   const { toast } = useToast();
   const { confirm, ConfirmDialog } = useConfirmDialog();
+
+  const loadSettings = async () => {
+    try {
+      const data = await SettingsAPI.get();
+      setSettings(data.settings);
+      const fee = data.settings.platformFeePercent ?? 4;
+      setPlatformFeePercent(fee);
+      setTempFeePercent(fee);
+    } catch (err: any) {
+      console.error('Failed to load settings:', err);
+    }
+  };
 
   const loadRequests = async () => {
     setLoading(true);
@@ -89,8 +109,70 @@ const TeacherApprovalPage = () => {
   };
 
   useEffect(() => {
+    loadSettings();
     loadRequests();
   }, [filterStatus]);
+
+  // Reload settings when window regains focus (e.g., after updating settings on another page)
+  useEffect(() => {
+    const handleFocus = () => {
+      loadSettings();
+      loadRequests();
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
+
+  const handleUpdatePlatformFee = async () => {
+    if (!settings) return;
+    try {
+      const data = await SettingsAPI.update({ platformFeePercent: tempFeePercent });
+      setSettings(data.settings);
+      setPlatformFeePercent(tempFeePercent);
+      setFeeDialogOpen(false);
+      toast({ title: 'Platform fee updated successfully' });
+    } catch (err: any) {
+      toast({ title: 'Failed to update platform fee', description: err?.message, variant: 'destructive' });
+    }
+  };
+
+  const getCourseFeePercent = (course: ApiTeacherCourse): number => {
+    // Check if course has a custom platform fee percentage
+    return (course as any).customPlatformFeePercent ?? platformFeePercent;
+  };
+
+  const calculatePlatformFee = (teacherPrice: number, customPercent?: number) => {
+    const feePercent = customPercent ?? platformFeePercent;
+    return (teacherPrice * feePercent) / 100;
+  };
+
+  const calculateTotalPrice = (teacherPrice: number, customPercent?: number) => {
+    return teacherPrice + calculatePlatformFee(teacherPrice, customPercent);
+  };
+
+  const openCustomFeeDialog = (course: ApiTeacherCourse) => {
+    setSelectedCourseForFee(course);
+    const currentFee = getCourseFeePercent(course);
+    setTempCustomFeePercent(currentFee);
+    setCustomFeeDialogOpen(true);
+  };
+
+  const handleUpdateCustomFee = async () => {
+    if (!selectedCourseForFee) return;
+    try {
+      // Update the teacher course with custom platform fee
+      await TeacherCoursesAPI.update(selectedCourseForFee._id, {
+        customPlatformFeePercent: tempCustomFeePercent
+      });
+      toast({ title: 'Custom platform fee updated successfully' });
+      setCustomFeeDialogOpen(false);
+      setSelectedCourseForFee(null);
+      loadRequests(); // Reload to show updated data
+    } catch (err: any) {
+      toast({ title: 'Failed to update custom fee', description: err?.message, variant: 'destructive' });
+    }
+  };
 
   const handleApprove = async (id: string) => {
     const confirmed = await confirm({
@@ -181,6 +263,47 @@ const TeacherApprovalPage = () => {
               <Button variant="outline" size="sm" className="gap-2">
                 <Download className="h-4 w-4" />
                 Export
+              </Button>
+            </PermissionGate>
+          </div>
+        </div>
+
+        {/* Platform Fee Info Card */}
+        <div className="rounded-xl border border-border bg-card p-4 animate-slide-up flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <DollarSign className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-foreground">Platform Fee Percentage</p>
+              <p className="text-xs text-muted-foreground">
+                Current processing fee: <span className="font-semibold">{platformFeePercent}%</span>
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-2"
+              onClick={() => {
+                loadSettings();
+                loadRequests();
+              }}
+              title="Refresh settings"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Refresh
+            </Button>
+            <PermissionGate permission="settings.edit">
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={() => setFeeDialogOpen(true)}
+              >
+                <Edit className="h-4 w-4" />
+                Edit Fee
               </Button>
             </PermissionGate>
           </div>
@@ -337,12 +460,41 @@ const TeacherApprovalPage = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <span className="font-medium">
-                        {request?.pricing?.teacherCurrency || 'USD'}{' '}
-                        {typeof request?.pricing?.teacherPrice === 'number'
-                          ? request.pricing.teacherPrice.toFixed(2)
-                          : '0.00'}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <div className="space-y-1 flex-1">
+                          <div className="font-medium text-foreground">
+                            {request?.pricing?.teacherCurrency || 'USD'}{' '}
+                            {typeof request?.pricing?.teacherPrice === 'number'
+                              ? calculateTotalPrice(request.pricing.teacherPrice, getCourseFeePercent(request)).toFixed(2)
+                              : '0.00'}
+                          </div>
+                          {typeof request?.pricing?.teacherPrice === 'number' && (
+                            <>
+                              <div className="text-xs text-muted-foreground">
+                                Teacher: {request?.pricing?.teacherCurrency || 'USD'} {request.pricing.teacherPrice.toFixed(2)}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                Fee ({getCourseFeePercent(request)}%): {request?.pricing?.teacherCurrency || 'USD'}{' '}
+                                {calculatePlatformFee(request.pricing.teacherPrice, getCourseFeePercent(request)).toFixed(2)}
+                                {(request as any).customPlatformFeePercent !== undefined && (
+                                  <Badge variant="outline" className="ml-1 text-[10px] px-1 py-0">Custom</Badge>
+                                )}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                        <PermissionGate permission="settings.edit">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 w-7 p-0"
+                            onClick={() => openCustomFeeDialog(request)}
+                            title="Edit platform fee for this course"
+                          >
+                            <Edit className="h-3.5 w-3.5" />
+                          </Button>
+                        </PermissionGate>
+                      </div>
                     </TableCell>
                     <TableCell>
                       <Badge
@@ -429,6 +581,110 @@ const TeacherApprovalPage = () => {
               onClick={handleReject}
             >
               Reject Request
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Platform Fee Edit Dialog */}
+      <Dialog open={feeDialogOpen} onOpenChange={setFeeDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Platform Fee</DialogTitle>
+            <DialogDescription>
+              Update the platform processing fee percentage applied to all teacher course bookings.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="platformFeePercent">Platform Fee Percentage (%)</Label>
+              <Input
+                id="platformFeePercent"
+                type="number"
+                min="0"
+                max="100"
+                step="0.1"
+                value={tempFeePercent}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value);
+                  if (!isNaN(value) && value >= 0 && value <= 100) {
+                    setTempFeePercent(value);
+                  }
+                }}
+                placeholder="4.0"
+              />
+              <p className="text-xs text-muted-foreground">
+                The percentage fee charged on top of the teacher's price. Current: {platformFeePercent}%
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setFeeDialogOpen(false);
+                setTempFeePercent(platformFeePercent);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleUpdatePlatformFee}>
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Custom Platform Fee Edit Dialog */}
+      <Dialog open={customFeeDialogOpen} onOpenChange={setCustomFeeDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Platform Fee for Course</DialogTitle>
+            <DialogDescription>
+              Set a custom platform fee percentage for this specific teacher course, or use the global default ({platformFeePercent}%).
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="customFeePercent">Platform Fee Percentage (%)</Label>
+              <Input
+                id="customFeePercent"
+                type="number"
+                min="0"
+                max="100"
+                step="0.1"
+                value={tempCustomFeePercent}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value);
+                  if (!isNaN(value) && value >= 0 && value <= 100) {
+                    setTempCustomFeePercent(value);
+                  }
+                }}
+                placeholder={`${platformFeePercent}`}
+              />
+              <p className="text-xs text-muted-foreground">
+                Global default: {platformFeePercent}% • Current custom: {selectedCourseForFee && getCourseFeePercent(selectedCourseForFee)}%
+              </p>
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setCustomFeeDialogOpen(false);
+                setSelectedCourseForFee(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => setTempCustomFeePercent(platformFeePercent)}
+            >
+              Use Global ({platformFeePercent}%)
+            </Button>
+            <Button onClick={handleUpdateCustomFee}>
+              Save Custom Fee
             </Button>
           </DialogFooter>
         </DialogContent>

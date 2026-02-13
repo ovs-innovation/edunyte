@@ -8,7 +8,7 @@ const InstructorsDetails = () => {
       <>
          <HeaderOne />
          <main className="main-area fix">
-            <BreadcrumbTwo title="Robert Fox" sub_title="Instructors" />
+            <BreadcrumbTwo title="Become an Instructor" sub_title="" />
             <InstructorDetailsArea />
          </main>
          <FooterOne style={false} style_2={false} />

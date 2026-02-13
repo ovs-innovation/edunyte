@@ -142,6 +142,13 @@ const teacherCourseSchema = new mongoose.Schema(
       trim: true,
       default: "",
     },
+    // Custom platform fee percentage (overrides global setting if set)
+    customPlatformFeePercent: {
+      type: Number,
+      min: 0,
+      max: 100,
+      default: undefined, // Use undefined so we can check if it's set, otherwise use global default
+    },
   },
   { timestamps: true }
 );

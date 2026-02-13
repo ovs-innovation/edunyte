@@ -56,7 +56,7 @@ const Instructor = () => {
                      </div>
                      <p>{t('home.how_it_works.description')}</p>
                      <div className="tg-button-wrap">
-                        <Link to="/instructors" className="btn arrow-btn">{t('home.how_it_works.see_all_instructors')}<BtnArrow /></Link>
+                        <Link to="/instructor" className="btn arrow-btn">{t('home.join_section.join_as_instructor_title')}<BtnArrow /></Link>
                      </div>
                   </div>
                </div>

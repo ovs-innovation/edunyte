@@ -115,6 +115,7 @@ const BookingCheckoutPage = () => {
   const [pricing, setPricing] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [studentCount, setStudentCount] = useState(1)
 
   const selectedCurrency = useMemo(() => state?.selectedCurrency || currency || 'USD', [state, currency])
 
@@ -142,6 +143,7 @@ const BookingCheckoutPage = () => {
             duration: state.duration,
             selectedCurrency,
             selectedSlot: { availabilityId: state.availabilityId },
+            studentCount, // Add number of students
           }),
         })
         if (!resp.ok) {
@@ -158,7 +160,7 @@ const BookingCheckoutPage = () => {
       }
     }
     run()
-  }, [state, selectedCurrency, token, t])
+  }, [state, selectedCurrency, studentCount, token, t])
 
   if (!state) {
     return (
@@ -230,30 +232,6 @@ const BookingCheckoutPage = () => {
                         ) : null}
                       </div>
                     </div>
-
-                    {/* Teacher Stats - only show if at least one stat exists */}
-                    {(state.teacherStudents || state.teacherLessons || state.teacherYearsTeaching) ? (
-                      <div className="d-flex gap-3 gap-md-4 pt-2 mt-2 border-top justify-content-around">
-                        {state.teacherStudents ? (
-                          <div className="text-center">
-                            <div className="fw-bold text-primary">{state.teacherStudents}</div>
-                            <div className="text-muted small">{t('checkout.students')}</div>
-                          </div>
-                        ) : null}
-                        {state.teacherLessons ? (
-                          <div className="text-center">
-                            <div className="fw-bold text-primary">{state.teacherLessons}</div>
-                            <div className="text-muted small">{t('checkout.lessons')}</div>
-                          </div>
-                        ) : null}
-                        {state.teacherYearsTeaching ? (
-                          <div className="text-center">
-                            <div className="fw-bold text-primary">{state.teacherYearsTeaching}</div>
-                            <div className="text-muted small">{t('checkout.years_teaching')}</div>
-                          </div>
-                        ) : null}
-                      </div>
-                    ) : null}
                   </div>
                 </div>
 
@@ -306,14 +284,73 @@ const BookingCheckoutPage = () => {
                   </div>
                 </div>
 
+                {/* Number of Students Selector */}
+                <div className="card shadow-sm border-0 mb-3">
+                  <div className="card-body p-3">
+                    <h6 className="text-muted mb-3 text-uppercase small fw-semibold">{t('checkout.number_of_students') || 'Number of Students'}</h6>
+                    <div className="d-flex align-items-center justify-content-between">
+                      <span className="text-muted">{t('checkout.students_attending') || 'Students attending this lesson'}</span>
+                      <div className="d-flex align-items-center gap-2">
+                        <button
+                          type="button"
+                          className="btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                          style={{ width: '40px', height: '40px', padding: 0 }}
+                          onClick={() => setStudentCount(Math.max(1, studentCount - 1))}
+                          disabled={studentCount <= 1}
+                        >
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                          </svg>
+                        </button>
+                        <span className="fw-bold fs-4 mx-2" style={{ minWidth: '40px', textAlign: 'center' }}>
+                          {studentCount}
+                        </span>
+                        <button
+                          type="button"
+                          className="btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                          style={{ width: '40px', height: '40px', padding: 0 }}
+                          onClick={() => setStudentCount(studentCount + 1)}
+                          disabled={studentCount >= 10}
+                        >
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                    {studentCount > 1 && (
+                      <p className="text-muted small mb-0 mt-2">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="me-1" style={{ verticalAlign: 'text-bottom' }}>
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <line x1="12" y1="16" x2="12" y2="12"></line>
+                          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                        {t('checkout.group_lesson_note', { count: studentCount }) || `Price will be calculated for ${studentCount} students`}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
                 {/* Checkout Info */}
                 <div className="card shadow-sm border-0">
                   <div className="card-body p-3">
                     <h6 className="text-muted mb-2 text-uppercase small fw-semibold">{t('checkout.checkout_info')}</h6>
                     {pricing ? (
                       <>
+                        {studentCount > 1 && (
+                          <div className="bg-light p-2 rounded mb-2">
+                            <div className="d-flex justify-content-between text-muted small">
+                              <span>{t('checkout.per_student') || 'Per Student'}:</span>
+                              <span>{formatPrice((pricing.lessonAmount || 0) / studentCount, pricing.selectedCurrency)}</span>
+                            </div>
+                          </div>
+                        )}
                         <div className="d-flex justify-content-between mb-2">
-                          <span>{state.duration}-{t('checkout.min_lesson')}</span>
+                          <span>
+                            {state.duration}-{t('checkout.min_lesson')}
+                            {studentCount > 1 && <span className="text-muted small"> × {studentCount} {t('checkout.students_lowercase') || 'students'}</span>}
+                          </span>
                           <span className="fw-semibold">
                             {formatPrice(pricing.lessonAmount || 0, pricing.selectedCurrency)}
                           </span>

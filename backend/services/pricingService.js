@@ -15,7 +15,9 @@ const BASE = "USD";
  * RULES:
  * - 25 min = basePriceUSD * 0.5
  * - 50 min = basePriceUSD * 1
- * - platformFeePercent is configurable via Settings (stored separately)
+ * - platformFeePercent priority:
+ *   1. Custom fee set by admin for specific teacher course (teacherCourse.customPlatformFeePercent)
+ *   2. Global platform fee from settings (settings.platformFeePercent, default: 4%)
  * - platform fee is calculated in USD first
  * - conversion for display/charge currency is done server-side for checkout security
  */
@@ -23,6 +25,7 @@ export async function calculateCheckoutAmounts({
   teacherCourse,
   duration,
   selectedCurrency,
+  studentCount = 1, // Default to 1 student
 }) {
   const basePriceUSD = Number(teacherCourse?.pricing?.basePriceUSD || 0);
   if (!Number.isFinite(basePriceUSD) || basePriceUSD < 0) {
@@ -34,11 +37,27 @@ export async function calculateCheckoutAmounts({
     throw new Error("Invalid duration");
   }
 
-  const multiplier = d === 25 ? 0.5 : 1;
-  const lessonAmountUSD = basePriceUSD * multiplier;
+  // Validate and default studentCount
+  const numStudents = Math.max(1, Math.min(10, Number(studentCount) || 1));
 
+  const multiplier = d === 25 ? 0.5 : 1;
+  const lessonAmountUSD = basePriceUSD * multiplier * numStudents; // Multiply by student count
+
+  // Use custom platform fee if set for this teacher course, otherwise use global setting
   const settings = await Settings.getSettings();
-  const platformFeePercent = Number(settings?.platformFeePercent ?? 4);
+  const globalPlatformFeePercent = Number(settings?.platformFeePercent ?? 4);
+  
+  // Check if teacher course has a custom platform fee percentage
+  const platformFeePercent = teacherCourse?.customPlatformFeePercent !== undefined 
+    ? Number(teacherCourse.customPlatformFeePercent)
+    : globalPlatformFeePercent;
+  
+  // Debug logging to verify which fee is being used
+  console.log('[Pricing] Teacher Course ID:', teacherCourse?._id);
+  console.log('[Pricing] Custom Platform Fee:', teacherCourse?.customPlatformFeePercent);
+  console.log('[Pricing] Global Platform Fee:', globalPlatformFeePercent);
+  console.log('[Pricing] Using Platform Fee:', platformFeePercent);
+  
   const platformFeeUSD = (lessonAmountUSD * platformFeePercent) / 100;
   const totalAmountUSD = lessonAmountUSD + platformFeeUSD;
 
@@ -52,6 +71,7 @@ export async function calculateCheckoutAmounts({
     baseCurrency: BASE,
     selectedCurrency: currency,
     platformFeePercent,
+    studentCount: numStudents, // Include in response
     lessonAmountUSD: roundMoney2(lessonAmountUSD),
     platformFeeUSD: roundMoney2(platformFeeUSD),
     totalAmountUSD: roundMoney2(totalAmountUSD),

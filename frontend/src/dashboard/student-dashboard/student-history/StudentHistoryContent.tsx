@@ -83,6 +83,8 @@ const StudentHistoryContent = () => {
                               <th>{t('dashboard.course_name')}</th>
                               <th>{t('dashboard.date')}</th>
                               <th>{t('dashboard.teacher')}</th>
+                              <th>{t('dashboard.students') || 'Students'}</th>
+                              <th>{t('dashboard.price') || 'Price'}</th>
                               <th>{t('dashboard.payment_status')}</th>
                               <th>{t('dashboard.status')}</th>
                            </tr>
@@ -104,6 +106,22 @@ const StudentHistoryContent = () => {
                                         <p>{getTeacherName(item)}</p>
                                     </td>
                                     <td>
+                                       <p style={{ fontWeight: '600', color: 'var(--tg-theme-primary)' }}>
+                                          {(item as any).studentCount || 1} {((item as any).studentCount || 1) === 1 ? t('student') || 'student' : t('students') || 'students'}
+                                       </p>
+                                    </td>
+                                    <td>
+                                       <p style={{ fontWeight: '600', color: 'var(--tg-common-color-green)' }}>
+                                          {(item as any).pricingSnapshot?.studentPaid ? 
+                                            new Intl.NumberFormat('en-IN', {
+                                              style: 'currency',
+                                              currency: (item as any).pricingSnapshot.studentPaid.currency || 'INR'
+                                            }).format((item as any).pricingSnapshot.studentPaid.amount || 0)
+                                            : 'N/A'
+                                          }
+                                       </p>
+                                    </td>
+                                    <td>
                                        <span style={getStatusStyle(item.paymentStatus)}>
                                           {item.paymentStatus}
                                        </span>
@@ -117,7 +135,7 @@ const StudentHistoryContent = () => {
                               ))
                            ) : (
                               <tr>
-                                 <td colSpan={6} className="text-center">{t('dashboard.no_bookings_found')}</td>
+                                 <td colSpan={8} className="text-center">{t('dashboard.no_bookings_found')}</td>
                               </tr>
                            )}
                         </tbody>

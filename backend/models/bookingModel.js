@@ -58,6 +58,12 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    studentCount: {
+      type: Number,
+      default: 1,
+      min: 1,
+      max: 10,
+    },
     lesson: {
       duration: { type: Number, required: true },
       scheduledAt: { type: Date, required: true, index: true },

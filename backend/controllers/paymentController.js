@@ -65,6 +65,7 @@ export const createCheckoutPaymentIntent = async (req, res, next) => {
       teacherCourse,
       duration: d,
       selectedCurrency,
+      studentCount: req.body.studentCount || 1, // Pass student count from frontend
     });
 
     const stripeAmount = toStripeAmount(amounts.totalAmount, amounts.selectedCurrency);
@@ -83,6 +84,7 @@ export const createCheckoutPaymentIntent = async (req, res, next) => {
         duration: String(d),
         baseAmountUSD: String(amounts.lessonAmountUSD),
         platformFeeUSD: String(amounts.platformFeeUSD),
+        studentCount: String(amounts.studentCount || 1), // Add student count to metadata
       },
     });
 
@@ -135,6 +137,7 @@ export const stripeWebhook = async (req, res, next) => {
     const duration = Number(meta.duration || 0);
     const baseAmountUSD = Number(meta.baseAmountUSD || 0);
     const platformFeeUSD = Number(meta.platformFeeUSD || 0);
+    const studentCount = Number(meta.studentCount || 1); // Extract student count
 
     if (!teacherId || !studentId || !courseId || !availabilityId || !teacherCourseId || !languageId) {
       return res.json({ received: true });
@@ -202,6 +205,7 @@ export const stripeWebhook = async (req, res, next) => {
       endTime: availability.endTime,
       duration: availability.duration,
       timezone: availability.timezone,
+      studentCount, // Save student count to booking
       lesson: {
         duration: availability.duration,
         scheduledAt,
