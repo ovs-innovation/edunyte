@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { fetchCourseTeachers, fetchCourses, fetchCourse, type TeacherCourse, type Course } from '../../../services/courseService';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../contexts/AuthContext';
-import { useWishlist } from '../../../contexts/WishlistContext';
 import { useCurrency } from '../../../hooks/useCurrency';
 import BookingModal from './BookingModal';
 import * as Flags from 'country-flag-icons/react/3x2';
@@ -38,7 +37,6 @@ const TeachersSelection = () => {
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
   const [bookingTeacher, setBookingTeacher] = useState<TeacherCourse | null>(null);
   const [expandedBios, setExpandedBios] = useState<Set<string>>(new Set());
-  const { toggleWishlist, isInWishlist } = useWishlist();
   const [videoModalOpen, setVideoModalOpen] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string>('');
   const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
@@ -488,12 +486,6 @@ const TeachersSelection = () => {
       }
       return newSet;
     });
-  };
-
-  const toggleFavorite = (teacherId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    toggleWishlist(teacherId);
   };
 
   if (loading) {
