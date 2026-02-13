@@ -11,7 +11,6 @@ import Course from '../pages/Course';
 import Lesson from '../pages/Lesson';
 import CourseDetails from '../pages/CourseDetails';
 import About from '../pages/About';
-import Instructor from '../pages/Instructor';
 import InstructorDetails from '../pages/InstructorDetails';
 import Event from '../pages/Event';
 import EventDetails from '../pages/EventDetails';

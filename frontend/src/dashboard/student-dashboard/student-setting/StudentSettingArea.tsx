@@ -12,7 +12,7 @@ const StudentSettingArea = () => {
             <div className="dashboard__inner-wrap">
                <div className="row">
                   <DashboardSidebarTwo />
-                  <InstructorSettingContent style={true} />
+                  <InstructorSettingContent />
                </div>
             </div>
          </div>

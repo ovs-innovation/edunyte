@@ -1,11 +1,11 @@
 "use client";
-import React, { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Select from "react-select";
 import { Country, State, City } from "country-state-city";
 import { useAuth } from "../../../contexts/AuthContext";
 import { toast } from "react-toastify";
 
-const InstructorSettingProfile = ({ style }: any) => {
+const InstructorSettingProfile = () => {
    const { user, token } = useAuth();
    const [name, setName] = useState("");
    const [phone, setPhone] = useState("");
