@@ -4,6 +4,8 @@ import Role from "../models/roleModel.js";
 import { resolveRoleKey } from "../lib/validateRole.js";
 import StudentProfile from "../models/studentProfileModel.js";
 import TeacherProfile from "../models/teacherProfileModel.js";
+import Availability from "../models/availabilityModel.js";
+import TeacherCourse from "../models/teacherCourseModel.js";
 
 const resolvePermissions = async (roleKey) => {
   const role = await Role.findOne({ key: roleKey });
@@ -105,6 +107,8 @@ export const deleteUser = async (req, res, next) => {
       await StudentProfile.findOneAndDelete({ userId: user._id });
     } else if (user.role === "teacher") {
       await TeacherProfile.findOneAndDelete({ userId: user._id });
+      await Availability.deleteMany({ teacherId: user._id });
+      await TeacherCourse.deleteMany({ teacherId: user._id });
     }
 
     await user.deleteOne();
