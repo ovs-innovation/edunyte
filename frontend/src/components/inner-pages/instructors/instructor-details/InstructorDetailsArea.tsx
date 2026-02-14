@@ -1,80 +1,80 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
-interface StepType {
-  id: number;
-  step: string;
-  title: string;
-  description: string;
-}
 
-const steps_data: StepType[] = [
-  {
-    id: 1,
-    step: "1",
-    title: "Sign up",
-    description: "to create your tutor profile"
-  },
-  {
-    id: 2,
-    step: "2",
-    title: "Get approved",
-    description: "by our team in 5 business days"
-  },
-  {
-    id: 3,
-    step: "3",
-    title: "Start earning",
-    description: "by teaching students all over the world!"
-  },
-];
 
-const faq_data = [
-  {
-    id: 1,
-    question: "What kind of tutors does Edunyte look for?",
-    answer: "No specific certification is needed! We look for passionate tutors who have great communication skills and are experts in their subjects. While teaching experience or certifications are a plus, they are not mandatory for all subjects."
-  },
-  {
-    id: 2,
-    question: "What subject can I teach?",
-    answer: "You can teach over 100 subjects including languages, K-12 school subjects, university courses, coding, hobbies, and art. If your subject is not listed, you can suggest it during registration."
-  },
-  {
-    id: 3,
-    question: "How do I become an online tutor at Edunyte?",
-    answer: "The process is simple: Sign up, create your profile, upload a professional photo/video introduction, and submit for review. Our team approves profiles within 3-5 business days."
-  },
-  {
-    id: 4,
-    question: "How can I get my profile approved quickly?",
-    answer: "Ensure your profile is complete with a high-quality photo, a well-written description, and a clear video introduction. Verify your identity and qualifications to speed up the process."
-  },
-  {
-    id: 5,
-    question: "Why should I teach on Edunyte?",
-    answer: "Edunyte offers flexibility to set your own rates and schedule, access to a global student base, secure payments, professional development resources, and a supportive community."
-  },
-  {
-    id: 6,
-    question: "What computer equipment do I need to teach on Edunyte?",
-    answer: "You need a desktop or laptop computer with a stable internet connection, a working webcam, and a headset with a microphone for clear audio."
-  },
-  {
-    id: 7,
-    question: "Is it free to create a tutor profile on Edunyte?",
-    answer: "Yes, creating a tutor profile and getting listed on Edunyte is completely free. We only charge a small commission on the lessons you teach."
-  },
-  {
-    id: 8,
-    question: "How much can I earn on Edunyte?",
-    answer: "You set your own hourly rate. Earnings depend on your rate and the number of hours you teach. Top tutors can earn significantly by building a strong student base."
-  },
-];
+// Removed static steps_data definition as it is now inside the component using translations
+
 
 const InstructorDetailsArea = () => {
+  const { t } = useTranslation();
   const [activeStep, setActiveStep] = useState<number>(1);
   const [openFaqId, setOpenFaqId] = useState<number | null>(null);
+
+  const steps_data = [
+    {
+      id: 1,
+      step: "1",
+      title: t('become_instructor_page.steps.1.title'),
+      description: t('become_instructor_page.steps.1.desc')
+    },
+    {
+      id: 2,
+      step: "2",
+      title: t('become_instructor_page.steps.2.title'),
+      description: t('become_instructor_page.steps.2.desc')
+    },
+    {
+      id: 3,
+      step: "3",
+      title: t('become_instructor_page.steps.3.title'),
+      description: t('become_instructor_page.steps.3.desc')
+    },
+  ];
+
+  const faq_data = [
+    {
+      id: 1,
+      question: t('become_instructor_page.faq.items.1.question'),
+      answer: t('become_instructor_page.faq.items.1.answer')
+    },
+    {
+      id: 2,
+      question: t('become_instructor_page.faq.items.2.question'),
+      answer: t('become_instructor_page.faq.items.2.answer')
+    },
+    {
+      id: 3,
+      question: t('become_instructor_page.faq.items.3.question'),
+      answer: t('become_instructor_page.faq.items.3.answer')
+    },
+    {
+      id: 4,
+      question: t('become_instructor_page.faq.items.4.question'),
+      answer: t('become_instructor_page.faq.items.4.answer')
+    },
+    {
+      id: 5,
+      question: t('become_instructor_page.faq.items.5.question'),
+      answer: t('become_instructor_page.faq.items.5.answer')
+    },
+    {
+      id: 6,
+      question: t('become_instructor_page.faq.items.6.question'),
+      answer: t('become_instructor_page.faq.items.6.answer')
+    },
+    {
+      id: 7,
+      question: t('become_instructor_page.faq.items.7.question'),
+      answer: t('become_instructor_page.faq.items.7.answer')
+    },
+    {
+      id: 8,
+      question: t('become_instructor_page.faq.items.8.question'),
+      answer: t('become_instructor_page.faq.items.8.answer')
+    }
+  ];
 
   const toggleFaq = (id: number) => {
     setOpenFaqId(openFaqId === id ? null : id);
@@ -88,8 +88,7 @@ const InstructorDetailsArea = () => {
           <div className="col-xl-9 col-lg-8">
             <div className="instructor__recruitment-content">
               <h1 className="instructor__recruitment-title">
-                Learn it right, speak it bright, and step into a global
-                future with Edunyte.
+                {t('become_instructor_page.hero.title')}
               </h1>
 
               {/* Steps Section */}
@@ -115,7 +114,7 @@ const InstructorDetailsArea = () => {
               {/* CTA Button */}
               <div className="instructor__cta-btn">
                 <Link to="/registration/tutor" className="btn btn-primary">
-                  Create a tutor profile now
+                  {t('become_instructor_page.hero.cta')}
                 </Link>
               </div>
             </div>
@@ -137,25 +136,25 @@ const InstructorDetailsArea = () => {
         <div className="row mt-60">
           <div className="col-lg-4 col-md-6">
             <div className="instructor__feature-card">
-              <h3 className="feature-title">Set your own rate</h3>
+              <h3 className="feature-title">{t('become_instructor_page.features.1.title')}</h3>
               <p className="feature-description">
-                Choose your hourly rate and change it anytime. On average, English tutors charge $15-25 per hour.
+                {t('become_instructor_page.features.1.desc')}
               </p>
             </div>
           </div>
           <div className="col-lg-4 col-md-6">
             <div className="instructor__feature-card">
-              <h3 className="feature-title">Teach anytime, anywhere</h3>
+              <h3 className="feature-title">{t('become_instructor_page.features.2.title')}</h3>
               <p className="feature-description">
-                Decide when and how many hours you want to teach. No minimum time commitment or fixed schedule. Be your own boss!
+                {t('become_instructor_page.features.2.desc')}
               </p>
             </div>
           </div>
           <div className="col-lg-4 col-md-6">
             <div className="instructor__feature-card">
-              <h3 className="feature-title">Grow professionally</h3>
+              <h3 className="feature-title">{t('become_instructor_page.features.3.title')}</h3>
               <p className="feature-description">
-                Once you sign up and complete your application, you can be approved and start teaching in as little as three days.
+                {t('become_instructor_page.features.3.desc')}
               </p>
             </div>
           </div>
@@ -165,12 +164,11 @@ const InstructorDetailsArea = () => {
         <div className="row mt-80 align-items-center">
           <div className="col-lg-6">
             <div className="instructor__global-content">
-              <h2 className="global-title">Inspire Minds. Teach Globally. Grow With Us.
+              <h2 className="global-title">{t('become_instructor_page.global.title')}
               </h2>
               <p className="global-description">
-                At Edunyte, we believe great teachers create great futures.
-                If you’re passionate about teaching and want to make a real impact, Edunyte is hiring
-                educators across multiple subjects and grades.
+                {t('become_instructor_page.global.desc_p1')}
+                {t('become_instructor_page.global.desc_p2')}
               </p>
 
 
@@ -178,34 +176,34 @@ const InstructorDetailsArea = () => {
               <ul className="global-features-list">
                 <li className="global-feature-item">
                   <i className="fas fa-check"></i>
-                  <span> Teach students from anywhere</span>
+                  <span> {t('become_instructor_page.global.list.1')}</span>
                 </li>
                 <li className="global-feature-item">
                   <i className="fas fa-check"></i>
-                  <span> Flexible teaching hours</span>
+                  <span> {t('become_instructor_page.global.list.2')}</span>
                 </li>
                 <li className="global-feature-item">
                   <i className="fas fa-check"></i>
-                  <span>Competitive pay structure</span>
+                  <span>{t('become_instructor_page.global.list.3')}</span>
                 </li>
                 <li className="global-feature-item">
                   <i className="fas fa-check"></i>
-                  <span>Dedicated academic support</span>
+                  <span>{t('become_instructor_page.global.list.4')}</span>
                 </li>
                 <li className="global-feature-item">
                   <i className="fas fa-check"></i>
-                  <span>Growth opportunities & skill development</span>
+                  <span>{t('become_instructor_page.global.list.5')}</span>
                 </li>
                 <li className="global-feature-item">
                   <i className="fas fa-check"></i>
-                  <span>Respect, recognition & professional environment
+                  <span>{t('become_instructor_page.global.list.6')}
                   </span>
                 </li>
               </ul>
 
               <div className="global-cta">
                 <Link to="/registration/tutor" className="btn btn-primary">
-                  Create a tutor profile now
+                  {t('become_instructor_page.global.cta')}
                 </Link>
               </div>
             </div>
@@ -237,15 +235,15 @@ const InstructorDetailsArea = () => {
           <div className="col-lg-7">
             <div className="instructor__testimonial-content">
               <blockquote className="testimonial-quote">
-                "Edunyte allowed me to make a living without leaving home!"
+                "{t('become_instructor_page.testimonial.quote')}"
               </blockquote>
               <div className="testimonial-author">
-                <p className="author-name">Krista A.</p>
-                <p className="author-role">English tutor</p>
+                <p className="author-name">{t('become_instructor_page.testimonial.name')}</p>
+                <p className="author-role">{t('become_instructor_page.testimonial.role')}</p>
               </div>
               <div className="testimonial-cta">
                 <Link to="/registration/tutor" className="btn btn-primary">
-                  Create a tutor profile now
+                  {t('become_instructor_page.testimonial.cta')}
                 </Link>
               </div>
             </div>
@@ -255,7 +253,7 @@ const InstructorDetailsArea = () => {
           <div className="row mt-100 justify-content-center">
             <div className="col-lg-10">
               <div className="text-center mb-50">
-                <h2 className="section-title">Frequently asked questions</h2>
+                <h2 className="section-title">{t('become_instructor_page.faq.title')}</h2>
               </div>
 
               <div className="faq-wrapper">
@@ -298,13 +296,13 @@ const InstructorDetailsArea = () => {
                 <div className="cta-image" style={{ flex: '1 1 50%', minHeight: '400px', backgroundImage: 'url(/assets/img/instructor/instructor1.png)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
                 </div>
                 <div className="cta-content" style={{ flex: '1 1 50%', padding: '80px 60px', backgroundColor: '#36d6b2', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                  <h2 style={{ fontSize: '48px', fontWeight: 800, color: '#0a0a0a', marginBottom: '20px', lineHeight: 1.1 }}>Get paid to teach online</h2>
+                  <h2 style={{ fontSize: '48px', fontWeight: 800, color: '#0a0a0a', marginBottom: '20px', lineHeight: 1.1 }}>{t('become_instructor_page.final_cta.title')}</h2>
                   <p style={{ fontSize: '18px', color: '#0a0a0a', marginBottom: '40px', maxWidth: '480px', lineHeight: 1.6, fontWeight: 500 }}>
-                    Connect with thousands of learners around the world and teach from your living room
+                    {t('become_instructor_page.final_cta.desc')}
                   </p>
                   <div>
                     <Link to="/registration/tutor" className="btn" style={{ backgroundColor: '#0a0a0a', color: '#fff', padding: '18px 45px', borderRadius: '8px', fontSize: '18px', fontWeight: 700, border: 'none', minWidth: '200px' }}>
-                      Create a tutor profile now
+                      {t('become_instructor_page.final_cta.button')}
                     </Link>
                   </div>
                 </div>

@@ -175,6 +175,11 @@
       "subtitle": "How Your Learning Journey Begins",
       "title": "Take the First Step Toward Skills",
       "description": "A simple learning experience that brings students and mentors together to learn, track progress, and succeed.",
+      "home_2_header": {
+        "subtitle": "Our Top Features",
+        "title": "Achieve Your Goal With Edunyte",
+        "description": "Edunyte helps you reach your personal and professional goals through clear paths, expert guidance, and proven results."
+      },
       "items": {
         "home_1": {
           "1": {
@@ -442,5 +447,215 @@
     "course_name": "Course Name",
     "teacher": "Teacher",
     "date": "Date"
+  },
+  "about_page": {
+    "hero": {
+      "title": "Where Students Learn Better & Teachers Grow Stronger",
+      "description": "Edunyte is a modern education platform built to bring students and educators together in one meaningful learning ecosystem. We believe education works best when it’s personal, flexible, and human-led.",
+      "button": "Join the Edunyte Community"
+    },
+    "purpose": {
+      "subtitle": "Our Purpose",
+      "title": "Education that works for real people",
+      "description": "We are shaping education with real goals, real support, and real results.",
+      "cards": {
+        "student_confidence": {
+          "title": "Student Confidence",
+          "description": "Help students learn with confidence and clarity through personalized attention and verified educators."
+        },
+        "teacher_support": {
+          "title": "Teacher Support",
+          "description": "Support teachers with opportunities, tools, and flexibility to focus on what they do best: teaching."
+        },
+        "trusted_environment": {
+          "title": "Trusted Environment",
+          "description": "Create a trusted learning environment driven by quality, transparency, and results."
+        }
+      }
+    },
+    "platform": {
+      "title": "One Platform for Everyone",
+      "description": "Whether you’re here to learn, teach, or grow — Edunyte welcomes you.",
+      "tabs": {
+        "teachers": {
+          "name": "teachers",
+          "badge": "Teach",
+          "title": "Teach With Freedom. Grow With Purpose. Inspire With Impact.",
+          "text": "Teachers are the foundation of Edunyte. We empower educators by giving them a platform where their skills are valued and their growth matters. Whether you’re an experienced professional or a passionate educator, Edunyte offers the flexibility, support, and respect you deserve. We provide flexible teaching schedules, access to motivated students, fair earnings, and long-term growth opportunities."
+        },
+        "students": {
+          "name": "students",
+          "badge": "Learn",
+          "title": "Learn Smarter. Progress Faster. Succeed Confidently.",
+          "text": "Edunyte is designed around students — your pace, your goals, your future. We connect learners with expert educators who focus on understanding, not just syllabus completion. Whether you’re improving grades, preparing for exams, or building skills, Edunyte ensures learning feels clear, supportive, and effective with personalized learning paths and verified teachers."
+        },
+        "values": {
+          "name": "Our Values",
+          "badge": "Values",
+          "title": "Our Core Values",
+          "list": {
+            "1": "<strong>Student-First Learning</strong> – Every learner deserves personal attention.",
+            "2": "<strong>Teacher Empowerment</strong> – Great teaching deserves great support.",
+            "3": "<strong>Trust & Transparency</strong> – Clear communication at every step.",
+            "4": "<strong>Growth Mindset</strong> – Continuous learning for everyone."
+          }
+        }
+      },
+      "join_link": "Join as a {{role}}"
+    },
+    "numbers": {
+      "title": "Edunyte by numbers",
+      "description": "We’re proud to be a leading platform in the global online education market.",
+      "items": {
+        "tutors": {
+          "label": "Tutors",
+          "desc": "from 120 countries, teaching 90 languages and 100+ subjects."
+        },
+        "companies": {
+          "label": "Companies",
+          "desc": "trust us to upskill their employees with our corporate training."
+        },
+        "global_hubs": {
+          "label": "Global Hubs",
+          "desc": "in New York, London, Kyiv, and Barcelona."
+        },
+        "employees": {
+          "label": "Employees",
+          "desc": "united by one mission: to power people’s progress."
+        }
+      }
+    },
+    "story": {
+      "title": "Building the Future of Learning",
+      "subtitle": "Edunyte is more than a platform — it’s a growing community of learners and educators.",
+      "p1": "Edunyte is a modern education platform built to bring students and educators together in one meaningful learning ecosystem. We believe education works best when it’s personal, flexible, and human-led.",
+      "p2": "Whether you’re here to learn, teach, or grow — Edunyte welcomes you. Success at Edunyte is built together.",
+      "box_title": "How Edunyte Works",
+      "list": {
+        "1": "Students choose subjects and goals",
+        "2": "Teachers bring expertise and guidance",
+        "3": "Learning happens through structured, engaging sessions",
+        "4": "Progress is tracked, supported, and celebrated"
+      }
+    },
+    "testimonials": {
+      "subtitle": "Our Testimonials",
+      "title": "What Students Think and Say About Edunyte",
+      "description": "Hear from our community of learners who have transformed their lives with Edunyte.",
+      "items": {
+        "1": {
+          "name": "Wade Warren",
+          "desc": "Edunyte has completely changed the way I learn. The tutors are fantastic and the flexibility is exactly what I needed."
+        },
+        "2": {
+          "name": "Jenny Wilson",
+          "desc": "I was able to improve my English skills significantly in just 3 months. Highly recommended for anyone looking to upskill."
+        },
+        "3": {
+          "name": "Guy Hawkin",
+          "desc": "The best platform for online learning. The interface is easy to use and the quality of instruction is top-notch."
+        }
+      }
+    },
+    "roles": {
+      "teacher": "Teacher",
+      "student": "Student"
+    }
+  },
+  "become_instructor_page": {
+    "hero": {
+      "title": "Learn it right, speak it bright, and step into a global future with Edunyte.",
+      "cta": "Create a tutor profile now"
+    },
+    "steps": {
+      "1": {
+        "title": "Sign up",
+        "desc": "to create your tutor profile"
+      },
+      "2": {
+        "title": "Get approved",
+        "desc": "by our team in 5 business days"
+      },
+      "3": {
+        "title": "Start earning",
+        "desc": "by teaching students all over the world!"
+      }
+    },
+    "features": {
+      "1": {
+        "title": "Set your own rate",
+        "desc": "Choose your hourly rate and change it anytime. On average, English tutors charge $15-25 per hour."
+      },
+      "2": {
+        "title": "Teach anytime, anywhere",
+        "desc": "Decide when and how many hours you want to teach. No minimum time commitment or fixed schedule. Be your own boss!"
+      },
+      "3": {
+        "title": "Grow professionally",
+        "desc": "Once you sign up and complete your application, you can be approved and start teaching in as little as three days."
+      }
+    },
+    "global": {
+      "title": "Inspire Minds. Teach Globally. Grow With Us.",
+      "desc_p1": "At Edunyte, we believe great teachers create great futures.",
+      "desc_p2": "If you’re passionate about teaching and want to make a real impact, Edunyte is hiring educators across multiple subjects and grades.",
+      "list": {
+        "1": "Teach students from anywhere",
+        "2": "Flexible teaching hours",
+        "3": "Competitive pay structure",
+        "4": "Dedicated academic support",
+        "5": "Growth opportunities & skill development",
+        "6": "Respect, recognition & professional environment"
+      },
+      "cta": "Create a tutor profile now"
+    },
+    "testimonial": {
+      "quote": "Edunyte allowed me to make a living without leaving home!",
+      "name": "Krista A.",
+      "role": "English tutor",
+      "cta": "Create a tutor profile now"
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "items": {
+        "1": {
+          "question": "What kind of tutors does Edunyte look for?",
+          "answer": "No specific certification is needed! We look for passionate tutors who have great communication skills and are experts in their subjects. While teaching experience or certifications are a plus, they are not mandatory for all subjects."
+        },
+        "2": {
+          "question": "What subject can I teach?",
+          "answer": "You can teach over 100 subjects including languages, K-12 school subjects, university courses, coding, hobbies, and art. If your subject is not listed, you can suggest it during registration."
+        },
+        "3": {
+          "question": "How do I become an online tutor at Edunyte?",
+          "answer": "The process is simple: Sign up, create your profile, upload a professional photo/video introduction, and submit for review. Our team approves profiles within 3-5 business days."
+        },
+        "4": {
+          "question": "How can I get my profile approved quickly?",
+          "answer": "Ensure your profile is complete with a high-quality photo, a well-written description, and a clear video introduction. Verify your identity and qualifications to speed up the process."
+        },
+        "5": {
+          "question": "Why should I teach on Edunyte?",
+          "answer": "Edunyte offers flexibility to set your own rates and schedule, access to a global student base, secure payments, professional development resources, and a supportive community."
+        },
+        "6": {
+          "question": "What computer equipment do I need to teach on Edunyte?",
+          "answer": "You need a desktop or laptop computer with a stable internet connection, a working webcam, and a headset with a microphone for clear audio."
+        },
+        "7": {
+          "question": "Is it free to create a tutor profile on Edunyte?",
+          "answer": "Yes, creating a tutor profile and getting listed on Edunyte is completely free. We only charge a small commission on the lessons you teach."
+        },
+        "8": {
+          "question": "How much can I earn on Edunyte?",
+          "answer": "You set your own hourly rate. Earnings depend on your rate and the number of hours you teach. Top tutors can earn significantly by building a strong student base."
+        }
+      }
+    },
+    "final_cta": {
+      "title": "Get paid to teach online",
+      "desc": "Connect with thousands of learners around the world and teach from your living room",
+      "button": "Create a tutor profile now"
+    }
   }
 }

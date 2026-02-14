@@ -14,9 +14,9 @@ const Feature = ({ style }: FeatureProps) => {
             <div className="row justify-content-center">
                <div className="col-xl-6 col-lg-8">
                   <div className="section__title text-center mb-40">
-                     <span className="sub-title">Our Top Features</span>
-                     <h2 className="title">Achieve Your Goal With Edunyte</h2>
-                     <p>when an unknown printer took a galley of type and scrambled make <br /> specimen book has survived not only five centuries</p>
+                     <span className="sub-title">{t('home.features.home_2_header.subtitle')}</span>
+                     <h2 className="title">{t('home.features.home_2_header.title')}</h2>
+                     <p>{t('home.features.home_2_header.description')}</p>
                   </div>
                </div>
             </div>

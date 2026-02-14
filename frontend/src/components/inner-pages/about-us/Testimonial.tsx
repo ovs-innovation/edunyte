@@ -1,38 +1,30 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
-interface DataType {
-   id: number;
-   avatar_thumb: string;
-   avatar_name: string;
-   desc: string;
-};
 
-const testi_data: DataType[] = [
+
+const testi_data = [
    {
       id: 1,
       avatar_thumb: "/assets/img/others/testi_author01.png",
       avatar_name: "Wade Warren",
-      desc: "“ when an unknown printer took alley ffferer area typey and scrambled to make a type specimen book hass”",
    },
    {
       id: 2,
       avatar_thumb: "/assets/img/others/testi_author02.png",
       avatar_name: "Jenny Wilson",
-      desc: "“ when an unknown printer took alley ffferer area typey and scrambled to make a type specimen book hass”",
    },
    {
       id: 3,
       avatar_thumb: "/assets/img/others/testi_author03.png",
       avatar_name: "Guy Hawkin",
-      desc: "“ when an unknown printer took alley ffferer area typey and scrambled to make a type specimen book hass”",
    },
    {
       id: 4,
       avatar_thumb: "/assets/img/others/testi_author02.png",
       avatar_name: "Jenny Wilson",
-      desc: "“ when an unknown printer took alley ffferer area typey and scrambled to make a type specimen book hass”",
    },
 ];
 
@@ -72,7 +64,7 @@ const setting = {
 }
 
 const Testimonial = () => {
-
+   const { t } = useTranslation();
    const [isLoop, setIsLoop] = useState(false);
    useEffect(() => {
       setIsLoop(true);
@@ -84,13 +76,13 @@ const Testimonial = () => {
             <div className="row justify-content-center">
                <div className="col-xl-5">
                   <div className="section__title text-center mb-50">
-                     <span className="sub-title">Our Testimonials</span>
-                     <h2 className="title">What Students Think and Say About Edunyte</h2>
-                     <p>when known printer took a galley of type scrambl edmake</p>
+                     <span className="sub-title">{t('about_page.testimonials.subtitle')}</span>
+                     <h2 className="title">{t('about_page.testimonials.title')}</h2>
+                     <p>{t('about_page.testimonials.description')}</p>
                   </div>
                </div>
             </div>
-            
+
             <div className="row">
                <div className="col-12">
                   <div className="testimonial__item-wrap">
@@ -114,12 +106,12 @@ const Testimonial = () => {
                                              <i className="fas fa-star"></i>
                                              <i className="fas fa-star"></i>
                                           </div>
-                                          <h2 className="title">{item.avatar_name}</h2>
+                                          <h2 className="title">{t(`about_page.testimonials.items.${item.id > 3 ? 2 : item.id}.name`)}</h2>
                                        </div>
                                     </div>
                                  </div>
                                  <div className="testimonial__content">
-                                    <p>{item.desc}</p>
+                                    <p>“{t(`about_page.testimonials.items.${item.id > 3 ? 2 : item.id}.desc`)}”</p>
                                  </div>
                               </div>
                            </SwiperSlide>

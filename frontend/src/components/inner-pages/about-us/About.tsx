@@ -1,36 +1,38 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const About = () => {
+    const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState('teachers');
 
     const tabData = {
         teachers: {
             image: "/assets/img/others/h7_testimonial_img.png",
-            badge: "Teach",
+            badge: t('about_page.platform.tabs.teachers.badge'),
             badgeColor: "#4CAF50",
-            title: "Teach With Freedom. Grow With Purpose. Inspire With Impact.",
-            text: "Teachers are the foundation of Edunyte. We empower educators by giving them a platform where their skills are valued and their growth matters. Whether you’re an experienced professional or a passionate educator, Edunyte offers the flexibility, support, and respect you deserve. We provide flexible teaching schedules, access to motivated students, fair earnings, and long-term growth opportunities."
+            title: t('about_page.platform.tabs.teachers.title'),
+            text: t('about_page.platform.tabs.teachers.text')
         },
         students: {
             image: "/assets/img/others/h6_testimonial_img.jpg",
-            badge: "Learn",
+            badge: t('about_page.platform.tabs.students.badge'),
             badgeColor: "#FFC107",
-            title: "Learn Smarter. Progress Faster. Succeed Confidently.",
-            text: "Edunyte is designed around students — your pace, your goals, your future. We connect learners with expert educators who focus on understanding, not just syllabus completion. Whether you’re improving grades, preparing for exams, or building skills, Edunyte ensures learning feels clear, supportive, and effective with personalized learning paths and verified teachers."
+            title: t('about_page.platform.tabs.students.title'),
+            text: t('about_page.platform.tabs.students.text')
         },
         values: {
             image: "/assets/img/others/h5_about_img02.jpg",
-            badge: "Values",
+            badge: t('about_page.platform.tabs.values.badge'),
             badgeColor: "#2196F3",
-            title: "Our Core Values",
+            title: t('about_page.platform.tabs.values.title'),
             text: (
                 <>
                     <ul style={{ listStyleType: 'disc', paddingLeft: '20px', marginBottom: '0' }}>
-                        <li style={{ marginBottom: '10px' }}><strong>Student-First Learning</strong> – Every learner deserves personal attention.</li>
-                        <li style={{ marginBottom: '10px' }}><strong>Teacher Empowerment</strong> – Great teaching deserves great support.</li>
-                        <li style={{ marginBottom: '10px' }}><strong>Trust & Transparency</strong> – Clear communication at every step.</li>
-                        <li style={{ marginBottom: '0' }}><strong>Growth Mindset</strong> – Continuous learning for everyone.</li>
+                        <li style={{ marginBottom: '10px' }} dangerouslySetInnerHTML={{ __html: t('about_page.platform.tabs.values.list.1') }} />
+                        <li style={{ marginBottom: '10px' }} dangerouslySetInnerHTML={{ __html: t('about_page.platform.tabs.values.list.2') }} />
+                        <li style={{ marginBottom: '10px' }} dangerouslySetInnerHTML={{ __html: t('about_page.platform.tabs.values.list.3') }} />
+                        <li style={{ marginBottom: '0' }} dangerouslySetInnerHTML={{ __html: t('about_page.platform.tabs.values.list.4') }} />
                     </ul>
                 </>
             )
@@ -53,7 +55,7 @@ const About = () => {
                                 color: '#0a0a0a',
                                 letterSpacing: '-1px',
                                 lineHeight: '1.2'
-                            }}>Where Students Learn Better & Teachers Grow Stronger</h2>
+                            }}>{t('about_page.hero.title')}</h2>
                             <p className="desc" style={{
                                 fontSize: '20px',
                                 marginBottom: '60px',
@@ -62,7 +64,7 @@ const About = () => {
                                 marginLeft: 'auto',
                                 marginRight: 'auto',
                                 lineHeight: '1.6'
-                            }}>Edunyte is a modern education platform built to bring students and educators together in one meaningful learning ecosystem. We believe education works best when it’s personal, flexible, and human-led.</p>
+                            }}>{t('about_page.hero.description')}</p>
                         </div>
                     </div>
 
@@ -98,7 +100,7 @@ const About = () => {
                                 display: 'inline-block',
                                 textTransform: 'none'
                             }}>
-                                Join the Edunyte Community
+                                {t('about_page.hero.button')}
                             </Link>
                         </div>
                     </div>
@@ -110,10 +112,10 @@ const About = () => {
                 <div className="container">
                     <div className="row justify-content-center text-center mb-60">
                         <div className="col-lg-8">
-                            <span style={{ color: '#5751E1', fontWeight: 700, display: 'block', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>Our Purpose</span>
-                            <h2 className="title" style={{ fontWeight: 800, fontSize: '42px', color: '#0a0a0a' }}>Education that works for real people</h2>
+                            <span style={{ color: '#5751E1', fontWeight: 700, display: 'block', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>{t('about_page.purpose.subtitle')}</span>
+                            <h2 className="title" style={{ fontWeight: 800, fontSize: '42px', color: '#0a0a0a' }}>{t('about_page.purpose.title')}</h2>
                             <p style={{ fontSize: '18px', color: '#666', marginTop: '15px' }}>
-                                We are shaping education with real goals, real support, and real results.
+                                {t('about_page.purpose.description')}
                             </p>
                         </div>
                     </div>
@@ -124,8 +126,8 @@ const About = () => {
                                 <div className="icon mb-30" style={{ width: '70px', height: '70px', backgroundColor: '#009688', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '28px' }}>
                                     <i className="fas fa-user-graduate"></i>
                                 </div>
-                                <h3 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '15px' }}>Student Confidence</h3>
-                                <p style={{ fontSize: '16px', lineHeight: '1.6', color: '#444' }}>Help students learn with confidence and clarity through personalized attention and verified educators.</p>
+                                <h3 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '15px' }}>{t('about_page.purpose.cards.student_confidence.title')}</h3>
+                                <p style={{ fontSize: '16px', lineHeight: '1.6', color: '#444' }}>{t('about_page.purpose.cards.student_confidence.description')}</p>
                             </div>
                         </div>
                         {/* Card 2 */}
@@ -134,8 +136,8 @@ const About = () => {
                                 <div className="icon mb-30" style={{ width: '70px', height: '70px', backgroundColor: '#673AB7', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '28px' }}>
                                     <i className="fas fa-chalkboard-teacher"></i>
                                 </div>
-                                <h3 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '15px' }}>Teacher Support</h3>
-                                <p style={{ fontSize: '16px', lineHeight: '1.6', color: '#444' }}>Support teachers with opportunities, tools, and flexibility to focus on what they do best: teaching.</p>
+                                <h3 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '15px' }}>{t('about_page.purpose.cards.teacher_support.title')}</h3>
+                                <p style={{ fontSize: '16px', lineHeight: '1.6', color: '#444' }}>{t('about_page.purpose.cards.teacher_support.description')}</p>
                             </div>
                         </div>
                         {/* Card 3 */}
@@ -144,8 +146,8 @@ const About = () => {
                                 <div className="icon mb-30" style={{ width: '70px', height: '70px', backgroundColor: '#FFC107', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '28px' }}>
                                     <i className="fas fa-shield-alt"></i>
                                 </div>
-                                <h3 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '15px' }}>Trusted Environment</h3>
-                                <p style={{ fontSize: '16px', lineHeight: '1.6', color: '#444' }}>Create a trusted learning environment driven by quality, transparency, and results.</p>
+                                <h3 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '15px' }}>{t('about_page.purpose.cards.trusted_environment.title')}</h3>
+                                <p style={{ fontSize: '16px', lineHeight: '1.6', color: '#444' }}>{t('about_page.purpose.cards.trusted_environment.description')}</p>
                             </div>
                         </div>
                     </div>
@@ -157,9 +159,9 @@ const About = () => {
                 <div className="container">
                     <div className="row justify-content-center text-center mb-50">
                         <div className="col-lg-8">
-                            <h2 className="title" style={{ fontWeight: 800, fontSize: '42px', color: '#0a0a0a', marginBottom: '20px' }}>One Platform for Everyone</h2>
+                            <h2 className="title" style={{ fontWeight: 800, fontSize: '42px', color: '#0a0a0a', marginBottom: '20px' }}>{t('about_page.platform.title')}</h2>
                             <p style={{ fontSize: '18px', color: '#666' }}>
-                                Whether you’re here to learn, teach, or grow — Edunyte welcomes you.
+                                {t('about_page.platform.description')}
                             </p>
                         </div>
                     </div>
@@ -185,7 +187,7 @@ const About = () => {
                                             cursor: 'pointer'
                                         }}
                                     >
-                                        {tab === 'values' ? 'Our Values' : tab}
+                                        {t(`about_page.platform.tabs.${tab}.name`)}
                                     </button>
                                 ))}
                             </div>
@@ -235,7 +237,7 @@ const About = () => {
                                             display: 'inline-flex',
                                             alignItems: 'center'
                                         }}>
-                                            Join as a {activeTab.slice(0, -1)} <i className="fas fa-arrow-right ms-2" style={{ transition: 'transform 0.3s' }}></i>
+                                            {t('about_page.platform.join_link', { role: activeTab === 'teachers' ? t('about_page.roles.teacher') : t('about_page.roles.student') })} <i className="fas fa-arrow-right ms-2" style={{ transition: 'transform 0.3s' }}></i>
                                         </Link>
                                     )}
                                 </div>
@@ -250,19 +252,19 @@ const About = () => {
                 <div className="container">
                     <div className="row justify-content-center text-center mb-60">
                         <div className="col-lg-10">
-                            <h2 className="title" style={{ fontWeight: 800, fontSize: '42px', color: '#0a0a0a', marginBottom: '15px' }}>Edunyte by numbers</h2>
+                            <h2 className="title" style={{ fontWeight: 800, fontSize: '42px', color: '#0a0a0a', marginBottom: '15px' }}>{t('about_page.numbers.title')}</h2>
                             <p style={{ fontSize: '18px', color: '#666', maxWidth: '700px', margin: '0 auto' }}>
-                                We’re proud to be a leading platform in the global online education market.
+                                {t('about_page.numbers.description')}
                             </p>
                         </div>
                     </div>
 
                     <div className="row justify-content-center gutter-24">
                         {[
-                            { num: "50K", label: "Tutors", desc: "from 120 countries, teaching 90 languages and 100+ subjects." },
-                            { num: "500+", label: "Companies", desc: "trust us to upskill their employees with our corporate training." },
-                            { num: "4", label: "Global Hubs", desc: "in New York, London, Kyiv, and Barcelona." },
-                            { num: "700+", label: "Employees", desc: "united by one mission: to power people’s progress." }
+                            { num: "50K", label: t('about_page.numbers.items.tutors.label'), desc: t('about_page.numbers.items.tutors.desc') },
+                            { num: "500+", label: t('about_page.numbers.items.companies.label'), desc: t('about_page.numbers.items.companies.desc') },
+                            { num: "4", label: t('about_page.numbers.items.global_hubs.label'), desc: t('about_page.numbers.items.global_hubs.desc') },
+                            { num: "700+", label: t('about_page.numbers.items.employees.label'), desc: t('about_page.numbers.items.employees.desc') }
                         ].map((item, index) => (
                             <div key={index} className="col-xl-3 col-lg-4 col-md-6">
                                 <div className="number-card text-center" style={{
@@ -289,9 +291,9 @@ const About = () => {
                 <div className="container">
                     <div className="row justify-content-center text-center mb-60">
                         <div className="col-lg-10">
-                            <h2 className="title" style={{ fontWeight: 800, fontSize: '42px', color: '#0a0a0a', marginBottom: '15px' }}>Building the Future of Learning</h2>
+                            <h2 className="title" style={{ fontWeight: 800, fontSize: '42px', color: '#0a0a0a', marginBottom: '15px' }}>{t('about_page.story.title')}</h2>
                             <p style={{ fontSize: '18px', color: '#666' }}>
-                                Edunyte is more than a platform — it’s a growing community of learners and educators.
+                                {t('about_page.story.subtitle')}
                             </p>
                         </div>
                     </div>
@@ -305,19 +307,19 @@ const About = () => {
                         <div className="col-lg-6 ps-lg-5">
                             <div className="story-content">
                                 <p style={{ fontSize: '18px', lineHeight: '1.8', color: '#555', marginBottom: '30px' }}>
-                                    Edunyte is a modern education platform built to bring students and educators together in one meaningful learning ecosystem. We believe education works best when it’s personal, flexible, and human-led.
+                                    {t('about_page.story.p1')}
                                 </p>
                                 <p style={{ fontSize: '18px', lineHeight: '1.8', color: '#555', marginBottom: '40px' }}>
-                                    Whether you’re here to learn, teach, or grow — Edunyte welcomes you. Success at Edunyte is built together.
+                                    {t('about_page.story.p2')}
                                 </p>
 
                                 <div className="mission-card" style={{ backgroundColor: '#F9F9F9', padding: '40px', borderRadius: '24px' }}>
-                                    <h3 style={{ fontSize: '24px', fontWeight: 800, marginBottom: '15px', color: '#0a0a0a' }}>How Edunyte Works</h3>
+                                    <h3 style={{ fontSize: '24px', fontWeight: 800, marginBottom: '15px', color: '#0a0a0a' }}>{t('about_page.story.box_title')}</h3>
                                     <ul style={{ fontSize: '16px', lineHeight: '1.7', color: '#666', paddingLeft: '20px', marginBottom: '0', listStyleType: 'decimal' }}>
-                                        <li style={{ marginBottom: '10px' }}><strong>Students choose subjects and goals</strong></li>
-                                        <li style={{ marginBottom: '10px' }}><strong>Teachers bring expertise and guidance</strong></li>
-                                        <li style={{ marginBottom: '10px' }}><strong>Learning happens through structured, engaging sessions</strong></li>
-                                        <li><strong>Progress is tracked, supported, and celebrated</strong></li>
+                                        <li style={{ marginBottom: '10px' }}><strong>{t('about_page.story.list.1')}</strong></li>
+                                        <li style={{ marginBottom: '10px' }}><strong>{t('about_page.story.list.2')}</strong></li>
+                                        <li style={{ marginBottom: '10px' }}><strong>{t('about_page.story.list.3')}</strong></li>
+                                        <li><strong>{t('about_page.story.list.4')}</strong></li>
                                     </ul>
                                 </div>
                             </div>
