@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom"
+import { useTranslation } from "react-i18next";
 
 const FooterCommon = () => {
+   const { t } = useTranslation();
    return (
       <>
          <div className="col-xl-3 col-lg-4 col-md-6">
@@ -9,40 +11,40 @@ const FooterCommon = () => {
                   <Link to="/"><img src="/assets/img/logo/edunyte-light.png" height="100" width="100" alt="img" /></Link>
                </div>
                <div className="footer__content">
-                  <p>when an unknown printer took galley of type and scrambled it to make pspecimen bookt has.</p>
+                  <p>{t('footer.description_1')}</p>
                   <ul className="list-wrap">
-                     <li>463 7th Ave, NY 10018, USA</li>
-                     <li>+123 88 9900 456</li>
+                     <li>{t('footer.address')}</li>
+                     <li>{t('footer.phone')}</li>
                   </ul>
                </div>
             </div>
          </div>
          <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6">
             <div className="footer__widget">
-               <h4 className="footer__widget-title">Useful Links</h4>
+               <h4 className="footer__widget-title">{t('footer.useful_links')}</h4>
                <div className="footer__link">
                   <ul className="list-wrap">
-                     <li><Link to="/events-details">Our values</Link></li>
-                     <li><Link to="/events-details">Our advisory board</Link></li>
-                     <li><Link to="/events-details">Our partners</Link></li>
-                     <li><Link to="/events-details">Become a partner</Link></li>
-                     <li><Link to="/events-details">Work at Future Learn</Link></li>
-                     <li><Link to="/events-details">Quizlet Plus</Link></li>
+                     <li><Link to="/events-details">{t('footer.links.values')}</Link></li>
+                     <li><Link to="/events-details">{t('footer.links.advisory')}</Link></li>
+                     <li><Link to="/events-details">{t('footer.links.partners')}</Link></li>
+                     <li><Link to="/events-details">{t('footer.links.become_partner')}</Link></li>
+                     <li><Link to="/events-details">{t('footer.links.work')}</Link></li>
+                     <li><Link to="/events-details">{t('footer.links.quizlet')}</Link></li>
                   </ul>
                </div>
             </div>
          </div>
          <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6">
             <div className="footer__widget">
-               <h4 className="footer__widget-title">Our Company</h4>
+               <h4 className="footer__widget-title">{t('footer.our_company')}</h4>
                <div className="footer__link">
                   <ul className="list-wrap">
-                     <li><Link to="/about-us">About us</Link></li>
-                     <li><Link to="/contact">Contact Us</Link></li>
-                     <li><Link to="/instructor">Become Teacher</Link></li>
-                     <li><Link to="/registration">Become a Student</Link></li>
-                     <li><Link to="/blog">Blog</Link></li>
-                     <li><Link to="/events-details">Events</Link></li>
+                     <li><Link to="/about-us">{t('footer.company_links.about')}</Link></li>
+                     <li><Link to="/contact">{t('footer.company_links.contact')}</Link></li>
+                     <li><Link to="/instructor">{t('footer.company_links.become_teacher')}</Link></li>
+                     <li><Link to="/registration">{t('footer.company_links.become_student')}</Link></li>
+                     <li><Link to="/blog">{t('footer.company_links.blog')}</Link></li>
+                     <li><Link to="/events-details">{t('footer.company_links.events')}</Link></li>
                   </ul>
                </div>
             </div>

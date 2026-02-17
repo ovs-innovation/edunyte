@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom"
 import inner_instructor_data from "../../../../data/inner-data/InstructorData"
+import { useTranslation } from "react-i18next";
 
 const InstructorArea = () => {
+   const { t } = useTranslation();
    return (
       <section className="instructor__area">
          <div className="container">
@@ -14,10 +16,10 @@ const InstructorArea = () => {
                         </div>
                         <div className="instructor__content">
                            <h2 className="title"><Link to="/instructor-details">{item.name}</Link></h2>
-                           <span className="designation">{item.degisnation}</span>
+                           <span className="designation">{t(item.degisnation)}</span>
                            <p className="avg-rating">
                               <i className="fas fa-star"></i>
-                              (4.8 Ratings)
+                              (4.8 {t('instructor.ratings')})
                            </p>
                            <div className="instructor__social">
                               <ul className="list-wrap">

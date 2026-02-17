@@ -8,12 +8,15 @@ import Feature from "../../homes/home-two/Feature"
 import About from "./About"
 import Testimonial from "./Testimonial"
 
+import { useTranslation } from "react-i18next";
+
 const AboutUs = () => {
+   const { t } = useTranslation();
    return (
       <>
          <HeaderOne />
          <main className="main-area fix">
-            <BreadcrumbOne title="Who We Are" sub_title="About Us" />
+            <BreadcrumbOne title={t('about_page.breadcrumb.title')} sub_title={t('about_page.breadcrumb.subtitle')} />
             <About />
             <BrandOne />
             <Feature style={true} />

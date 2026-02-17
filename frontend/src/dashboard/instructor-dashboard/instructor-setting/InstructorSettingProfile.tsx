@@ -4,8 +4,10 @@ import Select from "react-select";
 import { Country, State, City } from "country-state-city";
 import { useAuth } from "../../../contexts/AuthContext";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 const InstructorSettingProfile = () => {
+   const { t } = useTranslation();
    const { user, token } = useAuth();
    const [name, setName] = useState("");
    const [phone, setPhone] = useState("");
@@ -16,14 +18,14 @@ const InstructorSettingProfile = () => {
 
    const countries = useMemo(() => Country.getAllCountries().map(c => ({ label: c.name, value: c.isoCode })), []);
    const states = useMemo(() => {
-       if (!selectedCountry) return [];
-       return State.getStatesOfCountry(selectedCountry.value).map(s => ({ label: s.name, value: s.isoCode }));
+      if (!selectedCountry) return [];
+      return State.getStatesOfCountry(selectedCountry.value).map(s => ({ label: s.name, value: s.isoCode }));
    }, [selectedCountry]);
    const cities = useMemo(() => {
-       if (!selectedState || !selectedCountry) return [];
-       return City.getCitiesOfState(selectedCountry.value, selectedState.value).map(c => ({ label: c.name, value: c.name }));
+      if (!selectedState || !selectedCountry) return [];
+      return City.getCitiesOfState(selectedCountry.value, selectedState.value).map(c => ({ label: c.name, value: c.name }));
    }, [selectedState, selectedCountry]);
-   
+
    const timezones = useMemo(() => (Intl as any).supportedValuesOf('timeZone').map((tz: string) => ({ label: tz, value: tz })), []);
 
    useEffect(() => {
@@ -36,27 +38,27 @@ const InstructorSettingProfile = () => {
                }
             });
             const data = await response.json();
-            
+
             if (data.profile) {
                const profile = data.profile;
-               
+
                // Set User Data
                setName(profile.userId?.name || user?.name || "");
                setPhone(profile.phone || "");
-               
+
                // Set Location Data
                if (profile.country) {
                   const foundCountry = Country.getAllCountries().find(c => c.name === profile.country);
                   if (foundCountry) {
                      const countryOption = { label: foundCountry.name, value: foundCountry.isoCode };
                      setSelectedCountry(countryOption);
-                     
+
                      if (profile.state) {
                         const foundState = State.getStatesOfCountry(foundCountry.isoCode).find(s => s.name === profile.state);
                         if (foundState) {
                            const stateOption = { label: foundState.name, value: foundState.isoCode };
                            setSelectedState(stateOption);
-                           
+
                            if (profile.city) {
                               // City value is name in our options
                               setSelectedCity({ label: profile.city, value: profile.city });
@@ -65,7 +67,7 @@ const InstructorSettingProfile = () => {
                      }
                   }
                }
-               
+
                if (profile.timezone) {
                   setSelectedTimezone({ label: profile.timezone, value: profile.timezone });
                }
@@ -103,14 +105,14 @@ const InstructorSettingProfile = () => {
          });
 
          if (response.ok) {
-            toast.success("Profile updated successfully");
+            toast.success(t("dashboard.update_success"));
          } else {
             const error = await response.json();
-            toast.error(error.message || "Failed to update profile");
+            toast.error(error.message || t("dashboard.update_error"));
          }
       } catch (error) {
          console.error(error);
-         toast.error("An error occurred while updating profile");
+         toast.error(t("dashboard.update_error_generic"));
       }
    };
 
@@ -120,12 +122,12 @@ const InstructorSettingProfile = () => {
             <div className="row">
                <div className="col-md-6">
                   <div className="form-grp">
-                     <label htmlFor="name">Full Name</label>
-                     <input 
-                        id="name" 
-                        type="text" 
-                        placeholder="Full Name" 
-                        readOnly 
+                     <label htmlFor="name">{t("dashboard.full_name")}</label>
+                     <input
+                        id="name"
+                        type="text"
+                        placeholder={t("dashboard.full_name")}
+                        readOnly
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                      />
@@ -133,11 +135,11 @@ const InstructorSettingProfile = () => {
                </div>
                <div className="col-md-6">
                   <div className="form-grp">
-                     <label htmlFor="phonenumber">Phone Number</label>
-                     <input 
-                        id="phonenumber" 
-                        type="tel" 
-                        placeholder="Phone Number" 
+                     <label htmlFor="phonenumber">{t("dashboard.phone_number")}</label>
+                     <input
+                        id="phonenumber"
+                        type="tel"
+                        placeholder={t("dashboard.phone_number")}
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                      />
@@ -145,7 +147,7 @@ const InstructorSettingProfile = () => {
                </div>
                <div className="col-md-6">
                   <div className="form-grp">
-                     <label>Country</label>
+                     <label>{t("dashboard.country")}</label>
                      <Select
                         options={countries}
                         value={selectedCountry}
@@ -155,13 +157,13 @@ const InstructorSettingProfile = () => {
                            setSelectedCity(null);
                         }}
                         classNamePrefix="react-select"
-                        placeholder="Select Country"
+                        placeholder={t("dashboard.select_country")}
                      />
                   </div>
                </div>
                <div className="col-md-6">
                   <div className="form-grp">
-                     <label>State</label>
+                     <label>{t("dashboard.state")}</label>
                      <Select
                         options={states}
                         value={selectedState}
@@ -171,39 +173,39 @@ const InstructorSettingProfile = () => {
                         }}
                         isDisabled={!selectedCountry}
                         classNamePrefix="react-select"
-                        placeholder="Select State"
+                        placeholder={t("dashboard.select_state")}
                      />
                   </div>
                </div>
                <div className="col-md-6">
                   <div className="form-grp">
-                     <label>City</label>
+                     <label>{t("dashboard.city")}</label>
                      <Select
                         options={cities}
                         value={selectedCity}
                         onChange={setSelectedCity}
                         isDisabled={!selectedState}
                         classNamePrefix="react-select"
-                        placeholder="Select City"
+                        placeholder={t("dashboard.select_city")}
                      />
                   </div>
                </div>
                <div className="col-md-6">
                   <div className="form-grp">
-                     <label>Timezone</label>
+                     <label>{t("dashboard.timezone")}</label>
                      <Select
                         options={timezones}
                         value={selectedTimezone}
                         onChange={setSelectedTimezone}
                         classNamePrefix="react-select"
-                        placeholder="Select Timezone"
+                        placeholder={t("dashboard.select_timezone")}
                      />
                   </div>
                </div>
             </div>
             <div className="submit-btn mt-25">
                <button type="submit" className="btn">
-                  Update Info
+                  {t("dashboard.update_info")}
                </button>
             </div>
          </form>

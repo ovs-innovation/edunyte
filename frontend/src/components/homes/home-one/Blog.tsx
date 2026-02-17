@@ -33,7 +33,7 @@ const Blog = ({ style }: BlogProps) => {
                            <div className="blog__post-meta">
                               <ul className="list-wrap">
                                  <li><i className="flaticon-calendar"></i>{item.date}</li>
-                                 <li><i className="flaticon-user-1"></i>by <Link to="/blog-details">Admin</Link></li>
+                                 <li><i className="flaticon-user-1"></i>{t('common.by')} <Link to="/blog-details">Admin</Link></li>
                               </ul>
                            </div>
                            <h4 className="title"><Link to="/blog-details">{t(item.title)}</Link></h4>

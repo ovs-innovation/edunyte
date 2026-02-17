@@ -28,13 +28,13 @@ const RegistrationForm = ({ role }: { role?: string }) => {
          password: yup.string().required().min(6).label(t("common.password")),
          cpassword: yup.string()
             .required()
-            .oneOf([yup.ref('password')], t("common.password") + ' must match')
+            .oneOf([yup.ref('password')], t("common.password_must_match"))
             .label(t("common.confirm_password")),
       })
       .required();
 
    const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(schema), });
-   
+
    const onSubmit = async (data: FormData) => {
       setIsLoading(true);
       try {
@@ -44,14 +44,14 @@ const RegistrationForm = ({ role }: { role?: string }) => {
             password: data.password,
             role: role === 'tutor' ? 'teacher' : 'student',
          });
-         toast.success(role === 'tutor' 
-            ? t("common.registration_success_pending", "Registration successful. Please wait for admin approval.") 
-            : t("common.registration_success"), 
+         toast.success(role === 'tutor'
+            ? t("common.registration_success_pending", "Registration successful. Please wait for admin approval.")
+            : t("common.registration_success"),
             { position: 'top-center' }
          );
          reset();
       } catch (error: any) {
-         toast.error(error.message || 'Registration failed', { position: 'top-center' });
+         toast.error(error.message || t("common.registration_failed"), { position: 'top-center' });
       } finally {
          setIsLoading(false);
       }
@@ -91,7 +91,7 @@ const RegistrationForm = ({ role }: { role?: string }) => {
             <p className="form_error">{errors.cpassword?.message}</p>
          </div>
          <button type="submit" className="btn btn-two arrow-btn" disabled={isLoading}>
-            {isLoading ? 'Signing Up...' : t("common.sign_up")}
+            {isLoading ? t("common.signing_up") : t("common.sign_up")}
             <BtnArrow />
          </button>
       </form>

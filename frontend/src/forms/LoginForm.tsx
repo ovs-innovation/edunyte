@@ -26,7 +26,7 @@ const LoginForm = () => {
       .required();
 
    const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(schema), });
-   
+
    const onSubmit = async (data: FormData) => {
       setIsLoading(true);
       try {
@@ -34,9 +34,9 @@ const LoginForm = () => {
          toast.success(t("common.login_success"), { position: 'top-center' });
          reset();
       } catch (error: any) {
-         const errorMessage = error.message === 'OTP_REQUIRED' 
-            ? 'OTP has been sent to your email. Please check and enter it.'
-            : error.message || 'Login failed';
+         const errorMessage = error.message === 'OTP_REQUIRED'
+            ? t('common.otp_sent')
+            : error.message || t('common.login_failed');
          toast.error(errorMessage, { position: 'top-center' });
       } finally {
          setIsLoading(false);
@@ -65,7 +65,7 @@ const LoginForm = () => {
             </div>
          </div>
          <button type="submit" className="btn btn-two arrow-btn" disabled={isLoading}>
-            {isLoading ? 'Signing In...' : t("common.sign_in")}
+            {isLoading ? t('common.signing_in') : t("common.sign_in")}
             <BtnArrow />
          </button>
       </form>

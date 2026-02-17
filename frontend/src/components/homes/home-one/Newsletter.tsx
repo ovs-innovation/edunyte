@@ -16,7 +16,7 @@ const Newsletter = () => {
                <div className="col-lg-8">
                   <div className="newsletter__content">
                      <h2 className="title">
-                        {t('common.newsletter_title_1')} <span>{t('common.newsletter_title_highlight_1')}</span> {t('common.newsletter_title_2')} <br /> 
+                        {t('common.newsletter_title_1')} <span>{t('common.newsletter_title_highlight_1')}</span> {t('common.newsletter_title_2')} <br />
                         {t('common.newsletter_title_3')} <span>{t('common.newsletter_title_highlight_2')}</span>
                      </h2>
                      <div className="newsletter__form">

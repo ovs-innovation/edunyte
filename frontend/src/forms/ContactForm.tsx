@@ -4,6 +4,7 @@ import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import emailjs from '@emailjs/browser';
+import { useTranslation } from "react-i18next";
 import { useRef } from 'react';
 
 interface FormData {
@@ -25,6 +26,7 @@ const schema = yup
    .required();
 
 const ContactForm = () => {
+   const { t } = useTranslation();
 
    const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(schema), });
 
@@ -34,7 +36,7 @@ const ContactForm = () => {
       if (form.current) {
          emailjs.sendForm('eaglesthemes', 'template_lojvsvb', form.current, 'mtLgOuG25NnIwGeKm')
             .then((result) => {
-               const notify = () => toast('Message sent successfully', { position: 'top-center' });
+               const notify = () => toast(t('contact.form.success'), { position: 'top-center' });
                notify();
                reset();
                console.log(result.text);
@@ -51,39 +53,39 @@ const ContactForm = () => {
          <div className="row">
             <div className="col-md-6">
                <div className="form-grp">
-                  <input {...register("user_name")} type="text" placeholder="Full Name *" />
+                  <input {...register("user_name")} type="text" placeholder={t('contact.form.name')} />
                   <p className="form_error">{errors.user_name?.message}</p>
                </div>
             </div>
             <div className="col-md-6">
                <div className="form-grp">
-                  <input {...register("user_email")} type="email" placeholder="Email Address *" />
+                  <input {...register("user_email")} type="email" placeholder={t('contact.form.email')} />
                   <p className="form_error">{errors.user_email?.message}</p>
                </div>
             </div>
             <div className="col-md-6">
                <div className="form-grp">
-                  <input {...register("phone_number")} type="tel" placeholder="Phone Number (Optional)" />
+                  <input {...register("phone_number")} type="tel" placeholder={t('contact.form.phone')} />
                   <p className="form_error">{errors.phone_number?.message}</p>
                </div>
             </div>
             <div className="col-md-6">
                <div className="form-grp">
                   <select {...register("role")} className="form-select" style={{ border: '1px solid #E6E6E6', height: '60px', padding: '0 25px', borderRadius: '10px', color: '#777', backgroundColor: '#F5F5F7' }}>
-                     <option value="">I am a...</option>
-                     <option value="Student">Student</option>
-                     <option value="Teacher">Teacher</option>
-                     <option value="Partner">Partner</option>
+                     <option value="">{t('contact.form.role_placeholder')}</option>
+                     <option value="Student">{t('contact.form.role_student')}</option>
+                     <option value="Teacher">{t('contact.form.role_teacher')}</option>
+                     <option value="Partner">{t('contact.form.role_partner')}</option>
                   </select>
                   <p className="form_error">{errors.role?.message}</p>
                </div>
             </div>
          </div>
          <div className="form-grp">
-            <textarea {...register("message")} placeholder="Message *" style={{ height: '150px' }}></textarea>
+            <textarea {...register("message")} placeholder={t('contact.form.message')} style={{ height: '150px' }}></textarea>
             <p className="form_error">{errors.message?.message}</p>
          </div>
-         <button type="submit" className="btn btn-two arrow-btn">Submit Message <BtnArrow /></button>
+         <button type="submit" className="btn btn-two arrow-btn">{t('contact.form.submit')} <BtnArrow /></button>
       </form>
    )
 }

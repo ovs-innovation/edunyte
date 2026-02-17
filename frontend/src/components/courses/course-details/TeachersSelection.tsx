@@ -48,7 +48,7 @@ const TeachersSelection = () => {
   const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
   const [languageSearch, setLanguageSearch] = useState('');
   const [displayPrices, setDisplayPrices] = useState<Record<string, { amount: number; formatted: string }>>({});
- 
+
   const [filters, setFilters] = useState<FilterState>({
     priceRange: '',
     country: '',
@@ -62,16 +62,16 @@ const TeachersSelection = () => {
 
   // Fetch specific course details
   useEffect(() => {
-     if (!slug) return;
-     const loadOneCourse = async () => {
-        try {
-           const { course } = await fetchCourse(slug as string);
-           setCurrentCourse(course);
-        } catch (error) {
-           console.error("Failed to load course details:", error);
-        }
-     };
-     loadOneCourse();
+    if (!slug) return;
+    const loadOneCourse = async () => {
+      try {
+        const { course } = await fetchCourse(slug as string);
+        setCurrentCourse(course);
+      } catch (error) {
+        console.error("Failed to load course details:", error);
+      }
+    };
+    loadOneCourse();
   }, [slug]);
 
 
@@ -327,7 +327,7 @@ const TeachersSelection = () => {
 
   const CountryFlag = ({ code }: { code: string }) => {
     if (!code) return null;
-    
+
     try {
       const upperCode = code.toUpperCase();
       const FlagComponent = (Flags as Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>>)[upperCode];
@@ -337,7 +337,7 @@ const TeachersSelection = () => {
     } catch (error) {
       console.error('Error rendering flag:', error);
     }
-    
+
     return <span style={{ fontSize: '12px', color: '#666' }}>{code}</span>;
   };
 
@@ -688,463 +688,514 @@ const TeachersSelection = () => {
             </div>
           </div>
 
-        <div className="row mb-3">
-          <div className="col-12">
-            <div
-              className="filters-bar"
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: '12px',
-                alignItems: 'center',
-                padding: '16px',
-                backgroundColor: '#fff',
-                borderRadius: '12px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-              }}
-            >
-              <div className="filter-item course-dropdown-container" style={{ flex: '0 1 auto', minWidth: '200px', position: 'relative' }}>
-                <div
-                  className="form-select"
-                  onClick={() => {
-                    setCourseDropdownOpen(!courseDropdownOpen);
-                    setCountryDropdownOpen(false);
-                    setLanguageDropdownOpen(false);
-                  }}
-                  style={{
-                    borderRadius: '8px',
-                    border: '1px solid #e0e0e0',
-                    padding: '10px 16px',
-                    fontSize: '14px',
-                    backgroundColor: '#fff',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    minHeight: '42px',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
-                    {currentCourse ? (
-                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        <i className="fas fa-graduation-cap" style={{ marginRight: '8px', color: '#666' }}></i>
-                        {currentCourse.name}
-                      </span>
-                    ) : (
-                      <span style={{ color: '#999' }}>
-                        <i className="fas fa-graduation-cap" style={{ marginRight: '8px', color: '#999' }}></i>
-                        {t('common.select_course')}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                {courseDropdownOpen && (
+          <div className="row mb-3">
+            <div className="col-12">
+              <div
+                className="filters-bar"
+                style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: '12px',
+                  alignItems: 'center',
+                  padding: '16px',
+                  backgroundColor: '#fff',
+                  borderRadius: '12px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                }}
+              >
+                <div className="filter-item course-dropdown-container" style={{ flex: '0 1 auto', minWidth: '200px', position: 'relative' }}>
                   <div
+                    className="form-select"
+                    onClick={() => {
+                      setCourseDropdownOpen(!courseDropdownOpen);
+                      setCountryDropdownOpen(false);
+                      setLanguageDropdownOpen(false);
+                    }}
                     style={{
-                      position: 'absolute',
-                      top: '100%',
-                      left: 0,
-                      right: 0,
-                      marginTop: '4px',
-                      backgroundColor: '#fff',
-                      border: '1px solid #e0e0e0',
                       borderRadius: '8px',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                      zIndex: 1001,
-                      maxHeight: '300px',
-                      overflow: 'hidden',
+                      border: '1px solid #e0e0e0',
+                      padding: '10px 16px',
+                      fontSize: '14px',
+                      backgroundColor: '#fff',
+                      cursor: 'pointer',
                       display: 'flex',
-                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      minHeight: '42px',
                     }}
                   >
-                    <div style={{ padding: '8px', borderBottom: '1px solid #e0e0e0' }}>
-                      <input
-                        type="text"
-                        placeholder="Type to search..."
-                        value={courseSearch}
-                        onChange={(e) => setCourseSearch(e.target.value)}
-                        onClick={(e) => e.stopPropagation()}
-                        style={{
-                          width: '100%',
-                          padding: '8px 12px',
-                          border: '1px solid #e0e0e0',
-                          borderRadius: '6px',
-                          fontSize: '14px',
-                        }}
-                      />
-                    </div>
-                    <div style={{ overflowY: 'auto', maxHeight: '250px' }}>
-                      {courses
-                        .filter((course) => {
-                          if (!courseSearch) return true;
-                          const name = (course.name || '').toLowerCase();
-                          return name.includes(courseSearch.toLowerCase());
-                        })
-                        .map((course) => (
-                          <div
-                            key={course._id}
-                            onClick={() => {
-                              if (course.slug && course.slug !== slug) {
-                                navigate(`/course/${course.slug}`);
-                              }
-                              setCourseDropdownOpen(false);
-                              setCourseSearch('');
-                            }}
-                            style={{
-                              padding: '12px 16px',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '10px',
-                              backgroundColor: currentCourse?._id === course._id ? '#f5f5f5' : 'transparent',
-                              borderBottom: '1px solid #f0f0f0',
-                            }}
-                            onMouseEnter={(e) => {
-                              if (currentCourse?._id !== course._id) {
-                                e.currentTarget.style.backgroundColor = '#f5f5f5';
-                              }
-                            }}
-                            onMouseLeave={(e) => {
-                              if (currentCourse?._id !== course._id) {
-                                e.currentTarget.style.backgroundColor = 'transparent';
-                              }
-                            }}
-                          >
-                            <i className="fas fa-graduation-cap" style={{ color: '#666', fontSize: '14px' }}></i>
-                            <span style={{ fontSize: '14px', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{course.name}</span>
-                            {currentCourse?._id === course._id && (
-                              <i className="fas fa-check" style={{ color: '#e91e63', fontSize: '12px', flexShrink: 0 }}></i>
-                            )}
-                          </div>
-                        ))}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                      {currentCourse ? (
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <i className="fas fa-graduation-cap" style={{ marginRight: '8px', color: '#666' }}></i>
+                          {currentCourse.name}
+                        </span>
+                      ) : (
+                        <span style={{ color: '#999' }}>
+                          <i className="fas fa-graduation-cap" style={{ marginRight: '8px', color: '#999' }}></i>
+                          {t('common.select_course')}
+                        </span>
+                      )}
                     </div>
                   </div>
-                )}
-              </div>
-              <div className="filter-item search-input-container" style={{ position: 'relative', flex: '1 1 200px', minWidth: '200px' }}>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder={t('common.search_by_name')}
-                  value={filters.search}
-                  onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-                  style={{
-                    borderRadius: '8px',
-                    border: '1px solid #e0e0e0',
-                    padding: '10px 40px 10px 16px',
-                    fontSize: '14px',
-                    transition: 'all 0.2s',
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = '#e91e63';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(233, 30, 99, 0.1)';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = '#e0e0e0';
-                    e.target.style.boxShadow = 'none';
-                  }}
-                />
-                <i
-                  className="fas fa-search"
-                  style={{
-                    position: 'absolute',
-                    right: '16px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    color: '#999',
-                    pointerEvents: 'none',
-                    fontSize: '14px',
-                  }}
-                />
-              </div>
-              <div className="filter-item" style={{ flex: '0 1 auto', minWidth: '160px' }}>
-                <select
-                  className="form-select"
-                  value={filters.priceRange}
-                  onChange={(e) => setFilters({ ...filters, priceRange: e.target.value })}
-                  style={{
-                    borderRadius: '8px',
-                    border: '1px solid #e0e0e0',
-                    padding: '10px 16px',
-                    fontSize: '14px',
-                    backgroundColor: '#fff',
-                    cursor: 'pointer',
-                    appearance: 'none',
-                    WebkitAppearance: 'none',
-                    MozAppearance: 'none',
-                    paddingRight: '16px',
-                  }}
-                >
-                  <option value="">{t('common.price_per_lesson')}</option>
-                  {priceRanges.map((range, idx) => (
-                    <option key={idx} value={range}>
-                      {range}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="filter-item country-dropdown-container" style={{ flex: '0 1 auto', minWidth: '180px', position: 'relative' }}>
-                <div
-                  className="form-select"
-                  onClick={() => {
-                    setCountryDropdownOpen(!countryDropdownOpen);
-                    setCourseDropdownOpen(false);
-                    setLanguageDropdownOpen(false);
-                  }}
-                  style={{
-                    borderRadius: '8px',
-                    border: '1px solid #e0e0e0',
-                    padding: '10px 16px',
-                    fontSize: '14px',
-                    backgroundColor: '#fff',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    minHeight: '42px',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
-                    {filters.country ? (
-                      <>
-                        <CountryFlag code={filters.country} />
-                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{getCountryName(filters.country)}</span>
-                      </>
-                    ) : (
-                      <span style={{ color: '#999' }}>{t('common.any_country')}</span>
-                    )}
-                  </div>
-                </div>
-                {countryDropdownOpen && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '100%',
-                      left: 0,
-                      right: 0,
-                      marginTop: '4px',
-                      backgroundColor: '#fff',
-                      border: '1px solid #e0e0e0',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                      zIndex: 1000,
-                      maxHeight: '300px',
-                      overflow: 'hidden',
-                      display: 'flex',
-                      flexDirection: 'column',
-                    }}
-                  >
-                    <div style={{ padding: '8px', borderBottom: '1px solid #e0e0e0' }}>
-                      <input
-                        type="text"
-                        placeholder="Type to search..."
-                        value={countrySearch}
-                        onChange={(e) => setCountrySearch(e.target.value)}
-                        onClick={(e) => e.stopPropagation()}
-                        style={{
-                          width: '100%',
-                          padding: '8px 12px',
-                          border: '1px solid #e0e0e0',
-                          borderRadius: '6px',
-                          fontSize: '14px',
-                        }}
-                      />
-                    </div>
-                    <div style={{ overflowY: 'auto', maxHeight: '250px' }}>
-                      <div
-                        onClick={() => {
-                          setFilters({ ...filters, country: '' });
-                          setCountryDropdownOpen(false);
-                          setCountrySearch('');
-                        }}
-                        style={{
-                          padding: '12px 16px',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          backgroundColor: filters.country === '' ? '#f5f5f5' : 'transparent',
-                          borderBottom: '1px solid #f0f0f0',
-                        }}
-                        onMouseEnter={(e) => {
-                          if (filters.country !== '') {
-                            e.currentTarget.style.backgroundColor = '#f5f5f5';
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (filters.country !== '') {
-                            e.currentTarget.style.backgroundColor = 'transparent';
-                          }
-                        }}
-                      >
-                        <span style={{ color: '#999', fontSize: '14px' }}>{t('common.any_country')}</span>
-                      </div>
-                      {countries
-                        .filter((country) => {
-                          if (!countrySearch) return true;
-                          const name = getCountryName(country).toLowerCase();
-                          const code = country.toLowerCase();
-                          return name.includes(countrySearch.toLowerCase()) || code.includes(countrySearch.toLowerCase());
-                        })
-                        .map((country) => (
-                          <div
-                            key={country}
-                            onClick={() => {
-                              setFilters({ ...filters, country });
-                              setCountryDropdownOpen(false);
-                              setCountrySearch('');
-                            }}
-                            style={{
-                              padding: '12px 16px',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '10px',
-                              backgroundColor: filters.country === country ? '#f5f5f5' : 'transparent',
-                              borderBottom: '1px solid #f0f0f0',
-                            }}
-                            onMouseEnter={(e) => {
-                              if (filters.country !== country) {
-                                e.currentTarget.style.backgroundColor = '#f5f5f5';
-                              }
-                            }}
-                            onMouseLeave={(e) => {
-                              if (filters.country !== country) {
-                                e.currentTarget.style.backgroundColor = 'transparent';
-                              }
-                            }}
-                          >
-                            <CountryFlag code={country} />
-                            <span style={{ fontSize: '14px', flex: 1 }}>{getCountryName(country)}</span>
-                            {filters.country === country && (
-                              <i className="fas fa-check" style={{ color: '#e91e63', fontSize: '12px' }}></i>
-                            )}
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div className="filter-item language-dropdown-container" style={{ flex: '0 1 auto', minWidth: '160px', position: 'relative' }}>
-                <div
-                  className="form-select"
-                  onClick={() => {
-                    setLanguageDropdownOpen(!languageDropdownOpen);
-                    setCourseDropdownOpen(false);
-                    setCountryDropdownOpen(false);
-                  }}
-                  style={{
-                    borderRadius: '8px',
-                    border: filters.language ? '1px solid #e91e63' : '1px solid #e0e0e0',
-                    padding: '10px 16px',
-                    fontSize: '14px',
-                    backgroundColor: '#fff',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    minHeight: '42px',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
-                    {filters.language ? (
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {(() => {
-                        const lang = languages.find(
-                          (l) => l._id === filters.language || formatLanguageLabel(l) === filters.language
-                        );
-                        return lang ? formatLanguageLabel(lang) : filters.language || 'Also speaks';
-                      })()}
-                    </span>
-                    ) : (
-                      <span style={{ color: '#999' }}>Also speaks</span>
-                    )}
-                  </div>
-                </div>
-                {languageDropdownOpen && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '100%',
-                      left: 0,
-                      right: 0,
-                      marginTop: '4px',
-                      backgroundColor: '#fff',
-                      border: '1px solid #e0e0e0',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                      zIndex: 1000,
-                      maxHeight: '400px',
-                      overflow: 'hidden',
-                      display: 'flex',
-                      flexDirection: 'column',
-                    }}
-                  >
-                    <div style={{ padding: '8px', borderBottom: '1px solid #e0e0e0' }}>
-                      <div style={{ position: 'relative' }}>
-                        <i className="fas fa-search" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#999', fontSize: '14px' }}></i>
+                  {courseDropdownOpen && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '100%',
+                        left: 0,
+                        right: 0,
+                        marginTop: '4px',
+                        backgroundColor: '#fff',
+                        border: '1px solid #e0e0e0',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                        zIndex: 1001,
+                        maxHeight: '300px',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column',
+                      }}
+                    >
+                      <div style={{ padding: '8px', borderBottom: '1px solid #e0e0e0' }}>
                         <input
                           type="text"
-                          placeholder="Type to search"
-                          value={languageSearch}
-                          onChange={(e) => setLanguageSearch(e.target.value)}
+                          placeholder={t('common.type_to_search')}
+                          value={courseSearch}
+                          onChange={(e) => setCourseSearch(e.target.value)}
                           onClick={(e) => e.stopPropagation()}
                           style={{
                             width: '100%',
-                            padding: '8px 12px 8px 36px',
+                            padding: '8px 12px',
                             border: '1px solid #e0e0e0',
                             borderRadius: '6px',
                             fontSize: '14px',
                           }}
                         />
                       </div>
-                    </div>
-                    <div style={{ overflowY: 'auto', maxHeight: '350px' }}>
-                      <div
-                        onClick={() => {
-                          setFilters({ ...filters, language: '' });
-                          setLanguageDropdownOpen(false);
-                          setLanguageSearch('');
-                        }}
-                        style={{
-                          padding: '12px 16px',
-                          cursor: 'pointer',
-                          backgroundColor: filters.language === '' ? '#f5f5f5' : 'transparent',
-                          borderBottom: '1px solid #f0f0f0',
-                        }}
-                        onMouseEnter={(e) => {
-                          if (filters.language !== '') {
-                            e.currentTarget.style.backgroundColor = '#f5f5f5';
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (filters.language !== '') {
-                            e.currentTarget.style.backgroundColor = 'transparent';
-                          }
-                        }}
-                      >
-                        <span style={{ color: '#999', fontSize: '14px' }}>All languages</span>
+                      <div style={{ overflowY: 'auto', maxHeight: '250px' }}>
+                        {courses
+                          .filter((course) => {
+                            if (!courseSearch) return true;
+                            const name = (course.name || '').toLowerCase();
+                            return name.includes(courseSearch.toLowerCase());
+                          })
+                          .map((course) => (
+                            <div
+                              key={course._id}
+                              onClick={() => {
+                                if (course.slug && course.slug !== slug) {
+                                  navigate(`/course/${course.slug}`);
+                                }
+                                setCourseDropdownOpen(false);
+                                setCourseSearch('');
+                              }}
+                              style={{
+                                padding: '12px 16px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '10px',
+                                backgroundColor: currentCourse?._id === course._id ? '#f5f5f5' : 'transparent',
+                                borderBottom: '1px solid #f0f0f0',
+                              }}
+                              onMouseEnter={(e) => {
+                                if (currentCourse?._id !== course._id) {
+                                  e.currentTarget.style.backgroundColor = '#f5f5f5';
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                if (currentCourse?._id !== course._id) {
+                                  e.currentTarget.style.backgroundColor = 'transparent';
+                                }
+                              }}
+                            >
+                              <i className="fas fa-graduation-cap" style={{ color: '#666', fontSize: '14px' }}></i>
+                              <span style={{ fontSize: '14px', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{course.name}</span>
+                              {currentCourse?._id === course._id && (
+                                <i className="fas fa-check" style={{ color: '#e91e63', fontSize: '12px', flexShrink: 0 }}></i>
+                              )}
+                            </div>
+                          ))}
                       </div>
-                      {languages.filter((lang) => {
-                        if (!languageSearch) return true;
-                        const searchLower = languageSearch.toLowerCase();
-                        const name = (lang.name || '').toString().toLowerCase();
-                        const nativeName = (lang.nativeName || '').toString().toLowerCase();
-                        const code = (lang.code || '').toString().toLowerCase();
-                        return (
-                          name.includes(searchLower) ||
-                          nativeName.includes(searchLower) ||
-                          code.includes(searchLower)
-                        );
-                      }).length > 0 && (
+                    </div>
+                  )}
+                </div>
+                <div className="filter-item search-input-container" style={{ position: 'relative', flex: '1 1 200px', minWidth: '200px' }}>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder={t('common.search_by_name')}
+                    value={filters.search}
+                    onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                    style={{
+                      borderRadius: '8px',
+                      border: '1px solid #e0e0e0',
+                      padding: '10px 40px 10px 16px',
+                      fontSize: '14px',
+                      transition: 'all 0.2s',
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#e91e63';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(233, 30, 99, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = '#e0e0e0';
+                      e.target.style.boxShadow = 'none';
+                    }}
+                  />
+                  <i
+                    className="fas fa-search"
+                    style={{
+                      position: 'absolute',
+                      right: '16px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: '#999',
+                      pointerEvents: 'none',
+                      fontSize: '14px',
+                    }}
+                  />
+                </div>
+                <div className="filter-item" style={{ flex: '0 1 auto', minWidth: '160px' }}>
+                  <select
+                    className="form-select"
+                    value={filters.priceRange}
+                    onChange={(e) => setFilters({ ...filters, priceRange: e.target.value })}
+                    style={{
+                      borderRadius: '8px',
+                      border: '1px solid #e0e0e0',
+                      padding: '10px 16px',
+                      fontSize: '14px',
+                      backgroundColor: '#fff',
+                      cursor: 'pointer',
+                      appearance: 'none',
+                      WebkitAppearance: 'none',
+                      MozAppearance: 'none',
+                      paddingRight: '16px',
+                    }}
+                  >
+                    <option value="">{t('common.price_per_lesson')}</option>
+                    {priceRanges.map((range, idx) => (
+                      <option key={idx} value={range}>
+                        {range}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="filter-item country-dropdown-container" style={{ flex: '0 1 auto', minWidth: '180px', position: 'relative' }}>
+                  <div
+                    className="form-select"
+                    onClick={() => {
+                      setCountryDropdownOpen(!countryDropdownOpen);
+                      setCourseDropdownOpen(false);
+                      setLanguageDropdownOpen(false);
+                    }}
+                    style={{
+                      borderRadius: '8px',
+                      border: '1px solid #e0e0e0',
+                      padding: '10px 16px',
+                      fontSize: '14px',
+                      backgroundColor: '#fff',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      minHeight: '42px',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                      {filters.country ? (
                         <>
-                          {popularLanguages.length > 0 && (
+                          <CountryFlag code={filters.country} />
+                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{getCountryName(filters.country)}</span>
+                        </>
+                      ) : (
+                        <span style={{ color: '#999' }}>{t('common.any_country')}</span>
+                      )}
+                    </div>
+                  </div>
+                  {countryDropdownOpen && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '100%',
+                        left: 0,
+                        right: 0,
+                        marginTop: '4px',
+                        backgroundColor: '#fff',
+                        border: '1px solid #e0e0e0',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                        zIndex: 1000,
+                        maxHeight: '300px',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column',
+                      }}
+                    >
+                      <div style={{ padding: '8px', borderBottom: '1px solid #e0e0e0' }}>
+                        <input
+                          type="text"
+                          placeholder={t('common.type_to_search')}
+                          value={countrySearch}
+                          onChange={(e) => setCountrySearch(e.target.value)}
+                          onClick={(e) => e.stopPropagation()}
+                          style={{
+                            width: '100%',
+                            padding: '8px 12px',
+                            border: '1px solid #e0e0e0',
+                            borderRadius: '6px',
+                            fontSize: '14px',
+                          }}
+                        />
+                      </div>
+                      <div style={{ overflowY: 'auto', maxHeight: '250px' }}>
+                        <div
+                          onClick={() => {
+                            setFilters({ ...filters, country: '' });
+                            setCountryDropdownOpen(false);
+                            setCountrySearch('');
+                          }}
+                          style={{
+                            padding: '12px 16px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            backgroundColor: filters.country === '' ? '#f5f5f5' : 'transparent',
+                            borderBottom: '1px solid #f0f0f0',
+                          }}
+                          onMouseEnter={(e) => {
+                            if (filters.country !== '') {
+                              e.currentTarget.style.backgroundColor = '#f5f5f5';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (filters.country !== '') {
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                            }
+                          }}
+                        >
+                          <span style={{ color: '#999', fontSize: '14px' }}>{t('common.any_country')}</span>
+                        </div>
+                        {countries
+                          .filter((country) => {
+                            if (!countrySearch) return true;
+                            const name = getCountryName(country).toLowerCase();
+                            const code = country.toLowerCase();
+                            return name.includes(countrySearch.toLowerCase()) || code.includes(countrySearch.toLowerCase());
+                          })
+                          .map((country) => (
+                            <div
+                              key={country}
+                              onClick={() => {
+                                setFilters({ ...filters, country });
+                                setCountryDropdownOpen(false);
+                                setCountrySearch('');
+                              }}
+                              style={{
+                                padding: '12px 16px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '10px',
+                                backgroundColor: filters.country === country ? '#f5f5f5' : 'transparent',
+                                borderBottom: '1px solid #f0f0f0',
+                              }}
+                              onMouseEnter={(e) => {
+                                if (filters.country !== country) {
+                                  e.currentTarget.style.backgroundColor = '#f5f5f5';
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                if (filters.country !== country) {
+                                  e.currentTarget.style.backgroundColor = 'transparent';
+                                }
+                              }}
+                            >
+                              <CountryFlag code={country} />
+                              <span style={{ fontSize: '14px', flex: 1 }}>{getCountryName(country)}</span>
+                              {filters.country === country && (
+                                <i className="fas fa-check" style={{ color: '#e91e63', fontSize: '12px' }}></i>
+                              )}
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="filter-item language-dropdown-container" style={{ flex: '0 1 auto', minWidth: '160px', position: 'relative' }}>
+                  <div
+                    className="form-select"
+                    onClick={() => {
+                      setLanguageDropdownOpen(!languageDropdownOpen);
+                      setCourseDropdownOpen(false);
+                      setCountryDropdownOpen(false);
+                    }}
+                    style={{
+                      borderRadius: '8px',
+                      border: filters.language ? '1px solid #e91e63' : '1px solid #e0e0e0',
+                      padding: '10px 16px',
+                      fontSize: '14px',
+                      backgroundColor: '#fff',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      minHeight: '42px',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                      {filters.language ? (
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {(() => {
+                            const lang = languages.find(
+                              (l) => l._id === filters.language || formatLanguageLabel(l) === filters.language
+                            );
+                            return lang ? formatLanguageLabel(lang) : filters.language || t('common.also_speaks');
+                          })()}
+                        </span>
+                      ) : (
+                        <span style={{ color: '#999' }}>{t('common.also_speaks')}</span>
+                      )}
+                    </div>
+                  </div>
+                  {languageDropdownOpen && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '100%',
+                        left: 0,
+                        right: 0,
+                        marginTop: '4px',
+                        backgroundColor: '#fff',
+                        border: '1px solid #e0e0e0',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                        zIndex: 1000,
+                        maxHeight: '400px',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column',
+                      }}
+                    >
+                      <div style={{ padding: '8px', borderBottom: '1px solid #e0e0e0' }}>
+                        <div style={{ position: 'relative' }}>
+                          <i className="fas fa-search" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#999', fontSize: '14px' }}></i>
+                          <input
+                            type="text"
+                            placeholder={t('common.type_to_search')}
+                            value={languageSearch}
+                            onChange={(e) => setLanguageSearch(e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                              width: '100%',
+                              padding: '8px 12px 8px 36px',
+                              border: '1px solid #e0e0e0',
+                              borderRadius: '6px',
+                              fontSize: '14px',
+                            }}
+                          />
+                        </div>
+                      </div>
+                      <div style={{ overflowY: 'auto', maxHeight: '350px' }}>
+                        <div
+                          onClick={() => {
+                            setFilters({ ...filters, language: '' });
+                            setLanguageDropdownOpen(false);
+                            setLanguageSearch('');
+                          }}
+                          style={{
+                            padding: '12px 16px',
+                            cursor: 'pointer',
+                            backgroundColor: filters.language === '' ? '#f5f5f5' : 'transparent',
+                            borderBottom: '1px solid #f0f0f0',
+                          }}
+                          onMouseEnter={(e) => {
+                            if (filters.language !== '') {
+                              e.currentTarget.style.backgroundColor = '#f5f5f5';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (filters.language !== '') {
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                            }
+                          }}
+                        >
+                          <span style={{ color: '#999', fontSize: '14px' }}>{t('common.all_languages')}</span>
+                        </div>
+                        {languages.filter((lang) => {
+                          if (!languageSearch) return true;
+                          const searchLower = languageSearch.toLowerCase();
+                          const name = (lang.name || '').toString().toLowerCase();
+                          const nativeName = (lang.nativeName || '').toString().toLowerCase();
+                          const code = (lang.code || '').toString().toLowerCase();
+                          return (
+                            name.includes(searchLower) ||
+                            nativeName.includes(searchLower) ||
+                            code.includes(searchLower)
+                          );
+                        }).length > 0 && (
                             <>
-                              <div style={{ padding: '12px 16px 8px', fontSize: '14px', fontWeight: '600', color: '#1a1a1a' }}>Popular</div>
+                              {popularLanguages.length > 0 && (
+                                <>
+                                  <div style={{ padding: '12px 16px 8px', fontSize: '14px', fontWeight: '600', color: '#1a1a1a' }}>{t('common.popular')}</div>
+                                  {languages
+                                    .filter((lang) => {
+                                      const langName = (lang.name || '').toString();
+                                      if (!popularLanguages.includes(langName)) return false;
+                                      if (!languageSearch) return true;
+                                      const searchLower = languageSearch.toLowerCase();
+                                      const name = (lang.name || '').toString().toLowerCase();
+                                      const nativeName = (lang.nativeName || '').toString().toLowerCase();
+                                      const code = (lang.code || '').toString().toLowerCase();
+                                      return (
+                                        name.includes(searchLower) ||
+                                        nativeName.includes(searchLower) ||
+                                        code.includes(searchLower)
+                                      );
+                                    })
+                                    .map((lang) => (
+                                      <div
+                                        key={lang._id}
+                                        onClick={() => {
+                                          setFilters({ ...filters, language: lang._id });
+                                          setLanguageDropdownOpen(false);
+                                          setLanguageSearch('');
+                                        }}
+                                        style={{
+                                          padding: '12px 16px',
+                                          cursor: 'pointer',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: '10px',
+                                          backgroundColor: filters.language === lang._id ? '#f5f5f5' : 'transparent',
+                                          borderBottom: '1px solid #f0f0f0',
+                                        }}
+                                        onMouseEnter={(e) => {
+                                          if (filters.language !== lang._id) {
+                                            e.currentTarget.style.backgroundColor = '#f5f5f5';
+                                          }
+                                        }}
+                                        onMouseLeave={(e) => {
+                                          if (filters.language !== lang._id) {
+                                            e.currentTarget.style.backgroundColor = 'transparent';
+                                          }
+                                        }}
+                                      >
+                                        <span style={{ fontSize: '14px', flex: 1 }}>{formatLanguageLabel(lang)}</span>
+                                        {filters.language === lang._id && (
+                                          <i className="fas fa-check" style={{ color: '#e91e63', fontSize: '12px' }}></i>
+                                        )}
+                                      </div>
+                                    ))}
+                                </>
+                              )}
                               {languages
                                 .filter((lang) => {
                                   const langName = (lang.name || '').toString();
-                                  if (!popularLanguages.includes(langName)) return false;
+                                  if (popularLanguages.includes(langName)) return false;
                                   if (!languageSearch) return true;
                                   const searchLower = languageSearch.toLowerCase();
                                   const name = (lang.name || '').toString().toLowerCase();
@@ -1192,178 +1243,299 @@ const TeachersSelection = () => {
                                 ))}
                             </>
                           )}
-                          {languages
-                            .filter((lang) => {
-                              const langName = (lang.name || '').toString();
-                              if (popularLanguages.includes(langName)) return false;
-                              if (!languageSearch) return true;
-                              const searchLower = languageSearch.toLowerCase();
-                              const name = (lang.name || '').toString().toLowerCase();
-                              const nativeName = (lang.nativeName || '').toString().toLowerCase();
-                              const code = (lang.code || '').toString().toLowerCase();
-                              return (
-                                name.includes(searchLower) ||
-                                nativeName.includes(searchLower) ||
-                                code.includes(searchLower)
-                              );
-                            })
-                            .map((lang) => (
-                              <div
-                                key={lang._id}
-                                onClick={() => {
-                                  setFilters({ ...filters, language: lang._id });
-                                  setLanguageDropdownOpen(false);
-                                  setLanguageSearch('');
-                                }}
-                                style={{
-                                  padding: '12px 16px',
-                                  cursor: 'pointer',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '10px',
-                                  backgroundColor: filters.language === lang._id ? '#f5f5f5' : 'transparent',
-                                  borderBottom: '1px solid #f0f0f0',
-                                }}
-                                onMouseEnter={(e) => {
-                                  if (filters.language !== lang._id) {
-                                    e.currentTarget.style.backgroundColor = '#f5f5f5';
-                                  }
-                                }}
-                                onMouseLeave={(e) => {
-                                  if (filters.language !== lang._id) {
-                                    e.currentTarget.style.backgroundColor = 'transparent';
-                                  }
-                                }}
-                              >
-                                    <span style={{ fontSize: '14px', flex: 1 }}>{formatLanguageLabel(lang)}</span>
-                                {filters.language === lang._id && (
-                                  <i className="fas fa-check" style={{ color: '#e91e63', fontSize: '12px' }}></i>
-                                )}
-                              </div>
-                            ))}
-                        </>
-                      )}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-              <div className="filter-item" style={{ flex: '0 1 auto', minWidth: '180px' }}>
-                <select
-                  className="form-select"
-                  value={filters.sortBy}
-                  onChange={(e) => setFilters({ ...filters, sortBy: e.target.value })}
-                  style={{
-                    borderRadius: '8px',
-                    border: '1px solid #e0e0e0',
-                    padding: '10px 16px',
-                    fontSize: '14px',
-                    backgroundColor: '#fff',
-                    cursor: 'pointer',
-                    appearance: 'none',
-                    WebkitAppearance: 'none',
-                    MozAppearance: 'none',
-                    paddingRight: '16px',
-                  }}
-                >
-                  <option value="top_picks">{t('common.sort_by_top_picks')}</option>
-                  <option value="price_low">{t('common.sort_by_price_low')}</option>
-                  <option value="price_high">{t('common.sort_by_price_high')}</option>
-                  <option value="rating">{t('common.sort_by_rating')}</option>
-                  <option value="popular">{t('common.sort_by_popular')}</option>
-                </select>
+                  )}
+                </div>
+                <div className="filter-item" style={{ flex: '0 1 auto', minWidth: '180px' }}>
+                  <select
+                    className="form-select"
+                    value={filters.sortBy}
+                    onChange={(e) => setFilters({ ...filters, sortBy: e.target.value })}
+                    style={{
+                      borderRadius: '8px',
+                      border: '1px solid #e0e0e0',
+                      padding: '10px 16px',
+                      fontSize: '14px',
+                      backgroundColor: '#fff',
+                      cursor: 'pointer',
+                      appearance: 'none',
+                      WebkitAppearance: 'none',
+                      MozAppearance: 'none',
+                      paddingRight: '16px',
+                    }}
+                  >
+                    <option value="top_picks">{t('common.sort_by_top_picks')}</option>
+                    <option value="price_low">{t('common.sort_by_price_low')}</option>
+                    <option value="price_high">{t('common.sort_by_price_high')}</option>
+                    <option value="rating">{t('common.sort_by_rating')}</option>
+                    <option value="popular">{t('common.sort_by_popular')}</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="row g-4">
-          <div className="col-12 col-lg-8">
-            <div className="teachers-list">
-              {filteredTeachers.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-muted">{t('common.no_teachers_found')}</p>
-                </div>
-              ) : (
-                filteredTeachers.map((teacher) => {
-                  const teacherId = typeof teacher.teacherId === 'object' ? teacher.teacherId : { name: '', _id: '' };
-                  const teacherName = String(teacherId.name || '');
-                  const languages =
-                    Array.isArray((teacher as any).languages) && (teacher as any).languages.length > 0
-                      ? (teacher as any).languages
-                      : Array.isArray(teacher.languageIds)
-                        ? teacher.languageIds
-                        : [];
-                  const courseId = typeof teacher.courseId === 'object' ? teacher.courseId : null;
-                  let courseName = '';
-                  if (courseId && courseId.name) {
-                    if (typeof courseId.name === 'string') {
-                      courseName = courseId.name;
-                    } else if (typeof courseId.name === 'object' && courseId.name !== null) {
-                      courseName = (courseId.name as any).en || String(courseId.name);
+          <div className="row g-4">
+            <div className="col-12 col-lg-8">
+              <div className="teachers-list">
+                {filteredTeachers.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-muted">{t('common.no_teachers_found')}</p>
+                  </div>
+                ) : (
+                  filteredTeachers.map((teacher) => {
+                    const teacherId = typeof teacher.teacherId === 'object' ? teacher.teacherId : { name: '', _id: '' };
+                    const teacherName = String(teacherId.name || '');
+                    const languages =
+                      Array.isArray((teacher as any).languages) && (teacher as any).languages.length > 0
+                        ? (teacher as any).languages
+                        : Array.isArray(teacher.languageIds)
+                          ? teacher.languageIds
+                          : [];
+                    const courseId = typeof teacher.courseId === 'object' ? teacher.courseId : null;
+                    let courseName = '';
+                    if (courseId && courseId.name) {
+                      if (typeof courseId.name === 'string') {
+                        courseName = courseId.name;
+                      } else if (typeof courseId.name === 'object' && courseId.name !== null) {
+                        courseName = (courseId.name as any).en || String(courseId.name);
+                      }
                     }
-                  }
-                  const isSelected = selectedTeacher?._id === teacher._id;
+                    const isSelected = selectedTeacher?._id === teacher._id;
 
-                  return (
-                    <div
-                      key={teacher._id}
-                      className={`teacher-card mb-3 border rounded position-relative ${
-                        isSelected ? 'border-primary' : ''
-                      }`}
-                      style={{
-                        backgroundColor: '#fff',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s ease',
-                        padding: '20px',
-                        boxShadow: isSelected ? '0 4px 12px rgba(233, 30, 99, 0.15)' : '0 2px 4px rgba(0,0,0,0.08)',
-                      }}
-                      onMouseEnter={() => setHoveredTeacher(teacher._id)}
-                      onMouseLeave={() => setHoveredTeacher(null)}
-                      onClick={() => setSelectedTeacher(teacher)}
-                    >
-                      <div className="position-absolute price-wishlist-section-desktop" style={{ top: '20px', right: '20px', zIndex: 2, maxWidth: '200px' }}>
-                        <div className="d-flex align-items-center justify-content-end" style={{ gap: '6px' }}>
-                          <span className="fw-bold text-primary" style={{ fontSize: '20px', lineHeight: '1' }}>
-                            {getFormattedTeacherPrice(teacher)}
-                          </span>
-                          <span className="text-muted" style={{ fontSize: '14px', lineHeight: '1' }}>
-                            / {t('common.hour')}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div 
-                        className="position-absolute action-buttons-section-desktop" 
-                        style={{ 
-                          top: '70px', 
-                          right: '20px', 
-                          zIndex: 2,
-                          minWidth: '160px',
+                    return (
+                      <div
+                        key={teacher._id}
+                        className={`teacher-card mb-3 border rounded position-relative ${isSelected ? 'border-primary' : ''
+                          }`}
+                        style={{
+                          backgroundColor: '#fff',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          padding: '20px',
+                          boxShadow: isSelected ? '0 4px 12px rgba(233, 30, 99, 0.15)' : '0 2px 4px rgba(0,0,0,0.08)',
                         }}
+                        onMouseEnter={() => setHoveredTeacher(teacher._id)}
+                        onMouseLeave={() => setHoveredTeacher(null)}
+                        onClick={() => setSelectedTeacher(teacher)}
                       >
-                        <div className="d-flex flex-column align-items-end gap-2">
+                        <div className="position-absolute price-wishlist-section-desktop" style={{ top: '20px', right: '20px', zIndex: 2, maxWidth: '200px' }}>
+                          <div className="d-flex align-items-center justify-content-end" style={{ gap: '6px' }}>
+                            <span className="fw-bold text-primary" style={{ fontSize: '20px', lineHeight: '1' }}>
+                              {getFormattedTeacherPrice(teacher)}
+                            </span>
+                            <span className="text-muted" style={{ fontSize: '14px', lineHeight: '1' }}>
+                              / {t('common.hour')}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div
+                          className="position-absolute action-buttons-section-desktop"
+                          style={{
+                            top: '70px',
+                            right: '20px',
+                            zIndex: 2,
+                            minWidth: '160px',
+                          }}
+                        >
+                          <div className="d-flex flex-column align-items-end gap-2">
+                            <button
+                              className="btn btn-sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleBookTrial(teacher);
+                              }}
+                              style={{
+                                backgroundColor: '#e91e63',
+                                borderColor: '#e91e63',
+                                fontSize: '13px',
+                                padding: '10px 20px',
+                                borderRadius: '8px',
+                                fontWeight: '500',
+                                color: '#fff',
+                                width: '100%',
+                                minWidth: '140px',
+                              }}
+                            >
+                              {t('common.book_trial_lesson')}
+                            </button>
+                            <button
+                              className="btn btn-sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleSendMessage(teacher);
+                              }}
+                              style={{
+                                backgroundColor: '#fff',
+                                borderColor: '#ddd',
+                                borderWidth: '1px',
+                                borderStyle: 'solid',
+                                fontSize: '13px',
+                                padding: '10px 20px',
+                                borderRadius: '8px',
+                                fontWeight: '500',
+                                color: '#1a1a1a',
+                                width: '100%',
+                                minWidth: '140px',
+                              }}
+                            >
+                              {t('common.send_message')}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="row g-3">
+                          <div className="col-auto">
+                            <div
+                              className="teacher-avatar"
+                              style={{
+                                width: '80px',
+                                height: '80px',
+                                borderRadius: '50%',
+                                overflow: 'hidden',
+                                border: '3px solid #f0f0f0',
+                              }}
+                            >
+                              {teacher.teacherProfile?.photo ? (
+                                <img
+                                  src={teacher.teacherProfile.photo}
+                                  alt={teacherName}
+                                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                />
+                              ) : (
+                                <div
+                                  style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: '#fff',
+                                    fontSize: '28px',
+                                    fontWeight: 'bold',
+                                  }}
+                                >
+                                  {teacherName.charAt(0).toUpperCase()}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="col teacher-content-col" style={{ paddingRight: '200px' }}>
+                            <div className="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                              <h5 className="mb-0 fw-bold" style={{ fontSize: '18px' }}>
+                                {teacherName}
+                              </h5>
+                              <i className="fas fa-check-circle text-primary"></i>
+                              {teacher.teacherProfile?.countryCode && (
+                                <span title={teacher.teacherProfile.country || teacher.teacherProfile.countryCode} style={{ display: 'inline-flex', alignItems: 'center', marginLeft: '4px' }}>
+                                  <CountryFlag code={teacher.teacherProfile.countryCode} />
+                                </span>
+                              )}
+                            </div>
+                            <div className="mb-2">
+                              <span className="badge bg-primary me-2 small">{t('common.professional')}</span>
+                              {teacher.teacherProfile?.rating >= 4.8 && (
+                                <span className="badge" style={{ backgroundColor: '#ff6b9d', color: '#fff' }}>{t('common.super_tutor')}</span>
+                              )}
+                            </div>
+                            {courseName && (
+                              <div className="mb-2 small text-muted d-flex align-items-center gap-2">
+                                <i className="fas fa-graduation-cap" style={{ fontSize: '14px', color: '#666' }}></i>
+                                <span>{courseName}</span>
+                              </div>
+                            )}
+                            <div className="mb-2 small text-muted d-flex align-items-center gap-2">
+                              <i className="fas fa-language" style={{ fontSize: '14px', color: '#666' }}></i>
+                              <span>{t('common.speaks')}: </span>
+                              {languages.map(
+                                (
+                                  lang: { _id?: string; name?: string; code?: string; nativeName?: string; proficiency?: string },
+                                  idx: number
+                                ) => {
+                                  const code = (lang.code || '').toString().toUpperCase();
+                                  let label = (lang.nativeName || lang.name || '').toString().trim();
+
+                                  if ((!label || label.toUpperCase() === code) && languageDisplayNames && code) {
+                                    try {
+                                      const resolved = languageDisplayNames.of(code.toLowerCase());
+                                      if (resolved) label = resolved.toString();
+                                    } catch { }
+                                  }
+                                  if (!label) label = code;
+
+                                  const proficiency = lang.proficiency;
+                                  let profLabel = '';
+                                  if (proficiency) {
+                                    const value = proficiency.toLowerCase();
+                                    if (value === 'native') profLabel = t('common.proficiency.native');
+                                    else if (value === 'c2') profLabel = t('common.proficiency.proficient');
+                                    else if (value === 'c1') profLabel = t('common.proficiency.advanced');
+                                    else if (value === 'b2') profLabel = t('common.proficiency.upper_intermediate');
+                                    else if (value === 'b1') profLabel = t('common.proficiency.intermediate');
+                                    else if (value === 'a2') profLabel = t('common.proficiency.elementary');
+                                    else if (value === 'a1') profLabel = t('common.proficiency.beginner');
+                                    else profLabel = proficiency;
+                                  }
+
+                                  const fullLabel = profLabel ? `${label} (${profLabel})` : label;
+                                  return (
+                                    <span key={lang._id || idx}>
+                                      {fullLabel}
+                                      {idx < languages.length - 1 && ', '}
+                                    </span>
+                                  );
+                                }
+                              )}
+                            </div>
+                            {teacher.bio && (
+                              <div className="mb-2">
+                                <p className="small text-muted mb-1" style={{ lineHeight: '1.6' }}>
+                                  {expandedBios.has(teacher._id)
+                                    ? teacher.bio
+                                    : teacher.bio.length > 110
+                                      ? `${teacher.bio.substring(0, 110)}...`
+                                      : teacher.bio}
+                                </p>
+                                {teacher.bio.length > 110 && (
+                                  <button
+                                    className="p-0 border-0 bg-transparent"
+                                    style={{ fontSize: '13px', textDecoration: 'none', color: '#0056b3', cursor: 'pointer', outline: 'none', boxShadow: 'none' }}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      toggleBio(teacher._id);
+                                    }}
+                                  >
+                                    {expandedBios.has(teacher._id) ? t('common.show_less') : t('common.show_more')}
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                            {teacher.teacherProfile?.rating > 0 && (
+                              <div className="d-flex align-items-center gap-3 small flex-wrap">
+                                <div>
+                                  <i className="fas fa-star text-warning"></i>
+                                  <strong className="ms-1">{teacher.teacherProfile.rating.toFixed(1)}</strong>
+                                  <span className="text-muted ms-1">
+                                    ({teacher.teacherProfile.totalReviews} {t('common.reviews')})
+                                  </span>
+                                </div>
+                                {/* Mobile Price Display in Stats Row */}
+                                <div className="d-lg-none d-flex align-items-center gap-1 ms-auto">
+                                  <span className="fw-bold text-primary" style={{ fontSize: '16px' }}>
+                                    {getFormattedTeacherPrice(teacher)}
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="mt-3 pt-3 border-top price-buttons-mobile d-flex align-items-center gap-3">
                           <button
-                            className="btn btn-sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleBookTrial(teacher);
-                            }}
-                            style={{
-                              backgroundColor: '#e91e63',
-                              borderColor: '#e91e63',
-                              fontSize: '13px',
-                              padding: '10px 20px',
-                              borderRadius: '8px',
-                              fontWeight: '500',
-                              color: '#fff',
-                              width: '100%',
-                              minWidth: '140px',
-                            }}
-                          >
-                            {t('common.book_trial_lesson')}
-                          </button>
-                          <button
-                            className="btn btn-sm"
+                            className="btn btn-sm d-flex align-items-center justify-content-center"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleSendMessage(teacher);
@@ -1373,227 +1545,54 @@ const TeachersSelection = () => {
                               borderColor: '#ddd',
                               borderWidth: '1px',
                               borderStyle: 'solid',
-                              fontSize: '13px',
-                              padding: '10px 20px',
+                              width: '42px',
+                              height: '42px',
                               borderRadius: '8px',
-                              fontWeight: '500',
                               color: '#1a1a1a',
-                              width: '100%',
-                              minWidth: '140px',
+                              padding: 0,
+                              flexShrink: 0,
                             }}
                           >
-                            {t('common.send_message')}
+                            <i className="far fa-comment-dots" style={{ fontSize: '18px' }}></i>
+                          </button>
+                          <button
+                            className="btn btn-sm flex-grow-1"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleBookTrial(teacher);
+                            }}
+                            style={{
+                              backgroundColor: '#e91e63',
+                              borderColor: '#e91e63',
+                              fontSize: '14px',
+                              height: '42px',
+                              borderRadius: '8px',
+                              fontWeight: '600',
+                              color: '#fff',
+                            }}
+                          >
+                            {t('common.book_trial_lesson')}
                           </button>
                         </div>
-                      </div>
 
-                      <div className="row g-3">
-                        <div className="col-auto">
-                          <div
-                            className="teacher-avatar"
-                            style={{
-                              width: '80px',
-                              height: '80px',
-                              borderRadius: '50%',
-                              overflow: 'hidden',
-                              border: '3px solid #f0f0f0',
-                            }}
-                          >
-                            {teacher.teacherProfile?.photo ? (
-                              <img
-                                src={teacher.teacherProfile.photo}
-                                alt={teacherName}
-                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                              />
-                            ) : (
-                              <div
-                                style={{
-                                  width: '100%',
-                                  height: '100%',
-                                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  color: '#fff',
-                                  fontSize: '28px',
-                                  fontWeight: 'bold',
-                                }}
-                              >
-                                {teacherName.charAt(0).toUpperCase()}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="col teacher-content-col" style={{ paddingRight: '200px' }}>
-                          <div className="d-flex align-items-center gap-2 mb-2 flex-wrap">
-                            <h5 className="mb-0 fw-bold" style={{ fontSize: '18px' }}>
-                              {teacherName}
-                            </h5>
-                            <i className="fas fa-check-circle text-primary"></i>
-                            {teacher.teacherProfile?.countryCode && (
-                              <span title={teacher.teacherProfile.country || teacher.teacherProfile.countryCode} style={{ display: 'inline-flex', alignItems: 'center', marginLeft: '4px' }}>
-                                <CountryFlag code={teacher.teacherProfile.countryCode} />
-                              </span>
-                            )}
-                          </div>
-                          <div className="mb-2">
-                            <span className="badge bg-primary me-2 small">{t('common.professional')}</span>
-                            {teacher.teacherProfile?.rating >= 4.8 && (
-                              <span className="badge" style={{ backgroundColor: '#ff6b9d', color: '#fff' }}>{t('common.super_tutor')}</span>
-                            )}
-                          </div>
-                          {courseName && (
-                            <div className="mb-2 small text-muted d-flex align-items-center gap-2">
-                              <i className="fas fa-graduation-cap" style={{ fontSize: '14px', color: '#666' }}></i>
-                              <span>{courseName}</span>
-                            </div>
-                          )}
-                          <div className="mb-2 small text-muted d-flex align-items-center gap-2">
-                            <i className="fas fa-language" style={{ fontSize: '14px', color: '#666' }}></i>
-                            <span>{t('common.speaks')}: </span>
-                            {languages.map(
-                              (
-                                lang: { _id?: string; name?: string; code?: string; nativeName?: string; proficiency?: string },
-                                idx: number
-                              ) => {
-                                const code = (lang.code || '').toString().toUpperCase();
-                                let label = (lang.nativeName || lang.name || '').toString().trim();
-                                
-                                if ((!label || label.toUpperCase() === code) && languageDisplayNames && code) {
-                                  try {
-                                    const resolved = languageDisplayNames.of(code.toLowerCase());
-                                    if (resolved) label = resolved.toString();
-                                  } catch {}
-                                }
-                                if (!label) label = code;
-
-                                const proficiency = lang.proficiency;
-                                let profLabel = '';
-                                if (proficiency) {
-                                  const value = proficiency.toLowerCase();
-                                  if (value === 'native') profLabel = 'Native';
-                                  else if (value === 'c2') profLabel = 'Proficient';
-                                  else if (value === 'c1') profLabel = 'Advanced';
-                                  else if (value === 'b2') profLabel = 'Upper Intermediate';
-                                  else if (value === 'b1') profLabel = 'Intermediate';
-                                  else if (value === 'a2') profLabel = 'Elementary';
-                                  else if (value === 'a1') profLabel = 'Beginner';
-                                  else profLabel = proficiency; 
-                                }
-                                
-                                const fullLabel = profLabel ? `${label} (${profLabel})` : label;
-                                return (
-                                  <span key={lang._id || idx}>
-                                    {fullLabel}
-                                    {idx < languages.length - 1 && ', '}
-                                  </span>
-                                );
-                              }
-                            )}
-                          </div>
-                          {teacher.bio && (
-                            <div className="mb-2">
-                              <p className="small text-muted mb-1" style={{ lineHeight: '1.6' }}>
-                                {expandedBios.has(teacher._id)
-                                  ? teacher.bio
-                                  : teacher.bio.length > 110
-                                  ? `${teacher.bio.substring(0, 110)}...`
-                                  : teacher.bio}
-                              </p>
-                              {teacher.bio.length > 110 && (
-                                <button
-                                  className="p-0 border-0 bg-transparent"
-                                  style={{ fontSize: '13px', textDecoration: 'none', color: '#0056b3', cursor: 'pointer', outline: 'none', boxShadow: 'none' }}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    toggleBio(teacher._id);
-                                  }}
-                                >
-                                  {expandedBios.has(teacher._id) ? t('common.show_less') : t('common.show_more') || 'Show more'}
-                                </button>
-                              )}
-                            </div>
-                          )}
-                          {teacher.teacherProfile?.rating > 0 && (
-                            <div className="d-flex align-items-center gap-3 small flex-wrap">
-                              <div>
-                                <i className="fas fa-star text-warning"></i>
-                                <strong className="ms-1">{teacher.teacherProfile.rating.toFixed(1)}</strong>
-                                <span className="text-muted ms-1">
-                                  ({teacher.teacherProfile.totalReviews} {t('common.reviews')})
-                                </span>
-                              </div>
-                              {/* Mobile Price Display in Stats Row */}
-                              <div className="d-lg-none d-flex align-items-center gap-1 ms-auto">
-                                <span className="fw-bold text-primary" style={{ fontSize: '16px' }}>
-                                  {getFormattedTeacherPrice(teacher)}
-                                </span>
-                              </div>
-                            </div>
-                          )}
-                        </div>
                       </div>
-                      
-                      <div className="mt-3 pt-3 border-top price-buttons-mobile d-flex align-items-center gap-3">
-                        <button
-                          className="btn btn-sm d-flex align-items-center justify-content-center"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSendMessage(teacher);
-                          }}
-                          style={{
-                            backgroundColor: '#fff',
-                            borderColor: '#ddd',
-                            borderWidth: '1px',
-                            borderStyle: 'solid',
-                            width: '42px',
-                            height: '42px',
-                            borderRadius: '8px',
-                            color: '#1a1a1a',
-                            padding: 0,
-                            flexShrink: 0,
-                          }}
-                        >
-                          <i className="far fa-comment-dots" style={{ fontSize: '18px' }}></i>
-                        </button>
-                        <button
-                          className="btn btn-sm flex-grow-1"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleBookTrial(teacher);
-                          }}
-                          style={{
-                            backgroundColor: '#e91e63',
-                            borderColor: '#e91e63',
-                            fontSize: '14px',
-                            height: '42px',
-                            borderRadius: '8px',
-                            fontWeight: '600',
-                            color: '#fff',
-                          }}
-                        >
-                          {t('common.book_trial_lesson')}
-                        </button>
-                      </div>
-                      
-                    </div>
-                  );
-                })
-              )}
+                    );
+                  })
+                )}
+              </div>
             </div>
-          </div>
 
-          <div className="col-12 col-lg-4">
-            {(() => {
-              const activeTeacherId = hoveredTeacher || (selectedTeacher?._id);
-              const activeTeacher = activeTeacherId ? filteredTeachers.find(t => t._id === activeTeacherId) : null;
-              
-              if (!activeTeacher) return null;
-              
-              return (
-                <div className="teacher-video-sidebar" style={{ position: 'sticky', top: '20px' }}>
-                  <div className="card border-0 shadow-sm" style={{ borderRadius: '12px', overflow: 'hidden' }}>
-                    {activeTeacher.introductionVideo ? (
+            <div className="col-12 col-lg-4">
+              {(() => {
+                const activeTeacherId = hoveredTeacher || (selectedTeacher?._id);
+                const activeTeacher = activeTeacherId ? filteredTeachers.find(t => t._id === activeTeacherId) : null;
+
+                if (!activeTeacher) return null;
+
+                return (
+                  <div className="teacher-video-sidebar" style={{ position: 'sticky', top: '20px' }}>
+                    <div className="card border-0 shadow-sm" style={{ borderRadius: '12px', overflow: 'hidden' }}>
+                      {activeTeacher.introductionVideo ? (
                         <div className="position-relative">
                           <div
                             className="video-thumbnail"
@@ -1605,16 +1604,16 @@ const TeachersSelection = () => {
                               cursor: 'pointer',
                               position: 'relative',
                             }}
-                        onClick={() => {
-                          if (activeTeacher.introductionVideo) {
-                            setVideoUrl(activeTeacher.introductionVideo);
-                            setVideoModalOpen(true);
-                          }
-                        }}
-                      >
-                        {getYouTubeThumbnail(activeTeacher.introductionVideo) ? (
-                          <img
-                            src={getYouTubeThumbnail(activeTeacher.introductionVideo)}
+                            onClick={() => {
+                              if (activeTeacher.introductionVideo) {
+                                setVideoUrl(activeTeacher.introductionVideo);
+                                setVideoModalOpen(true);
+                              }
+                            }}
+                          >
+                            {getYouTubeThumbnail(activeTeacher.introductionVideo) ? (
+                              <img
+                                src={getYouTubeThumbnail(activeTeacher.introductionVideo)}
                                 alt="Video thumbnail"
                                 style={{
                                   width: '100%',
@@ -1691,15 +1690,15 @@ const TeachersSelection = () => {
                           <button
                             className="btn btn-outline-secondary w-100"
                             onClick={() => handleViewSchedule(activeTeacher)}
-                        style={{
-                          borderRadius: '8px',
-                          padding: '10px',
-                          fontSize: '14px',
-                          fontWeight: '500',
-                        }}
-                      >
-                        {t('common.view_full_schedule')}
-                      </button>
+                            style={{
+                              borderRadius: '8px',
+                              padding: '10px',
+                              fontSize: '14px',
+                              fontWeight: '500',
+                            }}
+                          >
+                            {t('common.view_full_schedule')}
+                          </button>
                           <button
                             className="btn btn-outline-secondary w-100"
                             onClick={() => {
@@ -1722,8 +1721,8 @@ const TeachersSelection = () => {
                   </div>
                 );
               })()}
+            </div>
           </div>
-        </div>
         </div>
       </div>
       {bookingTeacher && (
@@ -1796,7 +1795,7 @@ const TeachersSelection = () => {
                       color: '#fff',
                     }}
                   >
-                    <p>Video URL is not supported</p>
+                    <p>{t('common.video_url_not_supported')}</p>
                   </div>
                 )}
               </div>

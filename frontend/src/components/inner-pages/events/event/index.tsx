@@ -2,13 +2,15 @@ import FooterOne from "../../../../layouts/footers/FooterOne"
 import HeaderOne from "../../../../layouts/headers/HeaderOne"
 import BreadcrumbOne from "../../../common/breadcrumb/BreadcrumbOne"
 import EventArea from "./EventArea"
+import { useTranslation } from "react-i18next"
 
 const Event = () => {
+   const { t } = useTranslation();
    return (
       <>
          <HeaderOne />
          <main className="main-area fix">
-            <BreadcrumbOne title="All Events" sub_title="Events" />
+            <BreadcrumbOne title={t('events.breadcrumb_title')} sub_title={t('events.breadcrumb_subtitle')} />
             <EventArea />
          </main>
          <FooterOne style={false} style_2={false} />

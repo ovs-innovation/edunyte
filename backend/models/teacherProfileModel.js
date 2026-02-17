@@ -52,6 +52,11 @@ const teacherProfileSchema = new mongoose.Schema(
       enum: ["pending", "verified", "rejected"],
       default: "pending",
     },
+    rejectionReason: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     kycDocuments: {
       idProof: { type: String, default: "" },
       addressProof: { type: String, default: "" },

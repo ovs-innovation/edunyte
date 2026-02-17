@@ -3,6 +3,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import inner_page_course_data from "../../../../data/inner-data/InnerPageCourseData";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const setting = {
    // Optional parameters
@@ -41,6 +42,7 @@ const setting = {
 }
 
 const InstructorSlider = () => {
+   const { t } = useTranslation();
 
    const [isLoop, setIsLoop] = useState(false);
    useEffect(() => {
@@ -63,16 +65,16 @@ const InstructorSlider = () => {
                   <div className="courses__item-content">
                      <ul className="courses__item-meta list-wrap">
                         <li className="courses__item-tag">
-                           <Link to="/course">{item.tag}</Link>
+                           <Link to="/course">{t(item.tag)}</Link>
                         </li>
-                        <li className="avg-rating"><i className="fas fa-star"></i>{item.review}</li>
+                        <li className="avg-rating"><i className="fas fa-star"></i>{t('common.reviews_count', { count: item.review })}</li>
                      </ul>
-                     <h5 className="title"><Link to="/course-details">{item.title}</Link></h5>
-                     <p className="author">By <Link to="#">{item.author}</Link></p>
+                     <h5 className="title"><Link to="/course-details">{t(item.title)}</Link></h5>
+                     <p className="author">{t('common.by')} <Link to="#">{item.author}</Link></p>
                      <div className="courses__item-bottom">
                         <div className="button">
                            <Link to="/course-details">
-                              <span className="text">Enroll Now</span>
+                              <span className="text">{t('common.enroll_now')}</span>
                               <i className="flaticon-arrow-right"></i>
                            </Link>
                         </div>

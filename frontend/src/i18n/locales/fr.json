@@ -1,7 +1,7 @@
 {
   "common": {
-    "login": "Se connecter",
-    "logout": "Se déconnecter",
+    "login": "Connexion",
+    "logout": "Déconnexion",
     "buy_now": "Acheter maintenant",
     "price": "Prix",
     "language": "Langue",
@@ -9,7 +9,488 @@
     "english": "Anglais",
     "hindi": "Hindi",
     "select_language": "Sélectionner la langue",
-    "select_currency": "Sélectionner la devise"
+    "select_currency": "Sélectionner la devise",
+    "student_registration": "Inscription étudiant",
+    "student_login": "Connexion étudiant",
+    "tutor_registration": "Inscription tuteur",
+    "welcome_back": "Bon retour !",
+    "login_description": "Salut ! Prêt à vous connecter ? Entrez simplement votre nom d'utilisateur et votre mot de passe et vous serez de retour en action en un rien de temps !",
+    "continue_with_google": "Continuer avec Google",
+    "or": "ou",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "remember_me": "Se souvenir de moi",
+    "forgot_password": "Mot de passe oublié ?",
+    "sign_in": "Se connecter",
+    "dont_have_account": "Vous n'avez pas de compte ?",
+    "sign_up": "S'inscrire",
+    "create_account": "Créer un compte",
+    "registration_description": "Salut ! Prêt à rejoindre ? Nous avons juste besoin de quelques détails de votre part pour commencer !",
+    "first_name": "Prénom",
+    "last_name": "Nom",
+    "confirm_password": "Confirmer le mot de passe",
+    "already_have_account": "Vous avez déjà un compte ?",
+    "registration_success": "Inscription réussie",
+    "login_success": "Connexion réussie",
+    "create_tutor_account": "Créer un compte tuteur",
+    "registration_success_pending": "Inscription réussie. Veuillez attendre l'approbation de l'administrateur.",
+    "otp_sent": "OTP a été envoyé à votre e-mail. Veuillez vérifier et le saisir.",
+    "login_failed": "Échec de la connexion",
+    "signing_in": "Connexion en cours...",
+    "signing_up": "Inscription en cours...",
+    "password_must_match": "Les mots de passe doivent correspondre",
+    "registration_failed": "Échec de l'inscription",
+    "are_you_sure": "Êtes-vous sûr ?",
+    "actions": "Actions",
+    "my_account": "Mon compte",
+    "dashboard": "Tableau de bord",
+    "profile": "Profil",
+    "categories": "Catégories",
+    "popular": "Populaire",
+    "also_speaks": "Parle aussi",
+    "all_languages": "Toutes les langues",
+    "type_to_search": "Tapez pour rechercher...",
+    "category_list": {
+      "development": "Développement",
+      "design": "Design",
+      "marketing": "Marketing",
+      "business": "Affaires",
+      "data_science": "Science des données",
+      "wellness_fitness": "Bien-être et fitness"
+    },
+    "search_courses_placeholder": "Rechercher des cours...",
+    "trending_categories": "Catégories tendance",
+    "top_category_we_have": "Nos meilleures catégories",
+    "category_description": "Quand une imprimante connue a pris une galée de caractères",
+    "top_class_courses": "Cours de première classe",
+    "best_exciting_class_experience": "Obtenez la meilleure expérience de cours passionnante avec nous",
+    "loading": "Chargement...",
+    "error_loading_data": "Erreur de chargement des données",
+    "age": "Âge",
+    "time": "Temps",
+    "years": "Années",
+    "all_courses": "Tous les cours",
+    "enroll_now": "S'inscrire maintenant",
+    "reviews": "Avis",
+    "by": "par",
+    "flexible": "Flexible",
+    "no_courses_found": "Aucun cours trouvé",
+    "course_not_found": "Cours non trouvé",
+    "show_more": "Afficher plus +",
+    "show_less": "Afficher moins -",
+    "learn_more": "En savoir plus",
+    "book_session": "Réserver une session",
+    "newsletter_title_1": "Voulez-vous rester",
+    "newsletter_title_highlight_1": "informé",
+    "newsletter_title_2": "sur",
+    "newsletter_title_3": "les nouveaux",
+    "newsletter_title_highlight_2": "cours et études ?",
+    "newsletter_placeholder": "Entrez votre e-mail",
+    "subscribe_now": "Abonnez-vous maintenant",
+    "curved_circle_text": "Éducation * Système * peut * créer * le * changement *",
+    "banner_title_prefix": "Au-delà des langues — Apprenez n'importe quel cours avec des professeurs",
+    "banner_title_highlight": "Dans le monde entier",
+    "banner_description": "Chaque parcours d'enseignement et d'apprentissage est unique. Nous sommes là pour vous guider à chaque étape.",
+    "start_free_trial": "Commencer l'essai",
+    "banner_features": "Apprendre, pratiquer et grandir en toute confiance",
+    "about_subtitle": "Obtenez plus d'informations sur nous",
+    "about_title_1": "Des milliers de",
+    "about_title_highlight": "Cours",
+    "about_title_2": "Apprenez des compétences dans votre propre langue",
+    "about_description": "Une plateforme. Plusieurs cours. Enseignés en hindi, anglais et plus — pour que l'apprentissage soit facile, naturel et efficace.",
+    "about_list_1": "Instructeurs experts",
+    "about_list_2": "Même cours, plusieurs langues",
+    "about_list_3": "Apprenez n'importe quand, n'importe où",
+    "enrolled_students": "Étudiants inscrits",
+    "home": "Accueil",
+    "about_us": "À propos de nous",
+    "contact_us": "Contactez-nous",
+    "courses": "Cours",
+    "pages": "Pages",
+    "blog": "Blog"
+  },
+  "home": {
+    "how_it_works": {
+      "subtitle": "Comment ça marche",
+      "title": "Comment fonctionne l'apprentissage sur notre plateforme",
+      "description": "Apprenez des compétences, des langues et des cours professionnels dans la langue avec laquelle vous êtes le plus à l'aise. Notre plateforme est conçue pour rendre l'apprentissage simple, flexible et accessible à tous — n'importe quand, n'importe où.",
+      "step1_title": "Choisissez votre compétence",
+      "step1_description": "Choisissez parmi les langues, les compétences créatives, les cours professionnels, le bien-être et plus encore — le tout en un seul endroit.",
+      "step2_title": "Sélectionnez votre langue",
+      "step2_description": "Apprenez en hindi, en anglais ou dans votre langue régionale préférée pour une meilleure compréhension.",
+      "step3_title": "Apprenez à votre rythme",
+      "step3_description": "Accédez à des cours en ligne, hors ligne, en direct ou enregistrés — apprenez quand cela vous convient.",
+      "step4_title": "Suivez votre croissance",
+      "step4_description": "Surveillez les progrès, accédez au matériel d'apprentissage et obtenez des certificats au fur et à mesure de votre croissance."
+    },
+    "counter": {
+      "active_students": "Étudiants actifs",
+      "experienced_tutors": "Tuteurs expérimentés",
+      "courses": "Cours",
+      "tutor_nationalities": "Nationalités des tuteurs"
+    },
+    "faq": {
+      "subtitle": "FAQ",
+      "title": "Développez vos compétences avec des mentors mondiaux de confiance",
+      "description": "Des cours dispensés par des experts conçus pour vous aider à progresser plus vite et plus intelligemment.",
+      "questions": {
+        "q1": "Pourquoi devrais-je choisir Edunyte pour apprendre ?",
+        "a1": "Parce qu'Edunyte propose des cours flexibles et basés sur les compétences, dispensés par des formateurs experts dans plusieurs langues.",
+        "q2": "Puis-je apprendre des compétences dans ma langue maternelle ?",
+        "a2": "Oui, les cours sont disponibles en hindi, en anglais et dans d'autres langues régionales pour une compréhension facile.",
+        "q3": "Les cours sont-ils dispensés par des experts certifiés ?",
+        "a3": "Absolument. Tous les cours sont dispensés par des professionnels vérifiés et expérimentés.",
+        "q4": "Edunyte est-elle abordable pour les étudiants ?",
+        "a4": "Oui, Edunyte offre une éducation de haute qualité à des prix abordables et adaptés aux étudiants."
+      }
+    },
+    "features": {
+      "subtitle": "Comment commence votre parcours d'apprentissage",
+      "title": "Faites le premier pas vers de nouvelles compétences",
+      "description": "Une expérience d'apprentissage simple qui rassemble étudiants et mentors pour apprendre, suivre les progrès et réussir.",
+      "home_2_header": {
+        "subtitle": "Nos meilleures fonctionnalités",
+        "title": "Atteignez votre objectif avec Edunyte",
+        "description": "Edunyte vous aide à atteindre vos objectifs personnels et professionnels grâce à des parcours clairs, des conseils d'experts et des résultats prouvés."
+      },
+      "items": {
+        "home_1": {
+          "1": {
+            "title": "Guidé par des professionnels qualifiés",
+            "desc": "Bénéficiez d'une formation pratique dispensée par des professionnels expérimentés."
+          },
+          "2": {
+            "title": "Compétences sans frontières",
+            "desc": "Explorez des compétences au-delà des limites et des frontières."
+          },
+          "3": {
+            "title": "Obtenez une certification en ligne",
+            "desc": "Suivez des cours et obtenez des certifications prêtes pour une carrière."
+          },
+          "4": {
+            "title": "E-mail Marketing",
+            "desc": "Des stratégies ciblées et des leçons pratiques pour vous aider à atteindre le bon public efficacement."
+          }
+        },
+        "home_2": {
+          "1": {
+            "title": "Tuteurs experts",
+            "desc": "Apprenez des meilleurs dans le domaine."
+          },
+          "2": {
+            "title": "Cours efficaces",
+            "desc": "Conçus pour obtenir des résultats et une croissance professionnelle."
+          },
+          "3": {
+            "title": "Obtenir un certificat",
+            "desc": "Certificats reconnus à la fin du parcours."
+          }
+        }
+      }
+    },
+    "join_section": {
+      "join_as_instructor_title": "Devenir formateur",
+      "join_as_instructor_description": "Comme un exemple simple, l'apprentissage commence par l'effort, la régularité et le bon accompagnement.",
+      "join_as_student_title": "Devenir étudiant",
+      "join_as_student_description": "Rejoignez des apprenants du monde entier et grandissez ensemble grâce à l'apprentissage en direct et en ligne.",
+      "apply_now": "Postuler maintenant"
+    },
+    "blog": {
+      "subtitle": "Actualités & Blogs",
+      "title": "Nos derniers flux d'actualités",
+      "description": "Restez informé des dernières tendances en matière d'éducation.",
+      "items": {
+        "home_1": {
+          "1": {
+            "tag": "Marketing",
+            "title": "Comment devenir incroyablement conscient de soi en 20 minutes"
+          },
+          "2": {
+            "tag": "Étudiants",
+            "title": "Démarrez avec le design UI avec des conseils de rapidité"
+          },
+          "3": {
+            "tag": "Science",
+            "title": "Créez votre propre contenu expansible et rétractable"
+          },
+          "4": {
+            "tag": "Agence",
+            "title": "Ce que nous sommes capables de découvrir habituellement"
+          }
+        }
+      }
+    }
+  },
+  "footer": {
+    "get_in_touch": "Entrer en contact",
+    "text": "Quand une imprimante inconnue a pris un galley.",
+    "address_1": "463 7th Ave, NY 10018, USA",
+    "phone": "+123 88 9900 456",
+    "useful_links": "Liens utiles",
+    "our_company": "Notre entreprise",
+    "our_values": "Nos valeurs",
+    "our_advisory_board": "Notre conseil consultatif",
+    "our_partners": "Nos partenaires",
+    "become_partner": "Devenir partenaire",
+    "work_at": "Travailler chez Future Learn",
+    "quizlet_plus": "Quizlet Plus",
+    "copyright": "© 2010-2024 Edunyte.com. Tous droits réservés."
+  },
+  "about_page": {
+    "hero": {
+      "title": "Où les étudiants apprennent mieux et les enseignants grandissent plus forts",
+      "description": "Edunyte est une plateforme éducative moderne conçue pour rassembler étudiants et enseignants dans un écosystème d'apprentissage significatif. Nous pensons que l'éducation fonctionne mieux lorsqu'elle est personnelle, flexible et menée par l'humain.",
+      "button": "Rejoignez la communauté Edunyte"
+    },
+    "breadcrumb": {
+      "title": "Qui sommes-nous",
+      "subtitle": "À propos de nous"
+    },
+    "purpose": {
+      "subtitle": "Notre objectif",
+      "title": "Une éducation pour de vraies personnes",
+      "description": "Nous façonnons l'éducation avec de vrais objectifs, un vrai soutien et de vrais résultats.",
+      "cards": {
+        "student_confidence": {
+          "title": "Confiance des étudiants",
+          "description": "Aidez les étudiants à apprendre avec confiance et clarté grâce à une attention personnalisée et des éducateurs certifiés."
+        },
+        "teacher_support": {
+          "title": "Soutien aux enseignants",
+          "description": "Soutenez les enseignants avec des opportunités, des outils et de la flexibilité pour qu'ils puissent se concentrer sur ce qu'ils font de mieux : enseigner."
+        },
+        "trusted_environment": {
+          "title": "Environnement de confiance",
+          "description": "Créez un environnement d'apprentissage de confiance axé sur la qualité, la transparence et les résultats."
+        }
+      }
+    },
+    "platform": {
+      "title": "Une plateforme pour tous",
+      "description": "Que vous soyez ici pour apprendre, enseigner ou grandir - Edunyte vous souhaite la bienvenue.",
+      "tabs": {
+        "teachers": {
+          "name": "enseignants",
+          "badge": "Enseigner",
+          "title": "Enseignez en toute liberté. Grandissez avec un but. Inspirez avec impact.",
+          "text": "Les enseignants sont la fondation d'Edunyte. Nous donnons aux éducateurs les moyens d'agir en leur offrant une plateforme où leurs compétences sont valorisées et leur croissance compte. Que vous soyez un professionnel expérimenté ou un éducateur passionné, Edunyte offre la flexibilité, le soutien et le respect que vous méritez. Nous proposons des horaires d'enseignement flexibles, l'accès à des étudiants motivés, des revenus équitables et des opportunités de croissance à long terme."
+        },
+        "students": {
+          "name": "étudiants",
+          "badge": "Apprendre",
+          "title": "Apprenez plus intelligemment. Progressez plus vite. Réussissez avec confiance.",
+          "text": "Edunyte est conçu autour des étudiants - votre rythme, vos objectifs, votre avenir. Nous connectons les apprenants avec des éducateurs experts qui se concentrent sur la compréhension, pas seulement sur l'achèvement du programme. Que vous amélioriez vos notes, prépariez des examens ou développiez des compétences, Edunyte garantit que l'apprentissage soit clair, soutenu et efficace avec des parcours d'apprentissage personnalisés et des enseignants certifiés."
+        },
+        "values": {
+          "name": "Nos valeurs",
+          "badge": "Valeurs",
+          "title": "Nos valeurs fondamentales",
+          "list": {
+            "1": "<strong>L'apprentissage d'abord pour l'étudiant</strong> – Chaque apprenant mérite une attention personnelle.",
+            "2": "<strong>Autonomisation des enseignants</strong> – Un enseignement de qualité mérite un soutien de qualité.",
+            "3": "<strong>Confiance et transparence</strong> – Une communication claire à chaque étape.",
+            "4": "<strong>Esprit de croissance</strong> – Apprentissage continu pour tous."
+          }
+        }
+      },
+      "join_link": "Rejoindre en tant que {{role}}"
+    },
+    "numbers": {
+      "title": "Edunyte en chiffres",
+      "description": "Nous sommes fiers d'être une plateforme leader sur le marché mondial de l'éducation en ligne.",
+      "items": {
+        "tutors": {
+          "label": "Tuteurs",
+          "desc": "de 120 pays, enseignant 90 langues et plus de 100 matières."
+        },
+        "companies": {
+          "label": "Entreprises",
+          "desc": "nous font confiance pour perfectionner leurs employés grâce à notre formation en entreprise."
+        },
+        "global_hubs": {
+          "label": "Hubs mondiaux",
+          "desc": "à New York, Londres, Kiev et Barcelone."
+        },
+        "employees": {
+          "label": "Employés",
+          "desc": "unis par une mission : stimuler le progrès des gens."
+        }
+      }
+    },
+    "story": {
+      "title": "Bâtir l'avenir de l'apprentissage",
+      "subtitle": "Edunyte est plus qu'une plateforme - c'est une communauté croissante d'apprenants et d'éducateurs.",
+      "p1": "Edunyte est une plateforme éducative moderne conçue pour rassembler étudiants et enseignants dans un écosystème d'apprentissage significatif. Nous pensons que l'éducation fonctionne mieux lorsqu'elle est personnelle, flexible et menée par l'humain.",
+      "p2": "Que vous soyez ici pour apprendre, enseigner ou grandir - Edunyte vous souhaite la bienvenue. Le succès chez Edunyte se construit ensemble.",
+      "box_title": "Comment fonctionne Edunyte",
+      "list": {
+        "1": "Les étudiants choisissent les matières et les objectifs",
+        "2": "Les enseignants apportent leur expertise et leurs conseils",
+        "3": "L'apprentissage se fait par des sessions structurées et engageantes",
+        "4": "Le progrès est suivi, soutenu et célébré"
+      }
+    },
+    "testimonials": {
+      "subtitle": "Nos témoignages",
+      "title": "Ce que les étudiants pensent et disent d'Edunyte",
+      "description": "Découvrez notre communauté d'apprenants qui ont transformé leur vie avec Edunyte.",
+      "items": {
+        "1": {
+          "name": "Wade Warren",
+          "desc": "Edunyte ha complètement changé ma façon d'apprendre. Les tuteurs sont fantastiques et la flexibilité est exactement ce dont j'avais besoin."
+        },
+        "2": {
+          "name": "Jenny Wilson",
+          "desc": "J'ai pu améliorer mes compétences en anglais de manière significative en seulement 3 mois. Hautement recommandé pour tous ceux qui cherchent à se perfectionner."
+        },
+        "3": {
+          "name": "Guy Hawkin",
+          "desc": "La meilleure plateforme pour l'apprentissage en ligne. L'interface est facile à utiliser et la qualité de l'enseignement est de premier ordre."
+        }
+      }
+    },
+    "roles": {
+      "teacher": "Enseignant",
+      "student": "Étudiant"
+    }
+  },
+  "become_instructor_page": {
+    "breadcrumb_title": "Devenez Instructeur",
+    "hero": {
+      "title": "Apprenez correctement, parlez clairement et entrez dans un avenir mondial avec Edunyte.",
+      "cta": "Créez un profil de tuteur maintenant"
+    },
+    "steps": {
+      "1": {
+        "title": "Inscrivez-vous",
+        "desc": "pour créer votre profil de tuteur"
+      },
+      "2": {
+        "title": "Obtenez l'approbation",
+        "desc": "de notre équipe en 5 jours ouvrables"
+      },
+      "3": {
+        "title": "Commencez à gagner",
+        "desc": "en enseignant à des étudiants du monde entier !"
+      }
+    },
+    "features": {
+      "1": {
+        "title": "Fixez votre propre tarif",
+        "desc": "Choisissez votre taux horaire et modifiez-le à tout moment. En moyenne, les tuteurs d'anglais facturent 15-25 $ par heure."
+      },
+      "2": {
+        "title": "Enseignez à tout moment, n'importe où",
+        "desc": "Décidez quand et combien d'heures vous voulez enseigner. Aucun engagement de temps minimum ni horaire fixe. Soyez votre propre patron !"
+      },
+      "3": {
+        "title": "Grandissez professionnellement",
+        "desc": "Une fois inscrit et votre candidature complétée, vous pouvez être approuvé et commencer à enseigner en seulement trois jours."
+      }
+    },
+    "global": {
+      "title": "Inspirez les Esprits. Enseignez Mondialement. Grandissez Avec Nous.",
+      "desc_p1": "Chez Edunyte, nous croyons que les grands enseignants créent de grands avenirs.",
+      "desc_p2": "Si vous êtes passionné par l'enseignement et souhaitez avoir un impact réel, Edunyte recrute des éducateurs dans plusieurs matières et niveaux.",
+      "list": {
+        "1": "Enseignez à des étudiants de n'importe où",
+        "2": "Horaires d'enseignement flexibles",
+        "3": "Structure de rémunération compétitive",
+        "4": "Soutien académique dédié",
+        "5": "Opportunités de croissance et développement des compétences",
+        "6": "Respect, reconnaissance et environnement professionnel"
+      },
+      "cta": "Créez un profil de tuteur maintenant"
+    },
+    "testimonial": {
+      "quote": "Edunyte m'a permis de gagner ma vie sans quitter la maison !",
+      "name": "Krista A.",
+      "role": "Tutrice d'anglais",
+      "cta": "Créez un profil de tuteur maintenant"
+    },
+    "faq": {
+      "title": "Questions fréquemment posées",
+      "items": {
+        "1": {
+          "question": "Quel type de tuteurs Edunyte recherche-t-il ?",
+          "answer": "Aucune certification spécifique n'est requise ! Nous recherchons des tuteurs passionnés qui ont d'excellentes compétences en communication et sont experts dans leurs matières. Bien que l'expérience d'enseignement ou les certifications soient un plus, elles ne sont pas obligatoires pour toutes les matières."
+        },
+        "2": {
+          "question": "Quelle matière puis-je enseigner ?",
+          "answer": "Vous pouvez enseigner plus de 100 matières, y compris les langues, les matières scolaires K-12, les cours universitaires, la programmation, les loisirs et l'art. Si votre matière n'est pas répertoriée, vous pouvez la suggérer lors de l'inscription."
+        },
+        "3": {
+          "question": "Comment devenir tuteur en ligne chez Edunyte ?",
+          "answer": "Le processus est simple : Inscrivez-vous, créez votre profil, téléchargez une photo/vidéo de présentation professionnelle et soumettez pour examen. Notre équipe approuve les profils dans les 3-5 jours ouvrables."
+        },
+        "4": {
+          "question": "Comment puis-je faire approuver mon profil rapidement ?",
+          "answer": "Assurez-vous que votre profil est complet avec une photo de haute qualité, une description bien rédigée et une vidéo de présentation claire. Vérifiez votre identité et vos qualifications pour accélérer le processus."
+        },
+        "5": {
+          "question": "Pourquoi devrais-je enseigner sur Edunyte ?",
+          "answer": "Edunyte offre la flexibilité de fixer vos propres tarifs et horaires, l'accès à une base d'étudiants mondiale, des paiements sécurisés, des ressources de développement professionnel et une communauté de soutien."
+        },
+        "6": {
+          "question": "Quel équipement informatique ai-je besoin pour enseigner sur Edunyte ?",
+          "answer": "Vous avez besoin d'un ordinateur de bureau ou portable avec une connexion Internet stable, une webcam fonctionnelle et un casque avec microphone pour un son clair."
+        },
+        "7": {
+          "question": "Est-il gratuit de créer un profil de tuteur sur Edunyte ?",
+          "answer": "Oui, créer un profil de tuteur et être répertorié sur Edunyte est entièrement gratuit. Nous ne facturons qu'une petite commission sur les leçons que vous enseignez."
+        },
+        "8": {
+          "question": "Combien puis-je gagner sur Edunyte ?",
+          "answer": "Vous fixez votre propre taux horaire. Les gains dépendent de votre tarif et du nombre d'heures que vous enseignez. Les meilleurs tuteurs peuvent gagner considérablement en construisant une solide base d'étudiants."
+        }
+      }
+    },
+    "final_cta": {
+      "title": "Soyez payé pour enseigner en ligne",
+      "desc": "Connectez-vous avec des milliers d'apprenants du monde entier et enseignez depuis votre salon",
+      "button": "Créez un profil de tuteur maintenant"
+    }
+  },
+  "contact": {
+    "breadcrumb_title": "Contactez-nous",
+    "breadcrumb_subtitle": "Contact",
+    "info": {
+      "student_support": {
+        "title": "Support Étudiant",
+        "text": "Besoin d'aide avec les cours ou le compte?",
+        "email": "support@edunyte.com",
+        "hours": "Lun – Ven, 9h - 18h (IST)"
+      },
+      "teacher_support": {
+        "title": "Support Enseignant",
+        "text": "Questions sur l'adhésion ou l'intégration?",
+        "email": "careers@edunyte.com",
+        "hours": "Lun – Ven, 9h - 18h (IST)"
+      },
+      "partnerships": {
+        "title": "Partenariats",
+        "text": "Opportunités commerciales?",
+        "email": "partnerships@edunyte.com"
+      }
+    },
+    "form": {
+      "title": "Envoyez-nous un message",
+      "text": "Votre adresse e-mail ne sera pas publiée. Les champs obligatoires sont marqués *",
+      "name": "Nom complet *",
+      "email": "Adresse e-mail *",
+      "phone": "Numéro de téléphone (Optionnel)",
+      "role_placeholder": "Je suis un...",
+      "role_student": "Étudiant",
+      "role_teacher": "Enseignant",
+      "role_partner": "Partenaire",
+      "message": "Message *",
+      "submit": "Envoyer le message",
+      "success": "Message envoyé avec succès"
+    }
+  },
+  "instructor": {
+    "breadcrumb_title": "Nos Instructeurs",
+    "breadcrumb_subtitle": "Instructeurs",
+    "ratings": "Évaluations"
   }
 }
-

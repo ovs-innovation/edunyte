@@ -27,7 +27,7 @@ const CustomSelect = ({ value, onChange }: any) => {
 
    const options = categories.map((cat) => ({
       value: cat._id,
-      label: cat.name,
+      label: t(`common.category_list.${cat.name.toLowerCase().replace(/ & /g, '_').replace(/ /g, '_')}`, cat.name),
    }))
 
    const handleCategoryChange = (selectedOption: any) => {

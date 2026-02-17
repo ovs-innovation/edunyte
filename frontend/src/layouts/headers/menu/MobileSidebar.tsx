@@ -1,12 +1,14 @@
 import { Link } from "react-router-dom"
 import MobileMenu from "./MobileMenu"
 import LanguageCurrencySwitcher from "../../../components/common/LanguageCurrencySwitcher"
+import { useTranslation } from "react-i18next"
 
 interface MobileSidebarProps {
    isActive: boolean;
    setIsActive: (isActive: boolean) => void;
 }
 const MobileSidebar = ({ isActive, setIsActive }: MobileSidebarProps) => {
+   const { t } = useTranslation()
    return (
       <div className={isActive ? "mobile-menu-visible" : ""}>
          <div className="tgmobile__menu">
@@ -17,7 +19,7 @@ const MobileSidebar = ({ isActive, setIsActive }: MobileSidebarProps) => {
                </div>
                <div className="tgmobile__search">
                   <form onSubmit={(e) => e.preventDefault()}>
-                     <input type="text" placeholder="Search here..." />
+                     <input type="text" placeholder={t("common.search_here")} />
                      <button><i className="fas fa-search"></i></button>
                   </form>
                </div>

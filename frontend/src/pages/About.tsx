@@ -3,7 +3,7 @@ import AboutMain from '../components/inner-pages/about-us';
 import SEO from '../components/SEO';
 
 const About = () => {
-  return (                                                                                                                                                                                                                                                        
+  return (
     <Wrapper>
       <SEO pageTitle={'Edunyte About'} />
       <AboutMain />

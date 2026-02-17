@@ -139,6 +139,7 @@ export interface ApiTeacherProfile {
   country?: string;
   countryCode?: string;
   kycStatus: "pending" | "verified" | "rejected";
+  rejectionReason?: string;
   socialLinks?: {
     website?: string;
     linkedin?: string;
@@ -172,11 +173,12 @@ export const TeacherProfileAPI = {
   getProfile: (userId: string) => apiFetch<{ profile: ApiTeacherProfile }>(`/teacher-profiles/${userId}`),
   list: () => apiFetch<{ profiles: ApiTeacherProfile[]; count: number }>("/teacher-profiles"),
   update: (userId: string, payload: {
-    bio?: string;
-    aboutUs?: string;
+    bio?: string | { en: string };
+    aboutUs?: string | { en: string };
     expertise?: string[];
     experience?: number;
     kycStatus?: "pending" | "verified" | "rejected";
+    rejectionReason?: string;
     payoutInfo?: Partial<ApiTeacherProfile["payoutInfo"]>;
     rating?: number;
   }) =>
@@ -199,10 +201,10 @@ export const TeacherProfileAPI = {
       method: "PATCH",
       body: JSON.stringify(payload),
     }),
-  updateKyc: (userId: string, kycStatus: "pending" | "verified" | "rejected") =>
+  updateKyc: (userId: string, kycStatus: "pending" | "verified" | "rejected", rejectionReason?: string) =>
     apiFetch<{ profile: ApiTeacherProfile }>(`/teacher-profiles/${userId}/kyc`, {
       method: "PATCH",
-      body: JSON.stringify({ kycStatus }),
+      body: JSON.stringify({ kycStatus, rejectionReason }),
     }),
   updateEarnings: (userId: string, amount: number, operation: "add" | "set" = "add") =>
     apiFetch<{ profile: ApiTeacherProfile }>(`/teacher-profiles/${userId}/earnings`, {

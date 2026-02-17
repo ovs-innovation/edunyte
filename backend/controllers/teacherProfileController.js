@@ -19,22 +19,22 @@ export const getTeacherProfile = async (req, res, next) => {
       profile = await TeacherProfile.create({ userId });
       profile = await TeacherProfile.findById(profile._id).populate("userId", "name email status");
     }
-    
+
     // Calculate stats
     const totalCourses = await TeacherCourse.countDocuments({ teacherId: userId });
     const publishedCourses = await TeacherCourse.countDocuments({ teacherId: userId, status: "approved" });
     const uniqueStudents = await Booking.distinct("studentId", { teacherId: userId, paymentStatus: "paid" });
-    
+
     // Calculate earnings from completed bookings
-    const completedBookings = await Booking.find({ 
-      teacherId: userId, 
+    const completedBookings = await Booking.find({
+      teacherId: userId,
       status: "completed",
       paymentStatus: "paid"
     });
-    
+
     let totalEarnings = 0;
     let pendingPayout = 0;
-    
+
     completedBookings.forEach(booking => {
       if (booking.payout && booking.payout.teacherAmountUSD) {
         totalEarnings += booking.payout.teacherAmountUSD;
@@ -43,9 +43,9 @@ export const getTeacherProfile = async (req, res, next) => {
         }
       }
     });
-    
+
     const paidAmount = totalEarnings - pendingPayout;
-    
+
     // Update profile with calculated stats
     profile.totalCourses = totalCourses;
     profile.publishedCourses = publishedCourses;
@@ -54,7 +54,7 @@ export const getTeacherProfile = async (req, res, next) => {
     profile.pendingPayout = pendingPayout;
     profile.paidAmount = paidAmount;
     await profile.save();
-    
+
     const profileObj = profile.toObject();
     profileObj.bio = getLanguageValue(profileObj.bio);
     profileObj.aboutUs = getLanguageValue(profileObj.aboutUs);
@@ -76,22 +76,22 @@ export const getMyTeacherProfile = async (req, res, next) => {
       profile = await TeacherProfile.create({ userId });
       profile = await TeacherProfile.findById(profile._id).populate("userId", "name email status");
     }
-    
+
     // Calculate stats
     const totalCourses = await TeacherCourse.countDocuments({ teacherId: userId });
     const publishedCourses = await TeacherCourse.countDocuments({ teacherId: userId, status: "approved" });
     const uniqueStudents = await Booking.distinct("studentId", { teacherId: userId, paymentStatus: "paid" });
-    
+
     // Calculate earnings from completed bookings
-    const completedBookings = await Booking.find({ 
-      teacherId: userId, 
+    const completedBookings = await Booking.find({
+      teacherId: userId,
       status: "completed",
       paymentStatus: "paid"
     });
-    
+
     let totalEarnings = 0;
     let pendingPayout = 0;
-    
+
     completedBookings.forEach(booking => {
       if (booking.payout && booking.payout.teacherAmountUSD) {
         totalEarnings += booking.payout.teacherAmountUSD;
@@ -100,9 +100,9 @@ export const getMyTeacherProfile = async (req, res, next) => {
         }
       }
     });
-    
+
     const paidAmount = totalEarnings - pendingPayout;
-    
+
     // Update profile with calculated stats
     profile.totalCourses = totalCourses;
     profile.publishedCourses = publishedCourses;
@@ -111,7 +111,7 @@ export const getMyTeacherProfile = async (req, res, next) => {
     profile.pendingPayout = pendingPayout;
     profile.paidAmount = paidAmount;
     await profile.save();
-    
+
     const profileObj = profile.toObject();
     profileObj.bio = getLanguageValue(profileObj.bio);
     profileObj.aboutUs = getLanguageValue(profileObj.aboutUs);
@@ -144,6 +144,8 @@ export const updateTeacherProfile = async (req, res, next) => {
       socialLinks,
       payoutInfo,
       rating,
+      kycStatus,
+      rejectionReason,
     } = req.body;
     let profile = await TeacherProfile.findOne({ userId });
     if (!profile) {
@@ -172,6 +174,21 @@ export const updateTeacherProfile = async (req, res, next) => {
     if (rating !== undefined && canUpdateRating) {
       profile.rating = rating;
     }
+
+    // Handle KYC status and rejection reason (admin only)
+    const canUpdateKyc = userId !== requestingUserId;
+    if (kycStatus !== undefined && canUpdateKyc) {
+      profile.kycStatus = kycStatus;
+
+      // Save rejection reason if status is rejected
+      if (kycStatus === "rejected" && rejectionReason) {
+        profile.rejectionReason = rejectionReason;
+      } else if (kycStatus !== "rejected") {
+        // Clear rejection reason if status is not rejected
+        profile.rejectionReason = "";
+      }
+    }
+
     await profile.save();
     await profile.populate("userId", "name email status");
     const profileObj = profile.toObject();
@@ -219,7 +236,7 @@ export const listTeacherProfiles = async (req, res, next) => {
 export const updateKycStatus = async (req, res, next) => {
   try {
     const { userId } = req.params;
-    const { kycStatus, kycDocuments } = req.body;
+    const { kycStatus, kycDocuments, rejectionReason } = req.body;
     if (!["pending", "verified", "rejected"].includes(kycStatus)) {
       return res.status(400).json({ message: "Invalid KYC status" });
     }
@@ -228,6 +245,15 @@ export const updateKycStatus = async (req, res, next) => {
       return res.status(404).json({ message: "Teacher profile not found" });
     }
     profile.kycStatus = kycStatus;
+
+    // Save rejection reason if status is rejected
+    if (kycStatus === "rejected" && rejectionReason) {
+      profile.rejectionReason = rejectionReason;
+    } else if (kycStatus !== "rejected") {
+      // Clear rejection reason if status is not rejected
+      profile.rejectionReason = "";
+    }
+
     if (kycDocuments) {
       profile.kycDocuments = {
         ...profile.kycDocuments,

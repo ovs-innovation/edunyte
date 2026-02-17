@@ -43,10 +43,10 @@ const StudentHistoryContent = () => {
 
    const getStatusStyle = (status: string) => {
       const lowerStatus = status?.toLowerCase() || '';
-      const baseStyle = { 
-         padding: '5px 12px', 
-         borderRadius: '30px', 
-         fontWeight: '500', 
+      const baseStyle = {
+         padding: '5px 12px',
+         borderRadius: '30px',
+         fontWeight: '500',
          display: 'inline-block',
          textTransform: 'capitalize' as const,
          fontSize: '13px'
@@ -83,8 +83,8 @@ const StudentHistoryContent = () => {
                               <th>{t('dashboard.course_name')}</th>
                               <th>{t('dashboard.date')}</th>
                               <th>{t('dashboard.teacher')}</th>
-                              <th>{t('dashboard.students') || 'Students'}</th>
-                              <th>{t('dashboard.price') || 'Price'}</th>
+                              <th>{t('dashboard.students')}</th>
+                              <th>{t('dashboard.price')}</th>
                               <th>{t('dashboard.payment_status')}</th>
                               <th>{t('dashboard.status')}</th>
                            </tr>
@@ -103,21 +103,21 @@ const StudentHistoryContent = () => {
                                        <p>{new Date(item.lesson.scheduledAt).toLocaleDateString()}</p>
                                     </td>
                                     <td>
-                                        <p>{getTeacherName(item)}</p>
+                                       <p>{getTeacherName(item)}</p>
                                     </td>
                                     <td>
                                        <p style={{ fontWeight: '600', color: 'var(--tg-theme-primary)' }}>
-                                          {(item as any).studentCount || 1} {((item as any).studentCount || 1) === 1 ? t('student') || 'student' : t('students') || 'students'}
+                                          {(item as any).studentCount || 1} {((item as any).studentCount || 1) === 1 ? t('dashboard.student') : t('dashboard.students')}
                                        </p>
                                     </td>
                                     <td>
                                        <p style={{ fontWeight: '600', color: 'var(--tg-common-color-green)' }}>
-                                          {(item as any).pricingSnapshot?.studentPaid ? 
-                                            new Intl.NumberFormat('en-IN', {
-                                              style: 'currency',
-                                              currency: (item as any).pricingSnapshot.studentPaid.currency || 'INR'
-                                            }).format((item as any).pricingSnapshot.studentPaid.amount || 0)
-                                            : 'N/A'
+                                          {(item as any).pricingSnapshot?.studentPaid ?
+                                             new Intl.NumberFormat('en-IN', {
+                                                style: 'currency',
+                                                currency: (item as any).pricingSnapshot.studentPaid.currency || 'INR'
+                                             }).format((item as any).pricingSnapshot.studentPaid.amount || 0)
+                                             : 'N/A'
                                           }
                                        </p>
                                     </td>

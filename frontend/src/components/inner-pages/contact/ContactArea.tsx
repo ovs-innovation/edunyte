@@ -1,7 +1,9 @@
 import ContactForm from "../../../forms/ContactForm"
+import { useTranslation } from "react-i18next";
 
 
 const ContactArea = () => {
+   const { t } = useTranslation();
    return (
       <section className="contact-area section-py-120">
          <div className="container">
@@ -14,10 +16,10 @@ const ContactArea = () => {
                               <i className="fas fa-user-graduate" style={{ fontSize: '24px', color: '#5751E1' }}></i>
                            </div>
                            <div className="content">
-                              <h4 className="title">Student Support</h4>
-                              <p>Need help with courses or account?</p>
+                              <h4 className="title">{t('contact.info.student_support.title')}</h4>
+                              <p>{t('contact.info.student_support.text')}</p>
                               <a href="mailto:support@edunyte.com">support@edunyte.com</a>
-                              <p className="mb-0" style={{ fontSize: '14px', color: '#777', marginTop: '5px' }}>Mon – Fri, 9AM - 6PM (IST)</p>
+                              <p className="mb-0" style={{ fontSize: '14px', color: '#777', marginTop: '5px' }}>{t('contact.info.student_support.hours')}</p>
                            </div>
                         </li>
                         <li>
@@ -25,10 +27,10 @@ const ContactArea = () => {
                               <i className="fas fa-chalkboard-teacher" style={{ fontSize: '24px', color: '#5751E1' }}></i>
                            </div>
                            <div className="content">
-                              <h4 className="title">Teacher Support</h4>
-                              <p>Joining questions or onboarding?</p>
+                              <h4 className="title">{t('contact.info.teacher_support.title')}</h4>
+                              <p>{t('contact.info.teacher_support.text')}</p>
                               <a href="mailto:careers@edunyte.com">careers@edunyte.com</a>
-                              <p className="mb-0" style={{ fontSize: '14px', color: '#777', marginTop: '5px' }}>Mon – Fri, 9AM - 6PM (IST)</p>
+                              <p className="mb-0" style={{ fontSize: '14px', color: '#777', marginTop: '5px' }}>{t('contact.info.student_support.hours')}</p>
                            </div>
                         </li>
                         <li>
@@ -36,8 +38,8 @@ const ContactArea = () => {
                               <i className="fas fa-handshake" style={{ fontSize: '24px', color: '#5751E1' }}></i>
                            </div>
                            <div className="content">
-                              <h4 className="title">Partnerships</h4>
-                              <p>Business opportunities?</p>
+                              <h4 className="title">{t('contact.info.partnerships.title')}</h4>
+                              <p>{t('contact.info.partnerships.text')}</p>
                               <a href="mailto:partnerships@edunyte.com">partnerships@edunyte.com</a>
                            </div>
                         </li>
@@ -47,8 +49,8 @@ const ContactArea = () => {
 
                <div className="col-lg-8">
                   <div className="contact-form-wrap">
-                     <h4 className="title">Send Us Message</h4>
-                     <p>Your email address will not be published. Required fields are marked *</p>
+                     <h4 className="title">{t('contact.form.title')}</h4>
+                     <p>{t('contact.form.text')}</p>
                      <ContactForm />
                      <p className="ajax-response mb-0"></p>
                   </div>

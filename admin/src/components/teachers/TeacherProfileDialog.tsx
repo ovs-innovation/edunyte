@@ -30,6 +30,7 @@ export function TeacherProfileDialog({ open, mode, onClose, profile, userId, onS
   const [expertiseInput, setExpertiseInput] = useState("");
   const [experience, setExperience] = useState(0);
   const [kycStatus, setKycStatus] = useState<"pending" | "verified" | "rejected">("pending");
+  const [rejectionReason, setRejectionReason] = useState("");
   const [payoutInfo, setPayoutInfo] = useState({
     bankName: "",
     accountNumber: "",
@@ -50,6 +51,7 @@ export function TeacherProfileDialog({ open, mode, onClose, profile, userId, onS
       setExpertise(profile.expertise || []);
       setExperience(profile.experience || 0);
       setKycStatus(profile.kycStatus || "pending");
+      setRejectionReason(profile.rejectionReason || "");
       setPayoutInfo(profile.payoutInfo || {
         bankName: "",
         accountNumber: "",
@@ -77,6 +79,7 @@ export function TeacherProfileDialog({ open, mode, onClose, profile, userId, onS
         setExpertise(data.profile.expertise || []);
         setExperience(data.profile.experience || 0);
         setKycStatus(data.profile.kycStatus || "pending");
+        setRejectionReason(data.profile.rejectionReason || "");
         setPayoutInfo(data.profile.payoutInfo || {
           bankName: "",
           accountNumber: "",
@@ -104,6 +107,7 @@ export function TeacherProfileDialog({ open, mode, onClose, profile, userId, onS
     setExpertiseInput("");
     setExperience(0);
     setKycStatus("pending");
+    setRejectionReason("");
     setPayoutInfo({
       bankName: "",
       accountNumber: "",
@@ -129,17 +133,34 @@ export function TeacherProfileDialog({ open, mode, onClose, profile, userId, onS
     if (!targetUserId) return;
     setLoading(true);
     try {
-      const res = await TeacherProfileAPI.update(targetUserId, {
+      // 1. Update overall profile including status and reason
+      const updatePayload: any = {
         bio: normalizeLanguageValue(bio),
         aboutUs: normalizeLanguageValue(aboutUs),
         expertise,
         experience,
         kycStatus,
+        rejectionReason: kycStatus === 'rejected' ? rejectionReason : "",
         payoutInfo,
         rating,
-      });
-      onSaved?.(res.profile);
-      toast({ title: "Profile updated" });
+        totalEarnings,
+      };
+
+      const res = await TeacherProfileAPI.update(targetUserId, updatePayload);
+
+      // 2. Also call the specific KYC endpoint if status or reason changed
+      // This ensures any backend hooks/notifications tied to the specific KYC endpoint are triggered
+      const statusChanged = kycStatus !== profile?.kycStatus;
+      const reasonChanged = kycStatus === 'rejected' && rejectionReason !== (profile?.rejectionReason || (profile as any)?.kycRejectionReason);
+
+      if (statusChanged || reasonChanged) {
+        const kycRes = await TeacherProfileAPI.updateKyc(targetUserId, kycStatus, kycStatus === 'rejected' ? rejectionReason : undefined);
+        onSaved?.(kycRes.profile);
+      } else {
+        onSaved?.(res.profile);
+      }
+
+      toast({ title: "Profile updated successfully" });
       onClose();
     } catch (err: any) {
       toast({
@@ -156,7 +177,7 @@ export function TeacherProfileDialog({ open, mode, onClose, profile, userId, onS
     if (!targetUserId) return;
     setLoading(true);
     try {
-      const res = await TeacherProfileAPI.updateKyc(targetUserId, status);
+      const res = await TeacherProfileAPI.updateKyc(targetUserId, status, status === 'rejected' ? rejectionReason : undefined);
       setKycStatus(status);
       onSaved?.(res.profile);
       toast({ title: "KYC status updated" });
@@ -185,21 +206,51 @@ export function TeacherProfileDialog({ open, mode, onClose, profile, userId, onS
         <div className="space-y-4">
           {/* KYC Status - Admin only */}
           <PermissionGate permission="teachers.manage">
-            <div className="space-y-2">
-              <Label>KYC Status</Label>
-              <div className="flex gap-2">
-                {(["pending", "verified", "rejected"] as const).map((status) => (
-                  <Button
-                    key={status}
-                    variant={kycStatus === status ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => mode === "edit" ? setKycStatus(status) : handleKycUpdate(status)}
-                    disabled={loading}
-                  >
-                    {status}
-                  </Button>
-                ))}
+            <div className="space-y-3 p-4 rounded-xl bg-muted/30 border border-border">
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold">KYC Verification Status</Label>
+                <div className="flex flex-wrap gap-2">
+                  {(["pending", "verified", "rejected"] as const).map((status) => (
+                    <Button
+                      key={status}
+                      type="button"
+                      variant={kycStatus === status ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setKycStatus(status)}
+                      disabled={loading}
+                      className={cn(
+                        "capitalize transition-all",
+                        status === 'verified' && kycStatus === status && "bg-success hover:bg-success/90 text-success-foreground",
+                        status === 'rejected' && kycStatus === status && "bg-destructive hover:bg-destructive/90 text-destructive-foreground",
+                        status === 'pending' && kycStatus === status && "bg-warning hover:bg-warning/90 text-warning-foreground"
+                      )}
+                    >
+                      {status}
+                    </Button>
+                  ))}
+                </div>
               </div>
+
+              {kycStatus === 'rejected' && (
+                <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <Label className="text-sm font-semibold text-destructive flex items-center gap-2">
+                    Rejection Reason
+                    {kycStatus === 'rejected' && <span className="text-[10px] font-normal text-muted-foreground">(Required for rejection)</span>}
+                  </Label>
+                  {mode === "view" ? (
+                    <div className="p-3 rounded-lg bg-destructive/5 border border-destructive/20 text-sm text-destructive italic">
+                      {rejectionReason || "No reason provided."}
+                    </div>
+                  ) : (
+                    <Textarea
+                      value={rejectionReason}
+                      onChange={(e) => setRejectionReason(e.target.value)}
+                      placeholder="Explain why the KYC is being rejected..."
+                      className="border-destructive/50 focus-visible:ring-destructive min-h-[80px]"
+                    />
+                  )}
+                </div>
+              )}
             </div>
           </PermissionGate>
 
@@ -272,6 +323,7 @@ export function TeacherProfileDialog({ open, mode, onClose, profile, userId, onS
               </div>
             )}
           </div>
+
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -375,8 +427,12 @@ export function TeacherProfileDialog({ open, mode, onClose, profile, userId, onS
             {mode === "view" ? "Close" : "Cancel"}
           </Button>
           {mode === "edit" && (
-            <Button onClick={handleSave} disabled={loading}>
-              Save
+            <Button
+              onClick={handleSave}
+              disabled={loading || (kycStatus === 'rejected' && !rejectionReason.trim())}
+              className="gradient-primary text-primary-foreground"
+            >
+              {loading ? "Saving..." : "Save Profile"}
             </Button>
           )}
         </DialogFooter>
