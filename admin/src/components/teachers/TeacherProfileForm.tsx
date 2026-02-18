@@ -152,8 +152,14 @@ export function TeacherProfileForm({ profile, onSuccess, onCancel }: TeacherProf
                             <AlertCircle className="h-5 w-5" />
                         </div>
                         <div className="flex-1">
-                            <p className="text-base text-destructive font-bold italic leading-relaxed">
-                                "{profile?.rejectionReason || (profile as any)?.kycRejectionReason || (profile as any)?.reason || "Please update your profile information and ensure all details are accurate."}"
+                            <h4 className="font-bold text-destructive mb-2">KYC Verification Rejected</h4>
+                            <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+                                <p className="text-sm text-destructive font-bold italic leading-relaxed">
+                                    "{profile?.rejectionReason || (profile as any)?.kycRejectionReason || (profile as any)?.reason || "Please update your profile information and ensure all details are accurate."}"
+                                </p>
+                            </div>
+                            <p className="text-[11px] text-destructive/70 mt-2">
+                                Please fix the issues above and click "Save Changes" to re-submit.
                             </p>
                         </div>
                     </div>
