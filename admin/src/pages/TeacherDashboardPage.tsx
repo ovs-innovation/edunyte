@@ -207,21 +207,9 @@ const TeacherDashboardPage = () => {
                         {kycStatus === 'pending'
                           ? <p>Your profile is currently being verified by our team. Please ensure all your details are up-to-date for a faster approval.</p>
                           : (
-                            <div className="flex flex-col gap-3">
-                              {(profile?.rejectionReason || (profile as any)?.kycRejectionReason || (profile as any)?.reason) ? (
-                                <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20">
-                                  <p className="text-base text-destructive font-bold italic leading-relaxed">
-                                    "{profile?.rejectionReason || (profile as any)?.kycRejectionReason || (profile as any)?.reason}"
-                                  </p>
-                                </div>
-                              ) : (
-                                <div className="p-3 rounded-lg bg-destructive/5 border border-destructive/10">
-                                  <p className="text-destructive italic m-0">
-                                    No specific reason provided by admin. Please ensure your profile is complete.
-                                  </p>
-                                </div>
-                              )}
-                            </div>
+                            <p className="text-sm text-destructive/80 mt-1">
+                              Your KYC has been rejected. Click <strong>"Edit &amp; Re-submit"</strong> to see the reason and update your profile.
+                            </p>
                           )}
                       </div>
                     </div>
