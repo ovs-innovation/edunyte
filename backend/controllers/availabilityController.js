@@ -264,9 +264,12 @@ export const getCourseAvailability = async (req, res, next) => {
       .populate("courseId", "name description")
       .sort({ date: 1, startTimeUTC: 1, startTime: 1 });
 
+    // Filter out orphaned slots where teacherId is null (e.g. teacher was deleted)
+    const validAvailabilities = availabilities.filter(av => av.teacherId);
+
     const targetTimezone = studentTimezone || null;
 
-    const processedAvailabilities = availabilities.map((av) => {
+    const processedAvailabilities = validAvailabilities.map((av) => {
       const avObj = av.toObject();
       const sourceTimezone = av.timezone || "UTC";
 
