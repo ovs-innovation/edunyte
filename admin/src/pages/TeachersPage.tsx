@@ -7,6 +7,16 @@ import { Download, Filter } from 'lucide-react';
 import { TeacherProfileAPI, ApiTeacherProfile, UsersAPI, ApiUser } from '@/lib/api';
 import { TeacherProfileDialog } from '@/components/teachers/TeacherProfileDialog';
 import { useToast } from '@/hooks/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 const TeachersPage = () => {
   const [teachers, setTeachers] = useState<Array<ApiTeacherProfile & { userId: ApiUser }>>([]);
@@ -14,6 +24,10 @@ const TeachersPage = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [viewProfile, setViewProfile] = useState<ApiTeacherProfile & { userId: ApiUser } | null>(null);
   const [editProfile, setEditProfile] = useState<ApiTeacherProfile & { userId: ApiUser } | null>(null);
+  const [kycRejectOpen, setKycRejectOpen] = useState(false);
+  const [rejectingUserId, setRejectingUserId] = useState<string | null>(null);
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [isSubmittingReject, setIsSubmittingReject] = useState(false);
   const { toast } = useToast();
 
   const loadTeachers = async () => {
@@ -61,12 +75,40 @@ const TeachersPage = () => {
   };
 
   const handleKycUpdate = async (userId: string, status: "pending" | "verified" | "rejected") => {
+    if (status === 'rejected') {
+      setRejectingUserId(userId);
+      setRejectionReason('');
+      setKycRejectOpen(true);
+      return;
+    }
+
     try {
       const res = await TeacherProfileAPI.updateKyc(userId, status);
       handleSaved(res.profile);
       toast({ title: 'KYC status updated' });
     } catch (err: any) {
       toast({ title: 'Update failed', description: err?.message, variant: 'destructive' });
+    }
+  };
+
+  const handleConfirmReject = async () => {
+    if (!rejectingUserId || !rejectionReason.trim()) {
+      toast({ title: 'Reason required', description: 'Please provide a reason for rejection', variant: 'destructive' });
+      return;
+    }
+
+    setIsSubmittingReject(true);
+    try {
+      const res = await TeacherProfileAPI.updateKyc(rejectingUserId, 'rejected', rejectionReason);
+      handleSaved(res.profile);
+      toast({ title: 'KYC status updated to rejected' });
+      setKycRejectOpen(false);
+      setRejectingUserId(null);
+      setRejectionReason('');
+    } catch (err: any) {
+      toast({ title: 'Update failed', description: err?.message, variant: 'destructive' });
+    } finally {
+      setIsSubmittingReject(false);
     }
   };
 
@@ -136,6 +178,49 @@ const TeachersPage = () => {
         }}
         onSaved={handleSaved}
       />
+
+      {/* KYC Rejection Dialog */}
+      <Dialog open={kycRejectOpen} onOpenChange={setKycRejectOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Reject KYC Verification</DialogTitle>
+            <DialogDescription>
+              Please provide a reason why this teacher's KYC is being rejected. This reason will be shown to the teacher on their dashboard.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="kycRejectionReason">Rejection Reason</Label>
+              <Textarea
+                id="kycRejectionReason"
+                placeholder="e.g., Incomplete profile information, unclear profile photo..."
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                rows={4}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setKycRejectOpen(false);
+                setRejectingUserId(null);
+              }}
+              disabled={isSubmittingReject}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmReject}
+              disabled={isSubmittingReject || !rejectionReason.trim()}
+            >
+              {isSubmittingReject ? 'Rejecting...' : 'Confirm Rejection'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 };

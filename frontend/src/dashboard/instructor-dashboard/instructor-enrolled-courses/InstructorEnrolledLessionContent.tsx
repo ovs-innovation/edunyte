@@ -3,10 +3,8 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from 'swiper/modules';
+import { useTranslation } from "react-i18next";
 import enroll_course_data from "../../../data/dashboard-data/InstructorEnrollCourseData";
-
-const enrolled_courses: string[] = ["Enrolled Courses", "Active Courses", "Completed Courses",];
-const my_courses: string[] = ["Publish", "Pendig", "Draft",];
 
 const setting = {
    slidesPerView: 3,
@@ -39,6 +37,9 @@ const setting = {
 }
 
 const InstructorEnrolledCourseContent = ({ style }: any) => {
+   const { t } = useTranslation();
+   const enrolled_courses: string[] = [t("dashboard.enrolled_courses"), t("dashboard.active_courses"), t("dashboard.completed_courses"),];
+   const my_courses: string[] = [t("dashboard.publish"), t("dashboard.pending"), t("dashboard.draft"),];
 
    const [activeTab, setActiveTab] = useState(0);
 
@@ -57,7 +58,7 @@ const InstructorEnrolledCourseContent = ({ style }: any) => {
       <div className="col-lg-9">
          <div className="dashboard__content-wrap dashboard__content-wrap-two">
             <div className="dashboard__content-title">
-               <h4 className="title">{style ? "My Courses" : "Enrolled Courses"}</h4>
+               <h4 className="title">{style ? t("dashboard.my_courses") : t("dashboard.enrolled_courses")}</h4>
             </div>
             <div className="row">
                <div className="col-12">
@@ -103,7 +104,7 @@ const InstructorEnrolledCourseContent = ({ style }: any) => {
                                           </div>
                                           {item.progress &&
                                              <div className="progress-item progress-item-two">
-                                                <h6 className="title">COMPLETE <span>{item.progress}%</span></h6>
+                                                <h6 className="title">{t("dashboard.complete")} <span>{item.progress}%</span></h6>
                                                 <div className="progress">
                                                    <div className="progress-bar" style={{ width: `${item.progress}%` }}></div>
                                                 </div>

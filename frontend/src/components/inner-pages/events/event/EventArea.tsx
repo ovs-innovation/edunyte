@@ -2,12 +2,14 @@ import { useState } from "react"
 import ReactPaginate from "react-paginate"
 import inner_event_data from "../../../../data/inner-data/InnerEvent";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 interface PageChangeEvent {
    length: number;
    selected: number;
 }
 const EventArea = () => {
+   const { t } = useTranslation();
 
    const event = inner_event_data.filter(items => items.page === "inner_1");
 
@@ -35,9 +37,9 @@ const EventArea = () => {
                               <Link to="/events-details" className="shine__animate-link"><img src={item.thumb} alt="img" /></Link>
                            </div>
                            <div className="event__item-content">
-                              <span className="date">{item.date}</span>
-                              <h2 className="title"><Link to="/events-details">{item.title}</Link></h2>
-                              <Link to="https://maps.google.com/maps" className="location" target="_blank"><i className="flaticon-map"></i>{item.location}</Link>
+                              <span className="date">{t(item.date)}</span>
+                              <h2 className="title"><Link to="/events-details">{t(item.title)}</Link></h2>
+                              <Link to="https://maps.google.com/maps" className="location" target="_blank"><i className="flaticon-map"></i>{t(item.location)}</Link>
                            </div>
                         </div>
                      </div>

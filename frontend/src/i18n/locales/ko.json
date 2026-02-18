@@ -1,15 +1,496 @@
 {
-  "common": {
-    "login": "로그인",
-    "logout": "로그아웃",
-    "buy_now": "지금 구매",
-    "price": "가격",
-    "language": "언어",
-    "currency": "통화",
-    "english": "영어",
-    "hindi": "힌디어",
-    "select_language": "언어 선택",
-    "select_currency": "통화 선택"
-  }
+    "common": {
+        "login": "로그인",
+        "logout": "로그아웃",
+        "buy_now": "지금 구매",
+        "price": "가격",
+        "language": "언어",
+        "currency": "통화",
+        "english": "영어",
+        "hindi": "힌디어",
+        "select_language": "언어 선택",
+        "select_currency": "통화 선택",
+        "student_registration": "학생 등록",
+        "student_login": "학생 로그인",
+        "tutor_registration": "튜터 등록",
+        "welcome_back": "다시 오신 것을 환영합니다!",
+        "login_description": "안녕하세요! 로그인할 준비가 되셨나요? 사용자 이름과 비밀번호를 입력하면 바로 시작할 수 있습니다!",
+        "continue_with_google": "Google로 계속하기",
+        "or": "또는",
+        "email": "이메일",
+        "password": "비밀번호",
+        "remember_me": "로그인 상태 유지",
+        "forgot_password": "비밀번호를 잊으셨나요?",
+        "sign_in": "로그인",
+        "dont_have_account": "계정이 없으신가요?",
+        "sign_up": "가입하기",
+        "create_account": "계정 만들기",
+        "registration_description": "안녕하세요! 가입할 준비가 되셨나요? 시작하기 위해 몇 가지 정보만 필요합니다!",
+        "first_name": "이름",
+        "last_name": "성",
+        "confirm_password": "비밀번호 확인",
+        "already_have_account": "이미 계정이 있으신가요?",
+        "registration_success": "등록이 완료되었습니다",
+        "login_success": "로그인에 성공했습니다",
+        "create_tutor_account": "튜터 계정 만들기",
+        "registration_success_pending": "등록이 완료되었습니다. 관리자 승인을 기다려주세요.",
+        "otp_sent": "OTP가 이메일로 전송되었습니다. 확인하고 입력해주세요.",
+        "login_failed": "로그인에 실패했습니다",
+        "signing_in": "로그인 중...",
+        "signing_up": "가입 중...",
+        "password_must_match": "비밀번호가 일치해야 합니다",
+        "registration_failed": "등록에 실패했습니다",
+        "are_you_sure": "확실하신가요?",
+        "actions": "작업",
+        "my_account": "내 계정",
+        "dashboard": "대시보드",
+        "profile": "프로필",
+        "categories": "카테고리",
+        "popular": "인기",
+        "also_speaks": "구사 언어",
+        "all_languages": "모든 언어",
+        "type_to_search": "검색하려면 입력하세요...",
+        "category_list": {
+            "development": "개발",
+            "design": "디자인",
+            "marketing": "마케팅",
+            "business": "비즈니스",
+            "data_science": "데이터 과학",
+            "wellness_fitness": "웰빙 및 피트니스"
+        },
+        "search_courses_placeholder": "강좌 검색...",
+        "trending_categories": "인기 카테고리",
+        "top_category_we_have": "최고의 카테고리",
+        "category_description": "알려진 프린터가 타입 갤리를 가져갔을 때",
+        "top_class_courses": "최고 수준의 강좌",
+        "best_exciting_class_experience": "우리와 함께 최고의 흥미진진한 수업 경험을 얻으세요",
+        "loading": "로딩 중...",
+        "error_loading_data": "데이터 로딩 오류",
+        "age": "나이",
+        "time": "시간",
+        "years": "년",
+        "all_courses": "모든 강좌",
+        "enroll_now": "지금 등록",
+        "reviews": "리뷰",
+        "by": "작성자",
+        "flexible": "유연한",
+        "no_courses_found": "강좌를 찾을 수 없습니다",
+        "course_not_found": "강좌를 찾을 수 없습니다",
+        "show_more": "더 보기 +",
+        "show_less": "덜 보기 -",
+        "learn_more": "자세히 알아보기",
+        "book_session": "세션 예약",
+        "newsletter_title_1": "계속",
+        "newsletter_title_highlight_1": "정보를",
+        "newsletter_title_2": "받고 싶으신가요",
+        "newsletter_title_3": "새로운",
+        "newsletter_title_highlight_2": "강좌 및 학습에 대해?",
+        "newsletter_placeholder": "이메일을 입력하세요",
+        "subscribe_now": "지금 구독",
+        "curved_circle_text": "교육 * 시스템이 * 변화를 * 만들 * 수 * 있습니다 *",
+        "banner_title_prefix": "언어를 넘어 — 강사로부터 모든 과정을 배우세요",
+        "banner_title_highlight": "전 세계에서",
+        "banner_description": "모든 가르침과 배움의 여정은 독특합니다. 우리는 그 여정의 모든 단계를 안내하기 위해 여기 있습니다.",
+        "start_free_trial": "무료 체험 시작",
+        "banner_features": "자신 있게 배우고 실천하며 성장하세요",
+        "about_subtitle": "회사에 대해 더 알아보기",
+        "about_title_1": "수천 개의",
+        "about_title_highlight": "강좌",
+        "about_title_2": "모국어로 기술 배우기",
+        "about_description": "하나의 플랫폼. 다양한 강좌. 힌디어, 영어 등으로 진행되어 학습이 쉽고 자연스러우며 효과적입니다.",
+        "about_list_1": "숙련된 강사진",
+        "about_list_2": "동일한 강좌, 다국어 지원",
+        "about_list_3": "언제 어디서나 학습 가능",
+        "enrolled_students": "등록된 학생",
+        "home": "홈",
+        "about_us": "회사 소개",
+        "contact_us": "문의하기",
+        "courses": "강좌",
+        "pages": "페이지",
+        "blog": "블로그"
+    },
+    "home": {
+        "how_it_works": {
+            "subtitle": "작동 방식",
+            "title": "우리 플랫폼에서 학습이 이루어지는 방식",
+            "description": "가장 편안한 언어로 기술, 언어 및 전문 과정을 배우세요. 당사의 플랫폼은 언제 어디서나 누구에게나 간단하고 유연하며 접근 가능한 학습을 제공하도록 설계되었습니다.",
+            "step1_title": "기술 선택",
+            "step1_description": "언어, 창의적 기술, 전문 과정, 웰니스 등 모든 분야에서 원하는 기술을 한 곳에서 선택하세요.",
+            "step2_title": "언어 선택",
+            "step2_description": "더 나은 이해를 위해 힌디어, 영어 또는 선호하는 지역 언어로 학습하세요.",
+            "step3_title": "자신의 속도로 학습",
+            "step3_description": "온라인, 오프라인, 라이브 또는 녹화 수업에 액세스하여 본인에게 맞는 시간에 학습하세요.",
+            "step4_title": "성장 추적",
+            "step4_description": "진행 상황을 모니터링하고 학습 자료에 액세스하며 성장함에 따라 수료증을 받으세요."
+        },
+        "counter": {
+            "active_students": "활성 학생",
+            "experienced_tutors": "경험부부한 튜터",
+            "courses": "강좌 수",
+            "tutor_nationalities": "튜터 국적 수"
+        },
+        "faq": {
+            "subtitle": "자주 묻는 질문(FAQ)",
+            "title": "신뢰할 수 있는 글로벌 멘토와 함께 기술 구축",
+            "description": "더 빠르고 스마트하게 성장할 수 있도록 설계된 전문가 주도 코스입니다.",
+            "questions": {
+                "q1": "학습을 위해 왜 Edunyte를 선택해야 하나요?",
+                "a1": "Edunyte는 숙련된 강사가 여러 언어로 가르치는 유연하고 기술 중심적인 과정을 제공하기 때문입니다.",
+                "q2": "현지 언어로 기술을 배울 수 있나요?",
+                "a2": "네, 쉬운 이해를 위해 힌디어, 영어 및 기타 지역 언어로 강좌가 제공됩니다.",
+                "q3": "강좌는 공인된 전문가가 가르치나요?",
+                "a3": "물론입니다. 모든 강좌는 검증된 숙련된 전문가들이 진행합니다.",
+                "q4": "Edunyte는 학생들에게 저렴한가요?",
+                "a4": "네, Edunyte는 학생 친화적이고 저렴한 가격으로 고품질 교육을 제공합니다."
+            }
+        },
+        "features": {
+            "subtitle": "학습 여정의 시작",
+            "title": "기술 향상을 향한 첫걸음",
+            "description": "학생과 멘토를 연결하여 학습, 진행 상황 추적 및 성공을 돕는 간단한 학습 경험을 제공합니다.",
+            "home_2_header": {
+                "subtitle": "주요 특징",
+                "title": "Edunyte와 함께 목표 달성",
+                "description": "Edunyte는 명확한 경로, 전문가의 지도 및 검증된 결과를 통해 귀하의 개인적 및 직업적 목표 달성을 돕습니다."
+            },
+            "items": {
+                "home_1": {
+                    "1": {
+                        "title": "숙련된 전문가의 지도",
+                        "desc": "경험 많은 전문가로부터 실무 교육을 받으세요."
+                    },
+                    "2": {
+                        "title": "경계 없는 기술",
+                        "desc": "한계와 경계를 넘어 다양한 기술을 탐색하세요."
+                    },
+                    "3": {
+                        "title": "온라인 인증 취득",
+                        "desc": "과정을 완료하고 커리어에 바로 활용 가능한 자격증을 취득하세요."
+                    },
+                    "4": {
+                        "title": "이메일 마케팅",
+                        "desc": "적절한 잠재 고객에게 효과적으로 도달하기 위한 선별된 전략과 실무 레슨."
+                    }
+                },
+                "home_2": {
+                    "1": {
+                        "title": "전문 튜터",
+                        "desc": "업계 최고의 전문가에게 배우세요."
+                    },
+                    "2": {
+                        "title": "효과적인 코스",
+                        "desc": "결과와 커리어 성장을 위해 설계되었습니다."
+                    },
+                    "3": {
+                        "title": "수료증 취득",
+                        "desc": "완료 시 인정되는 수료증을 발급합니다."
+                    }
+                }
+            }
+        },
+        "join_section": {
+            "join_as_instructor_title": "강사로 참여",
+            "join_as_instructor_description": "간단한 예로, 학습은 노력, 일관성 및 올바른 지도로부터 시작됩니다.",
+            "join_as_student_title": "학생으로 참여",
+            "join_as_student_description": "전 세계 학습자들과 함께하고 라이브 및 온라인 학습을 통해 함께 성장하세요.",
+            "apply_now": "지금 신청하기"
+        },
+        "blog": {
+            "subtitle": "뉴스 및 블로그",
+            "title": "최신 뉴스 피드",
+            "description": "교육 분야의 최신 트렌드를 확인하세요.",
+            "items": {
+                "home_1": {
+                    "1": {
+                        "tag": "마케팅",
+                        "title": "20분 만에 놀라운 자기 인식을 갖는 방법"
+                    },
+                    "2": {
+                        "tag": "학생",
+                        "title": "속도 향상 팁과 함께 배우는 UI 디자인 시작하기"
+                    },
+                    "3": {
+                        "tag": "과학",
+                        "title": "나만의 확장 및 축소 콘텐츠 만들기"
+                    },
+                    "4": {
+                        "tag": "에이전시",
+                        "title": "우리가 보통 발견할 수 있는 것들"
+                    }
+                }
+            }
+        }
+    },
+    "footer": {
+        "get_in_touch": "연락하기",
+        "text": "알 수 없는 프린터가.",
+        "address_1": "463 7th Ave, NY 10018, USA",
+        "phone": "+123 88 9900 456",
+        "useful_links": "유용한 링크",
+        "our_company": "우리 회사",
+        "our_values": "우리의 가치",
+        "our_advisory_board": "자문 위원회",
+        "our_partners": "파트너",
+        "become_partner": "파트너 되기",
+        "work_at": "채용 정보",
+        "quizlet_plus": "Quizlet Plus",
+        "copyright": "© 2010-2024 Edunyte.com. All Rights Reserved."
+    },
+    "about_page": {
+        "hero": {
+            "title": "학생들이 더 잘 배우고 교사들이 더 강하게 성장하는 곳",
+            "description": "Edunyte는 의미 있는 학습 생태계에서 학생과 교육자를 하나로 모으기 위해 구축된 현대적인 교육 플랫폼입니다. 우리는 교육이 개인적이고 유연하며 사람이 중심이 될 때 가장 잘 작동한다고 믿습니다.",
+            "button": "Edunyte 커뮤니티 가입"
+        },
+        "breadcrumb": {
+            "title": "회사 소개",
+            "subtitle": "Edunyte에 대하여"
+        },
+        "purpose": {
+            "subtitle": "우리의 목적",
+            "title": "실제 사람들을 위한 교육",
+            "description": "우리는 실제 목표, 실제 지원 및 실제 결과로 교육을 형성하고 있습니다.",
+            "cards": {
+                "student_confidence": {
+                    "title": "학생의 자신감",
+                    "description": "개인화된 관심과 검증된 교육자를 통해 학생들이 자신감과 명확성을 가지고 배울 수 있도록 돕습니다."
+                },
+                "teacher_support": {
+                    "title": "교사 지원",
+                    "description": "교사가 가장 잘하는 일인 가르치기에 집중할 수 있도록 기회, 도구 및 유연성으로 교사를 지원합니다."
+                },
+                "trusted_environment": {
+                    "title": "신뢰할 수 있는 환경",
+                    "description": "품질, 투명성 및 결과를 바탕으로 신뢰할 수 있는 학습 환경을 조성합니다."
+                }
+            }
+        },
+        "platform": {
+            "title": "모두를 위한 하나의 플랫폼",
+            "description": "배우든, 가르치든, 성장하든 - Edunyte는 여러분을 환영합니다.",
+            "tabs": {
+                "teachers": {
+                    "name": "교사",
+                    "badge": "가르치기",
+                    "title": "자유롭게 가르치고, 목적 있게 성장하며, 영향력을 미치세요.",
+                    "text": "교사는 Edunyte의 근간입니다. 우리는 교사의 기술이 가치 있게 여겨지고 성장이 중요한 플랫폼을 제공함으로써 교육자에게 힘을 실어줍니다. 노련한 전문가든 열정적인 교육자든, Edunyte는 귀하가 누릴 자격이 있는 유연성, 지원 및 존중을 제공합니다. 유연한 지도 일정, 의욕적인 학생들과의 만남, 공정한 수익 및 장기적인 성장 기회를 제공합니다."
+                },
+                "students": {
+                    "name": "학생",
+                    "badge": "배우기",
+                    "title": "더 똑똑하게 배우고, 더 빠르게 진행하며, 자신 있게 성공하세요.",
+                    "text": "Edunyte는 학생의 속도, 목표, 미래를 중심으로 설계되었습니다. 커리큘럼 완료뿐만 아니라 이해에 집중하는 전문가 교육자와 학습자를 연결합니다. 성적 향상, 시험 준비, 기술 습득 등 Edunyte는 개인화된 학습 경로와 검증된 교사를 통해 학습이 명확하고 지원적이며 효과적으로 느껴지도록 보장합니다."
+                },
+                "values": {
+                    "name": "우리의 가치",
+                    "badge": "가치",
+                    "title": "우리의 핵심 가치",
+                    "list": {
+                        "1": "<strong>학생 우선 학습</strong> – 모든 학습자는 개인화된 관심을 받을 자격이 있습니다.",
+                        "2": "<strong>교사 역량 강화</strong> – 훌륭한 가르침은 훌륭한 지원을 받을 자격이 있습니다.",
+                        "3": "<strong>신뢰와 투명성</strong> – 모든 단계에서의 명확한 소통.",
+                        "4": "<strong>성장 마인드셋</strong> – 모두를 위한 지속적인 학습."
+                    }
+                }
+            },
+            "join_link": "{{role}}로 가입"
+        },
+        "numbers": {
+            "title": "숫자로 보는 Edunyte",
+            "description": "우리는 글로벌 온라인 교육 시장에서 선도적인 플랫폼임을 자랑스럽게 생각합니다.",
+            "items": {
+                "tutors": {
+                    "label": "튜터",
+                    "desc": "120개국에서 90개 언어와 100개 이상의 과목을 가르치고 있습니다."
+                },
+                "companies": {
+                    "label": "기업",
+                    "desc": "기업 교육을 통해 직원들의 역량을 강화하기 위해 우리를 신뢰합니다."
+                },
+                "global_hubs": {
+                    "label": "글로벌 허브",
+                    "desc": "뉴욕, 런던, 키이우, 바르셀로나에 위치해 있습니다."
+                },
+                "employees": {
+                    "label": "직원",
+                    "desc": "사람들의 발전을 촉진한다는 하나의 미션으로 단결되어 있습니다."
+                }
+            }
+        },
+        "story": {
+            "title": "학습의 미래 구축",
+            "subtitle": "Edunyte는 단순한 플랫폼 이상입니다. 학습자와 교육자가 함께 성장하는 커뮤니티입니다.",
+            "p1": "Edunyte는 의미 있는 학습 생태계에서 학생과 교육자를 하나로 모으기 위해 구축된 현대적인 교육 플랫폼입니다. 우리는 교육이 개인적이고 유연하며 사람이 중심이 될 때 가장 잘 작동한다고 믿습니다.",
+            "p2": "배우든, 가르치든, 성장하든 - Edunyte는 여러분을 환영합니다. Edunyte에서의 성공은 함께 만들어가는 것입니다.",
+            "box_title": "Edunyte 작동 방식",
+            "list": {
+                "1": "학생들이 과목과 목표를 선택합니다",
+                "2": "교사가 전문 지식과 지도를 제공합니다",
+                "3": "체계적이고 매력적인 세션을 통해 학습이 이루어집니다",
+                "4": "진행 상황이 추적되고 지원되며 축하받습니다"
+            }
+        },
+        "testimonials": {
+            "subtitle": "고객 후기",
+            "title": "학생들의 생생한 후기",
+            "description": "Edunyte와 함께 삶을 변화시킨 학습자 커뮤니티의 이야기를 들어보세요.",
+            "items": {
+                "1": {
+                    "name": "Wade Warren",
+                    "desc": "Edunyte는 저의 학습 방식을 완전히 바꾸어 놓았습니다. 튜터들은 환상적이며 유연성은 제가 꼭 필요로 했던 것이었습니다."
+                },
+                "2": {
+                    "name": "Jenny Wilson",
+                    "desc": "단 3개월 만에 영어 실력을 크게 향상시킬 수 있었습니다. 역량을 키우고자 하는 모든 분들께 강력히 추천합니다."
+                },
+                "3": {
+                    "name": "Guy Hawkin",
+                    "desc": "온라인 학습을 위한 최고의 플랫폼입니다. 인터페이스는 사용하기 쉽고 교육의 질은 최고 수준입니다."
+                }
+            }
+        },
+        "roles": {
+            "teacher": "교사",
+            "student": "학생"
+        }
+    },
+    "become_instructor_page": {
+        "breadcrumb_title": "강사 되기",
+        "hero": {
+            "title": "올바르게 배우고, 명확하게 말하며, Edunyte와 함께 글로벌 미래로 나아가세요.",
+            "cta": "지금 튜터 프로필 만들기"
+        },
+        "steps": {
+            "1": {
+                "title": "가입하기",
+                "desc": "튜터 프로필을 만들기 위해"
+            },
+            "2": {
+                "title": "승인 받기",
+                "desc": "5영업일 이내에 팀으로부터"
+            },
+            "3": {
+                "title": "수익 시작",
+                "desc": "전 세계 학생들을 가르치며!"
+            }
+        },
+        "features": {
+            "1": {
+                "title": "자신의 요금 설정",
+                "desc": "시간당 요금을 선택하고 언제든지 변경하세요. 평균적으로 영어 튜터는 시간당 $15-25를 청구합니다."
+            },
+            "2": {
+                "title": "언제 어디서나 가르치기",
+                "desc": "언제, 몇 시간을 가르칠지 결정하세요. 최소 시간 약속이나 고정 일정이 없습니다. 자신의 상사가 되세요!"
+            },
+            "3": {
+                "title": "전문적으로 성장",
+                "desc": "가입하고 신청서를 작성하면 단 3일 만에 승인을 받고 가르치기 시작할 수 있습니다."
+            }
+        },
+        "global": {
+            "title": "마음을 고취시키세요. 전 세계적으로 가르치세요. 우리와 함께 성장하세요.",
+            "desc_p1": "Edunyte에서는 훌륭한 교사가 훌륭한 미래를 만든다고 믿습니다.",
+            "desc_p2": "가르치는 것에 열정이 있고 실질적인 영향을 미치고 싶다면, Edunyte는 여러 과목과 학년에서 교육자를 채용하고 있습니다.",
+            "list": {
+                "1": "어디서나 학생들을 가르치세요",
+                "2": "유연한 수업 시간",
+                "3": "경쟁력 있는 급여 구조",
+                "4": "전담 학술 지원",
+                "5": "성장 기회 및 기술 개발",
+                "6": "존중, 인정 및 전문적인 환경"
+            },
+            "cta": "지금 튜터 프로필 만들기"
+        },
+        "testimonial": {
+            "quote": "Edunyte는 집을 떠나지 않고도 생계를 유지할 수 있게 해주었습니다!",
+            "name": "크리스타 A.",
+            "role": "영어 튜터",
+            "cta": "지금 튜터 프로필 만들기"
+        },
+        "faq": {
+            "title": "자주 묻는 질문",
+            "items": {
+                "1": {
+                    "question": "Edunyte는 어떤 종류의 튜터를 찾고 있나요?",
+                    "answer": "특정 자격증은 필요하지 않습니다! 우수한 의사소통 능력을 가지고 과목의 전문가인 열정적인 튜터를 찾고 있습니다. 교육 경험이나 자격증이 있으면 좋지만 모든 과목에 필수는 아닙니다."
+                },
+                "2": {
+                    "question": "어떤 과목을 가르칠 수 있나요?",
+                    "answer": "언어, K-12 학교 과목, 대학 과정, 코딩, 취미 및 예술을 포함하여 100개 이상의 과목을 가르칠 수 있습니다. 과목이 목록에 없으면 등록 중에 제안할 수 있습니다."
+                },
+                "3": {
+                    "question": "Edunyte에서 온라인 튜터가 되려면 어떻게 해야 하나요?",
+                    "answer": "프로세스는 간단합니다: 가입하고, 프로필을 만들고, 전문적인 사진/비디오 소개를 업로드하고, 검토를 위해 제출하세요. 팀은 3-5영업일 이내에 프로필을 승인합니다."
+                },
+                "4": {
+                    "question": "프로필을 빠르게 승인받으려면 어떻게 해야 하나요?",
+                    "answer": "고품질 사진, 잘 작성된 설명 및 명확한 비디오 소개로 프로필이 완성되었는지 확인하세요. 신원과 자격을 확인하여 프로세스를 가속화하세요."
+                },
+                "5": {
+                    "question": "왜 Edunyte에서 가르쳐야 하나요?",
+                    "answer": "Edunyte는 자신의 요금과 일정을 설정할 수 있는 유연성, 글로벌 학생 기반에 대한 액세스, 안전한 결제, 전문 개발 리소스 및 지원 커뮤니티를 제공합니다."
+                },
+                "6": {
+                    "question": "Edunyte에서 가르치려면 어떤 컴퓨터 장비가 필요한가요?",
+                    "answer": "안정적인 인터넷 연결이 있는 데스크톱 또는 노트북 컴퓨터, 작동하는 웹캠, 명확한 오디오를 위한 마이크가 있는 헤드셋이 필요합니다."
+                },
+                "7": {
+                    "question": "Edunyte에서 튜터 프로필을 만드는 것이 무료인가요?",
+                    "answer": "예, 튜터 프로필을 만들고 Edunyte에 등록하는 것은 완전히 무료입니다. 가르치는 레슨에 대해서만 소액의 수수료를 청구합니다."
+                },
+                "8": {
+                    "question": "Edunyte에서 얼마나 벌 수 있나요?",
+                    "answer": "자신의 시간당 요금을 설정합니다. 수입은 요금과 가르치는 시간 수에 따라 다릅니다. 최고의 튜터는 강력한 학생 기반을 구축하여 상당한 수입을 올릴 수 있습니다."
+                }
+            }
+        },
+        "final_cta": {
+            "title": "온라인으로 가르치고 보수를 받으세요",
+            "desc": "전 세계 수천 명의 학습자와 연결하고 거실에서 가르치세요",
+            "button": "지금 튜터 프로필 만들기"
+        }
+    },
+    "contact": {
+        "breadcrumb_title": "문의하기",
+        "breadcrumb_subtitle": "연락처",
+        "info": {
+            "student_support": {
+                "title": "학생 지원",
+                "text": "코스나 계정에 도움이 필요하신가요?",
+                "email": "support@edunyte.com",
+                "hours": "월 – 금, 오전 9시 - 오후 6시 (IST)"
+            },
+            "teacher_support": {
+                "title": "교사 지원",
+                "text": "가입 질문이나 온보딩?",
+                "email": "careers@edunyte.com",
+                "hours": "월 – 금, 오전 9시 - 오후 6시 (IST)"
+            },
+            "partnerships": {
+                "title": "파트너십",
+                "text": "비즈니스 기회?",
+                "email": "partnerships@edunyte.com"
+            }
+        },
+        "form": {
+            "title": "메시지 보내기",
+            "text": "이메일 주소는 공개되지 않습니다. 필수 필드는 *로 표시됩니다",
+            "name": "전체 이름 *",
+            "email": "이메일 주소 *",
+            "phone": "전화번호 (선택사항)",
+            "role_placeholder": "저는...",
+            "role_student": "학생",
+            "role_teacher": "교사",
+            "role_partner": "파트너",
+            "message": "메시지 *",
+            "submit": "메시지 보내기",
+            "success": "메시지가 성공적으로 전송되었습니다"
+        }
+    },
+    "instructor": {
+        "breadcrumb_title": "강사 목록",
+        "breadcrumb_subtitle": "강사",
+        "ratings": "평가"
+    }
 }
-

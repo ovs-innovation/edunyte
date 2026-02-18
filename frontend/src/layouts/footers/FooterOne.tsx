@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom"
 import FooterCommon from "./FooterCommon"
 import Social from "../../components/common/Social"
+import { useTranslation } from "react-i18next";
 
 const FooterOne = ({ style, style_2 }: any) => {
+   const { t } = useTranslation();
    return (
       <footer className={`footer__area ${style_2 ? "footer__area-five" : style ? "footer__area-two" : ""}`}>
          <div className={`footer__top ${style_2 ? "footer__top-three" : ""}`}>
@@ -11,9 +13,9 @@ const FooterOne = ({ style, style_2 }: any) => {
                   <FooterCommon />
                   <div className="col-xl-3 col-lg-4 col-md-6">
                      <div className="footer__widget">
-                        <h4 className="footer__widget-title">Get In Touch</h4>
+                        <h4 className="footer__widget-title">{t('footer.get_in_touch')}</h4>
                         <div className="footer__contact-content">
-                           <p>when an unknown printer took <br /> galley type and scrambled</p>
+                           <p>{t('footer.description_2')}</p>
                            <ul className="list-wrap footer__social">
                               <Social />
                            </ul>
@@ -34,14 +36,14 @@ const FooterOne = ({ style, style_2 }: any) => {
                <div className="row align-items-center">
                   <div className="col-md-7">
                      <div className="copy-right-text">
-                        <p>© 2010-2024 Edunyte.com. All rights reserved.</p>
+                        <p>{t('footer.copyright')}</p>
                      </div>
                   </div>
                   <div className="col-md-5">
                      <div className="footer__bottom-menu">
                         <ul className="list-wrap">
-                           <li><Link to="/contact">Term of Use</Link></li>
-                           <li><Link to="/contact">Privacy Policy</Link></li>
+                           <li><Link to="/contact">{t('footer.terms')}</Link></li>
+                           <li><Link to="/contact">{t('footer.privacy')}</Link></li>
                         </ul>
                      </div>
                   </div>

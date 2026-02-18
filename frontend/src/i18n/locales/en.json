@@ -13,6 +13,8 @@
     "select_language": "Select Language",
     "select_currency": "Select Currency",
     "welcome_back": "Welcome back!",
+    "are_you_sure": "Are you sure?",
+    "actions": "Actions",
     "login_description": "Hey there! Ready to log in? Just enter your username and password below and you'll be back in action in no time. Let's go!",
     "continue_with_google": "Continue with google",
     "or": "or",
@@ -34,11 +36,29 @@
     "create_tutor_account": "Create Your Tutor Account",
     "tutor_registration": "Tutor Registration",
     "registration_success_pending": "Registration successful. Please wait for admin approval.",
+    "otp_sent": "OTP has been sent to your email. Please check and enter it.",
+    "login_failed": "Login failed",
+    "signing_in": "Signing In...",
+    "signing_up": "Signing Up...",
+    "password_must_match": "Password must match",
+    "registration_failed": "Registration failed",
     "my_account": "My Account",
     "dashboard": "Dashboard",
     "profile": "Profile",
     "home": "Home",
     "categories": "Categories",
+    "popular": "Popular",
+    "also_speaks": "Also speaks",
+    "all_languages": "All Languages",
+    "type_to_search": "Type to search...",
+    "category_list": {
+      "development": "Development",
+      "design": "Design",
+      "marketing": "Marketing",
+      "business": "Business",
+      "data_science": "Data Science",
+      "wellness_fitness": "Wellness & Fitness"
+    },
     "search_courses_placeholder": "Search for course...",
     "trending_categories": "Trending Categories",
     "top_category_we_have": "Top Category We Have",
@@ -54,6 +74,7 @@
     "all_courses": "All Courses",
     "enroll_now": "Enroll Now",
     "reviews": "Reviews",
+    "reviews_count": "({{count}} Reviews)",
     "by": "By",
     "flexible": "Flexible",
     "no_courses_found": "No courses found",
@@ -80,6 +101,16 @@
     "students": "students",
     "experience": "experience",
     "available_slots": "Available Slots",
+    "video_url_not_supported": "Video URL is not supported",
+    "proficiency": {
+      "native": "Native",
+      "proficient": "Proficient",
+      "advanced": "Advanced",
+      "upper_intermediate": "Upper Intermediate",
+      "intermediate": "Intermediate",
+      "elementary": "Elementary",
+      "beginner": "Beginner"
+    },
     "view_full_schedule": "View full schedule",
     "per_lesson": "per lesson",
     "book_trial_lesson": "Book trial lesson",
@@ -134,7 +165,8 @@
     "newsletter_title_3": "new",
     "newsletter_title_highlight_2": "courses & study?",
     "newsletter_placeholder": "Type your e-mail",
-    "subscribe_now": "Subscribe Now"
+    "subscribe_now": "Subscribe Now",
+    "curved_circle_text": "Education * System * can * Make * Change *"
   },
   "home": {
     "how_it_works": {
@@ -175,6 +207,11 @@
       "subtitle": "How Your Learning Journey Begins",
       "title": "Take the First Step Toward Skills",
       "description": "A simple learning experience that brings students and mentors together to learn, track progress, and succeed.",
+      "home_2_header": {
+        "subtitle": "Our Top Features",
+        "title": "Achieve Your Goal With Edunyte",
+        "description": "Edunyte helps you reach your personal and professional goals through clear paths, expert guidance, and proven results."
+      },
       "items": {
         "home_1": {
           "1": {
@@ -206,74 +243,6 @@
           "3": {
             "title": "Earn Certificate",
             "desc": "when an unknown printer took a galley offe type and scrambled makes."
-          }
-        },
-        "home_3": {
-          "1": {
-            "title": "Scholarship Facility",
-            "desc": "Eestuidar University we prepare you to launch your."
-          },
-          "2": {
-            "title": "Learn From Experts",
-            "desc": "Eestuidar University we prepare you to launch your."
-          },
-          "3": {
-            "title": "Graduation Courses",
-            "desc": "Eestuidar University we prepare you to launch your."
-          },
-          "4": {
-            "title": "Certificate Program",
-            "desc": "Eestuidar University we prepare you to launch your."
-          }
-        },
-        "home_4": {
-          "1": {
-            "title": "Support & Motivation",
-            "desc": "We are able to offer every yoga training experienced & best yoga trainer."
-          },
-          "2": {
-            "title": "Strong Body Life",
-            "desc": "We are able to offer every yoga training experienced & best yoga trainer."
-          },
-          "3": {
-            "title": "Increased Flexibility",
-            "desc": "We are able to offer every yoga training experienced & best yoga trainer."
-          }
-        },
-        "home_5": {
-          "1": {
-            "title": "Easy Class",
-            "desc": "Dear Psum Dolor Amettey Adipis Aecing Eiusmod Incididutt Reore"
-          },
-          "2": {
-            "title": "Safety & Security",
-            "desc": "Dear Psum Dolor Amettey Adipis Aecing Eiusmod Incididutt Reore"
-          },
-          "3": {
-            "title": "Skilled Teacher",
-            "desc": "Dear Psum Dolor Amettey Adipis Aecing Eiusmod Incididutt Reore"
-          },
-          "4": {
-            "title": "Clean Curriculum",
-            "desc": "Dear Psum Dolor Amettey Adipis Aecing Eiusmod Incididutt Reore"
-          }
-        },
-        "home_8": {
-          "1": {
-            "title": "Learn skills with 120k+",
-            "desc": "video courses."
-          },
-          "2": {
-            "title": "Choose courses",
-            "desc": "real-world experts."
-          },
-          "3": {
-            "title": "processional Tutors",
-            "desc": "video courses."
-          },
-          "4": {
-            "title": "Online Degrees",
-            "desc": "Study flexibly online"
           }
         }
       }
@@ -307,140 +276,517 @@
             "tag": "Agency",
             "title": "What we are capable to usually discovered"
           }
-        },
-        "home_4": {
-          "1": {
-            "tag": "Practice",
-            "title": "Finding Zen: The Benefits of Yoga And Meditation For Mental Health"
-          },
-          "2": {
-            "tag": "Yoga",
-            "title": "The Benefits of Yoga And Meditation For Mental Health"
-          },
-          "3": {
-            "tag": "Modern Instruments",
-            "title": "The Benefits of Yoga And Meditation For Mental Health"
-          }
-        },
-        "home_5": {
-          "1": {
-            "tag": "Marketing",
-            "title": "Learn from Anywhere with Our eLearning Platform"
-          },
-          "2": {
-            "tag": "Agency",
-            "title": "platform has given me the bility to learn on my own schedule"
-          },
-          "3": {
-            "tag": "Play Ground",
-            "title": "learning platform where you can easily access course content"
-          }
-        },
-        "home_6": {
-          "1": {
-            "tag": "Marketing",
-            "title": "Learn from Anywhere with Our eLearning Platform"
-          },
-          "2": {
-            "tag": "Agency",
-            "title": "platform has given me the bility to learn on my own schedule"
-          },
-          "3": {
-            "tag": "Play Ground",
-            "title": "learning platform where you can easily access course content"
-          }
-        },
-        "home_8": {
-          "1": {
-            "tag": "Cooking",
-            "title": "Learn From Anywhere With Our ELearning Platform"
-          },
-          "2": {
-            "tag": "Food",
-            "title": "Learn From Anywhere With Our ELearning Platform"
-          },
-          "3": {
-            "tag": "Recipes",
-            "title": "Learn From Anywhere With Our ELearning Platform"
-          }
         }
       }
     }
   },
-  "checkout": {
-    "title": "Checkout",
-    "your_tutor": "Your tutor",
-    "tutor": "Tutor",
-    "reviews": "reviews",
-    "students": "students",
-    "lessons": "lessons",
-    "years_teaching": "years teaching",
-    "trial_lesson_details": "Trial lesson details",
-    "time_based_on_location": "Time is based on your location",
-    "free_cancellation_policy": "Cancel or reschedule for free until 24 hours before the lesson",
-    "checkout_info": "Checkout info",
-    "min_lesson": "min lesson",
-    "processing_fee": "Processing fee",
-    "total": "Total",
-    "free_replacement": "Free tutor replacement",
-    "replacement_policy": "If this tutor isn't a match, try 2 more for free",
-    "calculating": "Calculating...",
-    "choose_payment_method": "Choose how to pay",
-    "loading": "Loading...",
-    "preparing_checkout": "Preparing secure checkout...",
-    "missing_client_secret": "Missing payment configuration",
-    "book_and_pay": "Book lesson and pay",
-    "processing": "Processing...",
-    "payment_failed": "Payment failed",
-    "secure_payment_info": "It's safe to pay on Edunyte. All transactions are protected by SSL encryption.",
-    "ssl_encrypted": "All transactions are protected by SSL encryption",
-    "refund_policy_link": "Edunyte's Refund and Payment Policy",
-    "missing_booking_details": "Missing booking details. Please select a slot again.",
-    "failed_to_start": "Failed to start checkout",
-    "go_back": "Go back",
-    "number_of_students": "Number of Students",
-    "students_attending": "Students attending this lesson",
-    "group_lesson_note": "Price will be calculated for {{count}} students",
-    "per_student": "Per Student",
-    "students_lowercase": "students"
+  "about_page": {
+    "hero": {
+      "title": "Where Students Learn Better & Teachers Grow Stronger",
+      "description": "Edunyte is a modern education platform built to bring students and educators together in one meaningful learning ecosystem. We believe education works best when it’s personal, flexible, and human-led.",
+      "button": "Join the Edunyte Community"
+    },
+    "breadcrumb": {
+      "title": "Who We Are",
+      "subtitle": "About Us"
+    },
+    "purpose": {
+      "subtitle": "Our Purpose",
+      "title": "Education that works for real people",
+      "description": "We are shaping education with real goals, real support, and real results.",
+      "cards": {
+        "student_confidence": {
+          "title": "Student Confidence",
+          "description": "Help students learn with confidence and clarity through personalized attention and verified educators."
+        },
+        "teacher_support": {
+          "title": "Teacher Support",
+          "description": "Support teachers with opportunities, tools, and flexibility to focus on what they do best: teaching."
+        },
+        "trusted_environment": {
+          "title": "Trusted Environment",
+          "description": "Create a trusted learning environment driven by quality, transparency, and results."
+        }
+      }
+    },
+    "platform": {
+      "title": "One Platform for Everyone",
+      "description": "Whether you’re here to learn, teach, or grow — Edunyte welcomes you.",
+      "tabs": {
+        "teachers": {
+          "name": "teachers",
+          "badge": "Teach",
+          "title": "Teach With Freedom. Grow With Purpose. Inspire With Impact.",
+          "text": "Teachers are the foundation of Edunyte. We empower educators by giving them a platform where their skills are valued and their growth matters. Whether you’re an experienced professional or a passionate educator, Edunyte offers the flexibility, support, and respect you deserve. We provide flexible teaching schedules, access to motivated students, fair earnings, and long-term growth opportunities."
+        },
+        "students": {
+          "name": "students",
+          "badge": "Learn",
+          "title": "Learn Smarter. Progress Faster. Succeed Confidently.",
+          "text": "Edunyte is designed around students — your pace, your goals, your future. We connect learners with expert educators who focus on understanding, not just syllabus completion. Whether you’re improving grades, preparing for exams, or building skills, Edunyte ensures learning feels clear, supportive, and effective with personalized learning paths and verified teachers."
+        },
+        "values": {
+          "name": "Our Values",
+          "badge": "Values",
+          "title": "Our Core Values",
+          "list": {
+            "1": "<strong>Student-First Learning</strong> – Every learner deserves personal attention.",
+            "2": "<strong>Teacher Empowerment</strong> – Great teaching deserves great support.",
+            "3": "<strong>Trust & Transparency</strong> – Clear communication at every step.",
+            "4": "<strong>Growth Mindset</strong> – Continuous learning for everyone."
+          }
+        }
+      },
+      "join_link": "Join as a {{role}}"
+    },
+    "numbers": {
+      "title": "Edunyte by numbers",
+      "description": "We’re proud to be a leading platform in the global online education market.",
+      "items": {
+        "tutors": {
+          "label": "Tutors",
+          "desc": "from 120 countries, teaching 90 languages and 100+ subjects."
+        },
+        "companies": {
+          "label": "Companies",
+          "desc": "trust us to upskill their employees with our corporate training."
+        },
+        "global_hubs": {
+          "label": "Global Hubs",
+          "desc": "in New York, London, Kyiv, and Barcelona."
+        },
+        "employees": {
+          "label": "Employees",
+          "desc": "united by one mission: to power people’s progress."
+        }
+      }
+    },
+    "story": {
+      "title": "Building the Future of Learning",
+      "subtitle": "Edunyte is more than a platform — it’s a growing community of learners and educators.",
+      "p1": "Edunyte is a modern education platform built to bring students and educators together in one meaningful learning ecosystem. We believe education works best when it’s personal, flexible, and human-led.",
+      "p2": "Whether you’re here to learn, teach, or grow — Edunyte welcomes you. Success at Edunyte is built together.",
+      "box_title": "How Edunyte Works",
+      "list": {
+        "1": "Students choose subjects and goals",
+        "2": "Teachers bring expertise and guidance",
+        "3": "Learning happens through structured, engaging sessions",
+        "4": "Progress is tracked, supported, and celebrated"
+      }
+    },
+    "testimonials": {
+      "subtitle": "Our Testimonials",
+      "title": "What Students Think and Say About Edunyte",
+      "description": "Hear from our community of learners who have transformed their lives with Edunyte.",
+      "items": {
+        "1": {
+          "name": "Wade Warren",
+          "desc": "Edunyte has completely changed the way I learn. The tutors are fantastic and the flexibility is exactly what I needed."
+        },
+        "2": {
+          "name": "Jenny Wilson",
+          "desc": "I was able to improve my English skills significantly in just 3 months. Highly recommended for anyone looking to upskill."
+        },
+        "3": {
+          "name": "Guy Hawkin",
+          "desc": "The best platform for online learning. The interface is easy to use and the quality of instruction is top-notch."
+        }
+      }
+    },
+    "roles": {
+      "teacher": "Teacher",
+      "student": "Student"
+    }
+  },
+  "become_instructor_page": {
+    "breadcrumb_title": "Become an Instructor",
+    "hero": {
+      "title": "Learn it right, speak it bright, and step into a global future with Edunyte.",
+      "cta": "Create a tutor profile now"
+    },
+    "steps": {
+      "1": {
+        "title": "Sign up",
+        "desc": "to create your tutor profile"
+      },
+      "2": {
+        "title": "Get approved",
+        "desc": "by our team in 5 business days"
+      },
+      "3": {
+        "title": "Start earning",
+        "desc": "by teaching students all over the world!"
+      }
+    },
+    "features": {
+      "1": {
+        "title": "Set your own rate",
+        "desc": "Choose your hourly rate and change it anytime. On average, English tutors charge $15-25 per hour."
+      },
+      "2": {
+        "title": "Teach anytime, anywhere",
+        "desc": "Decide when and how many hours you want to teach. No minimum time commitment or fixed schedule. Be your own boss!"
+      },
+      "3": {
+        "title": "Grow professionally",
+        "desc": "Once you sign up and complete your application, you can be approved and start teaching in as little as three days."
+      }
+    },
+    "global": {
+      "title": "Inspire Minds. Teach Globally. Grow With Us.",
+      "desc_p1": "At Edunyte, we believe great teachers create great futures.",
+      "desc_p2": "If you’re passionate about teaching and want to make a real impact, Edunyte is hiring educators across multiple subjects and grades.",
+      "list": {
+        "1": "Teach students from anywhere",
+        "2": "Flexible teaching hours",
+        "3": "Competitive pay structure",
+        "4": "Dedicated academic support",
+        "5": "Growth opportunities & skill development",
+        "6": "Respect, recognition & professional environment"
+      },
+      "cta": "Create a tutor profile now"
+    },
+    "testimonial": {
+      "quote": "Edunyte allowed me to make a living without leaving home!",
+      "name": "Krista A.",
+      "role": "English tutor",
+      "cta": "Create a tutor profile now"
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "items": {
+        "1": {
+          "question": "What kind of tutors does Edunyte look for?",
+          "answer": "No specific certification is needed! We look for passionate tutors who have great communication skills and are experts in their subjects. While teaching experience or certifications are a plus, they are not mandatory for all subjects."
+        },
+        "2": {
+          "question": "What subject can I teach?",
+          "answer": "You can teach over 100 subjects including languages, K-12 school subjects, university courses, coding, hobbies, and art. If your subject is not listed, you can suggest it during registration."
+        },
+        "3": {
+          "question": "How do I become an online tutor at Edunyte?",
+          "answer": "The process is simple: Sign up, create your profile, upload a professional photo/video introduction, and submit for review. Our team approves profiles within 3-5 business days."
+        },
+        "4": {
+          "question": "How can I get my profile approved quickly?",
+          "answer": "Ensure your profile is complete with a high-quality photo, a well-written description, and a clear video introduction. Verify your identity and qualifications to speed up the process."
+        },
+        "5": {
+          "question": "Why should I teach on Edunyte?",
+          "answer": "Edunyte offers flexibility to set your own rates and schedule, access to a global student base, secure payments, professional development resources, and a supportive community."
+        },
+        "6": {
+          "question": "What computer equipment do I need to teach on Edunyte?",
+          "answer": "You need a desktop or laptop computer with a stable internet connection, a working webcam, and a headset with a microphone for clear audio."
+        },
+        "7": {
+          "question": "Is it free to create a tutor profile on Edunyte?",
+          "answer": "Yes, creating a tutor profile and getting listed on Edunyte is completely free. We only charge a small commission on the lessons you teach."
+        },
+        "8": {
+          "question": "How much can I earn on Edunyte?",
+          "answer": "You set your own hourly rate. Earnings depend on your rate and the number of hours you teach. Top tutors can earn significantly by building a strong student base."
+        }
+      }
+    },
+    "final_cta": {
+      "title": "Get paid to teach online",
+      "desc": "Connect with thousands of learners around the world and teach from your living room",
+      "button": "Create a tutor profile now"
+    }
+  },
+  "contact": {
+    "breadcrumb_title": "Contact With Us",
+    "breadcrumb_subtitle": "Contact",
+    "info": {
+      "student_support": {
+        "title": "Student Support",
+        "text": "Need help with courses or account?",
+        "email": "support@edunyte.com",
+        "hours": "Mon – Fri, 9AM - 6PM (IST)"
+      },
+      "teacher_support": {
+        "title": "Teacher Support",
+        "text": "Joining questions or onboarding?",
+        "email": "careers@edunyte.com",
+        "hours": "Mon – Fri, 9AM - 6PM (IST)"
+      },
+      "partnerships": {
+        "title": "Partnerships",
+        "text": "Business opportunities?",
+        "email": "partnerships@edunyte.com"
+      }
+    },
+    "form": {
+      "title": "Send Us Message",
+      "text": "Your email address will not be published. Required fields are marked *",
+      "name": "Full Name *",
+      "email": "Email Address *",
+      "phone": "Phone Number (Optional)",
+      "role_placeholder": "I am a...",
+      "role_student": "Student",
+      "role_teacher": "Teacher",
+      "role_partner": "Partner",
+      "message": "Message *",
+      "submit": "Submit Message",
+      "success": "Message sent successfully"
+    }
+  },
+  "instructor": {
+    "breadcrumb_title": "Our Instructors",
+    "breadcrumb_subtitle": "Instructors",
+    "ratings": "Ratings",
+    "designations": {
+      "digital_marketing": "Digital Marketing",
+      "web_development": "Web Development",
+      "ux_design_lead": "UX Design Lead",
+      "web_design": "Web Design",
+      "ronald_s_staton": "Ronald S. Staton",
+      "barbara_d_rice": "Barbara D. Rice"
+    }
+  },
+  "inner_courses": {
+    "items": {
+      "1": {
+        "title": "Learning JavaScript With Imagination"
+      },
+      "2": {
+        "title": "The Complete Graphic Design for Beginners"
+      },
+      "3": {
+        "title": "Learning Digital Marketing on Facebook"
+      },
+      "4": {
+        "title": "Financial Analyst Training & Investing Course"
+      },
+      "5": {
+        "title": "Data Analysis & Visualization Masterclass"
+      }
+    }
+  },
+  "events": {
+    "breadcrumb_title": "All Events",
+    "breadcrumb_subtitle": "Events",
+    "details": {
+      "tag": "Development",
+      "reviews": "({{count}} Reviews)",
+      "title": "How To Become idiculously Self-Aware In 20 Minutes",
+      "by": "By",
+      "author": "David Millar",
+      "location": "LocationWashington DC, MI 2726",
+      "students": "2,250 Students",
+      "overview_title": "Event Overview",
+      "overview_desc": "Dorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan lacus vel facilisis.dolor sit amet, consectetur adipiscing elited do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      "learn_title": "What you'll learn in this event?",
+      "learn_desc": "Dorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan.",
+      "elements_title": "Four major elements that we offer for this event",
+      "elements": {
+        "1": "Work with color & Gradients & Grids",
+        "2": "All the useful shortcuts",
+        "3": "Be able to create Flyers, Brochures, Advertisements",
+        "4": "How to work with Images & Text"
+      },
+      "bottom_desc": "Morem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan.Dorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magn."
+    },
+    "sidebar": {
+      "fee_label": "Event Fee",
+      "fee": "$19.00",
+      "info_title": "Event Information:",
+      "date": "Date",
+      "date_val": "26/08/2024",
+      "time": "Start Time",
+      "time_val": "10.00am",
+      "topics": "Topics",
+      "quizzes": "Quizzes",
+      "cert": "Certifications",
+      "yes": "Yes",
+      "seat": "Total Seat",
+      "payment_title": "Secure Payment:",
+      "share_title": "Share this course:",
+      "join_btn": "Join This Event",
+      "map_title": "Map"
+    },
+    "items": {
+      "1": {
+        "title": "The Accessible Target Sizes Cheatsheet",
+        "location": "United Kingdom",
+        "date": "25 June, 2024"
+      },
+      "2": {
+        "title": "Aewe Creating Futures Through Technology",
+        "location": "Tokyo Japan",
+        "date": "25 June, 2024"
+      },
+      "3": {
+        "title": "Exactly How Technology Can Make Reading",
+        "location": "Colorado",
+        "date": "25 June, 2024"
+      },
+      "4": {
+        "title": "Learning JavaScript With Imagination",
+        "location": "Alexander City",
+        "date": "25 June, 2024"
+      },
+      "5": {
+        "title": "Make Your Magnificent May 2023 Edition",
+        "location": "Alaska",
+        "date": "25 June, 2024"
+      },
+      "6": {
+        "title": "Accessible Target Sizes Cheatsheet",
+        "location": "Estes Park",
+        "date": "25 June, 2024"
+      },
+      "7": {
+        "title": "Color mechanics that he came up with during",
+        "location": "Walsenburg",
+        "date": "25 June, 2024"
+      },
+      "8": {
+        "title": "How To Design Effective User Onboarding",
+        "location": "New Work",
+        "date": "25 June, 2024"
+      }
+    }
+  },
+  "footer": {
+    "description_1": "when an unknown printer took galley of type and scrambled it to make pspecimen bookt has.",
+    "address": "463 7th Ave, NY 10018, USA",
+    "phone": "+123 88 9900 456",
+    "useful_links": "Useful Links",
+    "links": {
+      "values": "Our values",
+      "advisory": "Our advisory board",
+      "partners": "Our partners",
+      "become_partner": "Become a partner",
+      "work": "Work at Future Learn",
+      "quizlet": "Quizlet Plus"
+    },
+    "our_company": "Our Company",
+    "company_links": {
+      "about": "About us",
+      "contact": "Contact Us",
+      "become_teacher": "Become Teacher",
+      "become_student": "Become a Student",
+      "blog": "Blog",
+      "events": "Events"
+    },
+    "get_in_touch": "Get In Touch",
+    "description_2": "when an unknown printer took \n galley type and scrambled",
+    "copyright": "© 2010-2024 Edunyte.com. All rights reserved.",
+    "terms": "Term of Use",
+    "privacy": "Privacy Policy"
+  },
+  "error": {
+    "title": "ERROR PAGE!",
+    "message": "Sorry! This Page is Not Available!",
+    "button": "Go To Home Page"
   },
   "dashboard": {
-    "lesson_booked": "Lessons Booked",
-    "completed": "Completed",
-    "book_lesson": "Book a Lesson",
     "welcome": "Welcome",
-    "student": "Student",
     "dashboard": "Dashboard",
-    "my_profile": "My Profile",
-    "my_lessons": "My Lessons",
+    "student": "Student",
     "wishlist": "Wishlist",
-    "reviews": "Reviews",
     "order_history": "Order History",
     "profile_settings": "Profile Settings",
     "logout": "Logout",
+    "lesson_booked": "Lessons Booked",
+    "completed": "Completed",
+    "book_lesson": "Book A Lesson",
     "my_dashboard": "My Dashboard",
     "total_lessons": "Total Lessons",
     "upcoming": "Upcoming",
     "next_lesson": "Next Lesson",
     "join_lesson": "Join Lesson",
+    "my_lessons": "My Lessons",
     "list": "List",
     "calendar": "Calendar",
+    "no_upcoming_lessons": "No upcoming lessons found",
+    "no_completed_lessons": "No completed lessons found",
     "browse_courses": "Browse Courses",
-    "no_upcoming_lessons": "No upcoming lessons",
-    "no_completed_lessons": "No completed lessons yet",
-    "my_wishlist": "My Wishlist",
-    "remove_from_wishlist": "Remove from wishlist",
-    "wishlist_empty": "Your wishlist is empty.",
-    "booking_history": "Booking History",
-    "booking_id": "Booking ID",
-    "payment_status": "Payment Status",
-    "status": "Status",
-    "no_bookings_found": "No bookings found",
-    "scheduled": "Scheduled",
+    "enrolled_courses": "Enrolled Courses",
+    "active_courses": "Active Courses",
+    "completed_courses": "Completed Courses",
+    "my_courses": "My Courses",
+    "publish": "Publish",
+    "pending": "Pending",
+    "draft": "Draft",
+    "complete": "Complete",
+    "my_profile": "My Profile",
+    "registration_date": "Registration Date",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "username": "Username",
+    "email": "Email",
+    "phone_number": "Phone Number",
+    "skill_occupation": "Skill/Occupation",
+    "biography": "Biography",
     "settings": "Settings",
     "social_share": "Social Share",
+    "current_password": "Current Password",
+    "new_password": "New Password",
+    "confirm_password": "Confirm Password",
+    "update_password": "Update Password",
+    "update_profile": "Update Profile",
+    "phone": "Phone",
+    "skill": "Skill/Occupation",
+    "facebook": "Facebook",
+    "twitter": "Twitter",
+    "linkedin": "Linkedin",
+    "website": "Website",
+    "github": "Github",
+    "full_name": "Full Name",
+    "country": "Country",
+    "state": "State",
+    "city": "City",
+    "timezone": "Timezone",
+    "select_country": "Select Country",
+    "select_state": "Select State",
+    "select_city": "Select City",
+    "select_timezone": "Select Timezone",
+    "update_info": "Update Info",
+    "update_success": "Profile updated successfully",
+    "update_error": "Failed to update profile",
+    "update_error_generic": "An error occurred while updating profile",
+    "booking_history": "Booking History",
+    "booking_id": "Booking ID",
     "course_name": "Course Name",
+    "date": "Date",
     "teacher": "Teacher",
-    "date": "Date"
+    "students": "Students",
+    "price": "Price",
+    "payment_status": "Payment Status",
+    "status": "Status",
+    "scheduled": "Scheduled",
+    "no_bookings_found": "No bookings found",
+    "my_wishlist": "My Wishlist",
+    "wishlist_empty": "Your wishlist is empty",
+    "remove_from_wishlist": "Remove from wishlist",
+    "uncategorized": "Uncategorized",
+    "reviews": "Reviews",
+    "feedback": "Feedback",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "student_dashboard": {
+    "my_dashboard": "My Dashboard",
+    "total_lessons": "Total Lessons",
+    "upcoming": "Upcoming",
+    "completed": "Completed",
+    "next_lesson": "Next Lesson",
+    "join_lesson": "Join Lesson",
+    "my_lessons": "My Lessons",
+    "list": "List",
+    "calendar": "Calendar",
+    "no_upcoming_lessons": "No upcoming lessons found",
+    "no_completed_lessons": "No completed lessons found",
+    "browse_courses": "Browse Courses",
+    "booking_cancelled_propmt": "You won't be able to revert this!",
+    "booking_cancelled_success": "Booking cancelled successfully",
+    "action_failed": "Action failed",
+    "video_not_supported": "Video URL is not supported",
+    "share_link": "Share Link",
+    "reschedule": "Reschedule",
+    "cancel_lesson": "Cancel Lesson"
   }
 }

@@ -71,7 +71,7 @@ const CourseArea = ({ style }: CourseProps) => {
     const loadCourses = async () => {
       try {
         setLoading(true);
-        const params: { status: string; limit?: number; category?: string } = { 
+        const params: { status: string; limit?: number; category?: string } = {
           status: 'active',
           limit: 12
         };
@@ -99,7 +99,10 @@ const CourseArea = ({ style }: CourseProps) => {
     }
   };
 
-  const tabTitles = [t('common.all_courses'), ...categories.map(cat => cat.name)];
+  const tabTitles = [
+    t('common.all_courses'),
+    ...categories.map(cat => t(`common.category_list.${cat.name.toLowerCase().replace(/ & /g, '_').replace(/ /g, '_')}`, cat.name))
+  ];
 
   if (loading) {
     return (
@@ -157,35 +160,37 @@ const CourseArea = ({ style }: CourseProps) => {
                           <img src={item.image || '/assets/img/courses/course_default.jpg'} alt={item.name} />
                         </Link>
                         <button
-                           onClick={(e) => {
-                              e.preventDefault();
-                              toggleWishlist(item._id);
-                           }}
-                           className="wishlist-btn"
-                           style={{
-                              position: 'absolute',
-                              top: '12px',
-                              right: '12px',
-                              zIndex: 9,
-                              background: '#fff',
-                              borderRadius: '50%',
-                              width: '32px',
-                              height: '32px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              border: 'none',
-                              cursor: 'pointer',
-                              boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
-                           }}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            toggleWishlist(item._id);
+                          }}
+                          className="wishlist-btn"
+                          style={{
+                            position: 'absolute',
+                            top: '12px',
+                            right: '12px',
+                            zIndex: 9,
+                            background: '#fff',
+                            borderRadius: '50%',
+                            width: '32px',
+                            height: '32px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            border: 'none',
+                            cursor: 'pointer',
+                            boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                          }}
                         >
-                           <i className={isInWishlist(item._id) ? "fas fa-heart" : "far fa-heart"} style={{ color: isInWishlist(item._id) ? "#e91e63" : "#1A202C", fontSize: '15px' }}></i>
+                          <i className={isInWishlist(item._id) ? "fas fa-heart" : "far fa-heart"} style={{ color: isInWishlist(item._id) ? "#e91e63" : "#1A202C", fontSize: '15px' }}></i>
                         </button>
                       </div>
                       <div className="courses__item-content">
                         <ul className="courses__item-meta list-wrap">
                           <li className="courses__item-tag">
-                            <Link to={`/courses?category=${selectedCategory || ''}`}>{item.category || t('common.categories')}</Link>
+                            <Link to={`/courses?category=${selectedCategory || ''}`}>
+                              {item.category ? t(`common.category_list.${item.category.toLowerCase().replace(/ & /g, '_').replace(/ /g, '_')}`, item.category) : t('common.categories')}
+                            </Link>
                           </li>
                           <li className="avg-rating"><i className="fas fa-star"></i> (5.0 {t('common.reviews')})</li>
                         </ul>

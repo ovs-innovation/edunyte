@@ -8,7 +8,10 @@ import UseCartInfo from "../../hooks/UseCartInfo"
 import NavMenu from "./menu/NavMenu"
 import CustomSelect from "../../ui/CustomSelect"
 
+import { useTranslation } from "react-i18next";
+
 const HeaderTwo = () => {
+   const { t } = useTranslation();
 
    const [selectedOption, setSelectedOption] = React.useState(null);
 
@@ -49,7 +52,7 @@ const HeaderTwo = () => {
                                        <strong className="price">${total.toFixed(2)}</strong>
                                     </li>
                                     <li className="header-btn login-btn">
-                                       <Link to="/contact" className="btn">Get Started</Link>
+                                       <Link to="/contact" className="btn">{t("common.get_started")}</Link>
                                     </li>
                                  </ul>
                               </div>

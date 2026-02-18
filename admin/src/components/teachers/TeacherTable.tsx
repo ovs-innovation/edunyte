@@ -152,12 +152,22 @@ export function TeacherTable({ teachers, loading, onEdit, onView, onKycUpdate }:
                         </DropdownMenuItem>
                         {teacher.kycStatus !== 'verified' && onKycUpdate && (
                           <DropdownMenuItem
-                            className="gap-2"
+                            className="gap-2 text-success focus:text-success"
                             onSelect={() => {
                               onKycUpdate(user?.id || '', 'verified');
                             }}
                           >
                             <CheckCircle2 className="h-4 w-4" /> Verify KYC
+                          </DropdownMenuItem>
+                        )}
+                        {teacher.kycStatus !== 'rejected' && onKycUpdate && (
+                          <DropdownMenuItem
+                            className="gap-2 text-destructive focus:text-destructive"
+                            onSelect={() => {
+                              onKycUpdate(user?.id || '', 'rejected');
+                            }}
+                          >
+                            <XCircle className="h-4 w-4" /> Reject KYC
                           </DropdownMenuItem>
                         )}
                       </PermissionGate>

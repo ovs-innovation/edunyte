@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import DashboardBannerTwo from "../../dashboard-common/DashboardBannerTwo";
 import DashboardSidebarTwo from "../../dashboard-common/DashboardSidebarTwo";
 
 const student_review_data: string[] = ["The Complete Graphic Design for Beginners", "The Complete Graphic Design for Beginners", "The Complete Graphic Design for Beginners", "The Complete Graphic Design for Beginners", "The Complete Graphic Design for Beginners", "The Complete Graphic Design for Beginners", "The Complete Graphic Design for Beginners", "The Complete Graphic Design for Beginners",];
 
 const StudentReviewArea = () => {
+   const { t } = useTranslation();
    return (
       <section className="dashboard__area section-pb-120">
          <div className="container">
@@ -15,7 +17,7 @@ const StudentReviewArea = () => {
                   <div className="col-lg-9">
                      <div className="dashboard__content-wrap">
                         <div className="dashboard__content-title">
-                           <h4 className="title">Reviews</h4>
+                           <h4 className="title">{t('dashboard.reviews')}</h4>
                         </div>
                         <div className="row">
                            <div className="col-12">
@@ -23,8 +25,8 @@ const StudentReviewArea = () => {
                                  <table className="table table-borderless">
                                     <thead>
                                        <tr>
-                                          <th>Course</th>
-                                          <th>Feedback</th>
+                                          <th>{t('common.course')}</th>
+                                          <th>{t('dashboard.feedback')}</th>
                                           <th>&nbsp;</th>
                                        </tr>
                                     </thead>
@@ -49,8 +51,8 @@ const StudentReviewArea = () => {
                                              </td>
                                              <td>
                                                 <div className="dashboard__review-action">
-                                                   <Link to="#" title="Edit"><i className="skillgro-edit"></i></Link>
-                                                   <Link to="#" title="Delete"><i className="skillgro-bin"></i></Link>
+                                                   <Link to="#" title={t('dashboard.edit')}><i className="skillgro-edit"></i></Link>
+                                                   <Link to="#" title={t('dashboard.delete')}><i className="skillgro-bin"></i></Link>
                                                 </div>
                                              </td>
                                           </tr>

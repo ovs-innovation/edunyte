@@ -1,15 +1,496 @@
 {
-  "common": {
-    "login": "登录",
-    "logout": "登出",
-    "buy_now": "立即购买",
-    "price": "价格",
-    "language": "语言",
-    "currency": "货币",
-    "english": "英语",
-    "hindi": "印地语",
-    "select_language": "选择语言",
-    "select_currency": "选择货币"
-  }
+    "common": {
+        "login": "登录",
+        "logout": "登出",
+        "buy_now": "立即购买",
+        "price": "价格",
+        "language": "语言",
+        "currency": "货币",
+        "english": "英语",
+        "hindi": "印地语",
+        "select_language": "选择语言",
+        "select_currency": "选择货币",
+        "student_registration": "学生注册",
+        "student_login": "学生登录",
+        "tutor_registration": "导师注册",
+        "welcome_back": "欢迎回来！",
+        "login_description": "您好！准备好登录了吗？只需输入您的用户名和密码，您就可以立即回到操作中！",
+        "continue_with_google": "使用 Google 继续",
+        "or": "或",
+        "email": "电子邮件",
+        "password": "密码",
+        "remember_me": "记住我",
+        "forgot_password": "忘记密码？",
+        "sign_in": "登录",
+        "dont_have_account": "还没有账户？",
+        "sign_up": "注册",
+        "create_account": "创建账户",
+        "registration_description": "您好！准备好加入了吗？我们只需要您提供一些详细信息即可开始！",
+        "first_name": "名字",
+        "last_name": "姓氏",
+        "confirm_password": "确认密码",
+        "already_have_account": "已经有账户了？",
+        "registration_success": "注册成功",
+        "login_success": "登录成功",
+        "create_tutor_account": "创建导师账户",
+        "registration_success_pending": "注册成功。请等待管理员批准。",
+        "otp_sent": "OTP 已发送到您的电子邮件。请检查并输入。",
+        "login_failed": "登录失败",
+        "signing_in": "登录中...",
+        "signing_up": "注册中...",
+        "password_must_match": "密码必须匹配",
+        "registration_failed": "注册失败",
+        "are_you_sure": "您确定吗？",
+        "actions": "操作",
+        "my_account": "我的账户",
+        "dashboard": "仪表板",
+        "profile": "个人资料",
+        "categories": "分类",
+        "popular": "热门",
+        "also_speaks": "也会说",
+        "all_languages": "所有语言",
+        "type_to_search": "输入以搜索...",
+        "category_list": {
+            "development": "开发",
+            "design": "设计",
+            "marketing": "市场营销",
+            "business": "商业",
+            "data_science": "数据科学",
+            "wellness_fitness": "健康与健身"
+        },
+        "search_courses_placeholder": "搜索课程...",
+        "trending_categories": "热门类别",
+        "top_category_we_have": "我们拥有的顶级类别",
+        "category_description": "当一台已知的打印机拿起一盘铅字",
+        "top_class_courses": "顶级课程",
+        "best_exciting_class_experience": "与我们一起获得最佳激动人心的课堂体验",
+        "loading": "加载中...",
+        "error_loading_data": "加载数据错误",
+        "age": "年龄",
+        "time": "时间",
+        "years": "年",
+        "all_courses": "所有课程",
+        "enroll_now": "立即注册",
+        "reviews": "评论",
+        "by": "由",
+        "flexible": "灵活",
+        "no_courses_found": "未找到课程",
+        "course_not_found": "未找到课程",
+        "show_more": "显示更多 +",
+        "show_less": "显示更少 -",
+        "learn_more": "了解更多",
+        "book_session": "预订课程",
+        "newsletter_title_1": "想要保持",
+        "newsletter_title_highlight_1": "从",
+        "newsletter_title_2": "关于",
+        "newsletter_title_3": "新的",
+        "newsletter_title_highlight_2": "课程和学习的信息吗？",
+        "newsletter_placeholder": "输入您的电子邮件",
+        "subscribe_now": "立即订阅",
+        "curved_circle_text": "教育 * 系统 * 可以 * 创造 * 改变 *",
+        "banner_title_prefix": "超越语言 —— 向导师学习任何课程",
+        "banner_title_highlight": "全球范围内",
+        "banner_description": "每一次教与学的旅程都是独特的。我们在这里全程为您提供指导。",
+        "start_free_trial": "开始试用",
+        "banner_features": "自信地学习、实践与成长",
+        "about_subtitle": "了解更多关于我们",
+        "about_title_1": "数以千计的",
+        "about_title_highlight": "课程",
+        "about_title_2": "用自己的语言学习技能",
+        "about_description": "一个平台。多个课程。提供印地语、英语及更多语言教学 —— 让学习变得简单、自然且高效。",
+        "about_list_1": "专家导师",
+        "about_list_2": "同一门课程，多种语言",
+        "about_list_3": "随时随地学习",
+        "enrolled_students": "已注册学生",
+        "home": "首页",
+        "about_us": "关于我们",
+        "contact_us": "联系我们",
+        "courses": "课程",
+        "pages": "页面",
+        "blog": "博客"
+    },
+    "home": {
+        "how_it_works": {
+            "subtitle": "运作方式",
+            "title": "我们的平台如何运作",
+            "description": "使用您最舒适的语言学习技能、语言和专业课程。我们的平台旨在让每个人都能随时随地享受简单、灵活且易于获取的学习体验。",
+            "step1_title": "选择您的技能",
+            "step1_description": "从语言、创意技能、专业课程、健康等各类选项中进行选择，一应俱全。",
+            "step2_title": "选择您的语言",
+            "step2_description": "使用印地语、英语或您喜欢的方言进行学习，以便更好地理解。",
+            "step3_title": "按您的节奏学习",
+            "step3_description": "访问在线、离线、直播或录播课程——在适合您的时间进行学习。",
+            "step4_title": "跟踪您的成长",
+            "step4_description": "监控学习进度，获取学习资料，并在成长过程中赢取证书。"
+        },
+        "counter": {
+            "active_students": "活跃学生",
+            "experienced_tutors": "经验丰富的导师",
+            "courses": "课程数量",
+            "tutor_nationalities": "导师国籍"
+        },
+        "faq": {
+            "subtitle": "常见问题",
+            "title": "与值得信赖的全球导师共同提升技能",
+            "description": "由专家引导的课程，旨在帮助您更快、更聪明地成长。",
+            "questions": {
+                "q1": "为什么我应该选择 Edunyte 进行学习？",
+                "a1": "因为 Edunyte 提供灵活、以技能为中心的课程，由经验丰富的讲师使用多种语言授课。",
+                "q2": "我可以用我的母语学习技能吗？",
+                "a2": "是的，我们提供印地语、英语和其他地方语言的课程，以便您轻松理解。",
+                "q3": "课程是由认证专家讲授的吗？",
+                "a3": "当然。所有课程均由经过验证且经验丰富的专业人士进行。",
+                "q4": "Edunyte 对学生来说价格实惠吗？",
+                "a4": "是的，Edunyte 以亲民且适合学生的价格提供高质量的教育。"
+            }
+        },
+        "features": {
+            "subtitle": "您的学习之旅如何开始",
+            "title": "迈向新技能的第一步",
+            "description": "简单便捷的学习体验，将学生与导师聚集在一起，共同学习、跟踪进度并取得成功。",
+            "home_2_header": {
+                "subtitle": "我们的核心特色",
+                "title": "通过 Edunyte 实现您的目标",
+                "description": "Edunyte 通过清晰的学习路径、专家的指导和实证的结果，帮助您实现个人及职业目标。"
+            },
+            "items": {
+                "home_1": {
+                    "1": {
+                        "title": "由资深专业人士指导",
+                        "desc": "从经验丰富的专业人士那里获得实战培训。"
+                    },
+                    "2": {
+                        "title": "无国界技能",
+                        "desc": "探索超越国界和限制的无限技能。"
+                    },
+                    "3": {
+                        "title": "获得在线认证",
+                        "desc": "完成课程并获得助力职场的专业证书。"
+                    },
+                    "4": {
+                        "title": "邮件营销",
+                        "desc": "精心策划的策略和实战课程，帮助您有效覆盖目标受众。"
+                    }
+                },
+                "home_2": {
+                    "1": {
+                        "title": "专家导师",
+                        "desc": "向行业内最优秀的专家学习。"
+                    },
+                    "2": {
+                        "title": "高效课程",
+                        "desc": "专为取得成果和职业成长而设计。"
+                    },
+                    "3": {
+                        "title": "获得证书",
+                        "desc": "学习完成后即可获得受认可的证书。"
+                    }
+                }
+            }
+        },
+        "join_section": {
+            "join_as_instructor_title": "加入成为讲师",
+            "join_as_instructor_description": "举个简单的例子，学习始于努力、持之以恒和正确的引导。",
+            "join_as_student_title": "加入成为学生",
+            "join_as_student_description": "加入来自全球的学习者，通过直播和在线学习共同成长。",
+            "apply_now": "立即申请"
+        },
+        "blog": {
+            "subtitle": "新闻与博客",
+            "title": "我们的最新动态",
+            "description": "掌握教育领域的最新趋势。",
+            "items": {
+                "home_1": {
+                    "1": {
+                        "tag": "营销",
+                        "title": "如何在 20 分钟内变得极度自我觉察"
+                    },
+                    "2": {
+                        "tag": "学生",
+                        "title": "通过速度技巧开启 UI 设计之旅"
+                    },
+                    "3": {
+                        "tag": "科学",
+                        "title": "创建您自己的可展开和可折叠内容"
+                    },
+                    "4": {
+                        "tag": "机构",
+                        "title": "我们通常能够发现的事情"
+                    }
+                }
+            }
+        }
+    },
+    "footer": {
+        "get_in_touch": "取得联系",
+        "text": "当一台未知的打印机。",
+        "address_1": "463 7th Ave, NY 10018, USA",
+        "phone": "+123 88 9900 456",
+        "useful_links": "有用链接",
+        "our_company": "我们的公司",
+        "our_values": "我们的价值观",
+        "our_advisory_board": "顾问委员会",
+        "our_partners": "合作伙伴",
+        "become_partner": "成为合作伙伴",
+        "work_at": "工作机会",
+        "quizlet_plus": "Quizlet Plus",
+        "copyright": "© 2010-2024 Edunyte.com. 保留所有权利。"
+    },
+    "about_page": {
+        "hero": {
+            "title": "学生学得更好，教师成长更强的地方",
+            "description": "Edunyte 是一个现代教育平台，旨在将学生和教育工作者联系在一个有意义的学习生态系统中。我们相信，当教育是个性化的、灵活的且由人主导时，它的效果最好。",
+            "button": "加入 Edunyte 社区"
+        },
+        "breadcrumb": {
+            "title": "我们是谁",
+            "subtitle": "关于我们"
+        },
+        "purpose": {
+            "subtitle": "我们的目标",
+            "title": "为真正的人提供的教育",
+            "description": "我们正在通过真实的目标、真实的支持和真实的结果来重塑教育。",
+            "cards": {
+                "student_confidence": {
+                    "title": "学生的自信",
+                    "description": "通过个性化的关注和经过验证的教育工作者，帮助学生充满信心和清晰地学习。"
+                },
+                "teacher_support": {
+                    "title": "教师支持",
+                    "description": "为教师提供机会、工具和灵活性，使他们能够专注于自己最擅长的事情：教学。"
+                },
+                "trusted_environment": {
+                    "title": "值得信赖的环境",
+                    "description": "建立一个由质量、透明度和结果驱动的值得信赖的学习环境。"
+                }
+            }
+        },
+        "platform": {
+            "title": "一个适合所有人的平台",
+            "description": "无论您是来学习、教学还是成长——Edunyte 都欢迎您。",
+            "tabs": {
+                "teachers": {
+                    "name": "教师",
+                    "badge": "教学",
+                    "title": "自由教学。有目的地成长。以影响力激发灵感。",
+                    "text": "教师是 Edunyte 的基石。我们通过为教育工作者提供一个能够体现其价值并关注其成长的平台来赋能教师。无论您是经验丰富的专业人士还是充满热情的教育工作者，Edunyte 都能提供您应得的灵活性、支持和尊重。我们提供灵活的教学时间表、接触积极主动的学生的机会、公平的收益以及长期成长的机会。"
+                },
+                "students": {
+                    "name": "学生",
+                    "badge": "学习",
+                    "title": "更聪明地学习。进步更快。充满信心地成功。",
+                    "text": "Edunyte 是围绕学生设计的——您的进度、您的目标、您的未来。我们将学习者与专注于理解（而不仅仅是完成课程）的专家教育者联系起来。无论您是为了提高成绩、准备考试还是掌握技能，Edunyte 都能通过个性化的学习路径和经过验证的老师，确保学习过程清晰、有支持且有效。"
+                },
+                "values": {
+                    "name": "我们的价值观",
+                    "badge": "价值观",
+                    "title": "我们的核心价值观",
+                    "list": {
+                        "1": "<strong>学生优先的学习</strong> – 每个学习者都值得个性化的关注。",
+                        "2": "<strong>教师赋能</strong> – 伟大的教学值得伟大的支持。",
+                        "3": "<strong>信任与透明</strong> – 每一步都有清晰的沟通。",
+                        "4": "<strong>成长心态</strong> – 适合每个人的持续学习。"
+                    }
+                }
+            },
+            "join_link": "以{{role}}身份加入"
+        },
+        "numbers": {
+            "title": "Edunyte 数据",
+            "description": "我们很自豪能成为全球在线教育领域的领先平台。",
+            "items": {
+                "tutors": {
+                    "label": "导师",
+                    "desc": "来自 120 个国家，教授 90 种语言和 100 多门学科。"
+                },
+                "companies": {
+                    "label": "公司",
+                    "desc": "信任我们通过我们的企业培训来提升其员工的技能。"
+                },
+                "global_hubs": {
+                    "label": "全球中心",
+                    "desc": "在纽约、伦敦、基辅和巴塞罗那设有办事处。"
+                },
+                "employees": {
+                    "label": "员工",
+                    "desc": "为了同一个使命而团结在一起：推动人们的进步。"
+                }
+            }
+        },
+        "story": {
+            "title": "构建学习的未来",
+            "subtitle": "Edunyte 不仅仅是一个平台——它是一个不断壮大的学习者和教育者社区。",
+            "p1": "Edunyte 是一个现代教育平台，旨在将学生和教育工作者联系在一个有意义的学习生态系统中。我们相信，当教育是个性化的、灵活的且由人主导时，它的效果最好。",
+            "p2": "无论您是来学习、教学还是成长——Edunyte 都欢迎您。Edunyte 的成功是由我们共同创造的。",
+            "box_title": "Edunyte 如何运作",
+            "list": {
+                "1": "学生选择科目和目标",
+                "2": "教师提供专业知识和指导",
+                "3": "学习通过结构化且引人入胜的课程进行",
+                "4": "进度得到跟踪、支持和庆祝"
+            }
+        },
+        "testimonials": {
+            "subtitle": "我们的推荐",
+            "title": "学生对 Edunyte 的看法和评价",
+            "description": "听听我们的学习者社区通过 Edunyte 改变生活的故事。",
+            "items": {
+                "1": {
+                    "name": "Wade Warren",
+                    "desc": "Edunyte 完全改变了我的学习方式。导师非常出色，而灵活性正是我所需要的。"
+                },
+                "2": {
+                    "name": "Jenny Wilson",
+                    "desc": "我能够在短短 3 个月内显著提高我的英语技能。强烈推荐给任何想要提升技能的人。"
+                },
+                "3": {
+                    "name": "Guy Hawkin",
+                    "desc": "最好的在线学习平台。界面易于使用，教学质量是一流的。"
+                }
+            }
+        },
+        "roles": {
+            "teacher": "教师",
+            "student": "学生"
+        }
+    },
+    "become_instructor_page": {
+        "breadcrumb_title": "成为讲师",
+        "hero": {
+            "title": "正确学习，清晰表达，与Edunyte一起迈向全球未来。",
+            "cta": "立即创建导师资料"
+        },
+        "steps": {
+            "1": {
+                "title": "注册",
+                "desc": "创建您的导师资料"
+            },
+            "2": {
+                "title": "获得批准",
+                "desc": "我们的团队将在5个工作日内"
+            },
+            "3": {
+                "title": "开始赚钱",
+                "desc": "通过教授世界各地的学生！"
+            }
+        },
+        "features": {
+            "1": {
+                "title": "设定自己的费率",
+                "desc": "选择您的小时费率并随时更改。平均而言，英语导师每小时收费15-25美元。"
+            },
+            "2": {
+                "title": "随时随地教学",
+                "desc": "决定何时以及教多少小时。没有最低时间承诺或固定时间表。做自己的老板！"
+            },
+            "3": {
+                "title": "专业成长",
+                "desc": "一旦您注册并完成申请，您可以在短短三天内获得批准并开始教学。"
+            }
+        },
+        "global": {
+            "title": "启发思想。全球教学。与我们一起成长。",
+            "desc_p1": "在Edunyte，我们相信伟大的教师创造伟大的未来。",
+            "desc_p2": "如果您对教学充满热情并希望产生真正的影响，Edunyte正在招聘多个科目和年级的教育工作者。",
+            "list": {
+                "1": "从任何地方教授学生",
+                "2": "灵活的教学时间",
+                "3": "有竞争力的薪酬结构",
+                "4": "专门的学术支持",
+                "5": "成长机会和技能发展",
+                "6": "尊重、认可和专业环境"
+            },
+            "cta": "立即创建导师资料"
+        },
+        "testimonial": {
+            "quote": "Edunyte让我不用离开家就能谋生！",
+            "name": "克里斯塔 A.",
+            "role": "英语导师",
+            "cta": "立即创建导师资料"
+        },
+        "faq": {
+            "title": "常见问题",
+            "items": {
+                "1": {
+                    "question": "Edunyte寻找什么样的导师？",
+                    "answer": "不需要特定的认证！我们寻找具有出色沟通技巧并且是其学科专家的热情导师。虽然教学经验或认证是加分项，但并非所有学科都必需。"
+                },
+                "2": {
+                    "question": "我可以教什么科目？",
+                    "answer": "您可以教授100多个科目，包括语言、K-12学校科目、大学课程、编程、爱好和艺术。如果您的科目未列出，您可以在注册时建议。"
+                },
+                "3": {
+                    "question": "如何在Edunyte成为在线导师？",
+                    "answer": "流程很简单：注册，创建您的个人资料，上传专业照片/视频介绍，并提交审核。我们的团队在3-5个工作日内批准个人资料。"
+                },
+                "4": {
+                    "question": "如何快速获得我的个人资料批准？",
+                    "answer": "确保您的个人资料包含高质量照片、精心撰写的描述和清晰的视频介绍。验证您的身份和资格以加快流程。"
+                },
+                "5": {
+                    "question": "为什么我应该在Edunyte教学？",
+                    "answer": "Edunyte提供设定自己费率和时间表的灵活性、访问全球学生群体、安全付款、专业发展资源和支持性社区。"
+                },
+                "6": {
+                    "question": "在Edunyte教学需要什么计算机设备？",
+                    "answer": "您需要一台具有稳定互联网连接的台式机或笔记本电脑、一个可用的网络摄像头和一个带麦克风的耳机以获得清晰的音频。"
+                },
+                "7": {
+                    "question": "在Edunyte创建导师资料是免费的吗？",
+                    "answer": "是的，创建导师资料并在Edunyte上列出是完全免费的。我们只对您教授的课程收取少量佣金。"
+                },
+                "8": {
+                    "question": "我在Edunyte能赚多少钱？",
+                    "answer": "您设定自己的小时费率。收入取决于您的费率和您教授的小时数。顶级导师可以通过建立强大的学生基础赚取可观的收入。"
+                }
+            }
+        },
+        "final_cta": {
+            "title": "通过在线教学获得报酬",
+            "desc": "与世界各地的数千名学习者联系，从您的客厅教学",
+            "button": "立即创建导师资料"
+        }
+    },
+    "contact": {
+        "breadcrumb_title": "联系我们",
+        "breadcrumb_subtitle": "联系",
+        "info": {
+            "student_support": {
+                "title": "学生支持",
+                "text": "需要课程或账户帮助？",
+                "email": "support@edunyte.com",
+                "hours": "周一 – 周五，上午9点 - 下午6点 (IST)"
+            },
+            "teacher_support": {
+                "title": "教师支持",
+                "text": "加入问题或入职？",
+                "email": "careers@edunyte.com",
+                "hours": "周一 – 周五，上午9点 - 下午6点 (IST)"
+            },
+            "partnerships": {
+                "title": "合作伙伴",
+                "text": "商业机会？",
+                "email": "partnerships@edunyte.com"
+            }
+        },
+        "form": {
+            "title": "给我们发送消息",
+            "text": "您的电子邮件地址不会被公开。必填字段标有 *",
+            "name": "全名 *",
+            "email": "电子邮件地址 *",
+            "phone": "电话号码（可选）",
+            "role_placeholder": "我是...",
+            "role_student": "学生",
+            "role_teacher": "教师",
+            "role_partner": "合作伙伴",
+            "message": "消息 *",
+            "submit": "发送消息",
+            "success": "消息发送成功"
+        }
+    },
+    "instructor": {
+        "breadcrumb_title": "我们的讲师",
+        "breadcrumb_subtitle": "讲师",
+        "ratings": "评分"
+    }
 }
-

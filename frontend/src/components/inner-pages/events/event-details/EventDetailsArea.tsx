@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom"
 import EventDetailsSidebar from "./EventDetailsSidebar"
+import { useTranslation } from "react-i18next";
 
 const EventDetailsArea = () => {
+  const { t } = useTranslation();
   return (
     <section className="event__details-area section-py-120">
       <div className="container">
@@ -15,27 +17,27 @@ const EventDetailsArea = () => {
                 <div className="col-70">
                   <div className="event__details-content">
                     <div className="event__details-content-top">
-                      <Link to="/courses" className="tag">Development</Link>
-                      <span className="avg-rating"><i className="fas fa-star"></i>(4.8 Reviews)</span>
+                      <Link to="/courses" className="tag">{t('events.details.tag')}</Link>
+                      <span className="avg-rating"><i className="fas fa-star"></i>{t('events.details.reviews', { count: 4.8 })}</span>
                     </div>
-                    <h2 className="title">How To Become idiculously Self-Aware In 20 Minutes</h2>
+                    <h2 className="title">{t('events.details.title')}</h2>
                     <div className="event__meta">
                       <ul className="list-wrap">
                         <li className="author">
                           <img src="/assets/img/courses/course_author001.png" alt="img" />
-                          By
-                          <Link to="/instructor-details">David Millar</Link>
+                          {t('events.details.by')}
+                          <Link to="/instructor-details">{t('events.details.author')}</Link>
                         </li>
-                        <li className="location"><i className="flaticon-placeholder"></i>LocationWashington DC, MI 2726</li>
-                        <li><i className="flaticon-mortarboard"></i>2,250 Students</li>
+                        <li className="location"><i className="flaticon-placeholder"></i>{t('events.details.location')}</li>
+                        <li><i className="flaticon-mortarboard"></i>{t('events.details.students')}</li>
                       </ul>
                     </div>
                     <div className="event__details-overview">
-                      <h4 className="title-two">Event Overview</h4>
-                      <p>Dorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan lacus vel facilisis.dolor sit amet, consectetur adipiscing elited do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                      <h4 className="title-two">{t('events.details.overview_title')}</h4>
+                      <p>{t('events.details.overview_desc')}</p>
                     </div>
-                    <h4 className="title-two">What you&apos;ll learn in this event?</h4>
-                    <p>Dorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan.</p>
+                    <h4 className="title-two">{t('events.details.learn_title')}</h4>
+                    <p>{t('events.details.learn_desc')}</p>
 
                     <div className="event__details-inner">
                       <div className="row">
@@ -44,30 +46,30 @@ const EventDetailsArea = () => {
                         </div>
                         <div className="col-61">
                           <div className="event__details-inner-content">
-                            <h4 className="title">Four major elements that we offer <br /> for this event</h4>
+                            <h4 className="title">{t('events.details.elements_title')}</h4>
                             <ul className="about__info-list list-wrap">
                               <li className="about__info-list-item">
                                 <i className="flaticon-angle-right"></i>
-                                <p className="content">Work with color & Gradients & Grids</p>
+                                <p className="content">{t('events.details.elements.1')}</p>
                               </li>
                               <li className="about__info-list-item">
                                 <i className="flaticon-angle-right"></i>
-                                <p className="content">All the useful shortcuts</p>
+                                <p className="content">{t('events.details.elements.2')}</p>
                               </li>
                               <li className="about__info-list-item">
                                 <i className="flaticon-angle-right"></i>
-                                <p className="content">Be able to create Flyers, Brochures, Advertisements</p>
+                                <p className="content">{t('events.details.elements.3')}</p>
                               </li>
                               <li className="about__info-list-item">
                                 <i className="flaticon-angle-right"></i>
-                                <p className="content">How to work with Images & Text</p>
+                                <p className="content">{t('events.details.elements.4')}</p>
                               </li>
                             </ul>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <p>Morem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan.Dorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magn.</p>
+                    <p>{t('events.details.bottom_desc')}</p>
                   </div>
                 </div>
                 <div className="col-30">
