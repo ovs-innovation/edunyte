@@ -41,7 +41,7 @@ const Counter = () => {
    return (
       <section className="fact__area">
          <div className="container">
-            <div className="fact__inner-wrap">
+            <div className="fact__inner-wrap mt-10">
                <div className="row">
                   {count_data.map((item) => (
                      <div key={item.id} className="col-lg-3 col-6">

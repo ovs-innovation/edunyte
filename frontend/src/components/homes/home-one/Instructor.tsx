@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import BtnArrow from "../../../svg/BtnArrow";
 import { useTranslation } from "react-i18next";
 
 interface DataType {
@@ -48,16 +47,13 @@ const Instructor = () => {
       <section className="instructor__area">
          <div className="container">
             <div className="row align-items-center">
-               <div className="col-xl-4">
-                  <div className="instructor__content-wrap">
-                     <div className="section__title mb-15">
+               <div className="col-xl-4 -mt-20">
+                  <div className="instructor__content-wrap ">
+                     <div className="section__title mb-15 ">
                         <span className="sub-title">{t('home.how_it_works.subtitle')}</span>
                         <h2 className="title">{t('home.how_it_works.title')}</h2>
                      </div>
                      <p>{t('home.how_it_works.description')}</p>
-                     <div className="tg-button-wrap">
-                        <Link to="/instructor" className="btn arrow-btn">{t('home.join_section.join_as_instructor_title')}<BtnArrow /></Link>
-                     </div>
                   </div>
                </div>
 

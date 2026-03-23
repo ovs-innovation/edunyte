@@ -1445,16 +1445,16 @@ textarea {
   opacity: 0.6;
 }
 .tg-header__area {
-  padding: 5px 0;
+  padding: 1px 0;
 }
 @media (max-width: 1500px) {
   .tg-header__area {
-    padding: 10px 0;
+    padding: 1px 0;
   }
 }
 @media (max-width: 1199.98px) {
   .tg-header__area {
-    padding: 20px 0;
+    padding:  0;
   }
 }
 .tg-header__area .mobile-nav-toggler {
@@ -1475,7 +1475,7 @@ textarea {
 }
 @media (max-width: 1199.98px) {
   .tg-header__area.sticky-menu {
-    padding: 20px 0;
+    padding: 1px 0;
   }
 }
 .tg-header__style-two .tgmenu__search-form {
@@ -13170,15 +13170,18 @@ textarea {
   box-shadow: 0px 25px 70px 0px rgba(40, 37, 104, 0.4);
   z-index: 3;
   position: relative;
+  margin-top: 10px;
 }
 @media (max-width: 1199.98px) {
   .fact__inner-wrap {
     padding: 60px 40px 30px;
+    margin-top: 10px;
   }
 }
 @media (max-width: 767.98px) {
   .fact__inner-wrap {
     padding: 50px 25px 20px;
+    margin-top: 10px;
   }
 }
 .fact__inner-wrap .row [class*=col-]:last-child .fact__item::before {
@@ -13219,12 +13222,14 @@ textarea {
     padding: 60px 40px 30px 40px;
     flex-wrap: wrap;
     gap: 0;
+    margin-top: 10px;
     justify-content: center;
   }
 }
 @media (max-width: 767.98px) {
   .fact__inner-wrap-two {
     padding: 60px 30px 30px 30px;
+    margin-top: 10px;
   }
 }
 .fact__inner-wrap-two .section__title {
@@ -14955,7 +14960,7 @@ textarea {
 ===============================*/
 .faq__area {
   background: var(--tg-common-color-gray);
-  padding: 260px 0 120px;
+  padding: 280px 0 120px;
   margin-top: -140px;
   position: relative;
   z-index: 1;
@@ -16151,10 +16156,10 @@ textarea {
 }
 .blog__post-area {
   position: relative;
-  padding: 240px 0 90px;
+  padding: 150px 0 90px;
   background: var(--tg-common-color-gray);
   z-index: 1;
-  margin-top: -150px;
+  margin-top: -100px;
 }
 @media (max-width: 767.98px) {
   .blog__post-area {
