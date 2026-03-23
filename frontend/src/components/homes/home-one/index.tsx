@@ -18,17 +18,22 @@ const HomeOne = () => {
       <>
          <HeaderOne />
          <main className="main-area fix">
-            <Banner />
-            <Categories />
-            {/* <BrandOne /> */}
             <About />
+           
+            
+            {/* <Banner /> */}
+            {/* <Categories /> */}
+            {/* <BrandOne /> */}
+            
             <CourseArea style={false} />
-            <Newsletter />
             <Instructor />
-            <Counter />
-            <FaqArea />
-            <Features />
             <InstructorTwo style={false} />
+            <Newsletter />
+            
+            <Counter />
+            {/* <FaqArea /> */}
+            {/* <Features /> */}
+            
             <Blog style={false} />
          </main>
          <FooterOne style={false} style_2={false} />

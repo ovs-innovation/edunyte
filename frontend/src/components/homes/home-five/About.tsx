@@ -25,7 +25,7 @@ const About = () => {
                <div className="col-lg-6">
                   <div className="about__content-five">
                      <div className="section__title mb-15">
-                        <span className="sub-title">Get More About Us</span>
+                        <span className="sub-title">More About Us</span>
                         <h2 className="title bold">Our passion is childhood, and we’re in kindergarten</h2>
                      </div>
                      <p>Groove’s intuitive shared inbox makes it easy for team members to organize, prioritize and.In this episode of the Smashing Pod we’re talking about Web Platform Baseline.</p>

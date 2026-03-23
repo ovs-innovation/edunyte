@@ -1,4 +1,4 @@
-import HeaderTopOne from "./menu/HeaderTopOne"
+// import HeaderTopOne from "./menu/HeaderTopOne"
 import NavMenu from "./menu/NavMenu"
 import React, { useState } from "react"
 import MobileSidebar from "./menu/MobileSidebar"
@@ -74,7 +74,7 @@ const HeaderOne = () => {
    return (
       <>
          <header>
-            <HeaderTopOne style={false} />
+            {/* <HeaderTopOne style={false} /> */}
             <div id="header-fixed-height"></div>
             <div id="sticky-header" className={`tg-header__area ${sticky ? "sticky-menu" : ""}`}>
                <div className="container custom-container">
@@ -83,7 +83,7 @@ const HeaderOne = () => {
                         <div className="tgmenu__wrap">
                            <nav className="tgmenu__nav">
                               <div className="logo">
-                                 <Link to="/"><img src="/assets/img/logo/edunyte-light.png" height="100" width="100" alt="Logo" /></Link>
+                                 <Link to="/"><img src="/assets/img/logo/edunyte-light.png" height="110" width="110" alt="Logo" /></Link>
                               </div>
                               <div className="tgmenu__navbar-wrap tgmenu__main-menu d-none d-xl-flex">
                                  <NavMenu />

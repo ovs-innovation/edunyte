@@ -15,10 +15,10 @@ const InstructorTwo = ({ style }: InstructorTwoProps) => {
    const svgIconRef2 = SvgAnimation('/assets/img/instructor/instructor_shape02.svg');
 
    return (
-      <section className={`${style ? "instructor__area-four" : "instructor__area-two"}`}>
+      <section className={`${style ? "instructor__area-four" : ""}`}>
          <div className="container">
             <div className="instructor__item-wrap-two">
-               <div className="row">
+               <div className="row mt-4">
                   <div className="col-xl-6">
                      <div className="instructor__item-two tg-svg" ref={svgIconRef}>
                         <div className="instructor__thumb-two">

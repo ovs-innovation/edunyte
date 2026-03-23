@@ -28,7 +28,7 @@ const About = () => {
                <div className="col-lg-6">
                   <div className="about__content-six">
                      <div className="section__title mb-15">
-                        <span className="sub-title">Get More About Us</span>
+                        <span className="sub-title">More About Us</span>
                         <h2 className="title">Thousand Of Top
                            <span className="position-relative" style={{ marginLeft: "10px" }}>
                               <svg x="0px" y="0px" preserveAspectRatio="none" viewBox="0 0 209 59" fill="none" xmlns="http://www.w3.org/2000/svg">

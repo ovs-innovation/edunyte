@@ -6,9 +6,11 @@ import { Link } from "react-router-dom"
 import InjectableSvg from "../../hooks/InjectableSvg"
 import TotalCart from "../../components/common/TotalCart"
 import HeaderSearch from "./menu/HeaderSearch"
+import { useTranslation } from "react-i18next"
 
 const HeaderSeven = () => {
 
+   const { t } = useTranslation();
    const [isSearch, setIsSearch] = useState<boolean>(false);
    const { sticky } = UseSticky();
    const [isActive, setIsActive] = useState<boolean>(false);
@@ -24,7 +26,7 @@ const HeaderSeven = () => {
                         <div className="tgmenu__wrap">
                            <nav className="tgmenu__nav">
                               <div className="logo">
-                                 <Link to="/"><img src="/assets/img/logo/edunyte-light.png" height="100" width="100" alt="Logo" /></Link>
+                                 <Link to="/"><img src="/assets/img/logo/edunyte-light.png" height="160" width="160" alt="Logo" /></Link>
                               </div>
                               <div className="tgmenu__navbar-wrap tgmenu__main-menu d-none d-xl-flex">
                                  <NavMenuOne />
@@ -59,9 +61,18 @@ const HeaderSeven = () => {
                                           <TotalCart />
                                        </Link>
                                     </li>
-                                    <li className="header-btn">
-                                       <Link to="/login" className="btn">Try For Free</Link>
-                                    </li>
+                                     <li className="header-btn">
+                                        <Link to="/courses" className="btn">{t('common.courses')}</Link>
+                                     </li>
+                                     <li className="header-btn">
+                                        <Link to="/about-us" className="btn">{t('common.about_us')}</Link>
+                                     </li>
+                                     <li className="header-btn">
+                                        <Link to="/contact" className="btn">{t('common.contact_us')}</Link>
+                                     </li>
+                                     <li className="header-btn">
+                                        <Link to="/login" className="btn">Try For Free</Link>
+                                     </li>
                                  </ul>
                               </div>
                               <div className="mobile-login-btn">

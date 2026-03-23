@@ -33,6 +33,25 @@ const menu_data: MenuItem[] = [
         titleKey: "common.home",
         link: "/",
         menu_class: "mega-menu",
+    },
+    {
+        id: 3,
+        title: "Courses",
+        titleKey: "common.courses",
+        link: "/courses",
+    },
+    {
+        id: 2,
+        title: "About Us",
+        titleKey: "common.about_us",
+        link: "/about-us",
+    },
+    
+    {
+        id: 4,
+        title: "FAQ",
+        titleKey: "FAQ",
+        link: "/faq-one",
     }
 ];
 export default menu_data;

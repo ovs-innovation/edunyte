@@ -1,29 +1,23 @@
 import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 
 interface HeaderTopOneProps {
    style: boolean;
 }
 
 const HeaderTopOne = ({ style }: HeaderTopOneProps) => {
-   const { t } = useTranslation();
    return (
       <div className="tg-header__top">
          <div className={`container ${style ? "" : "custom-container"}`}>
             <div className="row">
                <div className="col-lg-6">
-                  <ul className="tg-header__top-info list-wrap">
+                  {/* <ul className="tg-header__top-info list-wrap">
                      <li><img src="/assets/img/icons/map_marker.svg" alt="Icon" /> <span>{t('footer.address')}</span></li>
                      <li><img src="/assets/img/icons/envelope.svg" alt="Icon" /> <Link to="mailto:info@edunyte.com">info@edunyte.com</Link></li>
-                  </ul>
+                  </ul> */}
                </div>
                <div className="col-lg-6">
                   <div className="tg-header__top-right">
-                     <div className="tg-header__phone">
-                        <img src="/assets/img/icons/phone.svg" alt="Icon" />{t("common.call_us")} <Link to="tel:+123889900456">{t('footer.phone')}</Link>
-                     </div>
-                     <ul className="tg-header__top-social list-wrap">
-                        <li>{t("common.follow_us")}</li>
+                      <ul className="tg-header__top-social list-wrap">
                         <li><Link to="#"><i className="fab fa-facebook-f"></i></Link></li>
                         <li><Link to="#"><i className="fab fa-twitter"></i></Link></li>
                         <li><Link to="#"><i className="fab fa-whatsapp"></i></Link></li>

@@ -5,7 +5,7 @@ const Features = () => {
    const { t } = useTranslation();
 
    return (
-      <section className="features__area">
+      <section className="features__area mt-10">
          <div className="container">
             <div className="row justify-content-center">
                <div className="col-xl-6">

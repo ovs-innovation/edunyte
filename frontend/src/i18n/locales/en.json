@@ -59,6 +59,9 @@
       "data_science": "Data Science",
       "wellness_fitness": "Wellness & Fitness"
     },
+    "about_us": "About Us",
+    "blog": "Blog",
+    "contact_us": "Contact Us",
     "search_courses_placeholder": "Search for course...",
     "trending_categories": "Trending Categories",
     "top_category_we_have": "Top Category We Have",
@@ -150,7 +153,7 @@
     "banner_description": "Every teaching and learning journey is unique. We’re here to guide you every step of the way.",
     "start_free_trial": "Start Trial",
     "banner_features": "Learn, Practice & Grow Confidently",
-    "about_subtitle": "Get More About Us",
+    "about_subtitle": "More About Us",
     "about_title_1": "Thousands of",
     "about_title_highlight": "Courses",
     "about_title_2": "Learn Skills in Your Own Language",

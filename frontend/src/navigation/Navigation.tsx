@@ -49,6 +49,7 @@ import StudentSetting from '../pages/StudentSetting';
 import BookingCheckout from '../pages/BookingCheckout';
 import NotFound from '../pages/NotFound';
 import ProtectedRoute from '../components/common/ProtectedRoute';
+import FaqOnePage from '../pages/Faq';
 
 const AppNavigation = () => {
   return (
@@ -65,7 +66,6 @@ const AppNavigation = () => {
         <Route path="/course/:slug" element={<CourseDetails />} />
         <Route path="/lesson" element={<Lesson />} />
         <Route path="/about-us" element={<About />} />
-        {/* <Route path="/all-instructors" element={<Instructor />} /> */}
         <Route path="/instructor" element={<InstructorDetails />} />
         <Route path="/events" element={<Event />} />
         <Route path="/events-details" element={<EventDetails />} />
@@ -102,8 +102,8 @@ const AppNavigation = () => {
                <Route path="/my-attempts" element={<ProtectedRoute><StudentAttempt /></ProtectedRoute>} />
                <Route path="/my-history" element={<ProtectedRoute><StudentHistory /></ProtectedRoute>} />
                <Route path="/my-profile-setting" element={<ProtectedRoute><StudentSetting /></ProtectedRoute>} />
+        <Route path="/faq-one" element={<FaqOnePage />} />
         <Route path="/booking/checkout" element={<ProtectedRoute><BookingCheckout /></ProtectedRoute>} />
-        {/* <Route path="/blog-details/:id" element={<DynamicBlogDeatils />} /> */}
         <Route path="*" element={<NotFound />} />
       </Routes>
   );

@@ -15,7 +15,7 @@ const MobileSidebar = ({ isActive, setIsActive }: MobileSidebarProps) => {
             <nav className="tgmobile__menu-box">
                <div onClick={() => setIsActive(false)} className="close-btn"><i className="tg-flaticon-close-1"></i></div>
                <div className="nav-logo">
-                  <Link to="/"><img src="/assets/img/logo/edunyte-light.png" height="100" width="100" alt="Logo" /></Link>
+                  <Link to="/"><img src="/assets/img/logo/edunyte-light.png" height="160" width="160" alt="Logo" /></Link>
                </div>
                <div className="tgmobile__search">
                   <form onSubmit={(e) => e.preventDefault()}>
