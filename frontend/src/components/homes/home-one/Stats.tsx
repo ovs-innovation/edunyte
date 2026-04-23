@@ -1,0 +1,41 @@
+const statsData = [
+    { title: '100,000+', subtitle: 'Experienced tutors' },
+    { title: '300,000+', subtitle: '5-star tutor reviews' },
+    { title: '120+', subtitle: 'Subjects taught' },
+    { title: '180+', subtitle: 'Tutor nationalities' },
+    { title: '4.8', subtitle: 'on the App Store', isRating: true }
+];
+
+const Stats = () => {
+    return (
+        <section style={{ backgroundColor: '#fff', borderTop: '1px solid #eaeaea', borderBottom: '1px solid #eaeaea', padding: '60px 0' }}>
+            <div className="container">
+                <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '30px', textAlign: 'center' }}>
+                    {statsData.map((stat, index) => (
+                        <div key={index} style={{ flex: '1 1 150px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', marginBottom: '8px' }}>
+                                <h3 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#1a1a1a', margin: 0, lineHeight: 1 }}>
+                                    {stat.title}
+                                </h3>
+                                {stat.isRating && (
+                                    <div style={{ display: 'flex', fontSize: '1.2rem', gap: '2px' }}>
+                                        <i className="fas fa-star" style={{ color: '#1a1a1a' }}></i>
+                                        <i className="fas fa-star" style={{ color: '#1a1a1a' }}></i>
+                                        <i className="fas fa-star" style={{ color: '#1a1a1a' }}></i>
+                                        <i className="fas fa-star" style={{ color: '#1a1a1a' }}></i>
+                                        <i className="fas fa-star" style={{ color: '#1a1a1a' }}></i>
+                                    </div>
+                                )}
+                            </div>
+                            <p style={{ fontSize: '1rem', color: '#4d4d4d', margin: 0, fontWeight: 500 }}>
+                                {stat.subtitle}
+                            </p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
+};
+
+export default Stats;

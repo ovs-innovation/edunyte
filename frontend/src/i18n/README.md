@@ -1,6 +1,6 @@
 # Scalable Multi-Language System with Auto-Translation
 
-This system provides a scalable language solution with auto-translation capabilities, similar to Preply.com.
+This system provides a scalable language solution with auto-translation capabilities.
 
 ## Features
 

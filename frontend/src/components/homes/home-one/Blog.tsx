@@ -13,7 +13,7 @@ const Blog = ({ style }: BlogProps) => {
          <div className="container">
             <div className="row justify-content-center">
                <div className="col-lg-6">
-                  <div className="section__title text-center mb-40">
+                  <div className="section__title text-center mb-20">
                      <span className="sub-title">{t('home.blog.subtitle')}</span>
                      <h2 className="title">{t('home.blog.title')}</h2>
                      <p>{t('home.blog.description')}</p>

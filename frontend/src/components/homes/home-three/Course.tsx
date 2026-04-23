@@ -14,7 +14,7 @@ const Course = () => {
    };
 
    return (
-      <section className="courses-area-two tg-motion-effects courses__bg" style={{ backgroundImage: `url(/assets/img/bg/h3_courses_bg.jpg)` }}>
+      <section className="courses-area-two tg-motion-effects " >
          <div className="container">
             <div className="row">
                <div className="col-12">

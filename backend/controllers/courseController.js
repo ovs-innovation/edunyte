@@ -47,6 +47,7 @@ export const createCourse = async (req, res, next) => {
   try {
     const { name, description, category, image, status } = req.body;
     const createdBy = req.user.id;
+    const role = req.user.role;
 
     const normalizedName = normalizeLanguageValue(name);
     const normalizedDescription = normalizeLanguageValue(description);
@@ -62,15 +63,20 @@ export const createCourse = async (req, res, next) => {
       return res.status(409).json({ message: "Course with this name already exists" });
     }
 
+    // Teachers can only create pending courses
+    let courseStatus = status || "active";
+    if (role === "teacher") {
+      courseStatus = "pending";
+    }
+
     const course = await Course.create({
       name: normalizedName,
       description: normalizedDescription,
       category,
       image,
-      status: status || "active",
+      status: courseStatus,
       createdBy,
     });
-
     await course.populate("createdBy", "name email");
     const courseObj = course.toObject();
     courseObj.name = getLanguageValue(courseObj.name);

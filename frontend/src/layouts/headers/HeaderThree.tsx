@@ -20,7 +20,7 @@ const HeaderThree = () => {
       <>
          <header>
             <HeaderTopOne style={true} />
-            <div id="header-fixed-height"></div>
+            <div id="header-fixed-height" className={`${sticky ? "active-height" : ""}`}></div>
             <div id="sticky-header" className={`tg-header__area tg-header__style-three ${sticky ? "sticky-menu" : ""}`}>
                <div className="container">
                   <div className="row">

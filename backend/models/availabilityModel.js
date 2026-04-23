@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 /**
  * Availability Model
  * Stores teacher availability slots for specific dates
- * Similar to Preply's availability system
+ * Similar to the availability system
  */
 const availabilitySchema = new mongoose.Schema(
   {
@@ -83,7 +83,7 @@ const availabilitySchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      // `held` is a temporary lock during checkout (Preply-style).
+      // `held` is a temporary lock during checkout.
       enum: ["available", "held", "booked", "blocked", "cancelled"],
       default: "available",
       index: true,

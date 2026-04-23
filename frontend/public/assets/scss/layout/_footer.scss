@@ -41,15 +41,14 @@
         }
     }
     &__top {
-        padding: 100px 0 60px;
+        padding: 5px 0 5px;
         @media #{$xs} {
-            padding: 80px 0 40px;
+            padding: 15px 0 10px;
         }
         & .row {
             & [class*="col-"] {
                 &:nth-child(2) {
                     & .footer__widget {
-                        margin-left: 60px;
                         @media #{$md} {
                             margin-left: 0;
                         }
@@ -57,7 +56,6 @@
                 }
                 &:nth-child(3) {
                     & .footer__widget {
-                        margin-left: 60px;
                         @media #{$md} {
                             margin-left: 0;
                         }
@@ -78,8 +76,8 @@
             font-size: 22px;
             font-weight: 600;
             position: relative;
-            padding-bottom: 20px;
-            margin-bottom: 20px;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
             &::before {
                 content: "";
                 position: absolute;

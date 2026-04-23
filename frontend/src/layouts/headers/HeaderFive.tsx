@@ -2,7 +2,7 @@ import { useState } from "react"
 import NavMenuOne from "./menu/NavMenu"
 import MobileSidebar from "./menu/MobileSidebar"
 import UseSticky from "../../hooks/UseSticky"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import InjectableSvg from "../../hooks/InjectableSvg"
 import TotalCart from "../../components/common/TotalCart"
 import HeaderTopTwo from "./menu/HeaderTopTwo"
@@ -11,6 +11,16 @@ const HeaderFive = () => {
 
    const { sticky } = UseSticky();
    const [isActive, setIsActive] = useState<boolean>(false);
+   const [searchText, setSearchText] = useState('')
+   const navigate = useNavigate()
+
+   const handleSearchSubmit = (e: React.FormEvent) => {
+      e.preventDefault()
+      if (searchText.trim()) {
+         navigate(`/courses?search=${encodeURIComponent(searchText.trim())}`)
+         setSearchText('')
+      }
+   }
 
    return (
 
@@ -49,9 +59,14 @@ const HeaderFive = () => {
                                  <ul className="list-wrap">
                                     <li>
                                        <div className="tgmenu__search tgmenu__search-two  d-none d-md-block">
-                                          <form onSubmit={(e) => e.preventDefault()} className="tgmenu__search-form tgmenu__search-form-two">
+                                          <form onSubmit={handleSearchSubmit} className="tgmenu__search-form tgmenu__search-form-two">
                                              <div className="input-grp">
-                                                <input type="text" placeholder="Search . . ." />
+                                                <input 
+                                                   type="text" 
+                                                   placeholder="Search . . ." 
+                                                   value={searchText}
+                                                   onChange={(e) => setSearchText(e.target.value)}
+                                                />
                                                 <button type="submit"><i className="flaticon-search"></i></button>
                                              </div>
                                           </form>

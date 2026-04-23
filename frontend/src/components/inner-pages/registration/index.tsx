@@ -9,7 +9,7 @@ const Registration = ({ role }: { role?: string }) => {
       <>
          <HeaderOne />
          <main className="main-area fix">
-            <BreadcrumbOne title={role === 'tutor' ? t('common.tutor_registration') : t('common.student_registration')} sub_title={role === 'tutor' ? t('common.tutor_registration') : t('common.student_registration')} />
+            <BreadcrumbOne title={role === 'instructor' || role === 'tutor' ? t('common.instructor_registration') || t('common.tutor_registration') : t('common.student_registration')} sub_title={role === 'instructor' || role === 'tutor' ? t('common.instructor_registration') || t('common.tutor_registration') : t('common.student_registration')} />
          <RegistrationArea role={role} />
       </main>
       <FooterOne style={false} style_2={false} />

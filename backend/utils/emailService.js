@@ -4,20 +4,33 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST || "smtp.gmail.com",
-  port: Number(process.env.EMAIL_PORT || 465),
-  secure: process.env.EMAIL_SECURE ? process.env.EMAIL_SECURE === "true" : true,
+  service: 'gmail',
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+  tls: {
+    rejectUnauthorized: false
+  }
+});
+
+// Verify connection configuration on startup
+transporter.verify(function (error, success) {
+  if (error) {
+    console.error("❌ Email Transporter Error:", error.message);
+    if (error.message.includes("Invalid login")) {
+      console.error("👉 TIP: Your Gmail App Password seems incorrect or expired. Please generate a new one.");
+    }
+  } else {
+    console.log("✅ Email Server is ready to send notifications");
+  }
 });
 
 
 export const sendOTPEmail = async (email, otp, userName) => {
   try {
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: `"Edunyte Security" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Your Login Verification Code",
       html: `
@@ -76,7 +89,7 @@ export const sendOTPEmail = async (email, otp, userName) => {
 export const sendResetPasswordEmail = async (email, otp, userName) => {
   try {
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: `"Edunyte Security" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Reset your password",
       html: `
@@ -121,5 +134,60 @@ export const sendResetPasswordEmail = async (email, otp, userName) => {
   } catch (error) {
     console.error("Error sending reset password email:", error);
     throw error;
+  }
+};
+
+export const sendTeacherRegistrationNotificationToAdmin = async (teacherData) => {
+  try {
+    const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+    const mailOptions = {
+      from: `"Edunyte System" <${process.env.EMAIL_USER}>`,
+      to: adminEmail,
+      subject: "New Instructor Registration Pending Approval",
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+          <h2 style="color: #6366f1;">New Instructor Signup</h2>
+          <p>A new instructor has registered and is waiting for your approval.</p>
+          <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin-top: 20px;">
+            <p><strong>Name:</strong> ${teacherData.name}</p>
+            <p><strong>Email:</strong> ${teacherData.email}</p>
+            <p><strong>Registration Date:</strong> ${new Date().toLocaleString()}</p>
+          </div>
+          <p style="margin-top: 20px;">Please login to the admin panel to review and approve this account.</p>
+          <p>Regards,<br/>Edunyte System</p>
+        </div>
+      `,
+    };
+    await transporter.sendMail(mailOptions);
+    console.log(`Admin notification sent for new teacher: ${teacherData.email}`);
+  } catch (error) {
+    console.error("Error sending admin notification email:", error);
+  }
+};
+
+export const sendInstructorApprovalEmail = async (email, userName) => {
+  try {
+    const mailOptions = {
+      from: `"Edunyte Team" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "Your Instructor Account has been Approved!",
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+          <h2 style="color: #10b981;">Congratulations!</h2>
+          <p>Hello ${userName},</p>
+          <p>Your instructor account on Edunyte has been approved by the administrators.</p>
+          <p>You can now log in to the platform and start creating your courses or managing your profile.</p>
+          <div style="margin-top: 30px;">
+            <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/login/instructor" style="background: #10b981; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login to your Account</a>
+          </div>
+          <p style="margin-top: 30px;">Welcome to the Edunyte community!</p>
+          <p>Regards,<br/>Edunyte Team</p>
+        </div>
+      `,
+    };
+    await transporter.sendMail(mailOptions);
+    console.log(`Approval email sent to ${email}`);
+  } catch (error) {
+    console.error("Error sending approval email:", error);
   }
 };

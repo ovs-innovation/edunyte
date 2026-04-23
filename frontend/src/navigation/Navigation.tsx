@@ -50,6 +50,14 @@ import BookingCheckout from '../pages/BookingCheckout';
 import NotFound from '../pages/NotFound';
 import ProtectedRoute from '../components/common/ProtectedRoute';
 import FaqOnePage from '../pages/Faq';
+import OurValues from '../pages/OurValues';
+import OurAdvisoryBoard from '../pages/OurAdvisoryBoard';
+import OurPartners from '../pages/OurPartners';
+import WorkAtFutureLearn from '../pages/WorkAtFutureLearn';
+import QuizletPlus from '../pages/QuizletPlus';
+import BecomeTeacher from '../pages/BecomeTeacher';
+import BecomeStudent from '../pages/BecomeStudent';
+// import BecomePartner from '../pages/BecomePartner';
 
 const AppNavigation = () => {
   return (
@@ -78,11 +86,12 @@ const AppNavigation = () => {
         <Route path="/blog-2" element={<BlogTwo />} />
         <Route path="/blog-3" element={<BlogThree />} />
         <Route path="/blog-details" element={<BlogDetails />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/registration" element={<Registration />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/instructor-dashboard" element={<InstructorDashboard />} />
-        <Route path="/registration/tutor" element={<Registration role="tutor" />} />
+        <Route path="/login" element={<Login role="student" />} />
+        <Route path="/student/login" element={<Login role="student" />} />
+        <Route path="/instructor/login" element={<Login role="instructor" />} />
+        <Route path="/registration" element={<Registration role="student" />} />
+        <Route path="/student/registration" element={<Registration role="student" />} />
+        <Route path="/instructor/registration" element={<Registration role="instructor" />} />
         <Route path="/instructor-profile" element={<InstructorProfile />} />
         <Route path="/instructor-enrolled-courses" element={<InstructorEnrollCourse />} />
         <Route path="/instructor-wishlist" element={<InstructorWishlist />} />
@@ -104,6 +113,14 @@ const AppNavigation = () => {
                <Route path="/my-profile-setting" element={<ProtectedRoute><StudentSetting /></ProtectedRoute>} />
         <Route path="/faq-one" element={<FaqOnePage />} />
         <Route path="/booking/checkout" element={<ProtectedRoute><BookingCheckout /></ProtectedRoute>} />
+        <Route path="/our-values" element={<OurValues />} />
+        <Route path="/our-advisory-board" element={<OurAdvisoryBoard />} />
+        <Route path="/our-partners" element={<OurPartners />} />
+        <Route path="/work-at-future-learn" element={<WorkAtFutureLearn />} />
+        <Route path="/quizlet-plus" element={<QuizletPlus />} />
+        <Route path="/become-teacher" element={<BecomeTeacher />} />
+        <Route path="/become-student" element={<BecomeStudent />} />
+        {/* <Route path="/become-partner" element={<BecomePartner />} /> */}
         <Route path="*" element={<NotFound />} />
       </Routes>
   );

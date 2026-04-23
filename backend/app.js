@@ -34,7 +34,7 @@ const app = express();
 dotenv.config();
 
 connectDB(process.env.MONGO_URI);
-ensureDefaultRoles();
+ensureDefaultRoles().then(() => console.log("Default roles ensured"));
 
 app.use(cors({
   origin: true,

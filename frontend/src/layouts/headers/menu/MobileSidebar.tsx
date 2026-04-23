@@ -1,7 +1,8 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import MobileMenu from "./MobileMenu"
 import LanguageCurrencySwitcher from "../../../components/common/LanguageCurrencySwitcher"
 import { useTranslation } from "react-i18next"
+import { useState } from "react"
 
 interface MobileSidebarProps {
    isActive: boolean;
@@ -9,6 +10,18 @@ interface MobileSidebarProps {
 }
 const MobileSidebar = ({ isActive, setIsActive }: MobileSidebarProps) => {
    const { t } = useTranslation()
+   const navigate = useNavigate()
+   const [searchText, setSearchText] = useState('')
+
+   const handleSearchSubmit = (e: React.FormEvent) => {
+      e.preventDefault()
+      if (searchText.trim()) {
+         navigate(`/courses?search=${encodeURIComponent(searchText.trim())}`)
+         setSearchText('')
+         setIsActive(false)
+      }
+   }
+
    return (
       <div className={isActive ? "mobile-menu-visible" : ""}>
          <div className="tgmobile__menu">
@@ -18,9 +31,14 @@ const MobileSidebar = ({ isActive, setIsActive }: MobileSidebarProps) => {
                   <Link to="/"><img src="/assets/img/logo/edunyte-light.png" height="160" width="160" alt="Logo" /></Link>
                </div>
                <div className="tgmobile__search">
-                  <form onSubmit={(e) => e.preventDefault()}>
-                     <input type="text" placeholder={t("common.search_here")} />
-                     <button><i className="fas fa-search"></i></button>
+                  <form onSubmit={handleSearchSubmit}>
+                     <input 
+                        type="text" 
+                        placeholder={t("common.search_here")} 
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                     />
+                     <button type="submit"><i className="fas fa-search"></i></button>
                   </form>
                </div>
                <div className="tgmobile__language-currency">

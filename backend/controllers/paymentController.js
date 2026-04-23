@@ -252,4 +252,122 @@ export const stripeWebhook = async (req, res, next) => {
   }
 };
 
+export const createFreeBooking = async (req, res, next) => {
+  try {
+    const studentId = req.user.id;
+    const { teacherId, courseId, duration, selectedCurrency, selectedSlot, studentCount } = req.body;
+    const availabilityId = selectedSlot?.availabilityId || selectedSlot?._id || req.body.availabilityId;
+
+    if (!mongoose.Types.ObjectId.isValid(teacherId)) {
+      return res.status(400).json({ message: "Invalid teacherId" });
+    }
+    if (!mongoose.Types.ObjectId.isValid(courseId)) {
+      return res.status(400).json({ message: "Invalid courseId" });
+    }
+    if (!mongoose.Types.ObjectId.isValid(availabilityId)) {
+      return res.status(400).json({ message: "Invalid availabilityId" });
+    }
+
+    const { course, availability, teacherCourse } = await resolveCheckoutContext({
+      teacherId,
+      courseId,
+      availabilityId,
+    });
+
+    const d = Number(duration);
+    if (availability.duration !== d) {
+      return res.status(400).json({ message: "Duration does not match selected slot" });
+    }
+
+    if (availability.status !== "available" || availability.bookingId) {
+      return res.status(409).json({ message: "Slot is no longer available" });
+    }
+
+    const amounts = await calculateCheckoutAmounts({
+      teacherCourse,
+      duration: d,
+      selectedCurrency,
+      studentCount: studentCount || 1,
+    });
+
+    // In a "Free" booking, we bypass Stripe
+    availability.status = "booked";
+    await availability.save();
+
+    const scheduledAt = availability.startTimeUTC || availability.date;
+
+    let meeting = { meetingId: "", joinUrlStudent: "", joinUrlTeacher: "" };
+    try {
+      meeting = await createZoomMeeting({
+        topic: "Free Lesson",
+        startTimeUTC: scheduledAt,
+        durationMinutes: d || availability.duration,
+      });
+    } catch (e) {
+      console.error("Zoom meeting creation failed for free booking:", e);
+    }
+
+    const freePaymentId = `FREE_${new mongoose.Types.ObjectId()}`;
+
+    const booking = await Booking.create({
+      studentId,
+      teacherId,
+      teacherCourseId: teacherCourse._id,
+      availabilityId,
+      courseId,
+      languageId: teacherCourse.languageIds?.[0],
+      sessionDate: availability.date,
+      startTime: availability.startTime,
+      endTime: availability.endTime,
+      duration: availability.duration,
+      timezone: availability.timezone,
+      studentCount: studentCount || 1,
+      lesson: {
+        duration: availability.duration,
+        scheduledAt,
+        timezone: availability.timezone,
+      },
+      pricingSnapshot: {
+        baseAmountUSD: 0,
+        platformFeeUSD: 0,
+        studentPaid: {
+          amount: 0,
+          currency: (selectedCurrency || "USD").toUpperCase(),
+        },
+        exchangeRatesUsed: {},
+        chargedAt: new Date(),
+      },
+      payout: {
+        teacherAmountUSD: 0,
+        teacherCurrency: "USD",
+        status: "pending",
+      },
+      payment: {
+        stripePaymentIntentId: freePaymentId,
+        status: "paid",
+      },
+      meeting: {
+        provider: "zoom",
+        meetingId: meeting.meetingId,
+        joinUrlStudent: meeting.joinUrlStudent,
+        joinUrlTeacher: meeting.joinUrlTeacher,
+      },
+      paymentStatus: "paid",
+      paymentId: freePaymentId,
+    });
+
+    availability.bookingId = booking._id;
+    await availability.save();
+
+    res.json({
+      success: true,
+      bookingId: booking._id,
+      message: "Free booking successful",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+
 

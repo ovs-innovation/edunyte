@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MoreHorizontal, Pencil, Trash2, Eye } from 'lucide-react';
+import { MoreHorizontal, Pencil, Trash2, Eye, CheckCircle2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,9 +33,10 @@ interface Props {
   onEdit: (user: ApiUser) => void;
   onDelete: (id: string) => void;
   onView: (user: ApiUser) => void;
+  onStatusUpdate?: (id: string, status: string) => void;
 }
 
-export function UserTable({ users, loading, onEdit, onDelete, onView }: Props) {
+export function UserTable({ users, loading, onEdit, onDelete, onView, onStatusUpdate }: Props) {
   const { toast } = useToast();
 
   const formatAvatar = (name: string) =>
@@ -122,6 +123,16 @@ export function UserTable({ users, loading, onEdit, onDelete, onView }: Props) {
                     <DropdownMenuItem className="gap-2" onSelect={() => onView(user)}>
                       <Eye className="h-4 w-4" /> View
                     </DropdownMenuItem>
+                    {user.status === 'pending' && onStatusUpdate && (
+                      <PermissionGate permission="users.edit">
+                        <DropdownMenuItem 
+                          className="gap-2 text-success focus:text-success" 
+                          onSelect={() => onStatusUpdate(user.id, 'active')}
+                        >
+                          <CheckCircle2 className="h-4 w-4" /> Approve
+                        </DropdownMenuItem>
+                      </PermissionGate>
+                    )}
                     <PermissionGate permission="users.edit">
                       <DropdownMenuItem className="gap-2" onSelect={() => onEdit(user)}>
                         <Pencil className="h-4 w-4" /> Edit

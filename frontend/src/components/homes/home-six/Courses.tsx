@@ -5,7 +5,7 @@ import BtnArrow from "../../../svg/BtnArrow"
 
 const Courses = () => {
   return (
-    <section className="courses-area-five section-py-140 courses__bg-four" style={{ backgroundImage: `url(/assets/img/bg/h6_courses_bg.jpg)` }}>
+    <section className="courses-area-five section-py-140 courses__bg-four">
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-xl-6">

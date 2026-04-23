@@ -34,7 +34,7 @@ const FooterThree = () => {
                               <li><Link to="/events-details">Our values</Link></li>
                               <li><Link to="/events-details">Our advisory board</Link></li>
                               <li><Link to="/events-details">Our partners</Link></li>
-                              <li><Link to="/events-details">Become a partner</Link></li>
+                              {/* <li><Link to="/events-details">Become a partner</Link></li> */}
                               <li><Link to="/events-details">Work at Future Learn</Link></li>
                               <li><Link to="/events-details">Quizlet Plus</Link></li>
                            </ul>
@@ -84,7 +84,7 @@ const FooterThree = () => {
                <div className="row align-items-center">
                   <div className="col-md-7">
                      <div className="copy-right-text">
-                        <p>© 2010-2024 Edunyte.com. All rights reserved.</p>
+                        <p>© 2010-2026 Edunyte.com. All rights reserved.</p>
                      </div>
                   </div>
                   <div className="col-md-5">

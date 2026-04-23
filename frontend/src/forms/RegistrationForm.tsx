@@ -42,9 +42,9 @@ const RegistrationForm = ({ role }: { role?: string }) => {
             name: `${data.fname} ${data.lname}`,
             email: data.email,
             password: data.password,
-            role: role === 'tutor' ? 'teacher' : 'student',
+            role: (role === 'tutor' || role === 'instructor') ? 'teacher' : 'student',
          });
-         toast.success(role === 'tutor'
+         toast.success((role === 'tutor' || role === 'instructor')
             ? t("common.registration_success_pending", "Registration successful. Please wait for admin approval.")
             : t("common.registration_success"),
             { position: 'top-center' }

@@ -1,8 +1,10 @@
 import express from "express";
 import { joinCourse, getMyCourses, exitCourse, updateCourseRequest } from "../../controllers/teacherCourseController.js";
+import { createCourse } from "../../controllers/courseController.js";
 import { verifyToken } from "../../middlewares/authMiddleware.js";
 import { requirePermission } from "../../middlewares/permissionMiddleware.js";
 import { validateRequest } from "../../middlewares/validateRequest.js";
+import { createCourseSchema } from "../../validations/courseValidation.js";
 import { createTeacherCourseSchema, updateTeacherCourseSchema } from "../../validations/teacherCourseValidation.js";
 import Course from "../../models/courseModel.js";
 import Language from "../../models/languageModel.js";
@@ -34,11 +36,22 @@ router.get("/available-courses", requirePermission("courses.view"), async (req, 
 router.get("/languages", requirePermission("languages.view"), async (req, res, next) => {
   try {
     const languages = await Language.find({ status: "active" }).sort({ name: 1 });
-    res.json({ languages, count: languages.length });
+  res.json({ languages, count: languages.length });
   } catch (err) {
     next(err);
   }
 });
+
+/**
+ * Propose a new course (Teacher)
+ * Status will be 'pending' by default in controller
+ */
+router.post(
+  "/propose-course",
+  requirePermission("courses.create"),
+  validateRequest(createCourseSchema),
+  createCourse
+);
 
 // Join a course (create request)
 router.post(

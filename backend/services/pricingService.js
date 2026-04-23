@@ -7,7 +7,7 @@ import { getUsdToCurrencyRateOrThrow, buildUsdExchangeRateSnapshot, roundMoney2 
 const BASE = "USD";
 
 /**
- * Preply-style pricing calculation.
+ * Pricing calculation.
  *
  * INPUT (trusted):
  * - teacherCourse.pricing.basePriceUSD (per 50 min in this product)

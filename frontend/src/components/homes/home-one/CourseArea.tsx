@@ -106,7 +106,7 @@ const CourseArea = ({ style }: CourseProps) => {
 
   if (loading) {
     return (
-      <section className={`courses-area ${style ? "section-py-120" : "section-pt-120 section-pb-90"}`} style={{ backgroundImage: `url(/assets/img/bg/courses_bg.jpg )` }}>
+      <section className={`courses-area ${style ? "section-py-120" : "section-pt-120 section-pb-90"}`} >
         <div className="container">
           <div className="row justify-content-center">
             <div className="col-12 text-center">
@@ -119,7 +119,7 @@ const CourseArea = ({ style }: CourseProps) => {
   }
 
   return (
-    <section className={`courses-area ${style ? "section-py-120" : "section-pt-120 section-pb-90"}`} style={{ backgroundImage: `url(/assets/img/bg/courses_bg.jpg )` }}>
+    <section className={`courses-area ${style ? "section-py-120" : "section-pt-120 section-pb-90"}`} >
       <div className="container">
         <div className="section__title-wrap">
           <div className="row justify-content-center">

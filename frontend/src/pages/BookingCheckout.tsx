@@ -116,6 +116,8 @@ const BookingCheckoutPage = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [studentCount, setStudentCount] = useState(1)
+  const [paymentType, setPaymentType] = useState<'stripe' | 'free'>('stripe')
+  const [isProcessingFree, setIsProcessingFree] = useState(false)
 
   const selectedCurrency = useMemo(() => state?.selectedCurrency || currency || 'USD', [state, currency])
 
@@ -161,6 +163,39 @@ const BookingCheckoutPage = () => {
     }
     run()
   }, [state, selectedCurrency, studentCount, token, t])
+
+  const handleFreeBooking = async () => {
+    try {
+      setIsProcessingFree(true)
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8085/api'
+      const resp = await fetch(`${API_BASE_URL}/payments/checkout/free-booking`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          teacherId: state?.teacherId,
+          courseId: state?.courseId,
+          duration: state?.duration,
+          selectedCurrency,
+          selectedSlot: { availabilityId: state?.availabilityId },
+          studentCount,
+        }),
+      })
+
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => ({}))
+        throw new Error(data.message || 'Failed to book free class')
+      }
+
+      navigate('/my-dashboard')
+    } catch (e: any) {
+      setError(e?.message || 'Failed to book free class')
+    } finally {
+      setIsProcessingFree(false)
+    }
+  }
 
   if (!state) {
     return (
@@ -383,6 +418,52 @@ const BookingCheckoutPage = () => {
             <div className="card shadow-sm border-0">
               <div className="card-body p-3 p-md-4">
                 <h5 className="fw-bold mb-4">{t('checkout.choose_payment_method')}</h5>
+                
+                {/* Payment Method Selector */}
+                <div className="row g-3 mb-4">
+                  <div className="col-12 col-md-6">
+                    <div 
+                      className={`payment-method-card p-3 rounded-3 border cursor-pointer h-100 transition-all ${paymentType === 'stripe' ? 'border-primary bg-primary bg-opacity-10 shadow-sm' : 'border-light-subtle'}`}
+                      style={{ cursor: 'pointer', transition: 'all 0.2s' }}
+                      onClick={() => setPaymentType('stripe')}
+                    >
+                      <div className="d-flex align-items-center gap-3">
+                        <div className={`p-2 rounded-circle ${paymentType === 'stripe' ? 'bg-primary text-white' : 'bg-light'}`}>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                            <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                            <line x1="2" y1="10" x2="22" y2="10"></line>
+                          </svg>
+                        </div>
+                        <div>
+                          <div className="fw-bold">{t('checkout.online_payment') || 'Online Payment'}</div>
+                          <div className="text-muted small">Card, Cash App, Crypto...</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-12 col-md-6">
+                    <div 
+                      className={`payment-method-card p-3 rounded-3 border cursor-pointer h-100 transition-all ${paymentType === 'free' ? 'border-success bg-success bg-opacity-10 shadow-sm' : 'border-light-subtle'}`}
+                      style={{ cursor: 'pointer', transition: 'all 0.2s' }}
+                      onClick={() => setPaymentType('free')}
+                    >
+                      <div className="d-flex align-items-center gap-3">
+                        <div className={`p-2 rounded-circle ${paymentType === 'free' ? 'bg-success text-white' : 'bg-light'}`}>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                            <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path>
+                            <path d="M4 6v12c0 1.1.9 2 2 2h14v-4"></path>
+                            <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"></path>
+                          </svg>
+                        </div>
+                        <div>
+                          <div className="fw-bold">{t('checkout.free_class') || 'Free Class'}</div>
+                          <div className="text-muted small">Join for free as a demo</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {loading ? (
                   <div className="text-center py-5">
                     <div className="spinner-border text-primary" role="status">
@@ -392,6 +473,30 @@ const BookingCheckoutPage = () => {
                   </div>
                 ) : error ? (
                   <div className="alert alert-danger">{error}</div>
+                ) : paymentType === 'free' ? (
+                  <div className="text-center py-4">
+                    <div className="bg-success bg-opacity-10 p-4 rounded-4 mb-4">
+                      <h4 className="fw-bold text-success mb-2">Ready to Start?</h4>
+                      <p className="text-muted mb-0">You can join this class for free. Click below to confirm your booking.</p>
+                    </div>
+                    <button 
+                      className="btn btn-success w-100 py-3 fw-bold fs-5 shadow-sm"
+                      onClick={handleFreeBooking}
+                      disabled={isProcessingFree}
+                    >
+                      {isProcessingFree ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          Booking...
+                        </>
+                      ) : (
+                        'Confirm & Join Free Class'
+                      )}
+                    </button>
+                    <p className="text-muted small mt-3">
+                      By clicking confirm, you agree to our terms and conditions.
+                    </p>
+                  </div>
                 ) : !clientSecret ? (
                   <div className="alert alert-danger">{t('checkout.missing_client_secret')}</div>
                 ) : (
@@ -401,6 +506,9 @@ const BookingCheckoutPage = () => {
                       clientSecret,
                       appearance: {
                         theme: 'stripe',
+                        variables: {
+                          colorPrimary: '#0d6efd',
+                        }
                       },
                     }}
                   >

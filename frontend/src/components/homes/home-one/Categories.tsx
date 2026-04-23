@@ -1,164 +1,96 @@
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation } from 'swiper/modules';
-import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fetchCategories, type Category } from '../../../services/categoryService';
-
-// slider setting
-const setting = {
-   slidesPerView: 6,
-   spaceBetween: 44,
-   loop: true,
-   navigation: {
-      nextEl: '.categories-button-next',
-      prevEl: '.categories-button-prev',
-   },
-   breakpoints: {
-      '1500': {
-         slidesPerView: 6,
-      },
-      '1200': {
-         slidesPerView: 5,
-      },
-      '992': {
-         slidesPerView: 4,
-         spaceBetween: 30,
-      },
-      '768': {
-         slidesPerView: 3,
-         spaceBetween: 25,
-      },
-      '576': {
-         slidesPerView: 2,
-      },
-      '0': {
-         slidesPerView: 2,
-         spaceBetween: 20,
-      },
-   },
-};
+import { Link } from 'react-router-dom';
 
 const Categories = () => {
-   const { t } = useTranslation();
-   const [categories, setCategories] = useState<Category[]>([]);
-   const [loading, setLoading] = useState(true);
-   const [error, setError] = useState<string | null>(null);
+    const { t } = useTranslation();
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [loading, setLoading] = useState(true);
 
-   useEffect(() => {
-      const loadCategories = async () => {
-         try {
-            setLoading(true);
-            const response = await fetchCategories('active');
-            setCategories(response.categories);
-            setError(null);
-         } catch (err) {
-            setError(err instanceof Error ? err.message : t('common.error_loading_data'));
-         } finally {
-            setLoading(false);
-         }
-      };
+    useEffect(() => {
+        const loadCategories = async () => {
+            try {
+                setLoading(true);
+                const response = await fetchCategories('active');
+                setCategories(response.categories.slice(0, 8));
+            } catch (err) {
+                console.error('Failed to load categories:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-      loadCategories();
-   }, [t]);
+        loadCategories();
+    }, []);
 
-   const getCategoryIcon = (index: number) => {
-      const icons = [
-         "flaticon-graphic-design",
-         "flaticon-investment",
-         "flaticon-coding",
-         "flaticon-email",
-         "flaticon-fashion",
-         "flaticon-interaction",
-         "flaticon-web-design",
-      ];
-      return icons[index % icons.length];
-   };
+    const getCategoryIcon = (index: number) => {
+        const icons = [
+            "flaticon-graphic-design",
+            "flaticon-investment",
+            "flaticon-coding",
+            "flaticon-email",
+            "flaticon-fashion",
+            "flaticon-interaction",
+            "flaticon-web-design",
+        ];
+        return icons[index % icons.length];
+    };
 
-   if (loading) {
-      return (
-         <section className="categories-area section-py-120">
+    const getImageUrl = (imagePath: string) => {
+        if (!imagePath) return '';
+        if (imagePath.startsWith('http')) return imagePath;
+        const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+        return `${baseUrl.replace(/\/api$/, '')}/${imagePath.replace(/^\//, '')}`;
+    };
+
+    return (
+        <section style={{ backgroundColor: '#fcfaf8', padding: '50px 0' }}>
             <div className="container">
-               <div className="row justify-content-center">
-                  <div className="col-12 text-center">
-                     <p>{t('common.loading')}</p>
-                  </div>
-               </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px' }}>
+                    <div>
+                        <h2 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#1a1a1a', marginBottom: '10px' }}>Learn a Category</h2>
+                        <p style={{ fontSize: '1.1rem', color: '#6d6d6d', margin: 0 }}>Discover online tutors for any subject</p>
+                    </div>
+                </div>
+
+                <div className="row">
+                    {categories.map((cat, index) => (
+                        <div key={cat._id} className="col-lg-3 col-md-4 col-sm-6 mb-4">
+                            <Link to={`/courses?category=${cat.slug || cat._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', display: 'flex', alignItems: 'center', boxShadow: '0 4px 15px rgba(0,0,0,0.03)', transition: 'transform 0.2s, box-shadow 0.2s', cursor: 'pointer', height: '100%' }}
+                                    onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.08)'; }}
+                                    onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.03)'; }}
+                                >
+                                    <div style={{ marginRight: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: cat.image ? 'transparent' : '#eef6f6', borderRadius: '50%' }}>
+                                        {cat.image ? (
+                                            <img src={getImageUrl(cat.image)} alt={cat.name} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '50%' }} />
+                                        ) : (
+                                            <i className={getCategoryIcon(index)} style={{ fontSize: '1.5rem', color: '#3bb3bd' }}></i>
+                                        )}
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                        <h4 style={{ fontSize: '1.1rem', fontWeight: 700, margin: '0 0 5px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{cat.name}</h4>
+                                        <div style={{ fontSize: '0.9rem', color: '#6d6d6d' }}>View courses</div>
+                                    </div>
+                                    <i className="fas fa-chevron-right" style={{ marginLeft: '10px', color: '#c4c4c4', fontSize: '0.9rem' }}></i>
+                                </div>
+                            </Link>
+                        </div>
+                    ))}
+                </div>
+
+                <div style={{ textAlign: 'center', marginTop: '30px' }}>
+                    <Link to="/courses" style={{ display: 'inline-block', backgroundColor: 'transparent', color: '#1a1a1a', border: '2px solid #eaeaea', borderRadius: '8px', padding: '12px 30px', fontSize: '1.1rem', fontWeight: 700, cursor: 'pointer', transition: '0.2s', textDecoration: 'none' }}
+                        onMouseOver={(e) => { e.currentTarget.style.borderColor = '#1a1a1a'; }}
+                        onMouseOut={(e) => { e.currentTarget.style.borderColor = '#eaeaea'; }}
+                    >
+                        Explore all subjects
+                    </Link>
+                </div>
             </div>
-         </section>
-      );
-   }
+        </section>
+    );
+};
 
-   if (error) {
-      return (
-         <section className="categories-area section-py-120">
-            <div className="container">
-               <div className="row justify-content-center">
-                  <div className="col-12 text-center">
-                     <p>{error}</p>
-                  </div>
-               </div>
-            </div>
-         </section>
-      );
-   }
-
-   return (
-      <section className="categories-area section-py-120">
-         <div className="container">
-            <div className="row justify-content-center">
-               <div className="col-xl-5 col-lg-7">
-                  <div className="section__title text-center mb-40">
-                     <span className="sub-title">{t('common.trending_categories')}</span>
-                     <h2 className="title">{t('common.top_category_we_have')}</h2>
-                     <p className="desc">{t('common.category_description')}</p>
-                  </div>
-               </div>
-            </div>
-
-            <div className="row">
-               <div className="col-12">
-                  <div className="categories__wrap">
-                     <Swiper {...setting} modules={[Navigation]} className="swiper categories-active">
-                        {categories.map((item, index) => (
-                           <SwiperSlide key={item._id} className="swiper-slide">
-                              <div className="categories__item">
-                                 <Link to={`/courses?category=${item.slug || item._id}`}>
-                                    {item.image ? (
-                                       <div className="icon">
-                                          <img src={item.image} alt={item.name} style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '50%' }} />
-                                       </div>
-                                    ) : (
-                                       <div className="icon">
-                                          <i className={getCategoryIcon(index)}></i>
-                                       </div>
-                                    )}
-                                    <span className="name">{item.name}</span>
-                                    <span className="courses">({t('common.courses')})</span>
-                                 </Link>
-                              </div>
-                           </SwiperSlide>
-                        ))}
-                     </Swiper>
-
-                     <div className="categories__nav">
-                        <button className="categories-button-prev">
-                           <svg width="16" height="14" viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M15 7L1 7M1 7L7 1M1 7L7 13" stroke="#161439" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                           </svg>
-                        </button>
-                        <button className="categories-button-next">
-                           <svg width="16" height="14" viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M1 7L15 7M15 7L9 1M15 7L9 13" stroke="#161439" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                           </svg>
-                        </button>
-                     </div>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </section>
-   )
-}
-
-export default Categories
+export default Categories;

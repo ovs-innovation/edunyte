@@ -126,7 +126,7 @@ export function AdminSidebar() {
         ))}
         
         {/* Course Management Collapsible - Right after Dashboard */}
-        {currentRole !== 'teacher' && (
+        {(currentRole === 'admin' || currentRole === 'super_admin' || currentRole === 'teacher') && (
           <PermissionGate permission="courses.view">
             <Collapsible
               open={courseManagementOpen}

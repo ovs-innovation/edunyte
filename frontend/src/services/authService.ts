@@ -172,3 +172,45 @@ export const validateToken = async (): Promise<AuthResponse['user'] | null> => {
   }
 }
 
+export const googleLogin = async (credential: string, role?: string, isAccessToken?: boolean): Promise<AuthResponse> => {
+  const body: any = { role };
+  if (isAccessToken) {
+    body.accessToken = credential;
+  } else {
+    body.credential = credential;
+  }
+  
+  const response = await fetch(`${API_BASE_URL}/auth/google-login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  })
+
+  const data = await response.json()
+
+  if (!response.ok) {
+    throw new Error(data.message || 'Google login failed')
+  }
+
+  return data
+}
+
+export const firebaseLogin = async (token: string, role?: string): Promise<AuthResponse> => {
+  const response = await fetch(`${API_BASE_URL}/auth/firebase-login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ token, role }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Firebase login failed");
+  }
+
+  return data;
+};

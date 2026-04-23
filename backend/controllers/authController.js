@@ -1,14 +1,192 @@
 import User from "../models/userModel.js";
+import axios from "axios";
 import OTP from "../models/otpModel.js";
 import Settings from "../models/settingsModel.js";
 import { generateToken } from "../utils/generateToken.js";
 import { rolePermissions } from "../lib/roles.js";
 import Role from "../models/roleModel.js";
 import { resolveRoleKey } from "../lib/validateRole.js";
-import { sendOTPEmail, sendResetPasswordEmail } from "../utils/emailService.js";
+import { sendOTPEmail, sendResetPasswordEmail, sendTeacherRegistrationNotificationToAdmin } from "../utils/emailService.js";
 import TeacherProfile from "../models/teacherProfileModel.js";
 import { getLanguageValue } from "../utils/languageHelper.js";
 import crypto from "crypto";
+import { OAuth2Client } from "google-auth-library";
+import firebaseAdmin from "../config/firebase.js";
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+export const firebaseLogin = async (req, res, next) => {
+  try {
+    const { token, role } = req.body;
+    if (!token) {
+      return res.status(400).json({ message: "Firebase token is required" });
+    }
+
+    const decodedToken = await firebaseAdmin.auth().verifyIdToken(token);
+    const { email, name, picture, uid: firebaseId } = decodedToken;
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // Register new user via Firebase
+      const userRole = await resolveRoleKey(role || "student");
+      
+      let status = "active";
+      if (userRole === "teacher") {
+        status = "pending";
+      }
+
+      const randomPassword = crypto.randomBytes(16).toString("hex");
+      
+      user = await User.create({
+        name: name || email.split('@')[0],
+        email,
+        password: randomPassword,
+        role: userRole,
+        status,
+        firebaseId,
+      });
+
+      if (status === "pending") {
+        await sendTeacherRegistrationNotificationToAdmin({ name: user.name, email });
+        const perms = await resolvePermissions(user.role);
+        return res.status(201).json({
+          message: "Registration successful. Please wait for admin approval.",
+          user: formatUser(user, perms),
+          status: "pending"
+        });
+      }
+    } else {
+      if (!user.firebaseId) {
+        user.firebaseId = firebaseId;
+        await user.save();
+      }
+      
+      if (user.status === "inactive" || user.status === "pending") {
+        return res.status(403).json({ message: "Account is not active" });
+      }
+    }
+
+    user.lastLogin = new Date();
+    await user.save();
+
+    if (user.role === "student") {
+      const StudentProfile = (await import("../models/studentProfileModel.js")).default;
+      let studentProfile = await StudentProfile.findOne({ userId: user._id });
+      if (!studentProfile) {
+        await StudentProfile.create({ userId: user._id, photo: picture });
+      }
+    } else if (user.role === "teacher") {
+       let teacherProfile = await TeacherProfile.findOne({ userId: user._id });
+       if (!teacherProfile) {
+         await TeacherProfile.create({ userId: user._id, profilePicture: picture });
+       }
+    }
+
+    const perms = await resolvePermissions(user.role);
+    const tokenResponse = generateToken(user);
+    res.json({ token: tokenResponse, user: formatUser(user, perms) });
+  } catch (err) {
+    console.error("Firebase Login Error:", err);
+    res.status(401).json({ message: "Firebase authentication failed" });
+  }
+};
+
+export const googleLogin = async (req, res, next) => {
+  try {
+    const { credential, accessToken, role } = req.body;
+    let email, name, picture, googleId;
+
+    if (accessToken) {
+      // Handle OAuth2 Access Token (Implicit flow from custom button)
+      const { data } = await axios.get(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`);
+      email = data.email;
+      name = data.name;
+      picture = data.picture;
+      googleId = data.sub;
+    } else if (credential) {
+      // Handle ID Token (JWT from GoogleLogin component)
+      const ticket = await client.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      const payload = ticket.getPayload();
+      email = payload.email;
+      name = payload.name;
+      picture = payload.picture;
+      googleId = payload.sub;
+    } else {
+      return res.status(400).json({ message: "Google credential or access token is required" });
+    }
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // Register new user via Google
+      const userRole = await resolveRoleKey(role || "student");
+      
+      let status = "active";
+      if (userRole === "teacher") {
+        status = "pending";
+      }
+
+      // Generate a random password for Google users (they won't use it but it's required by model)
+      const randomPassword = crypto.randomBytes(16).toString("hex");
+      
+      user = await User.create({
+        name,
+        email,
+        password: randomPassword,
+        role: userRole,
+        status,
+        googleId,
+      });
+
+      if (status === "pending") {
+        await sendTeacherRegistrationNotificationToAdmin({ name, email });
+        const perms = await resolvePermissions(user.role);
+        return res.status(201).json({
+          message: "Registration successful. Please wait for admin approval.",
+          user: formatUser(user, perms),
+          status: "pending"
+        });
+      }
+    } else {
+      // User exists, update googleId if not present
+      if (!user.googleId) {
+        user.googleId = googleId;
+        await user.save();
+      }
+      
+      if (user.status === "inactive" || user.status === "pending") {
+        return res.status(403).json({ message: "Account is not active" });
+      }
+    }
+
+    user.lastLogin = new Date();
+    await user.save();
+
+    if (user.role === "student") {
+      const StudentProfile = (await import("../models/studentProfileModel.js")).default;
+      let studentProfile = await StudentProfile.findOne({ userId: user._id });
+      if (!studentProfile) {
+        await StudentProfile.create({ userId: user._id, photo: picture });
+      }
+    } else if (user.role === "teacher") {
+       let teacherProfile = await TeacherProfile.findOne({ userId: user._id });
+       if (!teacherProfile) {
+         await TeacherProfile.create({ userId: user._id, profilePicture: picture });
+       }
+    }
+
+    const perms = await resolvePermissions(user.role);
+    const token = generateToken(user);
+    res.json({ token, user: formatUser(user, perms) });
+  } catch (err) {
+    console.error("Google Login Error:", err);
+    res.status(401).json({ message: "Google authentication failed" });
+  }
+};
 
 const resolvePermissions = async (roleKey) => {
   const role = await Role.findOne({ key: roleKey });
@@ -50,6 +228,7 @@ export const register = async (req, res, next) => {
     
     // If pending, do not issue token
     if (status === "pending") {
+      await sendTeacherRegistrationNotificationToAdmin({ name, email });
       return res.status(201).json({ 
         message: "Registration successful. Please wait for admin approval.", 
         user: formatUser(user, perms),

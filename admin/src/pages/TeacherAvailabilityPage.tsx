@@ -30,7 +30,7 @@ import { cn } from '@/lib/utils';
 import { useConfirmDialog } from '@/hooks/use-confirm-dialog';
 import { useRole } from '@/contexts/RoleContext';
 import { useNavigate } from 'react-router-dom';
-import { format, startOfWeek, addDays, isSameDay } from 'date-fns';
+import { format, startOfWeek, endOfWeek, addDays, isSameDay, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, isSameMonth } from 'date-fns';
 import {
   Command,
   CommandEmpty,
@@ -284,8 +284,13 @@ const TeacherAvailabilityPage = () => {
     return acc;
   }, {} as Record<string, ApiAvailability[]>);
 
-  const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 }); // Monday
-  const weekDates = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+  const monthStart = startOfMonth(selectedDate);
+  const monthEnd = endOfMonth(selectedDate);
+  const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 });
+  const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
+  const calendarDates = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
+
+  const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   const getSlotsForDate = (date: Date) => {
     const dateKey = format(date, 'yyyy-MM-dd');
@@ -450,74 +455,95 @@ const TeacherAvailabilityPage = () => {
               {/* Week Navigation */}
               <Card>
                 <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setSelectedDate(addDays(selectedDate, -7))}
-                    >
-                      Previous Week
-                    </Button>
-                    <span className="font-medium">
-                      {format(weekStart, 'MMM d')} - {format(addDays(weekStart, 6), 'MMM d, yyyy')}
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedDate(addMonths(selectedDate, -1))}
+                      >
+                        Previous Month
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedDate(new Date())}
+                      >
+                        Today
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedDate(addMonths(selectedDate, 1))}
+                      >
+                        Next Month
+                      </Button>
+                    </div>
+                    <span className="text-xl font-bold">
+                      {format(selectedDate, 'MMMM yyyy')}
                     </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setSelectedDate(addDays(selectedDate, 7))}
-                    >
-                      Next Week
-                    </Button>
                   </div>
 
-                  {/* Week Calendar */}
+                  {/* Day Names Header */}
+                  <div className="grid grid-cols-7 gap-2 mb-2">
+                    {dayNames.map((day) => (
+                      <div key={day} className="text-center text-sm font-semibold text-muted-foreground uppercase">
+                        {day}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Month Grid */}
                   <div className="grid grid-cols-7 gap-2">
-                    {weekDates.map((date) => {
+                    {calendarDates.map((date) => {
                       const slots = getSlotsForDate(date);
                       const isToday = isSameDay(date, new Date());
+                      const isCurrentMonth = isSameMonth(date, monthStart);
                       return (
                         <div
                           key={date.toISOString()}
                           className={cn(
-                            'border rounded-lg p-3 min-h-[120px]',
-                            isToday && 'border-primary bg-primary/5'
+                            'border rounded-lg p-2 min-h-[100px] flex flex-col group',
+                            isToday && 'border-primary shadow-sm bg-primary/5',
+                            !isCurrentMonth && 'opacity-40 bg-muted/20'
                           )}
                         >
-                          <div className="text-center mb-2">
-                            <div className="text-xs text-muted-foreground">
-                              {format(date, 'EEE')}
-                            </div>
-                            <div className={cn('text-lg font-semibold', isToday && 'text-primary')}>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className={cn(
+                              'text-sm font-medium h-6 w-6 flex items-center justify-center rounded-full',
+                              isToday && 'bg-primary text-primary-foreground',
+                              !isCurrentMonth && 'text-muted-foreground'
+                            )}>
                               {format(date, 'd')}
-                            </div>
+                            </span>
+                            {slots.length > 0 && (
+                              <Badge variant="secondary" className="h-4 px-1 text-[10px]">
+                                {slots.length}
+                              </Badge>
+                            )}
                           </div>
-                          <div className="space-y-1">
+
+                          <div className="flex-1 overflow-y-auto space-y-1 max-h-[80px] scrollbar-hide">
                             {slots.map((slot) => (
                               <div
                                 key={slot._id}
                                 className={cn(
-                                  'text-xs p-1 rounded border',
+                                  'text-[10px] p-0.5 rounded border leading-tight truncate',
                                   statusStyles[slot.status] || 'bg-muted'
                                 )}
                               >
-                                <div className="font-medium">{slot.startTime}</div>
-                                <div className="text-muted-foreground">{slot.duration}m</div>
-                                {slot?.pricing?.baseAmountUSD !== undefined && (
-                                  <div className="text-primary font-semibold text-xs">
-                                    {getSlotTeacherPriceLabel(slot)}
-                                  </div>
-                                )}
+                                {slot.startTime}
                               </div>
                             ))}
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="w-full h-6 text-xs"
-                              onClick={() => handleOpenDialog(date)}
-                            >
-                              <Plus className="h-3 w-3" />
-                            </Button>
                           </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="w-full h-5 mt-1 text-[10px] opacity-0 group-hover:opacity-100 hover:bg-primary/10 transition-opacity"
+                            onClick={() => handleOpenDialog(date)}
+                          >
+                            <Plus className="h-2 w-2" />
+                          </Button>
                         </div>
                       );
                     })}

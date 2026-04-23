@@ -24,6 +24,8 @@ const userSchema = new mongoose.Schema(
       ],
     },
     status: { type: String, enum: ["active", "inactive", "pending"], default: "active" },
+    googleId: { type: String },
+    firebaseId: { type: String },
     lastLogin: { type: Date },
   },
   { timestamps: true }

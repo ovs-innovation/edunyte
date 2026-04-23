@@ -44,6 +44,7 @@ import {
 import { cn } from '@/lib/utils';
 import { CloudinaryImageUploader } from '@/components/ui/cloudinary-image-uploader';
 import { useConfirmDialog } from '@/hooks/use-confirm-dialog';
+import { useRole } from '@/contexts/RoleContext';
 
 // Helper function to generate slug preview from text
 const generateSlugPreview = (text: string): string => {
@@ -65,15 +66,18 @@ const CourseManagementPage = () => {
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editCourse, setEditCourse] = useState<ApiCourse | null>(null);
+  const { currentRole } = useRole();
+  const isAdmin = currentRole === 'admin' || currentRole === 'super_admin';
+  const { toast } = useToast();
+  const { confirm, ConfirmDialog } = useConfirmDialog();
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     category: '',
     image: '',
-    status: 'active' as 'active' | 'inactive',
+    status: (isAdmin ? 'active' : 'pending') as 'active' | 'inactive' | 'pending',
   });
-  const { toast } = useToast();
-  const { confirm, ConfirmDialog } = useConfirmDialog();
 
   const loadCourses = async () => {
     setLoading(true);
@@ -322,6 +326,8 @@ const CourseManagementPage = () => {
                           'border capitalize',
                           course.status === 'active'
                             ? 'bg-success/20 text-success border-success/30'
+                            : course.status === 'pending'
+                            ? 'bg-warning/20 text-warning border-warning/30'
                             : 'bg-muted text-muted-foreground border-muted'
                         )}
                       >
@@ -454,21 +460,24 @@ const CourseManagementPage = () => {
                 maxSize={5 * 1024 * 1024}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value) => setFormData({ ...formData, status: value as 'active' | 'inactive' })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            {isAdmin && (
+              <div className="space-y-2">
+                <Label htmlFor="status">Status</Label>
+                <Select
+                  value={formData.status}
+                  onValueChange={(value) => setFormData({ ...formData, status: value as 'active' | 'inactive' | 'pending' })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="inactive">Inactive</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={handleCloseDialog}>

@@ -11,6 +11,7 @@ const CourseArea = () => {
    const { t } = useTranslation();
    const [searchParams, setSearchParams] = useSearchParams();
    const categoryId = searchParams.get('category');
+   const searchQuery = searchParams.get('search');
    
    const [courses, setCourses] = useState<Course[]>([]);
    const [loading, setLoading] = useState(true);
@@ -25,22 +26,24 @@ const CourseArea = () => {
 
    const handleCategoryChange = (categoryId: string | null) => {
       setSelectedCategory(categoryId);
-      if (categoryId) {
-         setSearchParams({ category: categoryId });
-      } else {
-         setSearchParams({});
-      }
+      const newParams: { category?: string; search?: string } = {};
+      if (categoryId) newParams.category = categoryId;
+      if (searchQuery) newParams.search = searchQuery;
+      setSearchParams(newParams);
    };
 
    useEffect(() => {
       const loadCourses = async () => {
          try {
             setLoading(true);
-            const params: { status: string; category?: string } = { 
+            const params: { status: string; category?: string; search?: string } = { 
                status: 'active'
             };
             if (selectedCategory) {
                params.category = selectedCategory;
+            }
+            if (searchQuery) {
+               params.search = searchQuery;
             }
             const response = await fetchCourses(params);
             setCourses(response.courses);
@@ -52,7 +55,7 @@ const CourseArea = () => {
       };
 
       loadCourses();
-   }, [selectedCategory]);
+   }, [selectedCategory, searchQuery]);
 
    const itemsPerPage = 12;
    const [itemOffset, setItemOffset] = useState(0);
@@ -89,7 +92,7 @@ const CourseArea = () => {
    }
 
    return (
-      <section className="all-courses-area section-py-120">
+      <section className="all-courses-area section-pt-120 pb-120">
          <div className="container">
             <div className="row">
                <CourseSidebar setSelectedCategory={handleCategoryChange} selectedCategory={selectedCategory} />
@@ -105,7 +108,7 @@ const CourseArea = () => {
                   />
                   <div className="tab-content" id="myTabContent">
                      <div className={`tab-pane fade ${activeTab === 0 ? 'show active' : ''}`} id="grid" role="tabpanel" aria-labelledby="grid-tab">
-                        <div className="row courses__grid-wrap row-cols-1 row-cols-xl-3 row-cols-lg-2 row-cols-md-2 row-cols-sm-1">
+                        <div className="row courses__grid-wrap row-cols-1 row-cols-xl-3 row-cols-lg-2 row-cols-md-2 row-cols-sm-1 mb-50">
                            {currentItems.length === 0 ? (
                               <div className="col-12 text-center">
                                  <p>{t('common.no_courses_found')}</p>
@@ -182,7 +185,7 @@ const CourseArea = () => {
                      </div>
 
                      <div className={`tab-pane fade ${activeTab === 1 ? 'show active' : ''}`} id="list" role="tabpanel" aria-labelledby="list-tab">
-                        <div className="row courses__list-wrap row-cols-1">
+                        <div className="row courses__list-wrap row-cols-1 mb-50">
                            {currentItems.length === 0 ? (
                               <div className="col-12 text-center">
                                  <p>{t('common.no_courses_found')}</p>

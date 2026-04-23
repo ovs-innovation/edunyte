@@ -47,9 +47,9 @@ const HeaderOne = () => {
 
       if (avatarUrl) {
          return (
-            <img 
-               src={avatarUrl} 
-               alt={user?.name || 'User'} 
+            <img
+               src={avatarUrl}
+               alt={user?.name || 'User'}
                style={{
                   width: '100%',
                   height: '100%',
@@ -75,7 +75,7 @@ const HeaderOne = () => {
       <>
          <header>
             {/* <HeaderTopOne style={false} /> */}
-            <div id="header-fixed-height"></div>
+            <div id="header-fixed-height" className={`${sticky ? "active-height" : ""}`}></div>
             <div id="sticky-header" className={`tg-header__area ${sticky ? "sticky-menu" : ""}`}>
                <div className="container custom-container">
                   <div className="row">
@@ -97,8 +97,8 @@ const HeaderOne = () => {
                                        <LanguageCurrencySwitcher />
                                     </li>
                                     <li className="wishlist-icon">
-                                       <Link 
-                                          to="/my-wishlist" 
+                                       <Link
+                                          to="/my-wishlist"
                                           className="cart-count"
                                           onClick={(e) => {
                                              if (!isAuthenticated) {
@@ -114,8 +114,8 @@ const HeaderOne = () => {
                                     <li className="header-btn login-btn">
                                        {isAuthenticated ? (
                                           <div className="user-menu">
-                                             <Link 
-                                                to="/my-dashboard" 
+                                             <Link
+                                                to={user?.role === 'teacher' ? "/instructor-dashboard" : "/my-dashboard"}
                                                 className="user-avatar"
                                                 style={{
                                                    display: 'block',
@@ -138,11 +138,11 @@ const HeaderOne = () => {
                               </div>
                               <div className="mobile-login-btn">
                                  {isAuthenticated ? (
-                                    <Link 
-                                       to="/my-dashboard"
-                                       style={{ 
-                                          display: 'flex', 
-                                          alignItems: 'center', 
+                                    <Link
+                                       to={user?.role === 'teacher' ? "/instructor-dashboard" : "/my-dashboard"}
+                                       style={{
+                                          display: 'flex',
+                                          alignItems: 'center',
                                           justifyContent: 'center',
                                           width: '50px',
                                           height: '50px',

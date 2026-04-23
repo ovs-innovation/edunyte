@@ -113,7 +113,7 @@ const InstructorDetailsArea = () => {
 
               {/* CTA Button */}
               <div className="instructor__cta-btn">
-                <Link to="/registration/tutor" className="btn btn-primary">
+                <Link to="/instructor/registration" className="btn btn-primary">
                   {t('become_instructor_page.hero.cta')}
                 </Link>
               </div>
@@ -202,7 +202,7 @@ const InstructorDetailsArea = () => {
               </ul>
 
               <div className="global-cta">
-                <Link to="/registration/tutor" className="btn btn-primary">
+                <Link to="/instructor/registration" className="btn btn-primary">
                   {t('become_instructor_page.global.cta')}
                 </Link>
               </div>
@@ -242,7 +242,7 @@ const InstructorDetailsArea = () => {
                 <p className="author-role">{t('become_instructor_page.testimonial.role')}</p>
               </div>
               <div className="testimonial-cta">
-                <Link to="/registration/tutor" className="btn btn-primary">
+                <Link to="/instructor/registration" className="btn btn-primary">
                   {t('become_instructor_page.testimonial.cta')}
                 </Link>
               </div>
@@ -301,7 +301,7 @@ const InstructorDetailsArea = () => {
                     {t('become_instructor_page.final_cta.desc')}
                   </p>
                   <div>
-                    <Link to="/registration/tutor" className="btn" style={{ backgroundColor: '#0a0a0a', color: '#fff', padding: '18px 45px', borderRadius: '8px', fontSize: '18px', fontWeight: 700, border: 'none', minWidth: '200px' }}>
+                    <Link to="/instructor/registration" className="btn" style={{ backgroundColor: '#0a0a0a', color: '#fff', padding: '18px 45px', borderRadius: '8px', fontSize: '18px', fontWeight: 700, border: 'none', minWidth: '200px' }}>
                       {t('become_instructor_page.final_cta.button')}
                     </Link>
                   </div>

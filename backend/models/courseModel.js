@@ -26,7 +26,7 @@ const courseSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["active", "inactive"],
+      enum: ["active", "inactive", "pending"],
       default: "active",
       index: true,
     },

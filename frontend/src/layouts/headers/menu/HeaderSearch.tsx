@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface HeaderSearchProps {
    isSearch: boolean;
@@ -6,7 +7,7 @@ interface HeaderSearchProps {
 }
 
 const HeaderSearch = ({ isSearch, setIsSearch }: HeaderSearchProps) => {
-
+   const navigate = useNavigate();
    const [searchValue, setSearchValue] = useState("");
 
    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -15,8 +16,11 @@ const HeaderSearch = ({ isSearch, setIsSearch }: HeaderSearchProps) => {
 
    const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
-      setSearchValue('');
-      setIsSearch(false);
+      if (searchValue.trim()) {
+         navigate(`/courses?search=${encodeURIComponent(searchValue.trim())}`);
+         setSearchValue('');
+         setIsSearch(false);
+      }
    };
 
    return (

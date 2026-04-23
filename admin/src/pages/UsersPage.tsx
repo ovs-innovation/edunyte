@@ -84,6 +84,16 @@ const UsersPage = () => {
     );
   };
 
+  const handleStatusUpdate = async (id: string, status: string) => {
+    try {
+      const data = await UsersAPI.update(id, { status });
+      setUsers((prev) => prev.map((u) => (u.id === id ? data.user : u)));
+      toast({ title: `User status updated to ${status}` });
+    } catch (err: any) {
+      toast({ title: 'Update failed', description: err?.message, variant: 'destructive' });
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -175,6 +185,7 @@ const UsersPage = () => {
             }}
             onDelete={handleDelete}
             onView={(user) => setViewUser(user)}
+            onStatusUpdate={handleStatusUpdate}
           />
         </div>
       </div>

@@ -82,6 +82,8 @@ export const rolePermissions = {
   teacher: [
     'dashboard.view',
     'courses.view',
+    'courses.create',
+    'categories.view',
     'languages.view',
     'teacher_courses.view',
     'teacher_courses.create',

@@ -6,6 +6,7 @@ import StudentProfile from "../models/studentProfileModel.js";
 import TeacherProfile from "../models/teacherProfileModel.js";
 import Availability from "../models/availabilityModel.js";
 import TeacherCourse from "../models/teacherCourseModel.js";
+import { sendInstructorApprovalEmail } from "../utils/emailService.js";
 
 const resolvePermissions = async (roleKey) => {
   const role = await Role.findOne({ key: roleKey });
@@ -79,8 +80,15 @@ export const updateUser = async (req, res, next) => {
     if (name) user.name = name;
     if (password) user.password = password;
     if (role) user.role = await resolveRoleKey(role);
+    
+    const oldStatus = user.status;
     if (status && ["active", "inactive", "pending"].includes(status)) user.status = status;
     await user.save();
+
+    // Send approval email if teacher is activated
+    if (user.role === "teacher" && oldStatus === "pending" && user.status === "active") {
+      await sendInstructorApprovalEmail(user.email, user.name);
+    }
 
     if (user.role === "student") {
       const existing = await StudentProfile.findOne({ userId: user._id });
