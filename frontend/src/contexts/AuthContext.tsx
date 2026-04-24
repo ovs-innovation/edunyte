@@ -35,7 +35,7 @@ interface AuthContextType {
   login: (credentials: LoginCredentials) => Promise<void>
   register: (userData: RegisterData) => Promise<void>
   googleLogin: (credential: string, role?: string, isAccessToken?: boolean) => Promise<void>
-  firebaseLogin: (token: string, role?: string) => Promise<void>
+//   firebaseLogin: (token: string, role?: string) => Promise<void>
   logout: () => void
   updateUserProfile: (data: any) => Promise<void>
 }
@@ -151,34 +151,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [navigate])
 
-  const firebaseLogin = useCallback(async (token: string, role?: string) => {
-    try {
-      const { firebaseLogin: firebaseLoginAPI } = await import('../services/authService')
-      const authResponse = await firebaseLoginAPI(token, role)
+//   const firebaseLogin = useCallback(async (token: string, role?: string) => {
+//     try {
+//       const { firebaseLogin: firebaseLoginAPI } = await import('../services/authService')
+//       const authResponse = await firebaseLoginAPI(token, role)
 
-      if ('status' in authResponse && (authResponse as any).status === 'pending') {
-        navigate('/login', { replace: true })
-        return
-      }
+//       if ('status' in authResponse && (authResponse as any).status === 'pending') {
+//         navigate('/login', { replace: true })
+//         return
+//       }
 
-      if (authResponse.token && authResponse.user) {
-        setStoredToken(authResponse.token)
-        setStoredUser(authResponse.user)
-        setToken(authResponse.token)
-        setUser(authResponse.user)
+//       if (authResponse.token && authResponse.user) {
+//         setStoredToken(authResponse.token)
+//         setStoredUser(authResponse.user)
+//         setToken(authResponse.token)
+//         setUser(authResponse.user)
 
-        if (authResponse.user.role === 'teacher') {
-          navigate('/instructor-dashboard', { replace: true })
-        } else if (authResponse.user.role === 'student') {
-          navigate('/my-dashboard', { replace: true })
-        } else {
-          navigate('/', { replace: true })
-        }
-      }
-    } catch (error) {
-      throw error
-    }
-  }, [navigate])
+//         if (authResponse.user.role === 'teacher') {
+//           navigate('/instructor-dashboard', { replace: true })
+//         } else if (authResponse.user.role === 'student') {
+//           navigate('/my-dashboard', { replace: true })
+//         } else {
+//           navigate('/', { replace: true })
+//         }
+//       }
+//     } catch (error) {
+//       throw error
+//     }
+//   }, [navigate])
 
   const register = useCallback(async (userData: RegisterData) => {
     try {
@@ -241,7 +241,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         login,
         register,
         googleLogin,
-        firebaseLogin,
+//         firebaseLogin,
         logout,
         updateUserProfile,
       }}

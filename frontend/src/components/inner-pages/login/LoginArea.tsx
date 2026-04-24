@@ -1,29 +1,29 @@
 import { Link, useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import LoginForm from "../../../forms/LoginForm"
-import { signInWithPopup } from 'firebase/auth'
-import { auth, googleProvider } from '../../../firebase-config'
+// import { signInWithPopup } from 'firebase/auth'
+// import { auth, googleProvider } from '../../../firebase-config'
 import { useAuth } from "../../../contexts/AuthContext"
 import { toast } from "react-toastify"
 
 const LoginArea = ({ role }: { role?: string }) => {
    const { t } = useTranslation()
    const navigate = useNavigate()
-   const { firebaseLogin } = useAuth()
+//    const { firebaseLogin } = useAuth()
 
-   const handleGoogleLogin = async () => {
-      try {
-         const result = await signInWithPopup(auth, googleProvider);
-         const token = await result.user.getIdToken();
-         const targetRole = role === 'instructor' ? 'teacher' : 'student';
-         
-         await firebaseLogin(token, targetRole);
-         toast.success(t("common.login_success"), { position: 'top-center' });
-      } catch (err: any) {
-         console.error("Firebase Error:", err);
-         toast.error(err.message || "Google Login failed", { position: 'top-center' });
-      }
-   };
+//    const handleGoogleLogin = async () => {
+//       try {
+//          const result = await signInWithPopup(auth, googleProvider);
+//          const token = await result.user.getIdToken();
+//          const targetRole = role === 'instructor' ? 'teacher' : 'student';
+//          
+//          await firebaseLogin(token, targetRole);
+//          toast.success(t("common.login_success"), { position: 'top-center' });
+//       } catch (err: any) {
+//          console.error("Firebase Error:", err);
+//          toast.error(err.message || "Google Login failed", { position: 'top-center' });
+//       }
+//    };
 
    return (
       <section className="singUp-area py-0 py-md-1">

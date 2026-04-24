@@ -9,12 +9,12 @@ const serviceAccount = {
   privateKey: process.env.FIREBASE_PRIVATE_KEY ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') : undefined,
 };
 
-if (serviceAccount.projectId && serviceAccount.clientEmail && serviceAccount.privateKey) {
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
-  });
-} else {
-  console.warn("⚠️ Firebase Admin not initialized. MISSING environment variables.");
-}
+// if (serviceAccount.projectId && serviceAccount.clientEmail && serviceAccount.privateKey) {
+//   admin.initializeApp({
+//     credential: admin.credential.cert(serviceAccount)
+//   });
+// } else {
+//   console.warn("⚠️ Firebase Admin not initialized. MISSING environment variables.");
+// }
 
 export default admin;
