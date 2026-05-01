@@ -60,7 +60,7 @@ const menu_data: MenuItem[] = [
         link: "#",
         sub_menus: [
             { link: "/our-values", title: "Our values", titleKey: "common.our_values" },
-            { link: "/our-advisory_board", title: "Our advisory board", titleKey: "common.our_advisory_board" },
+            { link: "/our-advisory-board", title: "Our advisory board", titleKey: "common.our_advisory_board" },
             { link: "/our-partners", title: "Our partners", titleKey: "common.our_partners" },
             { link: "/work-at-future-learn", title: "Work at Future Learn", titleKey: "common.work_at_future_learn" },
             { link: "/quizlet-plus", title: "Quizlet Plus", titleKey: "common.quizlet_plus" },

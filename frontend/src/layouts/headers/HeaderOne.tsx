@@ -23,7 +23,7 @@ const HeaderOne = () => {
    const { sticky } = UseSticky();
    const [isActive, setIsActive] = useState<boolean>(false);
    const { t } = useTranslation();
-   const { isAuthenticated, user } = useAuth();
+   const { isAuthenticated, user, logout } = useAuth();
    const navigate = useNavigate();
 
    const handleUserClick = (e: React.MouseEvent) => {
@@ -113,22 +113,50 @@ const HeaderOne = () => {
                                     </li>
                                     <li className="header-btn login-btn">
                                        {isAuthenticated ? (
-                                          <div className="user-menu">
-                                             <Link
-                                                to={user?.role === 'teacher' ? "/instructor-dashboard" : "/my-dashboard"}
-                                                className="user-avatar"
+                                          <div className="user-menu dropdown">
+                                             <a
+                                                href="#"
+                                                className="user-avatar dropdown-toggle"
+                                                id="userDropdown"
+                                                data-bs-toggle="dropdown"
+                                                aria-expanded="false"
                                                 style={{
                                                    display: 'block',
-                                                   width: '50px',
-                                                   height: '50px',
+                                                   width: '45px',
+                                                   height: '45px',
                                                    borderRadius: '50%',
                                                    overflow: 'hidden',
-                                                   minWidth: '50px'
+                                                   border: '2px solid var(--tg-theme-primary)',
+                                                   padding: '2px'
                                                 }}
                                              >
                                                 {renderAvatar()}
-                                             </Link>
-
+                                             </a>
+                                             <ul className="dropdown-menu dropdown-menu-end shadow border-0 p-2" aria-labelledby="userDropdown" style={{ borderRadius: '12px', minWidth: '200px' }}>
+                                                <li className="p-3 border-bottom mb-2">
+                                                   <span className="d-block fw-bold small text-dark">{user?.name}</span>
+                                                   <span className="d-block small text-muted">{user?.email}</span>
+                                                </li>
+                                                <li>
+                                                   <Link className="dropdown-item py-2 rounded-2" to={user?.role === 'teacher' ? "/instructor-dashboard" : "/my-dashboard"}>
+                                                      <i className="fas fa-th-large me-2"></i> {t("common.dashboard")}
+                                                   </Link>
+                                                </li>
+                                                <li>
+                                                   <Link className="dropdown-item py-2 rounded-2" to="/my-profile">
+                                                      <i className="fas fa-user me-2"></i> Profile
+                                                   </Link>
+                                                </li>
+                                                <li><hr className="dropdown-divider" /></li>
+                                                <li>
+                                                   <button 
+                                                      className="dropdown-item py-2 rounded-2 text-danger" 
+                                                      onClick={logout}
+                                                   >
+                                                      <i className="fas fa-sign-out-alt me-2"></i> {t("common.logout")}
+                                                   </button>
+                                                </li>
+                                             </ul>
                                           </div>
                                        ) : (
                                           <Link to="/login">{t("common.login")}</Link>

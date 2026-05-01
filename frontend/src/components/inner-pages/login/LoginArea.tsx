@@ -1,70 +1,48 @@
-import { Link, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import LoginForm from "../../../forms/LoginForm"
-// import { signInWithPopup } from 'firebase/auth'
-// import { auth, googleProvider } from '../../../firebase-config'
-import { useAuth } from "../../../contexts/AuthContext"
-import { toast } from "react-toastify"
 
 const LoginArea = ({ role }: { role?: string }) => {
    const { t } = useTranslation()
-   const navigate = useNavigate()
-//    const { firebaseLogin } = useAuth()
-
-//    const handleGoogleLogin = async () => {
-//       try {
-//          const result = await signInWithPopup(auth, googleProvider);
-//          const token = await result.user.getIdToken();
-//          const targetRole = role === 'instructor' ? 'teacher' : 'student';
-//          
-//          await firebaseLogin(token, targetRole);
-//          toast.success(t("common.login_success"), { position: 'top-center' });
-//       } catch (err: any) {
-//          console.error("Firebase Error:", err);
-//          toast.error(err.message || "Google Login failed", { position: 'top-center' });
-//       }
-//    };
 
    return (
-      <section className="singUp-area py-0 py-md-1">
-         <div className="container">
+      <section 
+        className="login-area py-0 position-relative d-flex align-items-center justify-content-center" 
+        style={{ 
+            minHeight: '100vh',
+            paddingTop: '100px'
+        }}
+      >
+         <div className="position-absolute top-0 start-0 w-100 h-100 glow-bg" style={{ opacity: 0.8, zIndex: 0 }}></div>
+         
+         <div className="container position-relative z-1 py-5">
             <div className="row justify-content-center">
-               <div className="col-xl-6 col-lg-8">
-                  <div className="singUp-wrap">
-                     <div className="courses__nav login-role-toggle mb-30">
-                        <ul className="nav nav-tabs justify-content-center" id="roleTab" role="tablist">
-                           <li className="nav-item" role="presentation">
-                              <Link to="/student/login" className={`nav-link ${role !== 'instructor' ? "active" : ""}`} style={{ display: 'block', width: '100%' }}>{t('common.student')}</Link>
-                           </li>
-                           <li className="nav-item" role="presentation">
-                              <Link to="/instructor/login" className={`nav-link ${role === 'instructor' ? "active" : ""}`} style={{ display: 'block', width: '100%' }}>{t('common.instructor')}</Link>
-                           </li>
-                        </ul>
+               <div className="col-xl-4 col-lg-6 col-md-8">
+                  <div className="glass-panel p-4 p-md-5 shadow-2xl overflow-hidden position-relative" style={{ border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.75)', borderRadius: '24px' }}>
+                     
+                     <div className="text-center mb-40">
+                        <div className="d-inline-flex align-items-center gap-2 p-1 rounded-pill mb-4" style={{ background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.05)' }}>
+                            <Link to="/student/login" className={`small fw-bold px-4 py-2 rounded-pill transition-all ${role !== 'instructor' ? 'bg-white shadow-sm text-primary' : 'text-muted'}`} style={{ textDecoration: 'none' }}>Student</Link>
+                            <Link to="/instructor/login" className={`small fw-bold px-4 py-2 rounded-pill transition-all ${role === 'instructor' ? 'bg-white shadow-sm text-primary' : 'text-muted'}`} style={{ textDecoration: 'none' }}>Instructor</Link>
+                        </div>
+                        <h2 className="title fw-900 mb-2" style={{ fontSize: '2rem' }}>{role === 'instructor' ? "Tutor Portal" : "Welcome Back"}</h2>
+                        <p className="opacity-60">{t("common.login_description")}</p>
                      </div>
-                     <h2 className="title">{role === 'instructor' ? t("common.instructor_login") : t("common.welcome_back")}</h2>
-                     <p>{t("common.login_description")}</p>
-{/* 
-                     <div className="account__social">
-                        <Link 
-                           to="#" 
-                           className="account__social-btn"
-                           onClick={(e) => {
-                              e.preventDefault();
-                              handleGoogleLogin();
-                           }}
-                        >
-                           <img src="/assets/img/icons/google.svg" alt="img" />
-                           {t("common.continue_with_google")}
-                        </Link>
-                     </div>
-                     <div className="account__divider">
-                        <span>{t("common.or")}</span>
-                     </div> 
-*/}
+
                      <LoginForm />
-                     <div className="account__switch">
-                        <p>{t("common.dont_have_account")}<Link to={role === 'instructor' ? "/instructor/registration" : "/student/registration"}>{t("common.sign_up")}</Link></p>
+
+                     <div className="account__switch text-center mt-30 pt-30 border-top">
+                        <p className="m-0 text-muted">
+                           {t("common.dont_have_account")} 
+                           <Link to={role === 'instructor' ? "/instructor/registration" : "/student/registration"} className="ms-2 fw-bold text-primary" style={{ textDecoration: 'none' }}>
+                              {t("common.sign_up")}
+                           </Link>
+                        </p>
                      </div>
+                  </div>
+                  
+                  <div className="text-center mt-30 small opacity-50">
+                    &copy; 2026 Edunyte Learning Platform. All rights reserved.
                   </div>
                </div>
             </div>

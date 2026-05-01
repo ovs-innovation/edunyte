@@ -93,8 +93,8 @@ const DashboardSidebarTwo = () => {
                                  </Link>
                               ) : (
                                  <Link to={list.link}>
-                                     <i className={list.icon}></i>
-                                     {t(list.title)}
+                                    <i className={list.icon}></i>
+                                    {t(list.title)}
                                  </Link>
                               )}
                            </li>

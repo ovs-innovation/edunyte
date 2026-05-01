@@ -45,46 +45,40 @@ const Categories = () => {
     };
 
     return (
-        <section style={{ backgroundColor: '#fcfaf8', padding: '50px 0' }}>
-            <div className="container">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px' }}>
+        <section className="glow-bg" style={{ padding: '80px 0' }}>
+            <div className="container position-relative z-1">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '50px' }}>
                     <div>
-                        <h2 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#1a1a1a', marginBottom: '10px' }}>Learn a Category</h2>
-                        <p style={{ fontSize: '1.1rem', color: '#6d6d6d', margin: 0 }}>Discover online tutors for any subject</p>
+                        <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 900, marginBottom: '15px' }} className="text-gradient">Learn a Category</h2>
+                        <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', margin: 0 }}>Discover online tutors for any subject</p>
                     </div>
                 </div>
 
-                <div className="row">
+                <div className="row g-4">
                     {categories.map((cat, index) => (
-                        <div key={cat._id} className="col-lg-3 col-md-4 col-sm-6 mb-4">
-                            <Link to={`/courses?category=${cat.slug || cat._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                                <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', display: 'flex', alignItems: 'center', boxShadow: '0 4px 15px rgba(0,0,0,0.03)', transition: 'transform 0.2s, box-shadow 0.2s', cursor: 'pointer', height: '100%' }}
-                                    onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.08)'; }}
-                                    onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.03)'; }}
-                                >
-                                    <div style={{ marginRight: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: cat.image ? 'transparent' : '#eef6f6', borderRadius: '50%' }}>
+                        <div key={cat._id} className="col-lg-3 col-md-4 col-sm-6">
+                            <Link to={`/courses?category=${cat.slug || cat._id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' }}>
+                                <div className="glass-panel" style={{ padding: '24px', display: 'flex', alignItems: 'center', height: '100%' }}>
+                                    <div style={{ marginRight: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '50px', height: '50px', background: cat.image ? 'transparent' : 'rgba(255,255,255,0.05)', borderRadius: '16px', border: cat.image ? 'none' : '1px solid var(--glass-border)', flexShrink: 0 }}>
                                         {cat.image ? (
-                                            <img src={getImageUrl(cat.image)} alt={cat.name} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '50%' }} />
+                                            <img src={getImageUrl(cat.image)} alt={cat.name} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '16px' }} />
                                         ) : (
-                                            <i className={getCategoryIcon(index)} style={{ fontSize: '1.5rem', color: '#3bb3bd' }}></i>
+                                            <i className={getCategoryIcon(index)} style={{ fontSize: '1.5rem', color: 'var(--neon-blue)' }}></i>
                                         )}
                                     </div>
-                                    <div style={{ flex: 1 }}>
-                                        <h4 style={{ fontSize: '1.1rem', fontWeight: 700, margin: '0 0 5px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{cat.name}</h4>
-                                        <div style={{ fontSize: '0.9rem', color: '#6d6d6d' }}>View courses</div>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <h4 style={{ fontSize: '1.1rem', fontWeight: 700, margin: '0 0 6px 0', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{cat.name}</h4>
+                                        <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>View courses</div>
                                     </div>
-                                    <i className="fas fa-chevron-right" style={{ marginLeft: '10px', color: '#c4c4c4', fontSize: '0.9rem' }}></i>
+                                    <i className="fas fa-chevron-right" style={{ marginLeft: '12px', color: 'var(--neon-purple)', fontSize: '0.9rem', opacity: 0.5 }}></i>
                                 </div>
                             </Link>
                         </div>
                     ))}
                 </div>
 
-                <div style={{ textAlign: 'center', marginTop: '30px' }}>
-                    <Link to="/courses" style={{ display: 'inline-block', backgroundColor: 'transparent', color: '#1a1a1a', border: '2px solid #eaeaea', borderRadius: '8px', padding: '12px 30px', fontSize: '1.1rem', fontWeight: 700, cursor: 'pointer', transition: '0.2s', textDecoration: 'none' }}
-                        onMouseOver={(e) => { e.currentTarget.style.borderColor = '#1a1a1a'; }}
-                        onMouseOut={(e) => { e.currentTarget.style.borderColor = '#eaeaea'; }}
-                    >
+                <div style={{ textAlign: 'center', marginTop: '50px' }}>
+                    <Link to="/courses" className="btn-neon-outline">
                         Explore all subjects
                     </Link>
                 </div>

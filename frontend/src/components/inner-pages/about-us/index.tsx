@@ -16,7 +16,7 @@ const AboutUs = () => {
    return (
       <>
          <HeaderOne />
-         <main className="main-area fix">
+         <main className="main-area fix glow-bg">
             <BreadcrumbOne title={t('about_page.breadcrumb.title')} sub_title={t('about_page.breadcrumb.subtitle')} />
             <Blog style={false} />
             <About />

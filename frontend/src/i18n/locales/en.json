@@ -677,38 +677,37 @@
       },
       "8": {
         "title": "How To Design Effective User Onboarding",
-        "location": "New Work",
         "date": "25 June, 2024"
       }
     }
   },
   "footer": {
-    "description_1": "when an unknown printer took galley of type and scrambled it to make pspecimen bookt has.",
-    "address": "463 7th Ave, NY 10018, USA",
-    "phone": "+123 88 9900 456",
-    "useful_links": "Useful Links",
+    "description_1": "Edunyte is a global learning ecosystem connecting ambitious students with world-class mentors. We believe in borderless education that is accessible, flexible, and driven by human expertise.",
+    "address": "Innovate Square, Tech District, Global Hub",
+    "phone": "+1 (800) EDUNYTE",
+    "useful_links": "Our Ecosystem",
     "links": {
-      "values": "Our values",
-      "advisory": "Our advisory board",
-      "partners": "Our partners",
-      "become_partner": "Become a partner",
-      "work": "Work at Future Learn",
-      "quizlet": "Quizlet Plus"
+      "values": "Core Integrity",
+      "advisory": "Expert Board",
+      "partners": "Global Partners",
+      "become_partner": "Institutional Collabs",
+      "work": "Join our Mission",
+      "quizlet": "Premium Learning"
     },
-    "our_company": "Our Company",
+    "our_company": "Quick Links",
     "company_links": {
-      "about": "About us",
-      "contact": "Contact Us",
-      "become_teacher": "Become Teacher",
-      "become_student": "Become a Student",
-      "blog": "Blog",
-      "events": "Events"
+      "about": "Our Journey",
+      "contact": "Contact Support",
+      "become_teacher": "Teach on Edunyte",
+      "become_student": "Start Learning",
+      "blog": "Insights & News",
+      "events": "Live Sessions"
     },
-    "get_in_touch": "Get In Touch",
-    "description_2": "when an unknown printer took \n galley type and scrambled",
-    "copyright": "© 2010-2026 Edunyte.com. All rights reserved.",
-    "terms": "Term of Use",
-    "privacy": "Privacy Policy"
+    "get_in_touch": "Connectivity",
+    "description_2": "Connecting the next generation of global leaders through knowledge.",
+    "copyright": "© 2026 Edunyte Ecosystem. Empowering Global Learners.",
+    "terms": "Usage Terms",
+    "privacy": "Privacy Charter"
   },
   "error": {
     "title": "ERROR PAGE!",

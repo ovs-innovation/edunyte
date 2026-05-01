@@ -12,7 +12,7 @@ const DashboardCounter = () => {
                   </div>
                   <div className="content">
                      <span className="count"><Count number={item.count} /></span>
-                     <p style={{marginTop:"5px"}}>{item.title}</p>
+                     <p style={{ marginTop: "5px" }}>{item.title}</p>
                   </div>
                </div>
             </div>

@@ -9,7 +9,7 @@ const Contact = () => {
    return (
       <>
          <HeaderOne />
-         <main className="main-area fix">
+         <main className="main-area fix glow-bg">
             <BreadcrumbOne title={t('contact.breadcrumb_title')} sub_title={t('contact.breadcrumb_subtitle')} />
             <ContactArea />
          </main>

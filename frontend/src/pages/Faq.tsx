@@ -9,9 +9,9 @@ const FaqPage = () => {
     <Wrapper>
       <SEO pageTitle={'Edunyte FAQ'} />
       <HeaderOne />
-      <main className="main-area fix">
+      <main className="main-area fix glow-bg">
         <BreadcrumbOne title={"Frequently Asked Questions"} sub_title={"FAQ"} />
-        <div className="section-py-120">
+        <div className="section-pb-120">
             <FaqArea />
         </div>
       </main>

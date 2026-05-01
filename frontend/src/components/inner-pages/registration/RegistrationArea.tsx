@@ -1,69 +1,43 @@
-import { Link, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import RegistrationForm from "../../../forms/RegistrationForm"
-// import { signInWithPopup } from 'firebase/auth'
-// import { auth, googleProvider } from '../../../firebase-config'
-import { useAuth } from "../../../contexts/AuthContext"
-import { toast } from "react-toastify"
 
 const RegistrationArea = ({ role }: { role?: string }) => {
    const { t } = useTranslation()
-   const navigate = useNavigate()
-//    const { firebaseLogin } = useAuth()
-
-//    const handleGoogleLogin = async () => {
-//       try {
-//          const result = await signInWithPopup(auth, googleProvider);
-//          const token = await result.user.getIdToken();
-//          const targetRole = role === 'instructor' ? 'teacher' : 'student';
-//          
-//          await firebaseLogin(token, targetRole);
-//          toast.success(t("common.registration_success"), { position: 'top-center' });
-//       } catch (err: any) {
-//          console.error("Firebase Error:", err);
-//          toast.error(err.message || "Google registration failed", { position: 'top-center' });
-//       }
-//    };
 
    return (
-      <section className="singUp-area py-0 py-md-1">
-         <div className="container">
+      <section 
+        className="registration-area py-0 position-relative d-flex align-items-center justify-content-center" 
+        style={{ 
+            minHeight: '100vh',
+            paddingTop: '100px',
+            paddingBottom: '50px'
+        }}
+      >
+         
+         <div className="container position-relative z-1 py-5">
             <div className="row justify-content-center">
-               <div className="col-xl-6 col-lg-8">
-                  <div className="singUp-wrap">
-                     <div className="courses__nav login-role-toggle mb-30">
-                        <ul className="nav nav-tabs justify-content-center" id="roleTab" role="tablist">
-                           <li className="nav-item" role="presentation">
-                              <Link to="/student/registration" className={`nav-link ${role !== 'instructor' ? "active" : ""}`} style={{ display: 'block', width: '100%' }}>{t('common.student')}</Link>
-                           </li>
-                           <li className="nav-item" role="presentation">
-                              <Link to="/instructor/registration" className={`nav-link ${role === 'instructor' ? "active" : ""}`} style={{ display: 'block', width: '100%' }}>{t('common.instructor')}</Link>
-                           </li>
-                        </ul>
+               <div className="col-xl-5 col-lg-7 col-md-10">
+                  <div className="glass-panel p-4 p-md-5 shadow-2xl overflow-hidden position-relative" style={{ border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.75)', borderRadius: '24px' }}>
+                     
+                     <div className="text-center mb-40">
+                        <div className="d-inline-flex align-items-center gap-2 p-1 rounded-pill mb-4" style={{ background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.05)' }}>
+                            <Link to="/student/registration" className={`small fw-bold px-4 py-2 rounded-pill transition-all ${role !== 'instructor' ? 'bg-white shadow-sm text-primary' : 'text-muted'}`} style={{ textDecoration: 'none' }}>Student</Link>
+                            <Link to="/instructor/registration" className={`small fw-bold px-4 py-2 rounded-pill transition-all ${role === 'instructor' ? 'bg-white shadow-sm text-primary' : 'text-muted'}`} style={{ textDecoration: 'none' }}>Instructor</Link>
+                        </div>
+                        <h2 className="title fw-900 mb-2" style={{ fontSize: '2rem' }}>{role === 'instructor' ? "Join as Instructor" : "Create Account"}</h2>
+                        <p className="opacity-60">Join thousands of learners worldwide on Edunyte.</p>
                      </div>
-                     <h2 className="title">{role === 'instructor' ? t("common.create_instructor_account") : t("common.create_account")}</h2>
-                     <p>{t("common.registration_description")}</p>
-{/* 
-                     <div className="account__social">
-                        <Link 
-                           to="#" 
-                           className="account__social-btn"
-                           onClick={(e) => {
-                              e.preventDefault();
-                              handleGoogleLogin();
-                           }}
-                        >
-                           <img src="/assets/img/icons/google.svg" alt="img" />
-                           {t("common.continue_with_google")}
-                        </Link>
-                     </div>
-                     <div className="account__divider">
-                        <span>{t("common.or")}</span>
-                     </div> 
-*/}
+
                      <RegistrationForm role={role} />
-                     <div className="account__switch">
-                        <p>{t("common.already_have_account")}<Link to={role === 'instructor' ? "/instructor/login" : "/student/login"}>{t("common.login")}</Link></p>
+
+                     <div className="account__switch text-center mt-30 pt-30 border-top">
+                        <p className="m-0 text-muted">
+                           {t("common.already_have_account")} 
+                           <Link to={role === 'instructor' ? "/instructor/login" : "/student/login"} className="ms-2 fw-bold text-primary" style={{ textDecoration: 'none' }}>
+                              {t("common.login")}
+                           </Link>
+                        </p>
                      </div>
                   </div>
                </div>

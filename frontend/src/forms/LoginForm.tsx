@@ -45,28 +45,63 @@ const LoginForm = () => {
 
    return (
       <form onSubmit={handleSubmit(onSubmit)} className="account__form">
-         <div className="form-grp">
-            <label htmlFor="email">{t("common.email")}</label>
-            <input id="email" {...register("email")} type="email" placeholder={t("common.email")} />
-            <p className="form_error">{errors.email?.message}</p>
+         <div className="form-grp mb-25">
+            <label htmlFor="email" className="fw-bold small opacity-50 mb-2">{t("common.email")}</label>
+            <div className="position-relative">
+                <input 
+                    id="email" 
+                    {...register("email")} 
+                    type="email" 
+                    placeholder="name@example.com"
+                    style={{ 
+                        width: '100%', 
+                        padding: '14px 20px', 
+                        background: 'rgba(255,255,255,0.8)', 
+                        border: '1px solid var(--glass-border)', 
+                        borderRadius: '12px',
+                        fontSize: '0.95rem',
+                        transition: 'all 0.3s'
+                    }} 
+                />
+            </div>
+            <p className="form_error text-danger small mt-1">{errors.email?.message}</p>
          </div>
-         <div className="form-grp">
+         <div className="form-grp mb-25">
             <label htmlFor="password">{t("common.password")}</label>
-            <input id="password" {...register("password")} type="password" placeholder={t("common.password")} />
-            <p className="form_error">{errors.password?.message}</p>
+            <input 
+                id="password" 
+                {...register("password")} 
+                type="password" 
+                placeholder="••••••••" 
+                style={{ 
+                    width: '100%', 
+                    padding: '14px 20px', 
+                    background: 'rgba(255,255,255,0.8)', 
+                    border: '1px solid var(--glass-border)', 
+                    borderRadius: '12px',
+                    fontSize: '0.95rem'
+                }} 
+            />
+            <p className="form_error text-danger small mt-1">{errors.password?.message}</p>
          </div>
-         <div className="account__check">
-            <div className="account__check-remember">
-               <input type="checkbox" className="form-check-input" value="" id="terms-check" />
-               <label htmlFor="terms-check" className="form-check-label">{t("common.remember_me")}</label>
+         <div className="account__check d-flex justify-content-between align-items-center mb-30">
+            <div className="account__check-remember d-flex align-items-center gap-2">
+               <input type="checkbox" className="form-check-input mt-0" value="" id="terms-check" style={{ width: '18px', height: '18px' }} />
+               <label htmlFor="terms-check" className="form-check-label small opacity-70 mb-0">{t("common.remember_me")}</label>
             </div>
             <div className="account__check-forgot">
-               <Link to="/registration">{t("common.forgot_password")}</Link>
+               <Link to="/registration" className="small text-primary fw-bold" style={{ textDecoration: 'none' }}>{t("common.forgot_password")}</Link>
             </div>
          </div>
-         <button type="submit" className="btn btn-two arrow-btn" disabled={isLoading}>
-            {isLoading ? t('common.signing_in') : t("common.sign_in")}
-            <BtnArrow />
+         <button type="submit" className="btn-neon-primary w-100 py-3 d-flex align-items-center justify-content-center gap-2" disabled={isLoading} style={{ borderRadius: '12px' }}>
+            {isLoading ? (
+                <div className="spinner-border spinner-border-sm" role="status"></div>
+            ) : (
+                <>
+                    {t("common.sign_in")}
+                    <i className="fas fa-arrow-right"></i>
+                </>
+            )}
          </button>
       </form>
    )
