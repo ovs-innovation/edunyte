@@ -93,7 +93,7 @@ const Tutors = () => {
                         const price = typeof teacher.price === 'number' ? teacher.price : (teacher.pricing?.basePriceUSD || 25);
                         const currency = typeof teacher.currency === 'string' ? teacher.currency : 'USD';
                         const photo = teacher.teacherProfile?.photo;
-                        const bio = teacher.teacherProfile?.bio || `Experienced educator specializing in ${typeof teacher.courseId === 'object' ? teacher.courseId.name : 'skills'}.`;
+                        const bio = teacher.teacherProfile?.bio || `Experienced educator specializing in ${typeof teacher.courseId === 'object' ? (teacher.courseId as any).name || 'skills' : 'skills'}.`;
 
                         return (
                             <div key={teacher._id} className="col-lg-4 col-md-6">
@@ -142,7 +142,7 @@ const Tutors = () => {
 
                                     <div className="d-flex gap-2">
                                         <Link 
-                                            to={`/course/${typeof teacher.courseId === 'object' ? teacher.courseId.slug : teacher.courseId}`} 
+                                            to={`/course/${typeof teacher.courseId === 'object' ? (teacher.courseId as any).slug || teacher.courseId._id : teacher.courseId}`} 
                                             className="btn-neon-primary w-100 py-3 text-center small fw-bold"
                                             style={{ textDecoration: 'none' }}
                                         >

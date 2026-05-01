@@ -64,7 +64,7 @@ const InstructorArea = () => {
                      <div key={teacher._id} className="col-xl-3 col-lg-4 col-md-6">
                         <div className="glass-panel h-100 p-3 shadow-sm border-0 bg-white hover-scale" style={{ borderRadius: '20px' }}>
                            <div className="instructor__thumb mb-3 overflow-hidden" style={{ borderRadius: '15px', aspectRatio: '1/1' }}>
-                              <Link to={`/course/${typeof teacher.courseId === 'object' ? teacher.courseId.slug : teacher.courseId}`}>
+                              <Link to={`/course/${typeof teacher.courseId === 'object' ? (teacher.courseId as any).slug || teacher.courseId._id : teacher.courseId}`}>
                                  {photo ? (
                                     <img src={photo} alt={teacherName} className="w-100 h-100" style={{ objectFit: 'cover' }} />
                                  ) : (
@@ -76,7 +76,7 @@ const InstructorArea = () => {
                            </div>
                            <div className="instructor__content text-center">
                               <h2 className="title h5 fw-900 mb-1">
-                                 <Link to={`/course/${typeof teacher.courseId === 'object' ? teacher.courseId.slug : teacher.courseId}`} className="text-dark text-decoration-none">
+                                 <Link to={`/course/${typeof teacher.courseId === 'object' ? (teacher.courseId as any).slug || teacher.courseId._id : teacher.courseId}`} className="text-dark text-decoration-none">
                                     {teacherName}
                                  </Link>
                               </h2>
