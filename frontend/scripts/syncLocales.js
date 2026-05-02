@@ -9,7 +9,7 @@ const __dirname = dirname(__filename)
 const LOCALES_DIR = path.join(__dirname, '../src/i18n/locales')
 const CONFIG_FILE = path.join(__dirname, '../src/i18n/languageConfig.ts')
 const BASE_LOCALE = 'en.json'
-const API_BASE_URL = process.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
+const API_BASE_URL = process.env.VITE_API_BASE_URL || '/api'
 
 const readJsonFile = (filePath) => {
   try {

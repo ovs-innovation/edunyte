@@ -40,7 +40,7 @@ const Categories = () => {
     const getImageUrl = (imagePath: string) => {
         if (!imagePath) return '';
         if (imagePath.startsWith('http')) return imagePath;
-        const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+        const baseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
         return `${baseUrl.replace(/\/api$/, '')}/${imagePath.replace(/^\//, '')}`;
     };
 

@@ -1,5 +1,5 @@
 async function testApi() {
-    const API_BASE_URL = 'https://edunyte.vastoratech.com/api';
+    const API_BASE_URL = '/api';
     const endpoints = [
         '/public/courses/teachers',
         '/public/all-instructors',
