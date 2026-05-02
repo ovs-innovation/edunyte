@@ -40,7 +40,7 @@ export const login = async (
 ): Promise<AuthResponse | OTPResponse> => {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  const response = await fetch(`${API_BASE_URL}/login?appType=student`, {
+  const response = await fetch(`${API_BASE_URL}/auth/login?appType=student`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -65,7 +65,7 @@ export const login = async (
 export const register = async (
   userData: RegisterData
 ): Promise<AuthResponse> => {
-  const response = await fetch(`${API_BASE_URL}/register`, {
+  const response = await fetch(`${API_BASE_URL}/auth/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -139,7 +139,7 @@ export const validateToken = async () => {
   if (!token) return null;
 
   try {
-    const response = await fetch(`${API_BASE_URL}/me`, {
+    const response = await fetch(`${API_BASE_URL}/auth/me`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -172,7 +172,7 @@ export const googleLogin = async (
     body.credential = credential;
   }
 
-  const response = await fetch(`${API_BASE_URL}/google-login`, {
+  const response = await fetch(`${API_BASE_URL}/auth/google-login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
