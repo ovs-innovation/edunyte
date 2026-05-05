@@ -36,7 +36,14 @@ const OurValues = () => {
       <SEO pageTitle={'Our Core Values - Edunyte'} />
       <HeaderOne />
       <main className="main-area fix glow-bg">
-        <BreadcrumbOne title={"Our Integrity"} sub_title={"Values"} />
+        <BreadcrumbOne
+          title={"Our Core Values"}
+          sub_title={"Values"}
+          description={"The principles that drive every decision we make — from product design to how we support our learners and educators."}
+          image="/assets/img/others/mission_vision_hero.png"
+          overlayItems={['Ethical Innovation', 'Radical Inclusion', 'Student Sovereignty']}
+          features={['Integrity at every step', 'Community-first mindset', 'Transparent & accountable']}
+        />
         
         <section className="section-pt-120 section-pb-90 overflow-hidden">
           <div className="container">
@@ -79,7 +86,7 @@ const OurValues = () => {
                         </div>
                         <div className="col-lg-5 text-center mt-5 mt-lg-0">
                             <div className="position-relative d-inline-block">
-                                <img src="/assets/img/others/mission_vision_hero.png" alt="Success" className="img-fluid rounded-4 shadow-lg" style={{ maxWidth: '450px' }} />
+                             <img src="/assets/img/others/about_img.png" alt="Success" className="img-fluid rounded-4 shadow-lg" style={{ maxWidth: '450px' }} />
                                 <div className="glass-panel p-4 position-absolute shadow-sm" style={{ bottom: '-20px', left: '-20px', borderRadius: '20px' }}>
                                     <h4 className="m-0 fw-900">98% Trust</h4>
                                 </div>

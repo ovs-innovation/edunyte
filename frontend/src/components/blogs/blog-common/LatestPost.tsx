@@ -10,7 +10,7 @@ interface DataType {
 const latest_podt_data: DataType[] = [
    {
       id: 1,
-      thumb: "/assets/img/blog/latest_post04.jpg",
+      thumb: "/assets/img/blog/latest_post01.jpg",
       date: "April 13, 2024",
       title: "the Right Learning Path for your",
    },
@@ -42,7 +42,7 @@ const LatestPost = () => {
             <div key={item.id} className="rc-post-item">
                <div className="rc-post-thumb">
                   <Link to="/blog-details">
-                     <img src={item.thumb} alt="img" />
+                     <img src={item.thumb} alt="img" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </Link>
                </div>
                <div className="rc-post-content">

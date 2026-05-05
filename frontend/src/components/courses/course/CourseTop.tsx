@@ -79,8 +79,8 @@ const CourseTop = ({ startOffset, endOffset, totalItems, courses, setCourses, ha
                <div className="d-flex justify-content-center justify-content-md-end align-items-center flex-wrap">
                   <div className="courses-top-right m-0 ms-md-auto">
                      <span className="sort-by">{t('common.sort_by')}:</span>
-                     <div className="courses-top-right-select">
-                        <select onChange={selectHandler} value={selected} name="orderby" className="orderby">
+                     <div className="courses-top-right-select" style={{ minWidth: '220px' }}>
+                        <select onChange={selectHandler} value={selected} name="orderby" className="orderby" style={{ width: '100%', paddingRight: '40px', paddingLeft: '15px' }}>
                            <option value="">{t('common.default_sorting')}</option>
                            <option value="popular">{t('common.sort_by_popularity')}</option>
                            <option value="price">{t('common.sort_by_price')}</option>

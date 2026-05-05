@@ -11,7 +11,11 @@ const WorkAtFutureLearn = () => {
       <SEO pageTitle={'Work At Future Learn - Edunyte'} />
       <HeaderOne />
       <main className="main-area fix">
-        <BreadcrumbOne title={"Work At Future Learn"} sub_title={"Work At Future Learn"} />
+        <BreadcrumbOne 
+          title={"Work At Future Learn"} 
+          sub_title={"Work At Future Learn"} 
+          image="/assets/img/others/h4_choose_img.jpg"
+        />
         
         <section className="section-pt-120 section-pb-120">
           <div className="container">

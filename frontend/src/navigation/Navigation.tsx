@@ -11,6 +11,7 @@ import Course from '../pages/Course';
 import Lesson from '../pages/Lesson';
 import CourseDetails from '../pages/CourseDetails';
 import About from '../pages/About';
+import Instructor from '../pages/Instructor';
 import InstructorDetails from '../pages/InstructorDetails';
 import Event from '../pages/Event';
 import EventDetails from '../pages/EventDetails';
@@ -74,7 +75,8 @@ const AppNavigation = () => {
         <Route path="/course/:slug" element={<CourseDetails />} />
         <Route path="/lesson" element={<Lesson />} />
         <Route path="/about-us" element={<About />} />
-        <Route path="/instructor" element={<InstructorDetails />} />
+        <Route path="/instructors" element={<Instructor />} />
+        <Route path="/instructor-details" element={<InstructorDetails />} />
         <Route path="/events" element={<Event />} />
         <Route path="/events-details" element={<EventDetails />} />
         <Route path="/shop" element={<Shop />} />

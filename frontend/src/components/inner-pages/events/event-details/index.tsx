@@ -8,7 +8,13 @@ const EventDetails = () => {
       <>
          <HeaderOne />
          <main className="main-area fix">
-            <BreadcrumbOne title="Resolving Conflicts Between Designers" sub_title="Events" sub_title_2="Resolving Conflicts Between Designers" style={true} />
+            <BreadcrumbOne 
+               title="Resolving Conflicts Between Designers" 
+               sub_title="Events" 
+               sub_title_2="Resolving Conflicts Between Designers" 
+               style={true} 
+               image="/assets/img/others/premium_learning_plus.png"
+            />
             <EventDetailsArea />
          </main>
          <FooterOne style={false} style_2={false} />

@@ -9,6 +9,8 @@
     "instructor": "Instructor",
     "create_instructor_account": "Create Your Instructor Account",
     "logout": "Logout",
+    "profile": "Profile",
+    "reviews": "reviews",
     "buy_now": "Buy Now",
     "price": "Price",
     "language": "Language",
@@ -21,7 +23,11 @@
     "are_you_sure": "Are you sure?",
     "actions": "Actions",
     "login_description": "Hey there! Ready to log in? Just enter your username and password below and you'll be back in action in no time. Let's go!",
-    "continue_with_google": "Continue with google",
+    "login_visual_title": "Shape Your Future",
+    "login_visual_desc": "Access world-class learning and expert mentorship in just one click.",
+    "registration_visual_title": "Start Your Journey",
+    "registration_visual_desc": "Join a global community of learners and educators today.",
+    "continue_with_google": "Continue with Google",
     "or": "or",
     "email": "Email",
     "password": "Password",
@@ -33,11 +39,11 @@
     "create_account": "Create Your Account",
     "registration_description": "Hey there! Ready to join the party? We just need a few details from you to get started. Let's do this!",
     "first_name": "First Name",
-    "last_name": "Last name",
+    "last_name": "Last Name",
     "confirm_password": "Confirm Password",
     "already_have_account": "Already have an account?",
-    "registration_success": "Registration successfully",
-    "login_success": "Login successfully",
+    "registration_success": "Registration successful",
+    "login_success": "Login successful",
     "create_tutor_account": "Create Your Tutor Account",
     "tutor_registration": "Tutor Registration",
     "registration_success_pending": "Registration successful. Please wait for admin approval.",
@@ -80,7 +86,7 @@
     "search_courses_placeholder": "Search for course...",
     "trending_categories": "Trending Categories",
     "top_category_we_have": "Top Category We Have",
-    "category_description": "when known printer took a galley of type scrambl edmake",
+    "category_description": "Find the perfect learning path tailored to your professional goals and interests.",
     "top_class_courses": "Top Class Courses",
     "best_exciting_class_experience": "Get The Best Exciting Class Experience With us",
     "loading": "Loading...",
@@ -200,6 +206,17 @@
         "trustpilot_reviews": "(Over 100k reviews)",
         "experienced_tutors_count": "32,000+",
         "experienced_tutors_label": "Experienced Tutors"
+      },
+      "tutors": {
+        "sub_title": "TOP RATED MENTORS",
+        "title_start": "Meet our",
+        "title_end": "top tutors",
+        "description": "Learn from the best. Our highest-rated tutors are ready to help you achieve your goals with personalized guidance.",
+        "view_all": "View All Courses",
+        "finding_tutors": "Finding the best tutors for you...",
+        "per_lesson": "/lesson",
+        "students": "students",
+        "verified": "Verified"
       }
     },
     "how_it_works": {
@@ -267,15 +284,15 @@
         "home_2": {
           "1": {
             "title": "Expert Tutors",
-            "desc": "when an unknown printer took a galley offe type and scrambled makes."
+            "desc": "Learn from certified industry experts with years of real-world professional experience."
           },
           "2": {
             "title": "Effective Courses",
-            "desc": "when an unknown printer took a galley offe type and scrambled makes."
+            "desc": "Access high-quality curriculum designed to deliver measurable learning outcomes."
           },
           "3": {
             "title": "Earn Certificate",
-            "desc": "when an unknown printer took a galley offe type and scrambled makes."
+            "desc": "Earn globally recognized certifications to boost your professional career and profile."
           }
         }
       }
@@ -283,19 +300,19 @@
     "join_section": {
       "join_as_instructor_title": "Join as an Instructor",
       "join_as_instructor_description": "As a simple example, learning begins with effort, consistency, and the right guidance.",
-      "join_as_student_title": "Join as an student",
+      "join_as_student_title": "Join as a student",
       "join_as_student_description": "Join learners from around the world and grow together through live and online learning.",
       "apply_now": "Apply Now"
     },
     "blog": {
       "subtitle": "News & Blogs",
       "title": "Our Latest News Feed",
-      "description": "when known printer took a galley of type scrambl edmake",
+      "description": "Stay updated with the latest educational trends, platform updates, and expert insights.",
       "items": {
         "home_1": {
           "1": {
             "tag": "Marketing",
-            "title": "How To Become idiculously Self-Aware In 20 Minutes"
+            "title": "How To Become Ridiculously Self-Aware In 20 Minutes"
           },
           "2": {
             "tag": "Students",
@@ -380,6 +397,8 @@
           "label": "Tutors",
           "desc": "from 120 countries, teaching 90 languages and 100+ subjects."
         },
+        "enrolled": "Joined by 50k+ Members",
+        "satisfaction": "Satisfaction Rate",
         "companies": {
           "label": "Companies",
           "desc": "trust us to upskill their employees with our corporate training."
@@ -603,10 +622,10 @@
     "details": {
       "tag": "Development",
       "reviews": "({{count}} Reviews)",
-      "title": "How To Become idiculously Self-Aware In 20 Minutes",
+      "title": "How To Become Ridiculously Self-Aware In 20 Minutes",
       "by": "By",
       "author": "David Millar",
-      "location": "LocationWashington DC, MI 2726",
+      "location": "Location: Washington DC, MI 2726",
       "students": "2,250 Students",
       "overview_title": "Event Overview",
       "overview_desc": "Dorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan lacus vel facilisis.dolor sit amet, consectetur adipiscing elited do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
@@ -682,6 +701,7 @@
     }
   },
   "footer": {
+    "mobile_app": "Mobile App",
     "description_1": "Edunyte is a global learning ecosystem connecting ambitious students with world-class mentors. We believe in borderless education that is accessible, flexible, and driven by human expertise.",
     "address": "Innovate Square, Tech District, Global Hub",
     "phone": "+1 (800) EDUNYTE",

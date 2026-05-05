@@ -37,19 +37,65 @@ const CourseSidebar = ({ setSelectedCategory, selectedCategory }: CourseSidebarP
                <h4 className="widget-title">{t('common.categories')}</h4>
                <div className="courses-cat-list">
                   <ul className="list-wrap">
-                     <li>
-                        <div onClick={() => handleCategory(null)} className="form-check">
-                           <input className="form-check-input" type="checkbox" checked={!selectedCategory} readOnly id="cat_all" />
-                           <label className="form-check-label" htmlFor="cat_all" onClick={() => handleCategory(null)}>{t('common.all_courses')}</label>
+                      <li style={{ marginBottom: '8px' }}>
+                        <div 
+                           onClick={() => handleCategory(null)} 
+                           className={`form-check ${!selectedCategory ? 'active-category-item' : ''}`} 
+                           style={{ 
+                              cursor: 'pointer', 
+                              padding: '10px 15px', 
+                              borderRadius: '12px', 
+                              transition: 'all 0.3s ease',
+                              background: !selectedCategory ? 'var(--grad-primary)' : 'rgba(255,255,255,0.4)',
+                              boxShadow: !selectedCategory ? '0 8px 20px rgba(87, 81, 225, 0.3)' : 'none',
+                              border: '1px solid var(--glass-border)'
+                           }}
+                        >
+                           <input className="form-check-input d-none" type="checkbox" checked={!selectedCategory} readOnly id="cat_all" />
+                           <label 
+                              className="form-check-label w-100" 
+                              htmlFor="cat_all" 
+                              style={{ 
+                                 cursor: 'pointer', 
+                                 color: !selectedCategory ? '#fff' : 'var(--text-primary)',
+                                 fontWeight: !selectedCategory ? '800' : '500',
+                                 margin: 0
+                              }}
+                           >
+                              {t('common.all_courses')}
+                           </label>
                         </div>
-                     </li>
+                      </li>
                      {categoriesToShow.map((category) => (
-                        <li key={category._id}>
-                           <div onClick={() => handleCategory(category.slug || category._id)} className="form-check">
-                              <input className="form-check-input" type="checkbox" checked={selectedCategory === (category.slug || category._id)} readOnly id={`cat_${category._id}`} />
-                              <label className="form-check-label" htmlFor={`cat_${category._id}`} onClick={() => handleCategory(category.slug || category._id)}>{category.name}</label>
-                           </div>
-                        </li>
+                         <li key={category._id} style={{ marginBottom: '8px' }}>
+                            <div 
+                               onClick={() => handleCategory(category.slug || category._id)} 
+                               className={`form-check ${selectedCategory === (category.slug || category._id) ? 'active-category-item' : ''}`}
+                               style={{ 
+                                  cursor: 'pointer', 
+                                  padding: '10px 15px', 
+                                  borderRadius: '12px', 
+                                  transition: 'all 0.3s ease',
+                                  background: selectedCategory === (category.slug || category._id) ? 'var(--grad-primary)' : 'rgba(255,255,255,0.4)',
+                                  boxShadow: selectedCategory === (category.slug || category._id) ? '0 8px 20px rgba(87, 81, 225, 0.3)' : 'none',
+                                  border: '1px solid var(--glass-border)'
+                               }}
+                            >
+                               <input className="form-check-input d-none" type="checkbox" checked={selectedCategory === (category.slug || category._id)} readOnly id={`cat_${category._id}`} />
+                               <label 
+                                  className="form-check-label w-100" 
+                                  htmlFor={`cat_${category._id}`}
+                                  style={{ 
+                                     cursor: 'pointer', 
+                                     color: selectedCategory === (category.slug || category._id) ? '#fff' : 'var(--text-primary)',
+                                     fontWeight: selectedCategory === (category.slug || category._id) ? '800' : '500',
+                                     margin: 0
+                                  }}
+                               >
+                                  {category.name}
+                               </label>
+                            </div>
+                         </li>
                      ))}
                   </ul>
                   {categories.length > 8 && (

@@ -27,18 +27,11 @@ export interface MenuItem {
 };
 
 const menu_data: MenuItem[] = [
-    // {
-    //     id: 1,
-    //     title: "Home",
-    //     titleKey: "common.home",
-    //     link: "/",
-    //     menu_class: "mega-menu",
-    // },
     {
-        id: 3,
-        title: "Courses",
-        titleKey: "common.courses",
-        link: "/courses",
+        id: 1,
+        title: "Home",
+        titleKey: "common.home",
+        link: "/",
     },
     {
         id: 2,
@@ -46,6 +39,7 @@ const menu_data: MenuItem[] = [
         titleKey: "common.about_us",
         link: "/about-us",
     },
+
 
     {
         id: 4,
@@ -60,10 +54,6 @@ const menu_data: MenuItem[] = [
         link: "#",
         sub_menus: [
             { link: "/our-values", title: "Our values", titleKey: "common.our_values" },
-            { link: "/our-advisory-board", title: "Our advisory board", titleKey: "common.our_advisory_board" },
-            { link: "/our-partners", title: "Our partners", titleKey: "common.our_partners" },
-            { link: "/work-at-future-learn", title: "Work at Future Learn", titleKey: "common.work_at_future_learn" },
-            { link: "/quizlet-plus", title: "Quizlet Plus", titleKey: "common.quizlet_plus" },
             { link: "/blog", title: "Blog", titleKey: "common.blog" },
             { link: "/events", title: "Events", titleKey: "common.events" },
         ]

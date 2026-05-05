@@ -165,7 +165,37 @@
           }
 
           &.currency-menu {
-            max-height: 220px;
+            max-height: 350px;
+            display: flex;
+            flex-direction: column;
+
+            .currency-search-wrapper {
+              position: sticky;
+              top: 0;
+              background: #ffffff;
+              padding: 10px;
+              border-bottom: 1px solid #f0f0f0;
+              z-index: 2;
+
+              .currency-search-input {
+                width: 100%;
+                padding: 8px 12px;
+                border: 1px solid #e0e0e0;
+                border-radius: 4px;
+                font-size: 13px;
+                outline: none;
+
+                &:focus {
+                  border-color: #007bff;
+                  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+                }
+              }
+            }
+
+            .currency-options-list {
+              flex: 1;
+              overflow-y: auto;
+            }
           }
 
           .nested-option-item {
@@ -205,6 +235,19 @@
 
             .language-name {
               flex: 1;
+            }
+
+            .currency-code {
+              font-weight: 600;
+              min-width: 40px;
+            }
+
+            .currency-name {
+              font-size: 12px;
+              opacity: 0.7;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
             }
           }
         }

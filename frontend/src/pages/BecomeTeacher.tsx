@@ -12,7 +12,11 @@ const BecomeTeacher = () => {
             <SEO pageTitle={'Become an Instructor - Edunyte'} />
             <HeaderOne />
             <main className="main-area fix glow-bg">
-                <BreadcrumbOne title={"Empower the Future"} sub_title={"Teach"} />
+                <BreadcrumbOne 
+                    title={"Empower the Future"} 
+                    sub_title={"Teach"} 
+                    image="/assets/img/others/professional_teacher.png"
+                />
 
                 <section className="section-pt-120 section-pb-120">
                     <div className="container">
@@ -30,7 +34,7 @@ const BecomeTeacher = () => {
                             <div className="col-lg-6">
                                 <div className="position-relative">
                                     <div className="glass-panel p-3 shadow-lg" style={{ borderRadius: '40px' }}>
-                                        <img src="/assets/img/others/educational_collaboration.png" alt="Teach" className="w-100 rounded-4" style={{ minHeight: '400px', objectFit: 'cover' }} />
+                                        <img src="/assets/img/others/professional_teacher.png" alt="Teach" className="w-100 rounded-4" style={{ minHeight: '400px', objectFit: 'cover' }} />
                                     </div>
                                     <div className="position-absolute top-0 end-0 glass-panel p-4 mt-4 me-4 shadow-sm">
                                         <h4 className="m-0 fw-900 text-primary">$5M+</h4>

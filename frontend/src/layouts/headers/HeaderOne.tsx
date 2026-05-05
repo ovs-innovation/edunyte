@@ -76,14 +76,16 @@ const HeaderOne = () => {
          <header>
             {/* <HeaderTopOne style={false} /> */}
             <div id="header-fixed-height" className={`${sticky ? "active-height" : ""}`}></div>
-            <div id="sticky-header" className={`tg-header__area ${sticky ? "sticky-menu" : ""}`}>
+            <div id="sticky-header" className={`tg-header__area ${sticky ? "sticky-menu" : ""}`} style={{ zIndex: 99999999 }}>
                <div className="container custom-container">
                   <div className="row">
                      <div className="col-12">
                         <div className="tgmenu__wrap">
                            <nav className="tgmenu__nav">
                               <div className="logo">
-                                 <Link to="/"><img src="/assets/img/logo/edunyte-light.png" height="110" width="110" alt="Logo" /></Link>
+                                 <Link to="/">
+                                    <img src="/logo.png" alt="Edunyte logo" style={{ height: '90px', width: 'auto', objectFit: 'contain' }} />
+                                 </Link>
                               </div>
                               <div className="tgmenu__navbar-wrap tgmenu__main-menu d-none d-xl-flex">
                                  <NavMenu />
@@ -144,13 +146,13 @@ const HeaderOne = () => {
                                                 </li>
                                                 <li>
                                                    <Link className="dropdown-item py-2 rounded-2" to="/my-profile">
-                                                      <i className="fas fa-user me-2"></i> Profile
+                                                      <i className="fas fa-user me-2"></i> {t("common.profile")}
                                                    </Link>
                                                 </li>
                                                 <li><hr className="dropdown-divider" /></li>
                                                 <li>
-                                                   <button 
-                                                      className="dropdown-item py-2 rounded-2 text-danger" 
+                                                   <button
+                                                      className="dropdown-item py-2 rounded-2 text-danger"
                                                       onClick={logout}
                                                    >
                                                       <i className="fas fa-sign-out-alt me-2"></i> {t("common.logout")}

@@ -18,7 +18,11 @@ const OurPartners = () => {
       <SEO pageTitle={'Our Global Partners - Edunyte'} />
       <HeaderOne />
       <main className="main-area fix glow-bg">
-        <BreadcrumbOne title={"Global Synergy"} sub_title={"Partners"} />
+        <BreadcrumbOne 
+          title={"Global Synergy"} 
+          sub_title={"Partners"} 
+          image="/assets/img/others/h3_about_img.jpg"
+        />
         
         <section className="section-pt-120 section-pb-90">
           <div className="container">
@@ -53,7 +57,7 @@ const OurPartners = () => {
               <div className="row align-items-center">
                 <div className="col-lg-6 mb-50 mb-lg-0 text-center">
                   <div className="position-relative d-inline-block">
-                    <img src="/assets/img/others/global_education_network.png" alt="Network" className="img-fluid rounded-4 shadow-lg" style={{ maxWidth: '450px' }} />
+                    <img src="/assets/img/banner/banner_img.png" alt="Network" className="img-fluid rounded-4 shadow-lg" style={{ maxWidth: '450px' }} />
                   </div>
                 </div>
                 <div className="col-lg-6">

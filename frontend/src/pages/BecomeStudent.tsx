@@ -12,7 +12,11 @@ const BecomeStudent = () => {
             <SEO pageTitle={'Become a Student - Edunyte'} />
             <HeaderOne />
             <main className="main-area fix glow-bg">
-                <BreadcrumbOne title={"Your Success Story"} sub_title={"Join as Student"} />
+                <BreadcrumbOne 
+                    title={"Your Success Story"} 
+                    sub_title={"Join as Student"} 
+                    image="/assets/img/others/student_success_celebration.png"
+                />
 
                 <section className="section-pt-120 section-pb-120">
                     <div className="container">
@@ -30,7 +34,7 @@ const BecomeStudent = () => {
                             <div className="col-lg-6">
                                 <div className="position-relative">
                                     <div className="glass-panel p-3 shadow-lg" style={{ borderRadius: '40px' }}>
-                                        <img src="/assets/img/others/student_success_celebration.png" alt="Student Success" className="w-100 rounded-4" style={{ minHeight: '400px', objectFit: 'cover' }} />
+                                        <img src="/assets/img/banner/h2_banner_img.png" alt="Student Success" className="w-100 rounded-4" style={{ minHeight: '400px', objectFit: 'cover' }} />
                                     </div>
                                     <div className="position-absolute bottom-0 end-0 glass-panel p-4 mb-4 me-4 shadow-sm">
                                         <h4 className="m-0 fw-900 text-primary">50k+</h4>

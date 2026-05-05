@@ -2,6 +2,7 @@ import FooterOne from "../../../layouts/footers/FooterOne"
 import HeaderOne from "../../../layouts/headers/HeaderOne"
 import BreadcrumbOne from "../../common/breadcrumb/BreadcrumbOne"
 import ContactArea from "./ContactArea"
+import FaqArea from "../../homes/home-one/FaqArea"
 import { useTranslation } from "react-i18next";
 
 const Contact = () => {
@@ -12,6 +13,9 @@ const Contact = () => {
          <main className="main-area fix glow-bg">
             <BreadcrumbOne title={t('contact.breadcrumb_title')} sub_title={t('contact.breadcrumb_subtitle')} />
             <ContactArea />
+            <div className="section-pt-120">
+               <FaqArea />
+            </div>
          </main>
          <FooterOne style={false} style_2={false} />
       </>

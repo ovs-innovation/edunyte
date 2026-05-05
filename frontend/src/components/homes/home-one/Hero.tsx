@@ -5,7 +5,7 @@ const Hero = () => {
     const { t } = useTranslation();
 
     return (
-        <section className="glow-bg" style={{ padding: '20px 0 0 0' }}>
+        <section className="glow-bg" style={{ padding: '0 0 0 0', marginTop: '-15px', position: 'relative', zIndex: 1 }}>
             <div className="container position-relative z-1">
                 <div className="row align-items-center" style={{ minHeight: '75vh' }}>
                     <div className="col-lg-6 mb-5 mb-lg-0">
@@ -20,7 +20,7 @@ const Hero = () => {
                             fontWeight: '700',
                             marginBottom: '32px'
                         }}>
-                            <i className="fas fa-star" style={{ color: '#fbbf24' }}></i> {t('home.one.hero.trustpilot_reviews', 'TRUSTED BY 100K+ LEARNERS WORLDWIDE')}
+                            <i className="fas fa-certificate" style={{ color: 'var(--neon-purple)' }}></i> {t('home.one.hero.badge_text', 'ELEVATING EDUCATION FOR EVERYONE')}
                         </div>
 
                         <h1 style={{ fontSize: 'clamp(3.5rem, 6vw, 4.5rem)', fontWeight: 900, lineHeight: 1.1, marginBottom: '24px' }}>
@@ -34,23 +34,25 @@ const Hero = () => {
 
                         {/* Standardized Buttons */}
                         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '48px' }}>
-                            <Link to="/courses" className="btn-neon-primary">
-                                Find A Tutor <i className="fas fa-arrow-right"></i>
+                            <Link to="/instructors" className="btn-neon-primary">
+                                {t('home.one.hero.find_tutor', 'Find A Tutor')} <i className="fas fa-arrow-right"></i>
                             </Link>
                             <Link to="/courses" className="btn-neon-outline">
                                 Explore Courses
                             </Link>
                         </div>
 
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                            <div style={{ display: 'flex', gap: '4px' }}>
-                                {[1, 2, 3, 4, 5].map((s) => (
-                                    <i key={s} className="fas fa-star" style={{ color: '#fbbf24', fontSize: '1.2rem' }}></i>
+                        {/* Joined Members UI */}
+                        <div className="d-flex align-items-center gap-3 mt-4">
+                            <div className="d-flex">
+                                {[1, 2, 3, 4].map(i => (
+                                    <div key={i} className="rounded-circle border border-white" style={{ width: '42px', height: '42px', marginLeft: i === 1 ? 0 : '-15px', background: `var(--grad-primary)`, overflow: 'hidden', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
+                                        <img src={`/assets/img/banner/banner_author0${i % 2 + 1}.png`} alt="Member" className="w-100 h-100" style={{ objectFit: 'cover' }} />
+                                    </div>
                                 ))}
                             </div>
-                            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                <span style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-primary)' }}>{t('home.one.hero.trustpilot_rating', '4.8 on Trustpilot')}</span>
-                                <span style={{ fontSize: '0.85rem' }}>{t('home.one.hero.trustpilot_reviews', '(Over 100k reviews)')}</span>
+                            <div className="small fw-bold" style={{ color: 'var(--text-primary)', fontSize: '1rem' }}>
+                                <span className="text-primary">50,000+</span> {t('home.one.hero.joined_learners', 'learners joined already')}
                             </div>
                         </div>
                     </div>

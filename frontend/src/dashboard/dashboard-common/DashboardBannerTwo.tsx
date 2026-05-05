@@ -27,7 +27,7 @@ const DashboardBannerTwo = ({ totalLessons = 0, completedLessons = 0 }: Dashboar
 
   const getProfilePicture = () => {
     if (user?.photo) return user.photo;
-    return "assets/img/courses/details_instructors02.jpg"
+    return "/assets/img/courses/details_instructors02.jpg"
   }
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {

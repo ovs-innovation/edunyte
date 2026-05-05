@@ -45,7 +45,7 @@ const LoginForm = () => {
 
    return (
       <form onSubmit={handleSubmit(onSubmit)} className="account__form">
-         <div className="form-grp mb-25">
+         <div className="form-grp mb-15">
             <label htmlFor="email" className="fw-bold small opacity-50 mb-2">{t("common.email")}</label>
             <div className="position-relative">
                 <input 
@@ -66,8 +66,8 @@ const LoginForm = () => {
             </div>
             <p className="form_error text-danger small mt-1">{errors.email?.message}</p>
          </div>
-         <div className="form-grp mb-25">
-            <label htmlFor="password">{t("common.password")}</label>
+         <div className="form-grp mb-15">
+            <label htmlFor="password" className="fw-bold small opacity-50 mb-2">{t("common.password")}</label>
             <input 
                 id="password" 
                 {...register("password")} 
@@ -84,7 +84,7 @@ const LoginForm = () => {
             />
             <p className="form_error text-danger small mt-1">{errors.password?.message}</p>
          </div>
-         <div className="account__check d-flex justify-content-between align-items-center mb-30">
+         <div className="account__check d-flex justify-content-between align-items-center mb-20">
             <div className="account__check-remember d-flex align-items-center gap-2">
                <input type="checkbox" className="form-check-input mt-0" value="" id="terms-check" style={{ width: '18px', height: '18px' }} />
                <label htmlFor="terms-check" className="form-check-label small opacity-70 mb-0">{t("common.remember_me")}</label>

@@ -44,7 +44,7 @@ const HeaderSix = () => {
                                     </li>
                                     <li className="mini-cart-icon">
                                        <Link to="/cart" className="cart-count">
-                                          <InjectableSvg src="assets/img/icons/cart.svg" className="injectable" alt="img" />
+                                          <InjectableSvg src="/assets/img/icons/cart.svg" className="injectable" alt="img" />
                                           <TotalCart />
                                        </Link>
                                     </li>
@@ -54,7 +54,7 @@ const HeaderSix = () => {
                                  </ul>
                               </div>
                               <div className="mobile-login-btn mobile-login-btn-two">
-                                 <Link to="/login"><InjectableSvg src="assets/img/icons/user.svg" alt="" className="injectable" /></Link>
+                                 <Link to="/login"><InjectableSvg src="/assets/img/icons/user.svg" alt="" className="injectable" /></Link>
                               </div>
                               <div onClick={() => setIsActive(true)} className="mobile-nav-toggler"><i className="tg-flaticon-menu-1"></i></div>
                            </nav>

@@ -13,7 +13,9 @@ const FooterOne = ({ style, style_2 }: any) => {
                   <div className="col-xl-4 col-lg-4 col-md-6 mb-30">
                      <div className="footer__widget">
                         <div className="logo mb-20">
-                           <Link to="/"><img src="/assets/img/logo/edunyte-light.png" height="75" width="75" alt="Edunyte" /></Link>
+                           <Link to="/">
+                              <img src="/logo.png" alt="Edunyte logo" style={{ height: '45px', width: 'auto' }} />
+                           </Link>
                         </div>
                         <div className="footer__content">
                            <p className="small opacity-70 mb-20" style={{ maxWidth: '300px', lineHeight: '1.6' }}>
@@ -63,7 +65,7 @@ const FooterOne = ({ style, style_2 }: any) => {
                   {/* Column 4: App */}
                   <div className="col-xl-2 col-lg-3 col-md-6 mb-30">
                      <div className="footer__widget">
-                        <h4 className="footer__widget-title mb-20" style={{ fontSize: '15px', letterSpacing: '1px' }}>Mobile App</h4>
+                        <h4 className="footer__widget-title mb-20" style={{ fontSize: '15px', letterSpacing: '1px' }}>{t('footer.mobile_app')}</h4>
                         <div className="app-download">
                            <Link to="#" className="d-block mb-2 hover-scale"><img src="/assets/img/others/google-play.svg" alt="" style={{ height: '35px' }} /></Link>
                            <Link to="#" className="d-block hover-scale"><img src="/assets/img/others/apple-store.svg" alt="" style={{ height: '35px' }} /></Link>

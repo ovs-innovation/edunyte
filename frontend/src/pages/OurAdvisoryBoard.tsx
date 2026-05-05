@@ -17,7 +17,11 @@ const OurAdvisoryBoard = () => {
       <SEO pageTitle={'Our Advisory Board - Edunyte'} />
       <HeaderOne />
       <main className="main-area fix glow-bg">
-        <BreadcrumbOne title={"Strategic Vision"} sub_title={"Advisory Board"} />
+        <BreadcrumbOne 
+          title={"Strategic Vision"} 
+          sub_title={"Advisory Board"} 
+          image="/assets/img/others/choose_img.jpg"
+        />
         
         <section className="section-pt-120 section-pb-90">
           <div className="container">
@@ -65,7 +69,7 @@ const OurAdvisoryBoard = () => {
                      </div>
                   </div>
                   <div className="col-lg-5 text-center mt-5 mt-lg-0">
-                     <img src="/assets/img/others/mission_vision_hero.png" alt="" className="img-fluid rounded-4 shadow-sm" style={{ opacity: 0.8 }} />
+                     <img src="/assets/img/banner/h3_hero_img.png" alt="" className="img-fluid rounded-4 shadow-sm" style={{ opacity: 0.9 }} />
                   </div>
                </div>
             </div>

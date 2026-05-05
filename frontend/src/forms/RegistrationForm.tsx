@@ -61,31 +61,31 @@ const RegistrationForm = ({ role }: { role?: string }) => {
       <form onSubmit={handleSubmit(onSubmit)} className="account__form">
          <div className="row g-3">
             <div className="col-md-6">
-               <div className="form-grp mb-3">
+               <div className="form-grp mb-2">
                   <label htmlFor="fast-name" className="fw-bold small opacity-50 mb-2">{t("common.first_name")}</label>
                   <input type="text" {...register("fname")} id="fast-name" placeholder="John" style={{ width: '100%', padding: '12px 18px', background: 'rgba(255,255,255,0.8)', border: '1px solid var(--glass-border)', borderRadius: '10px', fontSize: '0.9rem' }} />
                   <p className="form_error text-danger small mt-1">{errors.fname?.message}</p>
                </div>
             </div>
             <div className="col-md-6">
-               <div className="form-grp mb-3">
+               <div className="form-grp mb-2">
                   <label htmlFor="last-name" className="fw-bold small opacity-50 mb-2">{t("common.last_name")}</label>
                   <input type="text" {...register("lname")} id="last-name" placeholder="Doe" style={{ width: '100%', padding: '12px 18px', background: 'rgba(255,255,255,0.8)', border: '1px solid var(--glass-border)', borderRadius: '10px', fontSize: '0.9rem' }} />
                   <p className="form_error text-danger small mt-1">{errors.lname?.message}</p>
                </div>
             </div>
          </div>
-         <div className="form-grp mb-3">
+         <div className="form-grp mb-2">
             <label htmlFor="email" className="fw-bold small opacity-50 mb-2">{t("common.email")}</label>
             <input type="email" {...register("email")} id="email" placeholder="name@example.com" style={{ width: '100%', padding: '12px 18px', background: 'rgba(255,255,255,0.8)', border: '1px solid var(--glass-border)', borderRadius: '10px', fontSize: '0.9rem' }} />
             <p className="form_error text-danger small mt-1">{errors.email?.message}</p>
          </div>
-         <div className="form-grp mb-3">
+         <div className="form-grp mb-2">
             <label htmlFor="password" className="fw-bold small opacity-50 mb-2">{t("common.password")}</label>
             <input type="password" {...register("password")} id="password" placeholder="••••••••" style={{ width: '100%', padding: '12px 18px', background: 'rgba(255,255,255,0.8)', border: '1px solid var(--glass-border)', borderRadius: '10px', fontSize: '0.9rem' }} />
             <p className="form_error text-danger small mt-1">{errors.password?.message}</p>
          </div>
-         <div className="form-grp mb-30">
+         <div className="form-grp mb-20">
             <label htmlFor="confirm-password" className="fw-bold small opacity-50 mb-2">{t("common.confirm_password")}</label>
             <input type="password" {...register("cpassword")} id="confirm-password" placeholder="••••••••" style={{ width: '100%', padding: '12px 18px', background: 'rgba(255,255,255,0.8)', border: '1px solid var(--glass-border)', borderRadius: '10px', fontSize: '0.9rem' }} />
             <p className="form_error text-danger small mt-1">{errors.cpassword?.message}</p>

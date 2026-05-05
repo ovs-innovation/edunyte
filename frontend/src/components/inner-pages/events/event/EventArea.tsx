@@ -34,7 +34,7 @@ const EventArea = () => {
                      <div key={item.id} className="col-xl-3 col-lg-4 col-md-6">
                         <div className="event__item shine__animate-item">
                            <div className="event__item-thumb">
-                              <Link to="/events-details" className="shine__animate-link"><img src={item.thumb} alt="img" /></Link>
+                              <Link to="/events-details" className="shine__animate-link"><img src={item.thumb} alt="img" style={{ width: '100%', height: '200px', objectFit: 'cover' }} /></Link>
                            </div>
                            <div className="event__item-content">
                               <span className="date">{t(item.date)}</span>

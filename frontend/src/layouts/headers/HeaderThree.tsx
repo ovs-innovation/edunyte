@@ -42,13 +42,13 @@ const HeaderThree = () => {
                                     </li>
                                     <li className="wishlist-icon">
                                        <Link to="/wishlist" className="cart-count">
-                                          <InjectableSvg src="assets/img/icons/heart.svg" className="injectable" alt="img" />
+                                          <InjectableSvg src="/assets/img/icons/heart.svg" className="injectable" alt="img" />
                                           <TotalWishlist />
                                        </Link>
                                     </li>
                                     <li className="mini-cart-icon">
                                        <Link to="/cart" className="cart-count">
-                                          <InjectableSvg src="assets/img/icons/cart.svg" className="injectable" alt="img" />
+                                          <InjectableSvg src="/assets/img/icons/cart.svg" className="injectable" alt="img" />
                                           <TotalCart />
                                        </Link>
                                     </li>
