@@ -5,8 +5,10 @@ import FooterOne from '../layouts/footers/FooterOne';
 import BreadcrumbOne from '../components/common/breadcrumb/BreadcrumbOne';
 import Newsletter from '../components/homes/home-one/Newsletter';
 import { Link } from 'react-router-dom';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 const BecomeTeacher = () => {
+    const { getCurrencyInfo } = useCurrency();
     return (
         <Wrapper>
             <SEO pageTitle={'Become an Instructor - Edunyte'} />
@@ -37,7 +39,7 @@ const BecomeTeacher = () => {
                                         <img src="/assets/img/others/professional_teacher.png" alt="Teach" className="w-100 rounded-4" style={{ minHeight: '400px', objectFit: 'cover' }} />
                                     </div>
                                     <div className="position-absolute top-0 end-0 glass-panel p-4 mt-4 me-4 shadow-sm">
-                                        <h4 className="m-0 fw-900 text-primary">$5M+</h4>
+                                        <h4 className="m-0 fw-900 text-primary">{getCurrencyInfo().symbol}5M+</h4>
                                         <p className="m-0 small opacity-60">Paid to Experts</p>
                                     </div>
                                 </div>

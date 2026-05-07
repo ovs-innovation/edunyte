@@ -1,68 +1,70 @@
+import React, { Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import Home from '../pages/Home';
-import HomeTwo from '../pages/HomeTwo';
-import HomeEight from '../pages/HomeEight';
-import HomeSeven from '../pages/HomeSeven';
-import HomeSix from '../pages/HomeSix';
-import HomeFive from '../pages/HomeFive';
-import HomeFour from '../pages/HomeFour';
-import HomeThree from '../pages/HomeThree';
-import Course from '../pages/Course';
-import Lesson from '../pages/Lesson';
-import CourseDetails from '../pages/CourseDetails';
-import About from '../pages/About';
-import Instructor from '../pages/Instructor';
-import InstructorDetails from '../pages/InstructorDetails';
-import Event from '../pages/Event';
-import EventDetails from '../pages/EventDetails';
-import Shop from '../pages/Shop';
-import ShopDetails from '../pages/ShopDetails';
-import Cart from '../pages/Cart';
-import Wishlist from '../pages/Wishlist';
-import CheckOut from '../pages/CheckOut';
-import Blog from '../pages/Blog';
-import BlogTwo from '../pages/BlogTwo';
-import BlogThree from '../pages/BlogThree';
-import BlogDetails from '../pages/BlogDetails';
-import Login from '../pages/Login';
-import Registration from '../pages/Registration';
-import Contact from '../pages/Contact';
-import InstructorDashboard from '../pages/InstructorDashboard';
-import InstructorProfile from '../pages/InstructorProfile';
-import InstructorEnrollCourse from '../pages/InstructorEnrolledCourses';
-import InstructorWishlist from '../pages/InstructorWishlist';
-import InstructorReview from '../pages/InstructorReview';
-import InstructorQuiz from '../pages/InstructorQuiz';
-import InstructorHistory from '../pages/InstructorHistory';
-import InstructorCourses from '../pages/InstructorCourses';
-import InstructorAnnouncement from '../pages/InstructorAnnouncement';
-import InstructorAssignment from '../pages/InstructorAssignment';
-import InstructorSetting from '../pages/InstructorSetting';
-import InstructorAttempt from '../pages/InstructorAttempt';
-import StudentDashboard from '../pages/StudentDashboard';
-import StudentProfile from '../pages/StudentProfile';
-import MyLessions from '../pages/MyLessions';
-import StudentWishlist from '../pages/StudentWishlist';
-import StudentReview from '../pages/StudentReview';
-import StudentAttempt from '../pages/StudentAttempt';
-import StudentHistory from '../pages/StudentHistory';
-import StudentSetting from '../pages/StudentSetting';
-import BookingCheckout from '../pages/BookingCheckout';
-import NotFound from '../pages/NotFound';
+const Home = React.lazy(() => import('../pages/Home'));
+const HomeTwo = React.lazy(() => import('../pages/HomeTwo'));
+const HomeEight = React.lazy(() => import('../pages/HomeEight'));
+const HomeSeven = React.lazy(() => import('../pages/HomeSeven'));
+const HomeSix = React.lazy(() => import('../pages/HomeSix'));
+const HomeFive = React.lazy(() => import('../pages/HomeFive'));
+const HomeFour = React.lazy(() => import('../pages/HomeFour'));
+const HomeThree = React.lazy(() => import('../pages/HomeThree'));
+const Course = React.lazy(() => import('../pages/Course'));
+const Lesson = React.lazy(() => import('../pages/Lesson'));
+const CourseDetails = React.lazy(() => import('../pages/CourseDetails'));
+const About = React.lazy(() => import('../pages/About'));
+const Instructor = React.lazy(() => import('../pages/Instructor'));
+const InstructorDetails = React.lazy(() => import('../pages/InstructorDetails'));
+const Event = React.lazy(() => import('../pages/Event'));
+const EventDetails = React.lazy(() => import('../pages/EventDetails'));
+const Shop = React.lazy(() => import('../pages/Shop'));
+const ShopDetails = React.lazy(() => import('../pages/ShopDetails'));
+const Cart = React.lazy(() => import('../pages/Cart'));
+const Wishlist = React.lazy(() => import('../pages/Wishlist'));
+const CheckOut = React.lazy(() => import('../pages/CheckOut'));
+const Blog = React.lazy(() => import('../pages/Blog'));
+const BlogTwo = React.lazy(() => import('../pages/BlogTwo'));
+const BlogThree = React.lazy(() => import('../pages/BlogThree'));
+const BlogDetails = React.lazy(() => import('../pages/BlogDetails'));
+const Login = React.lazy(() => import('../pages/Login'));
+const Registration = React.lazy(() => import('../pages/Registration'));
+const Contact = React.lazy(() => import('../pages/Contact'));
+const InstructorDashboard = React.lazy(() => import('../pages/InstructorDashboard'));
+const InstructorProfile = React.lazy(() => import('../pages/InstructorProfile'));
+const InstructorEnrollCourse = React.lazy(() => import('../pages/InstructorEnrolledCourses'));
+const InstructorWishlist = React.lazy(() => import('../pages/InstructorWishlist'));
+const InstructorReview = React.lazy(() => import('../pages/InstructorReview'));
+const InstructorQuiz = React.lazy(() => import('../pages/InstructorQuiz'));
+const InstructorHistory = React.lazy(() => import('../pages/InstructorHistory'));
+const InstructorCourses = React.lazy(() => import('../pages/InstructorCourses'));
+const InstructorAnnouncement = React.lazy(() => import('../pages/InstructorAnnouncement'));
+const InstructorAssignment = React.lazy(() => import('../pages/InstructorAssignment'));
+const InstructorSetting = React.lazy(() => import('../pages/InstructorSetting'));
+const InstructorAttempt = React.lazy(() => import('../pages/InstructorAttempt'));
+const StudentDashboard = React.lazy(() => import('../pages/StudentDashboard'));
+const StudentProfile = React.lazy(() => import('../pages/StudentProfile'));
+const MyLessions = React.lazy(() => import('../pages/MyLessions'));
+const StudentWishlist = React.lazy(() => import('../pages/StudentWishlist'));
+const StudentReview = React.lazy(() => import('../pages/StudentReview'));
+const StudentAttempt = React.lazy(() => import('../pages/StudentAttempt'));
+const StudentHistory = React.lazy(() => import('../pages/StudentHistory'));
+const StudentSetting = React.lazy(() => import('../pages/StudentSetting'));
+const BookingCheckout = React.lazy(() => import('../pages/BookingCheckout'));
+const NotFound = React.lazy(() => import('../pages/NotFound'));
 import ProtectedRoute from '../components/common/ProtectedRoute';
-import FaqOnePage from '../pages/Faq';
-import OurValues from '../pages/OurValues';
-import OurAdvisoryBoard from '../pages/OurAdvisoryBoard';
-import OurPartners from '../pages/OurPartners';
-import WorkAtFutureLearn from '../pages/WorkAtFutureLearn';
-import QuizletPlus from '../pages/QuizletPlus';
-import BecomeTeacher from '../pages/BecomeTeacher';
-import BecomeStudent from '../pages/BecomeStudent';
-// import BecomePartner from '../pages/BecomePartner';
+const FaqOnePage = React.lazy(() => import('../pages/Faq'));
+const OurValues = React.lazy(() => import('../pages/OurValues'));
+const OurAdvisoryBoard = React.lazy(() => import('../pages/OurAdvisoryBoard'));
+const OurPartners = React.lazy(() => import('../pages/OurPartners'));
+const WorkAtFutureLearn = React.lazy(() => import('../pages/WorkAtFutureLearn'));
+const QuizletPlus = React.lazy(() => import('../pages/QuizletPlus'));
+const BecomeTeacher = React.lazy(() => import('../pages/BecomeTeacher'));
+const BecomeStudent = React.lazy(() => import('../pages/BecomeStudent'));
+// const BecomePartner = React.lazy(() => import('../pages/BecomePartner'));
 
 const AppNavigation = () => {
   return (
-    <Routes>
+    <Suspense fallback={<div className="preloader-lazy" style={{height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>Loading...</div>}>
+      <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/home-two" element={<HomeTwo />} />
         <Route path="/home-three" element={<HomeThree />} />
@@ -125,6 +127,7 @@ const AppNavigation = () => {
         {/* <Route path="/become-partner" element={<BecomePartner />} /> */}
         <Route path="*" element={<NotFound />} />
       </Routes>
+    </Suspense>
   );
 };
 

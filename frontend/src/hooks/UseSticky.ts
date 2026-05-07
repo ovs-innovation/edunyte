@@ -16,10 +16,21 @@ const UseSticky = (): StickyState => {
    };
 
    useEffect(() => {
-      window.addEventListener("scroll", stickyHeader);
+      let ticking = false;
+      const onScroll = () => {
+         if (!ticking) {
+            window.requestAnimationFrame(() => {
+               stickyHeader();
+               ticking = false;
+            });
+            ticking = true;
+         }
+      };
+
+      window.addEventListener("scroll", onScroll, { passive: true });
 
       return (): void => {
-         window.removeEventListener("scroll", stickyHeader);
+         window.removeEventListener("scroll", onScroll);
       };
    }, []);
    return {

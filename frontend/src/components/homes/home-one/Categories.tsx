@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { fetchCategories, type Category } from '../../../services/categoryService';
 import { Link } from 'react-router-dom';
 
+import { TranslatedContent } from '../../common/TranslatedContent';
+
 const Categories = () => {
     const { t } = useTranslation();
     const [categories, setCategories] = useState<Category[]>([]);
@@ -49,8 +51,8 @@ const Categories = () => {
             <div className="container position-relative z-1">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '50px' }}>
                     <div>
-                        <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 900, marginBottom: '15px' }} className="text-gradient">Learn a Category</h2>
-                        <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', margin: 0 }}>Discover online tutors for any subject</p>
+                        <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 900, marginBottom: '15px' }} className="text-gradient">{t('common.categories_title')}</h2>
+                        <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', margin: 0 }}>{t('common.categories_subtitle')}</p>
                     </div>
                 </div>
 
@@ -67,8 +69,10 @@ const Categories = () => {
                                         )}
                                     </div>
                                     <div style={{ flex: 1, minWidth: 0 }}>
-                                        <h4 style={{ fontSize: '1.1rem', fontWeight: 700, margin: '0 0 6px 0', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{cat.name}</h4>
-                                        <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>View courses</div>
+                                        <h4 style={{ fontSize: '1.1rem', fontWeight: 700, margin: '0 0 6px 0', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                            <TranslatedContent>{cat.name}</TranslatedContent>
+                                        </h4>
+                                        <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{t('common.view_courses')}</div>
                                     </div>
                                     <i className="fas fa-chevron-right" style={{ marginLeft: '12px', color: 'var(--neon-purple)', fontSize: '0.9rem', opacity: 0.5 }}></i>
                                 </div>
@@ -79,7 +83,7 @@ const Categories = () => {
 
                 <div style={{ textAlign: 'center', marginTop: '50px' }}>
                     <Link to="/courses" className="btn-neon-outline">
-                        Explore all subjects
+                        {t('common.explore_all_subjects')}
                     </Link>
                 </div>
             </div>

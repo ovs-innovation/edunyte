@@ -4,8 +4,10 @@ import HeaderOne from '../layouts/headers/HeaderOne';
 import FooterOne from '../layouts/footers/FooterOne';
 import BreadcrumbOne from '../components/common/breadcrumb/BreadcrumbOne';
 import Newsletter from '../components/homes/home-one/Newsletter';
+import { usePriceFormatter } from '../hooks/usePriceFormatter';
 
 const QuizletPlus = () => {
+  const { formatPriceWithConversion } = usePriceFormatter();
   const features = [
     { title: "AI Learning Assistant", desc: "Get personalized study paths driven by cutting-edge neural networks.", icon: "fas fa-robot" },
     { title: "Expert Solutions", desc: "Step-by-step guidance from verified industry experts.", icon: "fas fa-check-double" },
@@ -71,15 +73,15 @@ const QuizletPlus = () => {
                             <div className="col-md-6">
                                 <div className="p-5 rounded-4 shadow-sm h-100 d-flex flex-column" style={{ background: 'rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.05)' }}>
                                     <span className="d-block mb-3 fw-bold opacity-40">ANNUAL PLAN</span>
-                                    <h3 className="fw-900 mb-2" style={{ fontSize: '3rem' }}>$7.99<small className="fw-normal opacity-50" style={{ fontSize: '1rem' }}>/mo</small></h3>
-                                    <p className="mb-40 small opacity-60">Billed annually at $95.88</p>
+                                    <h3 className="fw-900 mb-2" style={{ fontSize: '3rem' }}>{formatPriceWithConversion(640)}<small className="fw-normal opacity-50" style={{ fontSize: '1rem' }}>/mo</small></h3>
+                                    <p className="mb-40 small opacity-60">Billed annually at {formatPriceWithConversion(7670)}</p>
                                     <button className="btn btn-dark w-100 py-3 mt-auto" style={{ borderRadius: '12px', fontWeight: 700 }}>Select Annual</button>
                                 </div>
                             </div>
                              <div className="col-md-6">
                                 <div className="p-5 rounded-4 shadow-sm h-100 d-flex flex-column" style={{ background: 'rgba(212, 175, 55, 0.05)', border: '1px solid rgba(212, 175, 55, 0.2)' }}>
                                     <span className="d-block mb-3 fw-bold" style={{ color: '#D4AF37' }}>MONTHLY PLAN</span>
-                                    <h3 className="fw-900 mb-2" style={{ fontSize: '3rem' }}>$14.99<small className="fw-normal opacity-50" style={{ fontSize: '1rem' }}>/mo</small></h3>
+                                    <h3 className="fw-900 mb-2" style={{ fontSize: '3rem' }}>{formatPriceWithConversion(1200)}<small className="fw-normal opacity-50" style={{ fontSize: '1rem' }}>/mo</small></h3>
                                     <p className="mb-40 small opacity-60">Flexible billing, cancel anytime</p>
                                     <button className="btn w-100 py-3 mt-auto text-white" style={{ background: 'linear-gradient(135deg, #D4AF37, #B8860B)', borderRadius: '12px', fontWeight: 700, border: 'none' }}>Select Monthly</button>
                                 </div>

@@ -12,7 +12,7 @@ const Newsletter = () => {
             toast.success(t('common.newsletter_success') || "Subscribed successfully!", { position: 'top-center' });
             setEmail('');
         } else {
-            toast.error("Please enter a valid email.", { position: 'top-center' });
+            toast.error(t('common.newsletter_error_email') || "Please enter a valid email address.", { position: 'top-center' });
         }
     };
 

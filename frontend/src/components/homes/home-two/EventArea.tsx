@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import BtnArrow from "../../../svg/BtnArrow";
+import { useTranslation } from "react-i18next";
 
 interface DataType {
     id: number;
@@ -9,31 +10,33 @@ interface DataType {
     location: string;
 };
 
-const event_data: DataType[] = [
-    {
-        id: 1,
-        thumb: "/assets/img/events/event_thumb01.jpg",
-        date: "25 June, 2024",
-        title: "The Accessible Target Sizes Cheatsheet",
-        location: "United Kingdom"
-    },
-    {
-        id: 2,
-        thumb: "/assets/img/events/event_thumb02.jpg",
-        date: "25 June, 2024",
-        title: "Exactly How Technology Can Make Reading",
-        location: "Tokyo Japan"
-    },
-    {
-        id: 3,
-        thumb: "/assets/img/events/event_thumb03.jpg",
-        date: "25 June, 2024",
-        title: "Aewe Creating Futures Through Technology",
-        location: "New Work"
-    },
-];
-
 const EventArea = () => {
+    const { t } = useTranslation();
+
+    const event_data: DataType[] = [
+        {
+            id: 1,
+            thumb: "/assets/img/events/event_thumb01.jpg",
+            date: "25 June, 2024",
+            title: t('events.items_h2.1.title'),
+            location: t('events.items_h2.1.location')
+        },
+        {
+            id: 2,
+            thumb: "/assets/img/events/event_thumb02.jpg",
+            date: "25 June, 2024",
+            title: t('events.items_h2.2.title'),
+            location: t('events.items_h2.2.location')
+        },
+        {
+            id: 3,
+            thumb: "/assets/img/events/event_thumb03.jpg",
+            date: "25 June, 2024",
+            title: t('events.items_h2.3.title'),
+            location: t('events.items_h2.3.location')
+        },
+    ];
+
     return (
         <section className="event__area section-pt-120 section-pb-90">
             <div className="container">
@@ -42,12 +45,12 @@ const EventArea = () => {
                         <div className="col-30">
                             <div className="event__content">
                                 <div className="section__title mb-20">
-                                    <span className="sub-title">Upcoming Events</span>
-                                    <h2 className="title">Join Our Community And Make it Bigger</h2>
+                                    <span className="sub-title">{t('events.home_2_subtitle')}</span>
+                                    <h2 className="title">{t('events.home_2_title')}</h2>
                                 </div>
-                                <p>Edhen an unknown printer took a galley acrambled make a type specimen bookas centuries.Edhen anderely unknown printer took a galley.</p>
+                                <p>{t('events.home_2_desc')}</p>
                                 <div className="tg-button-wrap">
-                                    <Link to="/events" className="btn arrow-btn">See All Events <BtnArrow /></Link>
+                                    <Link to="/events" className="btn arrow-btn">{t('events.see_all_events')} <BtnArrow /></Link>
                                 </div>
                             </div>
                         </div>
@@ -82,4 +85,4 @@ const EventArea = () => {
     )
 }
 
-export default EventArea
+export default EventArea;

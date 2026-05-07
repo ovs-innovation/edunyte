@@ -22,7 +22,7 @@
     "welcome_back": "Welcome back!",
     "are_you_sure": "Are you sure?",
     "actions": "Actions",
-    "login_description": "Hey there! Ready to log in? Just enter your username and password below and you'll be back in action in no time. Let's go!",
+    "login_description": "Welcome back! Please enter your credentials below to access your account and continue your learning journey.",
     "login_visual_title": "Shape Your Future",
     "login_visual_desc": "Access world-class learning and expert mentorship in just one click.",
     "registration_visual_title": "Start Your Journey",
@@ -37,7 +37,7 @@
     "dont_have_account": "Don't have an account?",
     "sign_up": "Sign Up",
     "create_account": "Create Your Account",
-    "registration_description": "Hey there! Ready to join the party? We just need a few details from you to get started. Let's do this!",
+    "registration_description": "Create your account today and join a global community of dedicated learners and expert mentors.",
     "first_name": "First Name",
     "last_name": "Last Name",
     "confirm_password": "Confirm Password",
@@ -195,7 +195,15 @@
     "newsletter_desc": "Sign up for our newsletter and get language learning tips and special offers directly to your inbox.",
     "newsletter_placeholder_email": "Enter your email address",
     "newsletter_subscribe": "Subscribe",
-    "newsletter_terms": "By subscribing, you agree to our Terms of Service and Privacy Policy."
+    "newsletter_terms": "By subscribing, you agree to our Terms of Service and Privacy Policy.",
+    "newsletter_error_email": "Please enter a valid email address.",
+    "categories_title": "Explore Learning Categories",
+    "categories_subtitle": "Find expert tutors across diverse subjects and interests.",
+    "view_courses": "View Courses",
+    "explore_all_subjects": "Explore All Subjects",
+    "expert_tutor": "Expert Tutor",
+    "experienced_educator": "Experienced educator dedicated to student success.",
+    "experienced_educator_specializing_in": "Experienced educator specializing in {{course}}."
   },
   "home": {
     "one": {
@@ -473,7 +481,7 @@
     "features": {
       "1": {
         "title": "Set your own rate",
-        "desc": "Choose your hourly rate and change it anytime. On average, English tutors charge $15-25 per hour."
+        "desc": "Choose your hourly rate and change it anytime. On average, English tutors charge 15-25 USD per hour."
       },
       "2": {
         "title": "Teach anytime, anywhere",
@@ -642,7 +650,7 @@
     },
     "sidebar": {
       "fee_label": "Event Fee",
-      "fee": "$19.00",
+      "fee": "",
       "info_title": "Event Information:",
       "date": "Date",
       "date_val": "26/08/2024",
@@ -697,6 +705,24 @@
       "8": {
         "title": "How To Design Effective User Onboarding",
         "date": "25 June, 2024"
+      }
+    },
+    "home_2_subtitle": "Upcoming Events",
+    "home_2_title": "Join Our Community and Grow Together",
+    "home_2_desc": "Stay connected with our global community through live workshops, webinars, and networking events designed to accelerate your learning journey.",
+    "see_all_events": "See All Events",
+    "items_h2": {
+      "1": {
+        "title": "The Accessible Target Sizes Cheatsheet",
+        "location": "United Kingdom"
+      },
+      "2": {
+        "title": "Exactly How Technology Can Make Reading",
+        "location": "Tokyo Japan"
+      },
+      "3": {
+        "title": "Building Futures Through Technology",
+        "location": "New York"
       }
     }
   },

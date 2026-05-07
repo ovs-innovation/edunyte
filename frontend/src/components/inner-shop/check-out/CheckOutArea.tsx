@@ -4,8 +4,12 @@ import { toast } from "react-toastify";
 import { RootState } from "../../../redux/store";
 import UseCartInfo from "../../../hooks/UseCartInfo";
 import { Link } from "react-router-dom";
+import { usePriceFormatter } from "../../../hooks/usePriceFormatter";
+import { useTranslation } from "react-i18next";
 
 const CheckOutArea = () => {
+  const { t } = useTranslation();
+  const { formatPriceDirect } = usePriceFormatter();
 
   const notify = () => toast("Order Submit");
   const productItem = useSelector((state: RootState) => state.cart.cart);
@@ -39,15 +43,15 @@ const CheckOutArea = () => {
                 {/* <!-- item list --> */}
                 {productItem.map((add_item: any, add_index: any) =>
                   <li key={add_index}>
-                    {add_item.title} <strong>{add_item.price.toFixed(2)} x {add_item.quantity}</strong>
-                    <span>${add_item.quantity * add_item.price}</span>
+                    {add_item.title} <strong>{formatPriceDirect(add_item.price)} x {add_item.quantity}</strong>
+                    <span>{formatPriceDirect(add_item.quantity * add_item.price)}</span>
                   </li>
                 )}
-                <li>Subtotal <span>${total.toFixed(2)}</span></li>
-                <li>Total <span>${total.toFixed(2)}</span></li>
+                <li>Subtotal <span>{formatPriceDirect(total)}</span></li>
+                <li>Total <span>{formatPriceDirect(total)}</span></li>
               </ul>
-              <p>Sorry, it seems that there are no available payment methods for your state. Please contact us if you require assistance or wish to make alternate arrangements.</p>
-              <p>Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our <Link to="#">privacy policy.</Link></p>
+              <p>{t('checkout.no_payment_methods') || "Sorry, it seems that there are no available payment methods for your state. Please contact us if you require assistance or wish to make alternate arrangements."}</p>
+              <p>{t('checkout.privacy_policy_notice') || "Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our"} <Link to="/privacy-policy">{t('checkout.privacy_policy') || "privacy policy"}</Link>.</p>
               <button onClick={notify} className="btn">Place order</button>
             </div>
           </div>

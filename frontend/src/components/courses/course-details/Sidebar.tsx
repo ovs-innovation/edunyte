@@ -3,8 +3,10 @@ import InjectableSvg from "../../../hooks/InjectableSvg";
 import { Link } from "react-router-dom";
 import BtnArrow from "../../../svg/BtnArrow";
 import VideoPopup from "../../../modals/VideoPopup";
+import { usePriceFormatter } from "../../../hooks/usePriceFormatter";
 
 const Sidebar = () => {
+   const { formatPriceDirect } = usePriceFormatter();
 
    const [isVideoOpen, setIsVideoOpen] = useState(false);
 
@@ -18,7 +20,7 @@ const Sidebar = () => {
                </div>
                <div className="courses__cost-wrap">
                   <span>This Course Fee:</span>
-                  <h2 className="title">$18.00 <del>$32.00</del></h2>
+                  <h2 className="title">{formatPriceDirect(18)} <del>{formatPriceDirect(32)}</del></h2>
                </div>
                <div className="courses__information-wrap">
                   <h5 className="title">Course includes:</h5>

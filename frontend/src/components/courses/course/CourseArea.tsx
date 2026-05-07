@@ -6,9 +6,12 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { fetchCourses, type Course } from '../../../services/courseService';
 import { useTranslation } from 'react-i18next';
 import { useWishlist } from '../../../contexts/WishlistContext';
+import { usePriceFormatter } from '../../../hooks/usePriceFormatter';
+import { TranslatedContent } from '../../common/TranslatedContent';
 
 const CourseArea = () => {
    const { t } = useTranslation();
+   const { formatPriceDirect } = usePriceFormatter();
    const [searchParams, setSearchParams] = useSearchParams();
    const categoryId = searchParams.get('category');
    const searchQuery = searchParams.get('search');
@@ -133,7 +136,9 @@ const CourseArea = () => {
                                              <i className={isInWishlist(item._id) ? "fas fa-heart text-danger" : "far fa-heart"}></i>
                                           </button>
                                           <div className="position-absolute bottom-0 start-0 m-3">
-                                             <span className="badge bg-white text-dark px-3 py-2 rounded-pill small fw-bold shadow-sm">{item.category || 'General'}</span>
+                                             <span className="badge bg-white text-dark px-3 py-2 rounded-pill small fw-bold shadow-sm">
+                                                <TranslatedContent>{item.category || 'General'}</TranslatedContent>
+                                             </span>
                                           </div>
                                        </div>
                                        <div className="p-4">
@@ -143,13 +148,15 @@ const CourseArea = () => {
                                              <span className="text-muted">(120 Reviews)</span>
                                           </div>
                                           <h5 className="title mb-4 fw-900" style={{ fontSize: '1.2rem', minHeight: '3rem' }}>
-                                             <Link to={`/course/${item.slug || item._id}`} className="text-dark text-decoration-none">{item.name}</Link>
+                                             <Link to={`/course/${item.slug || item._id}`} className="text-dark text-decoration-none">
+                                                <TranslatedContent>{item.name}</TranslatedContent>
+                                             </Link>
                                           </h5>
                                           <div className="d-flex align-items-center justify-content-between pt-3 border-top">
                                              <Link to={`/course/${item.slug || item._id}`} className="btn-neon-primary py-2 px-4 small" style={{ fontSize: '0.85rem' }}>
                                                 {t('common.book_session')}
                                              </Link>
-                                             <div className="price fw-900 text-primary">$49.00</div>
+                                             <div className="price fw-900 text-primary">{formatPriceDirect((item as any).price || 49)}</div>
                                           </div>
                                        </div>
                                     </div>
@@ -175,7 +182,9 @@ const CourseArea = () => {
                                        <div className="col-md-8">
                                           <div className="pe-4">
                                              <div className="d-flex align-items-center justify-content-between mb-2">
-                                                <span className="badge bg-primary px-3 py-2 rounded-pill small fw-bold">{item.category || 'General'}</span>
+                                                <span className="badge bg-primary px-3 py-2 rounded-pill small fw-bold">
+                                                   <TranslatedContent>{item.category || 'General'}</TranslatedContent>
+                                                </span>
                                                 <button 
                                                    onClick={() => toggleWishlist(item._id)}
                                                    className="border-0 bg-transparent text-muted"
@@ -183,12 +192,18 @@ const CourseArea = () => {
                                                    <i className={isInWishlist(item._id) ? "fas fa-heart text-danger" : "far fa-heart"}></i>
                                                 </button>
                                              </div>
-                                             <h4 className="fw-900 mb-3"><Link to={`/course/${item.slug || item._id}`} className="text-dark text-decoration-none">{item.name}</Link></h4>
-                                             <p className="opacity-60 small mb-4">{item.description}</p>
+                                             <h4 className="fw-900 mb-3">
+                                                <Link to={`/course/${item.slug || item._id}`} className="text-dark text-decoration-none">
+                                                   <TranslatedContent>{item.name}</TranslatedContent>
+                                                </Link>
+                                             </h4>
+                                             <p className="opacity-60 small mb-4">
+                                                <TranslatedContent>{item.description}</TranslatedContent>
+                                             </p>
                                              <div className="d-flex align-items-center justify-content-between">
                                                 <div className="d-flex align-items-center gap-3">
-                                                   <Link to={`/course/${item.slug || item._id}`} className="btn-neon-primary py-2 px-4">Book Now</Link>
-                                                   <span className="fw-900 text-primary">$49.00</span>
+                                                   <Link to={`/course/${item.slug || item._id}`} className="btn-neon-primary py-2 px-4">{t('common.book_session') || 'Book Now'}</Link>
+                                                   <span className="fw-900 text-primary">{formatPriceDirect((item as any).price || 49)}</span>
                                                 </div>
                                                 <div className="text-warning small">
                                                    <i className="fas fa-star"></i> 5.0 (120)

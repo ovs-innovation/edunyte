@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useCurrency } from '../../../hooks/useCurrency';
 
+import { TranslatedContent } from '../../common/TranslatedContent';
+
 const Tutors = () => {
     const { t } = useTranslation();
     const { formatPrice } = useCurrency();
@@ -74,13 +76,18 @@ const Tutors = () => {
 
                 <div className="row g-4">
                     {teachers.map((teacher) => {
-                        const teacherName = typeof teacher.teacherId === 'object' ? teacher.teacherId.name : 'Expert Tutor';
+                        const teacherName = typeof teacher.teacherId === 'object' ? teacher.teacherId.name : t('common.expert_tutor', 'Expert Tutor');
                         const rating = teacher.teacherProfile?.rating || 5.0;
                         const reviews = teacher.teacherProfile?.totalReviews || 120;
                         const students = teacher.teacherProfile?.totalStudents || 45;
                         const price = typeof teacher.price === 'number' ? teacher.price : (teacher.pricing?.basePriceUSD || 25);
                         const photo = teacher.teacherProfile?.photo;
-                        const bio = teacher.teacherProfile?.bio || `Experienced educator specializing in ${typeof teacher.courseId === 'object' ? (teacher.courseId as any).name || 'skills' : 'skills'}.`;
+                        
+                        const courseName = typeof teacher.courseId === 'object' ? (teacher.courseId as any).name : '';
+                        const fallbackBio = courseName 
+                            ? t('common.experienced_educator_specializing_in', { course: courseName }) 
+                            : t('common.experienced_educator');
+                        const bio = teacher.teacherProfile?.bio || fallbackBio;
 
                         return (
                             <div key={teacher._id} className="col-lg-4 col-md-6">
@@ -123,7 +130,7 @@ const Tutors = () => {
                                             </div>
                                         </div>
                                         <p className="opacity-60 small mb-0" style={{ lineHeight: 1.6, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                                            {bio}
+                                            <TranslatedContent>{bio}</TranslatedContent>
                                         </p>
                                     </div>
 

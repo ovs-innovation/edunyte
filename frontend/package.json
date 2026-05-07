@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "set NODE_OPTIONS=--max-old-space-size=4096 && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "sync-locales": "node scripts/syncLocales.js",
@@ -77,6 +77,7 @@
     "globals": "^15.9.0",
     "i": "^0.3.7",
     "npm": "^10.8.2",
+    "terser": "^5.46.2",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.1"

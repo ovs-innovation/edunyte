@@ -20,4 +20,16 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    target: 'es2015',
+    minify: 'terser',
+    cssCodeSplit: true,
+    chunkSizeWarningLimit: 2000,
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
+  }
 })
