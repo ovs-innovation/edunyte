@@ -5,9 +5,9 @@ const HowItWorks = () => {
 
     const steps = [
         {
-            id: '01',
+             id: '01',
             title: t('home.one.how_it_works.step1_title', 'Find the best tutor'),
-            desc: t('home.one.how_it_works.step1_desc', 'Choose from over 32,000 online tutors. Use filters to narrow your search and find the perfect fit.'),
+            desc: t('home.one.how_it_works.step1_desc', 'Explore 50+ expert tutors online and discover the right mentor tailored to your learning style.'),
             image: "/assets/img/others/educational_collaboration.png",
             icon: "fas fa-search",
             color: "var(--neon-blue)"
@@ -15,7 +15,7 @@ const HowItWorks = () => {
         {
             id: '02',
             title: t('home.one.how_it_works.step2_title', 'Take lessons anytime'),
-            desc: t('home.one.how_it_works.step2_desc', 'Find the perfect time for your busy schedule. Book lessons in seconds via desktop or mobile.'),
+            desc: t('home.one.how_it_works.step2_desc', 'Plan lessons around your daily schedule and experience learning with complete convenience and flexibility.'),
             image: "/assets/img/others/global_education_network.png",
             icon: "far fa-calendar-check",
             color: "var(--neon-purple)"
@@ -23,7 +23,7 @@ const HowItWorks = () => {
         {
             id: '03',
             title: t('home.one.how_it_works.step3_title', 'Enter virtual classroom'),
-            desc: t('home.one.how_it_works.step3_desc', 'When it\'s lesson time, connect with your tutor through our comprehensive video platform.'),
+            desc: t('home.one.how_it_works.step3_desc', 'Join live interactive sessions with expert tutors from anywhere. Learn, connect and collaborate in real time.'),
             image: "/assets/img/others/student_success_celebration.png",
             icon: "fas fa-video",
             color: "var(--neon-cyan)"
@@ -39,7 +39,7 @@ const HowItWorks = () => {
                         {t('home.one.how_it_works.title_start', 'How it')} <span className="text-gradient">{t('home.one.how_it_works.title_end', 'works')}</span>
                     </h2>
                     <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', maxWidth: '600px', margin: '20px auto 0', opacity: 0.8 }}>
-                        {t('home.one.how_it_works.description', 'Learn a language online with 1-on-1 lessons tailored specifically to your needs.')}
+                        {t('home.one.how_it_works.description', 'Personalised tutoring designed around your pace, goals and needs.')}
                     </p>
                 </div>
 
@@ -63,10 +63,10 @@ const HowItWorks = () => {
                                         <img src={step.image} alt={step.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         <div className="position-absolute top-0 start-0 w-100 h-100" style={{ background: 'linear-gradient(to bottom, transparent, rgba(0,0,0,0.4))' }}></div>
                                         
-                                        {/* Step Badge */}
+                                        {/* Step Badge
                                         <div className="position-absolute top-0 end-0 m-3" style={{ width: '50px', height: '50px', background: 'var(--grad-primary)', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 900, fontSize: '1.2rem', boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
                                             {step.id}
-                                        </div>
+                                        </div> */}
                                     </div>
 
                                     {/* Card Content */}

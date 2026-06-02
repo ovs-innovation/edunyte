@@ -1,9 +1,9 @@
 const statsData = [
-    { title: '100,000+', subtitle: 'Experienced tutors' },
-    { title: '300,000+', subtitle: '5-star tutor reviews' },
-    { title: '120+', subtitle: 'Subjects taught' },
-    { title: '180+', subtitle: 'Tutor nationalities' },
-    { title: '4.8', subtitle: 'on the App Store', isRating: true }
+    { title: '50+', subtitle: 'Experienced tutors' },
+    { title: '500+', subtitle: '5-star tutor reviews' },
+    { title: '50+', subtitle: 'Subjects taught' },
+    { title: '25+', subtitle: 'Tutor nationalities' },
+    // { title: '4.8', subtitle: 'on the App Store', isRating: true }
 ];
 
 const Stats = () => {

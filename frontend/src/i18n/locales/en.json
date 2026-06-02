@@ -209,10 +209,10 @@
     "one": {
       "hero": {
         "title": "Unlock your potential with the best tutors",
-        "description": "Prepare to achieve your goals with private lessons from professional language tutors.",
+        "description": "Prepare to achieve your goals with private lessons from professional tutors.",
         "trustpilot_rating": "4.8 on Trustpilot",
         "trustpilot_reviews": "(Over 100k reviews)",
-        "experienced_tutors_count": "32,000+",
+        "experienced_tutors_count": "50+",
         "experienced_tutors_label": "Experienced Tutors"
       },
       "tutors": {
@@ -388,10 +388,10 @@
           "badge": "Values",
           "title": "Our Core Values",
           "list": {
-            "1": "<strong>Student-First Learning</strong> – Every learner deserves personal attention.",
-            "2": "<strong>Teacher Empowerment</strong> – Great teaching deserves great support.",
-            "3": "<strong>Trust & Transparency</strong> – Clear communication at every step.",
-            "4": "<strong>Growth Mindset</strong> – Continuous learning for everyone."
+            "1": "<strong>Student-First Learning</strong> – We prioritize every learner with personalized attention and support.",
+            "2": "<strong>Teacher Empowerment</strong> – We support educators with the tools and environment they need to excel.",
+            "3": "<strong>Trust & Transparency</strong> – We maintain clear, honest, and open communication at every step.",
+            "4": "<strong>Growth Mindset</strong> – We believe in continuous learning and improvement for everyone."
           }
         }
       },
@@ -729,7 +729,7 @@
   "footer": {
     "mobile_app": "Mobile App",
     "description_1": "Edunyte is a global learning ecosystem connecting ambitious students with world-class mentors. We believe in borderless education that is accessible, flexible, and driven by human expertise.",
-    "address": "Innovate Square, Tech District, Global Hub",
+    "address": "info@edunyte.com",
     "phone": "+1 (800) EDUNYTE",
     "useful_links": "Our Ecosystem",
     "links": {

@@ -84,7 +84,7 @@ const HeaderOne = () => {
                            <nav className="tgmenu__nav">
                               <div className="logo">
                                  <Link to="/">
-                                    <img src="/logo.png" alt="Edunyte logo" style={{ height: '90px', width: 'auto', objectFit: 'contain' }} />
+                                    <img src="/logo.png" alt="Edunyte logo" style={{ height: '90px', width: 'auto', objectFit: 'contain', filter: 'brightness(1) contrast(1.9)',  transform: "scale(1.15)",  }} />
                                  </Link>
                               </div>
                               <div className="tgmenu__navbar-wrap tgmenu__main-menu d-none d-xl-flex">

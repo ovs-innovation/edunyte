@@ -24,12 +24,12 @@ const Hero = () => {
                         </div>
 
                         <h1 style={{ fontSize: 'clamp(3.5rem, 6vw, 4.5rem)', fontWeight: 900, lineHeight: 1.1, marginBottom: '24px' }}>
-                            {t('home.one.hero.title', 'Unlock your potential with the best tutors').split(' ').map((word: string, i: number) =>
+                            {t('home.one.hero.title', 'Unlock your potential with the best tutors').split('  ').map((word: string, i: number) =>
                                 i === 1 || i === 2 ? <span key={i} className="text-gradient"> {word} </span> : word + ' '
                             )}
                         </h1>
                         <p style={{ fontSize: '1.25rem', marginBottom: '40px', maxWidth: '550px', lineHeight: 1.6 }}>
-                            {t('home.one.hero.description', 'Prepare to achieve your goals with private lessons from professional language tutors.')}
+                            {t('home.one.hero.description', 'Prepare to achieve your goals with private lessons from professional tutors.')}
                         </p>
 
                         {/* Standardized Buttons */}
@@ -37,8 +37,9 @@ const Hero = () => {
                             <Link to="/instructors" className="btn-neon-primary">
                                 {t('home.one.hero.find_tutor', 'Find A Tutor')} <i className="fas fa-arrow-right"></i>
                             </Link>
-                            <Link to="/courses" className="btn-neon-outline">
-                                Explore Courses
+
+                            <Link to="/courses" className="btn-neon-primary">
+                                Explore Courses <i className="fas fa-arrow-right"></i>
                             </Link>
                         </div>
 
@@ -52,7 +53,7 @@ const Hero = () => {
                                 ))}
                             </div>
                             <div className="small fw-bold" style={{ color: 'var(--text-primary)', fontSize: '1rem' }}>
-                                <span className="text-primary">50,000+</span> {t('home.one.hero.joined_learners', 'learners joined already')}
+                                <span className="text-primary">150+</span> {t('home.one.hero.joined_learners', 'learners joined already')}
                             </div>
                         </div>
                     </div>
@@ -78,7 +79,7 @@ const Hero = () => {
                                     <i className="fas fa-check" style={{ color: '#fff', fontSize: '1.8rem' }}></i>
                                 </div>
                                 <div style={{ textAlign: 'left' }}>
-                                    <div style={{ fontWeight: 900, fontSize: '1.75rem', color: 'var(--text-primary)', lineHeight: 1 }}>{t('home.one.hero.experienced_tutors_count', '32,000+')}</div>
+                                    <div style={{ fontWeight: 900, fontSize: '1.75rem', color: 'var(--text-primary)', lineHeight: 1 }}>{t('home.one.hero.experienced_tutors_count', '50+')}</div>
                                     <div style={{ fontSize: '1rem', marginTop: '4px' }}>{t('home.one.hero.experienced_tutors_label', 'Experienced Tutors')}</div>
                                 </div>
                             </div>
