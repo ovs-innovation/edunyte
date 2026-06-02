@@ -208,7 +208,7 @@
   "home": {
     "one": {
       "hero": {
-        "title": "Unlock your potential with the best tutors",
+        "title": "Unlock **your** **potential**  with the best tutors",
         "description": "Prepare to achieve your goals with private lessons from professional tutors.",
         "trustpilot_rating": "4.8 on Trustpilot",
         "trustpilot_reviews": "(Over 100k reviews)",
@@ -384,16 +384,16 @@
           "text": "Edunyte is designed around students — your pace, your goals, your future. We connect learners with expert educators who focus on understanding, not just syllabus completion. Whether you’re improving grades, preparing for exams, or building skills, Edunyte ensures learning feels clear, supportive, and effective with personalized learning paths and verified teachers."
         },
         "values": {
-          "name": "Our Values",
-          "badge": "Values",
-          "title": "Our Core Values",
-          "list": {
-            "1": "<strong>Student-First Learning</strong> – We prioritize every learner with personalized attention and support.",
-            "2": "<strong>Teacher Empowerment</strong> – We support educators with the tools and environment they need to excel.",
-            "3": "<strong>Trust & Transparency</strong> – We maintain clear, honest, and open communication at every step.",
-            "4": "<strong>Growth Mindset</strong> – We believe in continuous learning and improvement for everyone."
-          }
-        }
+  "name": "Our Values",
+  "badge": "Values",
+  "title": "Our Core Values",
+  "list": {
+  "1": "Student-First Learning – We prioritize every learner with personalized attention and support.",
+  "2": "Teacher Empowerment – We support educators with the tools and environment they need to excel.",
+  "3": "Trust & Transparency – We maintain clear, honest, and open communication at every step.",
+  "4": "Growth Mindset – We believe in continuous learning and improvement for everyone."
+}
+}
       },
       "join_link": "Join as a {{role}}"
     },

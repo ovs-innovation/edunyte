@@ -24,10 +24,14 @@ const Hero = () => {
                         </div>
 
                         <h1 style={{ fontSize: 'clamp(3.5rem, 6vw, 4.5rem)', fontWeight: 900, lineHeight: 1.1, marginBottom: '24px' }}>
-                            {t('home.one.hero.title', 'Unlock your potential with the best tutors').split('  ').map((word: string, i: number) =>
-                                i === 1 || i === 2 ? <span key={i} className="text-gradient"> {word} </span> : word + ' '
-                            )}
-                        </h1>
+  {t('home.one.hero.title', 'Unlock **your** **potential**  with the best tutors')
+    .split(' ')
+    .map((word: string, i: number) =>
+      word.startsWith('**') && word.endsWith('**')
+        ? <span key={i} className="text-gradient"> {word.replace(/\*\*/g, '')} </span>
+        : word + ' '
+    )}
+</h1>
                         <p style={{ fontSize: '1.25rem', marginBottom: '40px', maxWidth: '550px', lineHeight: 1.6 }}>
                             {t('home.one.hero.description', 'Prepare to achieve your goals with private lessons from professional tutors.')}
                         </p>
