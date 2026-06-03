@@ -8,7 +8,7 @@ const About = () => {
 
     const tabData = {
         teachers: {
-            image: "/assets/img/others/about_teach.png",
+            image: "assets/images/Teach.jpg",
             badge: t('about_page.platform.tabs.teachers.badge', 'Expert Faculty'),
             badgeColor: "#5751E1",
             title: t('about_page.platform.tabs.teachers.title', 'Empowering Educators'),
