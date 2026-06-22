@@ -43,7 +43,7 @@ const FooterOne = ({ style, style_2 }: any) => {
                   </div>
 
                   {/* Column 3: Socials & Apps */}
-                <div className="col-xl-auto col-lg-auto col-md-6">
+                  <div className="col-xl-auto col-lg-auto col-md-6">
                      <div className="footer__widget">
                         <h4 className="footer__widget-title mb-15">{t('Community')}</h4>
                         <div className="footer__social-wrap">
@@ -59,7 +59,7 @@ const FooterOne = ({ style, style_2 }: any) => {
                            </div>
                         </div>
                      </div>
-                  </div>  
+                  </div>
                </div>
             </div>
             {style_2 && <div className="footer__shape" style={{ backgroundImage: `url(/assets/img/others/h8_footer_shape.svg)` }}></div>}
