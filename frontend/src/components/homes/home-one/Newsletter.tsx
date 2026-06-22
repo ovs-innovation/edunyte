@@ -1,32 +1,47 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
 
 const Newsletter = () => {
     const { t } = useTranslation();
+    const [email, setEmail] = useState('');
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (email) {
+            toast.success(t('common.newsletter_success') || "Subscribed successfully!", { position: 'top-center' });
+            setEmail('');
+        } else {
+            toast.error(t('common.newsletter_error_email') || "Please enter a valid email address.", { position: 'top-center' });
+        }
+    };
 
     return (
-        <section style={{ backgroundColor: '#eef6f6', padding: '80px 0' }}>
-            <div className="container">
-                <div style={{ backgroundColor: '#fff', borderRadius: '24px', padding: '60px', boxShadow: '0 10px 40px rgba(0,0,0,0.05)', position: 'relative', overflow: 'hidden' }}>
-                    <div style={{ position: 'absolute', top: '-50px', right: '-50px', width: '200px', height: '200px', backgroundColor: '#3bb3bd', opacity: 0.1, borderRadius: '50%' }}></div>
-                    <div style={{ position: 'absolute', bottom: '-80px', left: '10%', width: '150px', height: '150px', backgroundColor: '#ffb300', opacity: 0.1, borderRadius: '50%' }}></div>
+        <section className="glow-bg" style={{ padding: '80px 0' }}>
+            <div className="container position-relative z-1">
+                <div className="glass-panel" style={{ padding: '60px', position: 'relative', overflow: 'hidden' }}>
+                    <div style={{ position: 'absolute', top: '-50px', right: '-50px', width: '250px', height: '250px', background: 'var(--grad-primary)', opacity: 0.2, filter: 'blur(50px)', borderRadius: '50%' }}></div>
+                    <div style={{ position: 'absolute', bottom: '-80px', left: '10%', width: '200px', height: '200px', background: 'var(--neon-blue)', opacity: 0.15, filter: 'blur(50px)', borderRadius: '50%' }}></div>
 
-                    <div className="row align-items-center position-relative">
+                    <div className="row align-items-center position-relative z-1">
                         <div className="col-lg-6 mb-4 mb-lg-0">
-                            <h2 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#1a1a1a', marginBottom: '20px' }}>{t('common.newsletter_ready_to_learn')}</h2>
-                            <p style={{ fontSize: '1.2rem', color: '#6d6d6d', marginBottom: '0', maxWidth: '400px' }}>{t('common.newsletter_desc')}</p>
+                            <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.5rem)', fontWeight: 900, marginBottom: '20px', color: 'var(--text-primary)' }}>{t('common.newsletter_ready_to_learn')}</h2>
+                            <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', marginBottom: '0', maxWidth: '400px' }}>{t('common.newsletter_desc')}</p>
                         </div>
                         <div className="col-lg-6">
-                            <form style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }} onSubmit={(e) => e.preventDefault()}>
-                                <input type="email" placeholder={t('common.newsletter_placeholder_email')} style={{ flex: 1, minWidth: '250px', padding: '16px 24px', border: '1px solid #eaeaea', borderRadius: '12px', fontSize: '1rem', outline: 'none', transition: 'border-color 0.2s' }} />
-                                <button type="submit" style={{ backgroundColor: '#1a1a1a', color: '#fff', border: 'none', borderRadius: '12px', padding: '16px 32px', fontSize: '1rem', fontWeight: 700, cursor: 'pointer', transition: 'background-color 0.2s' }}
-                                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#333'}
-                                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#1a1a1a'}
-                                >
+                            <form style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }} onSubmit={handleSubmit}>
+                                <input 
+                                    type="email" 
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder={t('common.newsletter_placeholder_email')} 
+                                    style={{ flex: 1, minWidth: '250px', padding: '16px 24px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', borderRadius: '12px', fontSize: '1rem', outline: 'none', transition: 'border-color 0.2s' }} 
+                                />
+                                <button type="submit" className="btn-neon-primary">
                                     {t('common.newsletter_subscribe')}
                                 </button>
                             </form>
-                            <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '15px' }}>{t('common.newsletter_terms')}</p>
+                            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '15px' }}>{t('common.newsletter_terms')}</p>
                         </div>
                     </div>
                 </div>

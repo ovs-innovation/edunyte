@@ -77,6 +77,7 @@ const CustomSelect = ({ value, onChange }: any) => {
                isClearable={true}
                menuPortalTarget={typeof document !== 'undefined' ? document.body : undefined}
                menuPosition="fixed"
+               menuPlacement="top"
                styles={{
                   container: (base) => ({
                      ...base,

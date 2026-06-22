@@ -3,7 +3,7 @@
  * Handles currency conversion and formatting for the frontend
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8085/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 const CURRENCY_STORAGE_KEY = 'selected_currency';
 const RATES_STORAGE_KEY = 'exchange_rates_cache';
 const RATES_CACHE_DURATION = 6 * 60 * 60 * 1000; // 6 hours

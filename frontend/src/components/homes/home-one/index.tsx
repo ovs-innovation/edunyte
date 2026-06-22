@@ -19,7 +19,6 @@ const HomeOne = () => {
             <Categories />
             <Tutors />
             <Newsletter />
-            <Blog style={false} />
          </main>
          <FooterOne style={false} style_2={false} />
       </>

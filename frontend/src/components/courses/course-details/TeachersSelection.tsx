@@ -517,7 +517,7 @@ const TeachersSelection = () => {
       <style>{`
         .teachers-selection-page .filters-bar .form-control:focus,
         .teachers-selection-page .filters-bar .form-select:focus {
-          border-color: #e91e63 !important;
+          border-color: var(--neon-purple) !important;
           box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.1) !important;
           outline: none !important;
         }
@@ -690,19 +690,9 @@ const TeachersSelection = () => {
 
           <div className="row mb-3">
             <div className="col-12">
-              <div
-                className="filters-bar"
-                style={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: '12px',
-                  alignItems: 'center',
-                  padding: '16px',
-                  backgroundColor: '#fff',
-                  borderRadius: '12px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                }}
-              >
+              <div className="filters-section mb-4">
+                <div className="glass-panel p-3">
+                  <div className="d-flex flex-wrap gap-3 align-items-center">
                 <div className="filter-item course-dropdown-container" style={{ flex: '0 1 auto', minWidth: '200px', position: 'relative' }}>
                   <div
                     className="form-select"
@@ -813,7 +803,7 @@ const TeachersSelection = () => {
                               <i className="fas fa-graduation-cap" style={{ color: '#666', fontSize: '14px' }}></i>
                               <span style={{ fontSize: '14px', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{course.name}</span>
                               {currentCourse?._id === course._id && (
-                                <i className="fas fa-check" style={{ color: '#e91e63', fontSize: '12px', flexShrink: 0 }}></i>
+                                <i className="fas fa-check" style={{ color: 'var(--neon-purple)', fontSize: '12px', flexShrink: 0 }}></i>
                               )}
                             </div>
                           ))}
@@ -836,7 +826,7 @@ const TeachersSelection = () => {
                       transition: 'all 0.2s',
                     }}
                     onFocus={(e) => {
-                      e.target.style.borderColor = '#e91e63';
+                      e.target.style.borderColor = 'var(--neon-purple)';
                       e.target.style.boxShadow = '0 0 0 3px rgba(233, 30, 99, 0.1)';
                     }}
                     onBlur={(e) => {
@@ -1017,7 +1007,7 @@ const TeachersSelection = () => {
                               <CountryFlag code={country} />
                               <span style={{ fontSize: '14px', flex: 1 }}>{getCountryName(country)}</span>
                               {filters.country === country && (
-                                <i className="fas fa-check" style={{ color: '#e91e63', fontSize: '12px' }}></i>
+                                <i className="fas fa-check" style={{ color: 'var(--neon-purple)', fontSize: '12px' }}></i>
                               )}
                             </div>
                           ))}
@@ -1035,7 +1025,7 @@ const TeachersSelection = () => {
                     }}
                     style={{
                       borderRadius: '8px',
-                      border: filters.language ? '1px solid #e91e63' : '1px solid #e0e0e0',
+                      border: filters.language ? '1px solid var(--neon-purple)' : '1px solid #e0e0e0',
                       padding: '10px 16px',
                       fontSize: '14px',
                       backgroundColor: '#fff',
@@ -1186,7 +1176,7 @@ const TeachersSelection = () => {
                                       >
                                         <span style={{ fontSize: '14px', flex: 1 }}>{formatLanguageLabel(lang)}</span>
                                         {filters.language === lang._id && (
-                                          <i className="fas fa-check" style={{ color: '#e91e63', fontSize: '12px' }}></i>
+                                          <i className="fas fa-check" style={{ color: 'var(--neon-purple)', fontSize: '12px' }}></i>
                                         )}
                                       </div>
                                     ))}
@@ -1237,7 +1227,7 @@ const TeachersSelection = () => {
                                   >
                                     <span style={{ fontSize: '14px', flex: 1 }}>{formatLanguageLabel(lang)}</span>
                                     {filters.language === lang._id && (
-                                      <i className="fas fa-check" style={{ color: '#e91e63', fontSize: '12px' }}></i>
+                                      <i className="fas fa-check" style={{ color: 'var(--neon-purple)', fontSize: '12px' }}></i>
                                     )}
                                   </div>
                                 ))}
@@ -1271,10 +1261,12 @@ const TeachersSelection = () => {
                     <option value="rating">{t('common.sort_by_rating')}</option>
                     <option value="popular">{t('common.sort_by_popular')}</option>
                   </select>
-                </div>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
 
           <div className="row g-4">
             <div className="col-12 col-lg-8">
@@ -1307,14 +1299,9 @@ const TeachersSelection = () => {
                     return (
                       <div
                         key={teacher._id}
-                        className={`teacher-card mb-3 border rounded position-relative ${isSelected ? 'border-primary' : ''
-                          }`}
+                        className={`teacher-card glass-panel mb-4 p-4 position-relative ${isSelected ? 'border-primary' : ''}`}
                         style={{
-                          backgroundColor: '#fff',
                           cursor: 'pointer',
-                          transition: 'all 0.3s ease',
-                          padding: '20px',
-                          boxShadow: isSelected ? '0 4px 12px rgba(233, 30, 99, 0.15)' : '0 2px 4px rgba(0,0,0,0.08)',
                         }}
                         onMouseEnter={() => setHoveredTeacher(teacher._id)}
                         onMouseLeave={() => setHoveredTeacher(null)}
@@ -1342,43 +1329,30 @@ const TeachersSelection = () => {
                         >
                           <div className="d-flex flex-column align-items-end gap-2">
                             <button
-                              className="btn btn-sm"
+                              className="btn-neon-primary w-100"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleBookTrial(teacher);
                               }}
                               style={{
-                                backgroundColor: '#e91e63',
-                                borderColor: '#e91e63',
                                 fontSize: '13px',
-                                padding: '10px 20px',
-                                borderRadius: '8px',
-                                fontWeight: '500',
-                                color: '#fff',
-                                width: '100%',
-                                minWidth: '140px',
+                                padding: '12px 20px',
+                                borderRadius: '12px',
                               }}
                             >
                               {t('common.book_trial_lesson')}
                             </button>
                             <button
-                              className="btn btn-sm"
+                              className="btn-neon-outline w-100"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleSendMessage(teacher);
                               }}
                               style={{
-                                backgroundColor: '#fff',
-                                borderColor: '#ddd',
-                                borderWidth: '1px',
-                                borderStyle: 'solid',
                                 fontSize: '13px',
-                                padding: '10px 20px',
-                                borderRadius: '8px',
-                                fontWeight: '500',
-                                color: '#1a1a1a',
-                                width: '100%',
-                                minWidth: '140px',
+                                padding: '12px 20px',
+                                borderRadius: '12px',
+                                background: 'rgba(255,255,255,0.5)',
                               }}
                             >
                               {t('common.send_message')}
@@ -1436,7 +1410,7 @@ const TeachersSelection = () => {
                               )}
                             </div>
                             <div className="mb-2">
-                              <span className="badge bg-primary me-2 small">{t('common.professional')}</span>
+                              <span className="badge btn-neon-primary me-2 small">{t('common.professional')}</span>
                               {teacher.teacherProfile?.rating >= 4.8 && (
                                 <span className="badge" style={{ backgroundColor: '#ff6b9d', color: '#fff' }}>{t('common.super_tutor')}</span>
                               )}
@@ -1562,8 +1536,8 @@ const TeachersSelection = () => {
                               handleBookTrial(teacher);
                             }}
                             style={{
-                              backgroundColor: '#e91e63',
-                              borderColor: '#e91e63',
+                              backgroundColor: 'var(--neon-purple)',
+                              borderColor: 'var(--neon-purple)',
                               fontSize: '14px',
                               height: '42px',
                               borderRadius: '8px',
@@ -1586,12 +1560,11 @@ const TeachersSelection = () => {
               {(() => {
                 const activeTeacherId = hoveredTeacher || (selectedTeacher?._id);
                 const activeTeacher = activeTeacherId ? filteredTeachers.find(t => t._id === activeTeacherId) : null;
-
                 if (!activeTeacher) return null;
 
                 return (
                   <div className="teacher-video-sidebar" style={{ position: 'sticky', top: '20px' }}>
-                    <div className="card border-0 shadow-sm" style={{ borderRadius: '12px', overflow: 'hidden' }}>
+                    <div className="glass-panel overflow-hidden">
                       {activeTeacher.introductionVideo ? (
                         <div className="position-relative">
                           <div
@@ -1599,7 +1572,7 @@ const TeachersSelection = () => {
                             style={{
                               width: '100%',
                               aspectRatio: '16/9',
-                              backgroundColor: '#f8f9fa',
+                              backgroundColor: 'rgba(0,0,0,0.1)',
                               overflow: 'hidden',
                               cursor: 'pointer',
                               position: 'relative',
@@ -1628,40 +1601,22 @@ const TeachersSelection = () => {
                             <div
                               className="position-absolute top-50 start-50 translate-middle"
                               style={{
-                                width: '70px',
-                                height: '70px',
+                                width: '60px',
+                                height: '60px',
                                 borderRadius: '50%',
-                                background: 'linear-gradient(135deg, #e91e63 0%, #f06292 100%)',
+                                background: 'var(--grad-primary)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 color: '#fff',
-                                fontSize: '32px',
-                                boxShadow: '0 4px 12px rgba(233, 30, 99, 0.4)',
+                                fontSize: '24px',
+                                boxShadow: 'var(--neon-shadow-purple)',
                                 zIndex: 2,
-                                transition: 'transform 0.2s',
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1.1)';
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1)';
                               }}
                             >
                               <i className="fas fa-play" style={{ marginLeft: '4px' }}></i>
                             </div>
-                            <div
-                              className="position-absolute bottom-0 start-0 end-0 p-2"
-                              style={{
-                                background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)',
-                                color: '#fff',
-                                fontSize: '12px',
-                                fontWeight: '600',
-                                zIndex: 1,
-                              }}
-                            >
-                              {t('common.watch_intro')}
-                            </div>
+
                           </div>
                         </div>
                       ) : (
@@ -1688,29 +1643,17 @@ const TeachersSelection = () => {
                         </div>
                         <div className="d-flex flex-column gap-2">
                           <button
-                            className="btn btn-outline-secondary w-100"
+                            className="btn-neon-primary w-100"
                             onClick={() => handleViewSchedule(activeTeacher)}
-                            style={{
-                              borderRadius: '8px',
-                              padding: '10px',
-                              fontSize: '14px',
-                              fontWeight: '500',
-                            }}
                           >
                             {t('common.view_full_schedule')}
                           </button>
                           <button
-                            className="btn btn-outline-secondary w-100"
+                            className="btn-neon-outline w-100"
                             onClick={() => {
                               const teacherId =
                                 typeof activeTeacher.teacherId === 'object' ? activeTeacher.teacherId._id : '';
                               navigate(`/teacher/${teacherId}`);
-                            }}
-                            style={{
-                              borderRadius: '8px',
-                              padding: '10px',
-                              fontSize: '14px',
-                              fontWeight: '500',
                             }}
                           >
                             {t('common.see_teacher_profile')}

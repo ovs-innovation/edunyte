@@ -55,15 +55,15 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
       endDate.setDate(endDate.getDate() + 30);
       const tz = tzOverride || studentTimezone;
 
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8085/api';
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
       const response = await fetch(
         `${API_BASE_URL}/public/courses/availability?courseId=${courseId}&teacherId=${teacherId}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&studentTimezone=${encodeURIComponent(tz)}`
       );
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch availability');
       }
-      
+
       const data = await response.json();
       const normalized: AvailabilitySlot[] = (data.availabilities || []).map((av: any) => ({
         ...av,
@@ -103,7 +103,7 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
     const dates: Date[] = [];
     const startDate = new Date(currentWeek);
     startDate.setHours(0, 0, 0, 0);
-    
+
     // Start from currentWeek and show next 7 days
     for (let i = 0; i < 7; i++) {
       const date = new Date(startDate);
@@ -119,17 +119,17 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     const dateStr = `${year}-${month}-${day}`;
-    
+
     const filtered = availabilities.filter((av) => {
       const avDate = new Date(av.date);
       const avYear = avDate.getUTCFullYear();
       const avMonth = String(avDate.getUTCMonth() + 1).padStart(2, '0');
       const avDay = String(avDate.getUTCDate()).padStart(2, '0');
       const avDateStr = `${avYear}-${avMonth}-${avDay}`;
-      
+
       return avDateStr === dateStr;
     });
-    
+
     return filtered;
   };
 
@@ -161,22 +161,22 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
 
   const handleConfirm = () => {
     if (!selectedSlot) return;
-    
+
     // Extract teacher information
     const teacherObj = typeof teacher.teacherId === 'object' ? teacher.teacherId : null;
     const teacherId = teacherObj?._id || '';
     const teacherName = teacherObj?.name || '';
-    
+
     // Get course information from teacher object if available
     const courseObj = typeof teacher.courseId === 'object' ? teacher.courseId : null;
     // Safely handle both string and object types for name/description
-    const courseName = typeof courseObj?.name === 'object' 
-      ? (courseObj.name as any)?.en || '' 
+    const courseName = typeof courseObj?.name === 'object'
+      ? (courseObj.name as any)?.en || ''
       : courseObj?.name || '';
     const courseDescription = typeof courseObj?.description === 'object'
       ? (courseObj.description as any)?.en || ''
       : courseObj?.description || '';
-    
+
     onConfirm({
       availabilityId: selectedSlot._id,
       teacherCourseId: teacher._id,
@@ -271,7 +271,7 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
               <label className="form-label fw-semibold mb-2">{t('common.lesson_duration')}</label>
               <div className="d-flex gap-2">
                 <button
-                  className={`btn ${selectedDuration === 25 ? 'btn-primary' : 'btn-outline-secondary'}`}
+                  className={`btn ${selectedDuration === 25 ? 'btn-neon-primary' : 'btn-outline-secondary'}`}
                   onClick={() => {
                     setSelectedDuration(25);
                     setSelectedSlot(null);
@@ -279,15 +279,15 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
                   style={{
                     borderRadius: '8px',
                     padding: '10px 20px',
-                    backgroundColor: selectedDuration === 25 ? '#e91e63' : 'transparent',
-                    borderColor: selectedDuration === 25 ? '#e91e63' : '#ddd',
+                    backgroundColor: selectedDuration === 25 ? 'var(--neon-purple)' : 'transparent',
+                    borderColor: selectedDuration === 25 ? 'var(--neon-purple)' : '#ddd',
                     color: selectedDuration === 25 ? '#fff' : '#000',
                   }}
                 >
                   25 {t('common.mins')}
                 </button>
                 <button
-                  className={`btn ${selectedDuration === 50 ? 'btn-primary' : 'btn-outline-secondary'}`}
+                  className={`btn ${selectedDuration === 50 ? 'btn-neon-primary' : 'btn-outline-secondary'}`}
                   onClick={() => {
                     setSelectedDuration(50);
                     setSelectedSlot(null);
@@ -295,8 +295,8 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
                   style={{
                     borderRadius: '8px',
                     padding: '10px 20px',
-                    backgroundColor: selectedDuration === 50 ? '#e91e63' : 'transparent',
-                    borderColor: selectedDuration === 50 ? '#e91e63' : '#ddd',
+                    backgroundColor: selectedDuration === 50 ? 'var(--neon-purple)' : 'transparent',
+                    borderColor: selectedDuration === 50 ? 'var(--neon-purple)' : '#ddd',
                     color: selectedDuration === 50 ? '#fff' : '#000',
                   }}
                 >
@@ -350,7 +350,7 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
                   return (
                     <button
                       key={idx}
-                      className={`btn ${isSelected ? 'btn-primary' : 'btn-outline-secondary'}`}
+                      className={`btn ${isSelected ? 'btn-neon-primary' : 'btn-outline-secondary'}`}
                       onClick={() => {
                         setSelectedDate(date);
                         setSelectedSlot(null);
@@ -360,8 +360,8 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
                         minWidth: '80px',
                         borderRadius: '8px',
                         padding: '8px',
-                        backgroundColor: isSelected ? '#e91e63' : 'transparent',
-                        borderColor: isSelected ? '#e91e63' : '#ddd',
+                        backgroundColor: isSelected ? 'var(--neon-purple)' : 'transparent',
+                        borderColor: isSelected ? 'var(--neon-purple)' : '#ddd',
                         color: isSelected ? '#fff' : '#000',
                       }}
                     >
@@ -409,14 +409,14 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
                         return (
                           <button
                             key={slot._id}
-                            className={`btn ${isSelected ? 'btn-primary' : 'btn-outline-primary'}`}
+                            className={`btn ${isSelected ? 'btn-neon-primary' : 'btn-neon-outline'}`}
                             onClick={() => setSelectedSlot(slot)}
                             style={{
                               borderRadius: '8px',
                               padding: '8px 16px',
-                              backgroundColor: isSelected ? '#e91e63' : 'transparent',
-                              borderColor: '#e91e63',
-                              color: isSelected ? '#fff' : '#e91e63',
+                              backgroundColor: isSelected ? 'var(--neon-purple)' : 'transparent',
+                              borderColor: 'var(--neon-purple)',
+                              color: isSelected ? '#fff' : 'var(--neon-purple)',
                             }}
                           >
                             {formatTime(slot.startTime)}
@@ -452,8 +452,8 @@ const BookingModal = ({ teacher, courseId, isOpen, onClose, onConfirm }: Booking
               disabled={!selectedSlot}
               style={{
                 borderRadius: '8px',
-                backgroundColor: selectedSlot ? '#e91e63' : '#ccc',
-                borderColor: selectedSlot ? '#e91e63' : '#ccc',
+                backgroundColor: selectedSlot ? 'var(--neon-purple)' : '#ccc',
+                borderColor: selectedSlot ? 'var(--neon-purple)' : '#ccc',
                 padding: '12px 32px',
                 fontWeight: '600',
                 color: '#fff',

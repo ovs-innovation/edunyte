@@ -6,30 +6,30 @@ const ScrollToTop = () => {
 
    const [showScroll, setShowScroll] = useState(false);
 
-   const checkScrollTop = () => {
-      if (!showScroll && window.pageYOffset > 400) {
-         setShowScroll(true);
-      } else if (showScroll && window.pageYOffset <= 400) {
-         setShowScroll(false);
-      }
-   };
-
    const scrollTop = () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
    };
 
    useEffect(() => {
-      const checkScrollTop = () => {
-         if (!showScroll && window.pageYOffset > 400) {
-            setShowScroll(true);
-         } else if (showScroll && window.pageYOffset <= 400) {
-            setShowScroll(false);
+      let ticking = false;
+
+      const handleScroll = () => {
+         if (!ticking) {
+            window.requestAnimationFrame(() => {
+               if (window.pageYOffset > 400) {
+                  setShowScroll(true);
+               } else {
+                  setShowScroll(false);
+               }
+               ticking = false;
+            });
+            ticking = true;
          }
       };
 
-      window.addEventListener("scroll", checkScrollTop);
-      return () => window.removeEventListener("scroll", checkScrollTop);
-   }, [checkScrollTop]);
+      window.addEventListener("scroll", handleScroll, { passive: true });
+      return () => window.removeEventListener("scroll", handleScroll);
+   }, []);
 
    return (
       <>

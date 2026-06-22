@@ -10,7 +10,11 @@ const Event = () => {
       <>
          <HeaderOne />
          <main className="main-area fix">
-            <BreadcrumbOne title={t('events.breadcrumb_title')} sub_title={t('events.breadcrumb_subtitle')} />
+            <BreadcrumbOne 
+               title={t('events.breadcrumb_title')} 
+               sub_title={t('events.breadcrumb_subtitle')} 
+               image="/assets/img/others/premium_learning_plus.png"
+            />
             <EventArea />
          </main>
          <FooterOne style={false} style_2={false} />

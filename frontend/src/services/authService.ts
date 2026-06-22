@@ -1,201 +1,193 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
+const API_BASE_URL = "/api";
 
+// ================= TYPES =================
 export interface LoginCredentials {
-  email: string
-  password: string
-  otp?: string
+  email: string;
+  password: string;
+  otp?: string;
 }
 
 export interface RegisterData {
-  name: string
-  email: string
-  password: string
-  role?: string
+  name: string;
+  email: string;
+  password: string;
+  role?: string;
 }
 
 export interface AuthResponse {
-  token: string
+  token: string;
   user: {
-    id: string
-    name: string
-    email: string
-    role: string
-    permissions: string[]
-    status: string
-    photo?: string
-    avatar?: string
-    image?: string
-  }
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    permissions: string[];
+    status: string;
+    photo?: string;
+    avatar?: string;
+    image?: string;
+  };
 }
 
 export interface OTPResponse {
-  requiresOTP: boolean
-  message: string
+  requiresOTP: boolean;
+  message: string;
 }
 
-export const login = async (credentials: LoginCredentials): Promise<AuthResponse | OTPResponse> => {
+// ================= LOGIN =================
+export const login = async (
+  credentials: LoginCredentials
+): Promise<AuthResponse | OTPResponse> => {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
   const response = await fetch(`${API_BASE_URL}/auth/login?appType=student`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      'X-Timezone': timezone,
+      "Content-Type": "application/json",
+      "X-Timezone": timezone,
     },
     body: JSON.stringify({
       ...credentials,
       timezone,
     }),
-  })
+  });
 
-  const data = await response.json()
+  const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.message || 'Login failed')
+    throw new Error(data.message || "Login failed");
   }
 
-  return data
-}
+  return data;
+};
 
-export const register = async (userData: RegisterData): Promise<AuthResponse> => {
+// ================= REGISTER =================
+export const register = async (
+  userData: RegisterData
+): Promise<AuthResponse> => {
   const response = await fetch(`${API_BASE_URL}/auth/register`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
       ...userData,
-      role: userData.role || 'student',
+      role: userData.role || "student",
     }),
-  })
+  });
 
-  const data = await response.json()
+  const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.message || 'Registration failed')
+    throw new Error(data.message || "Registration failed");
   }
 
-  return data
-}
+  return data;
+};
 
+// ================= TOKEN STORAGE =================
 export const getStoredToken = (): string | null => {
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem('auth_token')
-  }
-  return null
-}
+  return localStorage.getItem("auth_token");
+};
 
 export const setStoredToken = (token: string): void => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('auth_token', token)
-  }
-}
+  localStorage.setItem("auth_token", token);
+};
 
 export const removeStoredToken = (): void => {
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('auth_token')
-  }
-}
+  localStorage.removeItem("auth_token");
+};
 
-export const getStoredUser = (): AuthResponse['user'] | null => {
-  if (typeof window !== 'undefined') {
-    const userStr = localStorage.getItem('auth_user')
-    if (userStr) {
-      return JSON.parse(userStr)
-    }
-  }
-  return null
-}
+export const getStoredUser = (): AuthResponse["user"] | null => {
+  const userStr = localStorage.getItem("auth_user");
+  return userStr ? JSON.parse(userStr) : null;
+};
 
-export const setStoredUser = (user: AuthResponse['user']): void => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('auth_user', JSON.stringify(user))
-  }
-}
+export const setStoredUser = (user: AuthResponse["user"]): void => {
+  localStorage.setItem("auth_user", JSON.stringify(user));
+};
 
 export const removeStoredUser = (): void => {
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('auth_user')
-  }
-}
+  localStorage.removeItem("auth_user");
+};
 
-export const updateProfile = async (data: any): Promise<AuthResponse['user']> => {
-  const token = getStoredToken()
-  
-  // Try student profile update
+// ================= PROFILE =================
+export const updateProfile = async (data: any) => {
+  const token = getStoredToken();
+
   const response = await fetch(`${API_BASE_URL}/student-profiles/me`, {
-    method: 'PATCH',
+    method: "PATCH",
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(data),
-  })
+  });
 
-  const resData = await response.json()
+  const resData = await response.json();
 
   if (!response.ok) {
-     throw new Error(resData.message || 'Update failed')
+    throw new Error(resData.message || "Update failed");
   }
-  
-  const currentUser = getStoredUser();
-  // Merge profile data with user data
-  const updatedUser = {
-      ...currentUser,
-      ...resData.profile,
-      ...resData.user
-  } as AuthResponse['user'];
-  
-  return updatedUser;
-}
 
-export const validateToken = async (): Promise<AuthResponse['user'] | null> => {
-  const token = getStoredToken()
-  if (!token) return null
+  return resData;
+};
+
+// ================= VALIDATE TOKEN =================
+export const validateToken = async () => {
+  const token = getStoredToken();
+  if (!token) return null;
 
   try {
     const response = await fetch(`${API_BASE_URL}/auth/me`, {
       headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     if (!response.ok) {
-        removeStoredToken();
-        removeStoredUser();
-        return null;
+      removeStoredToken();
+      removeStoredUser();
+      return null;
     }
 
-    const data = await response.json()
-    return data.user || data
-  } catch (error) {
-    return null
+    const data = await response.json();
+    return data.user || data;
+  } catch {
+    return null;
   }
-}
+};
 
-export const googleLogin = async (credential: string, role?: string, isAccessToken?: boolean): Promise<AuthResponse> => {
+// ================= GOOGLE LOGIN =================
+export const googleLogin = async (
+  credential: string,
+  role?: string,
+  isAccessToken?: boolean
+): Promise<AuthResponse> => {
   const body: any = { role };
+
   if (isAccessToken) {
     body.accessToken = credential;
   } else {
     body.credential = credential;
   }
-  
+
   const response = await fetch(`${API_BASE_URL}/auth/google-login`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(body),
-  })
+  });
 
-  const data = await response.json()
+  const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.message || 'Google login failed')
+    throw new Error(data.message || "Google login failed");
   }
 
-  return data
-}
+  return data;
+};
 
 // export const firebaseLogin = async (token: string, role?: string): Promise<AuthResponse> => {
 //   const response = await fetch(`${API_BASE_URL}/auth/firebase-login`, {

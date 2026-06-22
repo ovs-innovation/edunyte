@@ -16,7 +16,7 @@ const InstructorSettingSocialShare = () => {
    useEffect(() => {
       const fetchProfile = async () => {
          try {
-            const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+            const API_URL = import.meta.env.VITE_API_BASE_URL || '/api';
             const response = await fetch(`${API_URL}/student-profiles/me`, {
                headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -33,7 +33,7 @@ const InstructorSettingSocialShare = () => {
 
    const handleUpdate = async () => {
       try {
-         const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+         const API_URL = import.meta.env.VITE_API_BASE_URL || '/api';
          const response = await fetch(`${API_URL}/student-profiles/me`, {
             method: 'PATCH',
             headers: {

@@ -36,7 +36,7 @@ const Banner = () => {
 
                   <div className="col-xl-7 col-lg-6 col-md-8">
                      <div className="banner__images-two tg-svg" ref={svgIconRef}>
-                        <img src="/assets/img/banner/h2_banner_img.png" alt="img" className="main-img" />
+                        <img src="/assets/img/bg/edunytehero.png" alt="img" className="main-img" />
                         <div className="shape big-shape" data-aos="fade-up" data-aos-delay="600">
                            <InjectableSvg src="/assets/img/banner/h2_banner_shape01.svg" alt="shape" className="injectable tg-motion-effects1" />
                         </div>

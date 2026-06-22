@@ -27,14 +27,16 @@ const MobileSidebar = ({ isActive, setIsActive }: MobileSidebarProps) => {
          <div className="tgmobile__menu">
             <nav className="tgmobile__menu-box">
                <div onClick={() => setIsActive(false)} className="close-btn"><i className="tg-flaticon-close-1"></i></div>
-               <div className="nav-logo">
-                  <Link to="/"><img src="/assets/img/logo/edunyte-light.png" height="160" width="160" alt="Logo" /></Link>
+               <div className="nav-logo text-center">
+                  <Link to="/">
+                     <img src="/logo.png" alt="Edunyte logo" style={{ height: '85px', width: 'auto' }} />
+                  </Link>
                </div>
                <div className="tgmobile__search">
                   <form onSubmit={handleSearchSubmit}>
-                     <input 
-                        type="text" 
-                        placeholder={t("common.search_here")} 
+                     <input
+                        type="text"
+                        placeholder={t("common.search_here")}
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
                      />

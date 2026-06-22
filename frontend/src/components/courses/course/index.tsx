@@ -10,7 +10,13 @@ const Course = () => {
       <>
          <HeaderOne />
          <main className="main-area fix">
-            <BreadcrumbOne title={t('common.all_courses')} sub_title={t('common.courses')} sub_title_2="" style={false} />
+            <BreadcrumbOne 
+               title={t('common.all_courses')} 
+               sub_title={t('common.courses')} 
+               sub_title_2="" 
+               style={false} 
+               image="/assets/img/courses/courses_details.jpg"
+            />
             <CourseArea />
          </main>
          <FooterOne style={false} style_2={true} />

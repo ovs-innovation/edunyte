@@ -1,6 +1,6 @@
 import { BASE_LANGUAGE } from '../i18n/languageConfig'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'
 const TRANSLATION_CACHE_KEY = 'translation_cache'
 const CACHE_EXPIRY_DAYS = 7
 

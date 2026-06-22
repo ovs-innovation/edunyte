@@ -7,11 +7,14 @@ import TotalCart from "../../components/common/TotalCart"
 import UseCartInfo from "../../hooks/UseCartInfo"
 import NavMenu from "./menu/NavMenu"
 import CustomSelect from "../../ui/CustomSelect"
+import { usePriceFormatter } from "../../hooks/usePriceFormatter"
 
 import { useTranslation } from "react-i18next";
+import LanguageCurrencySwitcher from "../../components/common/LanguageCurrencySwitcher";
 
 const HeaderTwo = () => {
    const { t } = useTranslation();
+   const { formatPriceDirect } = usePriceFormatter();
 
    const [selectedOption, setSelectedOption] = React.useState(null);
 
@@ -49,7 +52,10 @@ const HeaderTwo = () => {
                                           <i className="flaticon-shopping-cart"></i>
                                           <TotalCart />
                                        </Link>
-                                       <strong className="price">${total.toFixed(2)}</strong>
+                                       <strong className="price">{formatPriceDirect(total)}</strong>
+                                    </li>
+                                    <li>
+                                       <LanguageCurrencySwitcher />
                                     </li>
                                     <li className="header-btn login-btn">
                                        <Link to="/contact" className="btn">{t("common.get_started")}</Link>

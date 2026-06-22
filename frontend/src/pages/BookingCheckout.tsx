@@ -132,7 +132,7 @@ const BookingCheckoutPage = () => {
         setLoading(true)
         setError(null)
 
-        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8085/api'
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'
         const resp = await fetch(`${API_BASE_URL}/payments/checkout/payment-intent`, {
           method: 'POST',
           headers: {
@@ -167,7 +167,7 @@ const BookingCheckoutPage = () => {
   const handleFreeBooking = async () => {
     try {
       setIsProcessingFree(true)
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8085/api'
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'
       const resp = await fetch(`${API_BASE_URL}/payments/checkout/free-booking`, {
         method: 'POST',
         headers: {

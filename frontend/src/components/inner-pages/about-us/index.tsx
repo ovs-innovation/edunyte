@@ -16,11 +16,16 @@ const AboutUs = () => {
    return (
       <>
          <HeaderOne />
-         <main className="main-area fix">
-            <BreadcrumbOne title={t('about_page.breadcrumb.title')} sub_title={t('about_page.breadcrumb.subtitle')} />
-            <Blog style={false} />
+         <main className="main-area fix glow-bg">
+            <BreadcrumbOne
+               title={t('about_page.breadcrumb.title', 'Where Learning Meets Excellence')}
+               sub_title={t('about_page.breadcrumb.subtitle', 'About Us')}
+               description={t('about_page.hero.description', 'Edunyte is a global movement dedicated to bridging the gap between world-class expertise and ambitious learners.')}
+               image="/assets/img/others/inner_about_img.png"
+               overlayItems={['Expert-Verified Tutors', 'Global Learning Community', 'Personalized Paths']}
+               features={['Trusted by 10,000+ students', 'Live 1-on-1 sessions', 'Multi-language support']}
+            />
             <About />
-            <BrandOne />
             <Feature style={true} />
             <Newsletter />
             <Testimonial />

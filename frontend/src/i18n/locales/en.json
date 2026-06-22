@@ -9,6 +9,8 @@
     "instructor": "Instructor",
     "create_instructor_account": "Create Your Instructor Account",
     "logout": "Logout",
+    "profile": "Profile",
+    "reviews": "reviews",
     "buy_now": "Buy Now",
     "price": "Price",
     "language": "Language",
@@ -20,8 +22,12 @@
     "welcome_back": "Welcome back!",
     "are_you_sure": "Are you sure?",
     "actions": "Actions",
-    "login_description": "Hey there! Ready to log in? Just enter your username and password below and you'll be back in action in no time. Let's go!",
-    "continue_with_google": "Continue with google",
+    "login_description": "Welcome back! Please enter your credentials below to access your account and continue your learning journey.",
+    "login_visual_title": "Shape Your Future",
+    "login_visual_desc": "Access world-class learning and expert mentorship in just one click.",
+    "registration_visual_title": "Start Your Journey",
+    "registration_visual_desc": "Join a global community of learners and educators today.",
+    "continue_with_google": "Continue with Google",
     "or": "or",
     "email": "Email",
     "password": "Password",
@@ -31,13 +37,13 @@
     "dont_have_account": "Don't have an account?",
     "sign_up": "Sign Up",
     "create_account": "Create Your Account",
-    "registration_description": "Hey there! Ready to join the party? We just need a few details from you to get started. Let's do this!",
+    "registration_description": "Create your account today and join a global community of dedicated learners and expert mentors.",
     "first_name": "First Name",
-    "last_name": "Last name",
+    "last_name": "Last Name",
     "confirm_password": "Confirm Password",
     "already_have_account": "Already have an account?",
-    "registration_success": "Registration successfully",
-    "login_success": "Login successfully",
+    "registration_success": "Registration successful",
+    "login_success": "Login successful",
     "create_tutor_account": "Create Your Tutor Account",
     "tutor_registration": "Tutor Registration",
     "registration_success_pending": "Registration successful. Please wait for admin approval.",
@@ -80,7 +86,7 @@
     "search_courses_placeholder": "Search for course...",
     "trending_categories": "Trending Categories",
     "top_category_we_have": "Top Category We Have",
-    "category_description": "when known printer took a galley of type scrambl edmake",
+    "category_description": "Find the perfect learning path tailored to your professional goals and interests.",
     "top_class_courses": "Top Class Courses",
     "best_exciting_class_experience": "Get The Best Exciting Class Experience With us",
     "loading": "Loading...",
@@ -189,17 +195,36 @@
     "newsletter_desc": "Sign up for our newsletter and get language learning tips and special offers directly to your inbox.",
     "newsletter_placeholder_email": "Enter your email address",
     "newsletter_subscribe": "Subscribe",
-    "newsletter_terms": "By subscribing, you agree to our Terms of Service and Privacy Policy."
+    "newsletter_terms": "By subscribing, you agree to our Terms of Service and Privacy Policy.",
+    "newsletter_error_email": "Please enter a valid email address.",
+    "categories_title": "Explore Learning Categories",
+    "categories_subtitle": "Find expert tutors across diverse subjects and interests.",
+    "view_courses": "View Courses",
+    "explore_all_subjects": "Explore All Subjects",
+    "expert_tutor": "Expert Tutor",
+    "experienced_educator": "Experienced educator dedicated to student success.",
+    "experienced_educator_specializing_in": "Experienced educator specializing in {{course}}."
   },
   "home": {
     "one": {
       "hero": {
-        "title": "Unlock your potential with the best tutors",
-        "description": "Prepare to achieve your goals with private lessons from professional language tutors.",
+        "title": "Unlock **your** **potential**  with the best tutors",
+        "description": "Prepare to achieve your goals with private lessons from professional tutors.",
         "trustpilot_rating": "4.8 on Trustpilot",
         "trustpilot_reviews": "(Over 100k reviews)",
-        "experienced_tutors_count": "32,000+",
+        "experienced_tutors_count": "50+",
         "experienced_tutors_label": "Experienced Tutors"
+      },
+      "tutors": {
+        "sub_title": "TOP RATED MENTORS",
+        "title_start": "Meet our",
+        "title_end": "top tutors",
+        "description": "Learn from the best. Our highest-rated tutors are ready to help you achieve your goals with personalized guidance.",
+        "view_all": "View All Courses",
+        "finding_tutors": "Finding the best tutors for you...",
+        "per_lesson": "/lesson",
+        "students": "students",
+        "verified": "Verified"
       }
     },
     "how_it_works": {
@@ -267,15 +292,15 @@
         "home_2": {
           "1": {
             "title": "Expert Tutors",
-            "desc": "when an unknown printer took a galley offe type and scrambled makes."
+            "desc": "Learn from certified industry experts with years of real-world professional experience."
           },
           "2": {
             "title": "Effective Courses",
-            "desc": "when an unknown printer took a galley offe type and scrambled makes."
+            "desc": "Access high-quality curriculum designed to deliver measurable learning outcomes."
           },
           "3": {
             "title": "Earn Certificate",
-            "desc": "when an unknown printer took a galley offe type and scrambled makes."
+            "desc": "Earn globally recognized certifications to boost your professional career and profile."
           }
         }
       }
@@ -283,19 +308,19 @@
     "join_section": {
       "join_as_instructor_title": "Join as an Instructor",
       "join_as_instructor_description": "As a simple example, learning begins with effort, consistency, and the right guidance.",
-      "join_as_student_title": "Join as an student",
+      "join_as_student_title": "Join as a student",
       "join_as_student_description": "Join learners from around the world and grow together through live and online learning.",
       "apply_now": "Apply Now"
     },
     "blog": {
       "subtitle": "News & Blogs",
       "title": "Our Latest News Feed",
-      "description": "when known printer took a galley of type scrambl edmake",
+      "description": "Stay updated with the latest educational trends, platform updates, and expert insights.",
       "items": {
         "home_1": {
           "1": {
             "tag": "Marketing",
-            "title": "How To Become idiculously Self-Aware In 20 Minutes"
+            "title": "How To Become Ridiculously Self-Aware In 20 Minutes"
           },
           "2": {
             "tag": "Students",
@@ -359,16 +384,16 @@
           "text": "Edunyte is designed around students — your pace, your goals, your future. We connect learners with expert educators who focus on understanding, not just syllabus completion. Whether you’re improving grades, preparing for exams, or building skills, Edunyte ensures learning feels clear, supportive, and effective with personalized learning paths and verified teachers."
         },
         "values": {
-          "name": "Our Values",
-          "badge": "Values",
-          "title": "Our Core Values",
-          "list": {
-            "1": "<strong>Student-First Learning</strong> – Every learner deserves personal attention.",
-            "2": "<strong>Teacher Empowerment</strong> – Great teaching deserves great support.",
-            "3": "<strong>Trust & Transparency</strong> – Clear communication at every step.",
-            "4": "<strong>Growth Mindset</strong> – Continuous learning for everyone."
-          }
-        }
+  "name": "Our Values",
+  "badge": "Values",
+  "title": "Our Core Values",
+  "list": {
+  "1": "Student-First Learning – At the heart of everything we do is a simple but powerful belief: every learner matters. We prioritize each student as an individual, recognizing that no two learning journeys are the same. Our approach is built around personalized attention, adaptive teaching methods, and a nurturing environment where every child feels seen, heard, and genuinely supported — because when students feel valued, they gain the confidence to explore, grow, and reach their fullest potential.",
+  "2": "Teacher Empowerment – Empowered teachers create empowered students. We are deeply committed to providing our educators with the tools, training, and professional support they need to thrive. We cultivate a culture built on respect, collaboration, and trust — where teachers are not just instructors but innovators and mentors. By investing in the growth and well-being of our educators, we ensure they walk into every classroom energized and fully equipped to make a lasting difference.",
+  "3": "Trust & Transparency – Trust is the foundation of every meaningful relationship, and we work hard to earn it every day. We are committed to clear, honest, and open communication at every level — sharing progress openly, explaining decisions clearly, and holding ourselves fully accountable. There are no hidden agendas here, only a genuine dedication to integrity and the belief that when people feel informed and respected, stronger partnerships and better outcomes naturally follow.",
+  "4": "Growth Mindset – We believe the capacity to grow and improve is the most powerful trait a person can develop, and we work every day to nurture that belief in everyone around us. For students, this means embracing challenges and understanding that effort matters more than perfection. For teachers and staff, it means continuously learning and refining their craft. We celebrate progress at every stage and foster an environment where curiosity thrives and every setback becomes a stepping stone toward excellence."
+}
+}
       },
       "join_link": "Join as a {{role}}"
     },
@@ -380,6 +405,8 @@
           "label": "Tutors",
           "desc": "from 120 countries, teaching 90 languages and 100+ subjects."
         },
+        "enrolled": "Joined by 50k+ Members",
+        "satisfaction": "Satisfaction Rate",
         "companies": {
           "label": "Companies",
           "desc": "trust us to upskill their employees with our corporate training."
@@ -454,7 +481,7 @@
     "features": {
       "1": {
         "title": "Set your own rate",
-        "desc": "Choose your hourly rate and change it anytime. On average, English tutors charge $15-25 per hour."
+        "desc": "Choose your hourly rate and change it anytime. On average, English tutors charge 15-25 USD per hour."
       },
       "2": {
         "title": "Teach anytime, anywhere",
@@ -603,10 +630,10 @@
     "details": {
       "tag": "Development",
       "reviews": "({{count}} Reviews)",
-      "title": "How To Become idiculously Self-Aware In 20 Minutes",
+      "title": "How To Become Ridiculously Self-Aware In 20 Minutes",
       "by": "By",
       "author": "David Millar",
-      "location": "LocationWashington DC, MI 2726",
+      "location": "Location: Washington DC, MI 2726",
       "students": "2,250 Students",
       "overview_title": "Event Overview",
       "overview_desc": "Dorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan lacus vel facilisis.dolor sit amet, consectetur adipiscing elited do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
@@ -623,7 +650,7 @@
     },
     "sidebar": {
       "fee_label": "Event Fee",
-      "fee": "$19.00",
+      "fee": "",
       "info_title": "Event Information:",
       "date": "Date",
       "date_val": "26/08/2024",
@@ -677,38 +704,56 @@
       },
       "8": {
         "title": "How To Design Effective User Onboarding",
-        "location": "New Work",
         "date": "25 June, 2024"
+      }
+    },
+    "home_2_subtitle": "Upcoming Events",
+    "home_2_title": "Join Our Community and Grow Together",
+    "home_2_desc": "Stay connected with our global community through live workshops, webinars, and networking events designed to accelerate your learning journey.",
+    "see_all_events": "See All Events",
+    "items_h2": {
+      "1": {
+        "title": "The Accessible Target Sizes Cheatsheet",
+        "location": "United Kingdom"
+      },
+      "2": {
+        "title": "Exactly How Technology Can Make Reading",
+        "location": "Tokyo Japan"
+      },
+      "3": {
+        "title": "Building Futures Through Technology",
+        "location": "New York"
       }
     }
   },
   "footer": {
-    "description_1": "when an unknown printer took galley of type and scrambled it to make pspecimen bookt has.",
-    "address": "463 7th Ave, NY 10018, USA",
-    "phone": "+123 88 9900 456",
-    "useful_links": "Useful Links",
+    "mobile_app": "Mobile App",
+    "description_1": "Edunyte is a global learning ecosystem connecting ambitious students with world-class mentors. We believe in borderless education that is accessible, flexible, and driven by human expertise.",
+    "address": "info@edunyte.com",
+    "phone": "+1 (800) EDUNYTE",
+    "useful_links": "Our Ecosystem",
     "links": {
-      "values": "Our values",
-      "advisory": "Our advisory board",
-      "partners": "Our partners",
-      "become_partner": "Become a partner",
-      "work": "Work at Future Learn",
-      "quizlet": "Quizlet Plus"
+      "values": "Core Integrity",
+      "advisory": "Expert Board",
+      "partners": "Global Partners",
+      "become_partner": "Institutional Collabs",
+      "work": "Join our Mission",
+      "quizlet": "Premium Learning"
     },
-    "our_company": "Our Company",
+    "our_company": "Quick Links",
     "company_links": {
-      "about": "About us",
-      "contact": "Contact Us",
-      "become_teacher": "Become Teacher",
-      "become_student": "Become a Student",
-      "blog": "Blog",
-      "events": "Events"
+      "about": "Our Journey",
+      "contact": "Contact Support",
+      "become_teacher": "Teach on Edunyte",
+      "become_student": "Start Learning",
+      "blog": "Insights & News",
+      "events": "Live Sessions"
     },
-    "get_in_touch": "Get In Touch",
-    "description_2": "when an unknown printer took \n galley type and scrambled",
-    "copyright": "© 2010-2026 Edunyte.com. All rights reserved.",
-    "terms": "Term of Use",
-    "privacy": "Privacy Policy"
+    "get_in_touch": "Connectivity",
+    "description_2": "Connecting the next generation of global leaders through knowledge.",
+    "copyright": "© 2026 Edunyte Ecosystem. Empowering Global Learners.",
+    "terms": "Usage Terms",
+    "privacy": "Privacy Charter"
   },
   "error": {
     "title": "ERROR PAGE!",

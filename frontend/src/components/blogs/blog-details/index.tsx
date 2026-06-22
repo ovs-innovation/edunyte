@@ -8,7 +8,13 @@ const BlogDetails = () => {
       <>
          <HeaderOne />
          <main className="main-area fix">
-            <BreadcrumbOne title="Blog Details" sub_title="Blogs" sub_title_2="How To Become idiculously Self-Aware In 20 Minutes" style={true} />
+            <BreadcrumbOne 
+               title="Blog Details" 
+               sub_title="Blogs" 
+               sub_title_2="How To Become Ridiculously Self-Aware In 20 Minutes" 
+               style={true} 
+               image="/assets/img/others/global_education_network.png"
+            />
             <BlogDetailsArea />
          </main>
          <FooterOne style={false} style_2={true}  />

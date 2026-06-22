@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8085/api/student-profiles/wishlist"; 
+const API_URL = "/api/student-profiles/wishlist"; 
 
 export const getWishlist = async (token: string) => {
    const response = await axios.get(API_URL, {

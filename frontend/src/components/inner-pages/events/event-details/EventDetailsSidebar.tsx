@@ -2,16 +2,18 @@ import { Link } from "react-router-dom"
 import InjectableSvg from "../../../../hooks/InjectableSvg"
 import BtnArrow from "../../../../svg/BtnArrow"
 import { useTranslation } from "react-i18next";
+import { usePriceFormatter } from "../../../../hooks/usePriceFormatter";
 
 const EventDetailsSidebar = () => {
    const { t } = useTranslation();
+   const { formatPriceDirect } = usePriceFormatter();
    return (
       <aside className="event__sidebar">
          <div className="event__widget">
             <div className="courses__details-sidebar">
                <div className="courses__cost-wrap">
                   <span>{t('events.sidebar.fee_label')}</span>
-                  <h2 className="title">{t('events.sidebar.fee')}</h2>
+                  <h2 className="title">{formatPriceDirect(19)}</h2>
                </div>
                <div className="courses__information-wrap">
                   <h5 className="title">{t('events.sidebar.info_title')}</h5>

@@ -17,12 +17,12 @@ const Testimonial = () => {
                      </div>
                      <div className="banner__review" data-aos="fade-left" data-aos-delay="1000">
                         <div className="icon">
-                           <InjectableSvg src="assets/img/icons/star.svg" alt="" className="injectable" />
+                           <InjectableSvg src="/assets/img/icons/star.svg" alt="" className="injectable" />
                         </div>
                         <h6 className="title">4.9/5 <span>Real Reviews</span></h6>
                      </div>
                      <div className="testimonial__img-icon">
-                        <InjectableSvg src="assets/img/icons/quote02.svg" alt="" className="injectable" />
+                        <InjectableSvg src="/assets/img/icons/quote02.svg" alt="" className="injectable" />
                      </div>
                      <span className="svg-icon"></span>
                   </div>

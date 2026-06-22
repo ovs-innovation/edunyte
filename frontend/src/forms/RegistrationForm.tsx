@@ -59,40 +59,46 @@ const RegistrationForm = ({ role }: { role?: string }) => {
 
    return (
       <form onSubmit={handleSubmit(onSubmit)} className="account__form">
-         <div className="row gutter-20">
+         <div className="row g-3">
             <div className="col-md-6">
-               <div className="form-grp">
-                  <label htmlFor="fast-name">{t("common.first_name")}</label>
-                  <input type="text" {...register("fname")} id="fast-name" placeholder={t("common.first_name")} />
-                  <p className="form_error">{errors.fname?.message}</p>
+               <div className="form-grp mb-2">
+                  <label htmlFor="fast-name" className="fw-bold small opacity-50 mb-2">{t("common.first_name")}</label>
+                  <input type="text" {...register("fname")} id="fast-name" placeholder="John" style={{ width: '100%', padding: '12px 18px', background: 'rgba(255,255,255,0.8)', border: '1px solid var(--glass-border)', borderRadius: '10px', fontSize: '0.9rem' }} />
+                  <p className="form_error text-danger small mt-1">{errors.fname?.message}</p>
                </div>
             </div>
             <div className="col-md-6">
-               <div className="form-grp">
-                  <label htmlFor="last-name">{t("common.last_name")}</label>
-                  <input type="text" {...register("lname")} id="last-name" placeholder={t("common.last_name")} />
-                  <p className="form_error">{errors.lname?.message}</p>
+               <div className="form-grp mb-2">
+                  <label htmlFor="last-name" className="fw-bold small opacity-50 mb-2">{t("common.last_name")}</label>
+                  <input type="text" {...register("lname")} id="last-name" placeholder="Doe" style={{ width: '100%', padding: '12px 18px', background: 'rgba(255,255,255,0.8)', border: '1px solid var(--glass-border)', borderRadius: '10px', fontSize: '0.9rem' }} />
+                  <p className="form_error text-danger small mt-1">{errors.lname?.message}</p>
                </div>
             </div>
          </div>
-         <div className="form-grp">
-            <label htmlFor="email">{t("common.email")}</label>
-            <input type="email" {...register("email")} id="email" placeholder={t("common.email")} />
-            <p className="form_error">{errors.email?.message}</p>
+         <div className="form-grp mb-2">
+            <label htmlFor="email" className="fw-bold small opacity-50 mb-2">{t("common.email")}</label>
+            <input type="email" {...register("email")} id="email" placeholder="name@example.com" style={{ width: '100%', padding: '12px 18px', background: 'rgba(255,255,255,0.8)', border: '1px solid var(--glass-border)', borderRadius: '10px', fontSize: '0.9rem' }} />
+            <p className="form_error text-danger small mt-1">{errors.email?.message}</p>
          </div>
-         <div className="form-grp">
-            <label htmlFor="password">{t("common.password")}</label>
-            <input type="password" {...register("password")} id="password" placeholder={t("common.password")} />
-            <p className="form_error">{errors.password?.message}</p>
+         <div className="form-grp mb-2">
+            <label htmlFor="password" className="fw-bold small opacity-50 mb-2">{t("common.password")}</label>
+            <input type="password" {...register("password")} id="password" placeholder="••••••••" style={{ width: '100%', padding: '12px 18px', background: 'rgba(255,255,255,0.8)', border: '1px solid var(--glass-border)', borderRadius: '10px', fontSize: '0.9rem' }} />
+            <p className="form_error text-danger small mt-1">{errors.password?.message}</p>
          </div>
-         <div className="form-grp">
-            <label htmlFor="confirm-password">{t("common.confirm_password")}</label>
-            <input type="password" {...register("cpassword")} id="confirm-password" placeholder={t("common.confirm_password")} />
-            <p className="form_error">{errors.cpassword?.message}</p>
+         <div className="form-grp mb-20">
+            <label htmlFor="confirm-password" className="fw-bold small opacity-50 mb-2">{t("common.confirm_password")}</label>
+            <input type="password" {...register("cpassword")} id="confirm-password" placeholder="••••••••" style={{ width: '100%', padding: '12px 18px', background: 'rgba(255,255,255,0.8)', border: '1px solid var(--glass-border)', borderRadius: '10px', fontSize: '0.9rem' }} />
+            <p className="form_error text-danger small mt-1">{errors.cpassword?.message}</p>
          </div>
-         <button type="submit" className="btn btn-two arrow-btn" disabled={isLoading}>
-            {isLoading ? t("common.signing_up") : t("common.sign_up")}
-            <BtnArrow />
+         <button type="submit" className="btn-neon-primary w-100 py-3 d-flex align-items-center justify-content-center gap-2" disabled={isLoading} style={{ borderRadius: '12px' }}>
+            {isLoading ? (
+                <div className="spinner-border spinner-border-sm" role="status"></div>
+            ) : (
+                <>
+                    {t("common.sign_up")}
+                    <i className="fas fa-arrow-right"></i>
+                </>
+            )}
          </button>
       </form>
    )
