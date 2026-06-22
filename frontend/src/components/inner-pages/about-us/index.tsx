@@ -23,7 +23,7 @@ const AboutUs = () => {
                description={t('about_page.hero.description', 'Edunyte is a global movement dedicated to bridging the gap between world-class expertise and ambitious learners.')}
                image="/assets/img/others/inner_about_img.png"
                overlayItems={['Expert-Verified Tutors', 'Global Learning Community', 'Personalized Paths']}
-               features={['Trusted by 10,000+ students', 'Live 1-on-1 sessions', 'Multi-language support']}
+               features={['Trusted by 50+ students', 'Live 1-on-1 sessions', 'Multi-language support']}
             />
             <About />
             <Newsletter />

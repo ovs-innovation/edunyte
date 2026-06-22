@@ -37,7 +37,7 @@ const BecomeStudent = () => {
                                         <img src="/assets/img/banner/h2_banner_img.png" alt="Student Success" className="w-100 rounded-4" style={{ minHeight: '400px', objectFit: 'cover' }} />
                                     </div>
                                     <div className="position-absolute bottom-0 end-0 glass-panel p-4 mb-4 me-4 shadow-sm">
-                                        <h4 className="m-0 fw-900 text-primary">50k+</h4>
+                                        <h4 className="m-0 fw-900 text-primary">150+</h4>
                                         <p className="m-0 small opacity-60">Success Stories</p>
                                     </div>
                                 </div>

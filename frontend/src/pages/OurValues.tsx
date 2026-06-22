@@ -67,7 +67,6 @@ const OurValues = () => {
                         <h3 className="my-3 fw-900" style={{ fontSize: '1.8rem' }}>{val.title}</h3>
                         <p className="opacity-70 mb-0" style={{ fontSize: '1.1rem', lineHeight: 1.8 }}>{val.desc}</p>
                      </div>
-                     <div style={{ position: 'absolute', bottom: '-20px', right: '-10px', fontSize: '8rem', fontWeight: 900, color: 'rgba(0,0,0,0.03)', zIndex: 0 }}>0{idx+1}</div>
                   </div>
                 </div>
               ))}

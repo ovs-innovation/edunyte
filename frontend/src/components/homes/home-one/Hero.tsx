@@ -38,7 +38,7 @@ const Hero = () => {
 
                         {/* Standardized Buttons */}
                         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '48px' }}>
-                            <Link to="/instructors" className="btn-neon-primary">
+                            <Link to="/courses" className="btn-neon-primary">
                                 {t('home.one.hero.find_tutor', 'Find a Tutor')} <i className="fas fa-arrow-right"></i>
                             </Link>
 
