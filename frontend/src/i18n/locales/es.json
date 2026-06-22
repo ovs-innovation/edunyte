@@ -96,7 +96,7 @@
     "learn_more": "Saber más",
     "book_session": "Reservar sesión",
     "newsletter_ready_to_learn": "¿Listo para aprender?",
-    "newsletter_desc": "Suscríbete a nuestro boletín y obtén consejos para el aprendizaje de idiomas y ofertas especiales directamente en tu bandeja de entrada.",
+    "newsletter_desc": "Suscríbete a nuestro boletín y obtén consejos para el aprendizaje y ofertas especiales directamente en tu bandeja de entrada.",
     "newsletter_placeholder_email": "Ingresa tu dirección de correo electrónico",
     "newsletter_subscribe": "Suscribirse",
     "newsletter_terms": "Al suscribirte, aceptas nuestros Términos de servicio y Política de privacidad."
@@ -105,10 +105,10 @@
     "one": {
       "hero": {
         "title": "Libera tu potencial con los mejores tutores",
-        "description": "Prepárate para alcanzar tus metas con lecciones privadas de tutores de idiomas profesionales.",
+        "description": "Prepárate para alcanzar tus metas con lecciones privadas de tutores profesionales.",
         "trustpilot_rating": "4.8 en Trustpilot",
         "trustpilot_reviews": "(Más de 100k reseñas)",
-        "experienced_tutors_count": "32,000+",
+        "experienced_tutors_count": "50+",
         "experienced_tutors_label": "Tutores experimentados"
       }
     }

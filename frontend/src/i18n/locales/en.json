@@ -192,7 +192,7 @@
     "subscribe_now": "Subscribe Now",
     "curved_circle_text": "Education * System * can * Make * Change *",
     "newsletter_ready_to_learn": "Ready to learn?",
-    "newsletter_desc": "Sign up for our newsletter and get language learning tips and special offers directly to your inbox.",
+    "newsletter_desc": "Sign up for our newsletter and get learning tips and special offers directly to your inbox.",
     "newsletter_placeholder_email": "Enter your email address",
     "newsletter_subscribe": "Subscribe",
     "newsletter_terms": "By subscribing, you agree to our Terms of Service and Privacy Policy.",
@@ -230,7 +230,7 @@
     "how_it_works": {
       "subtitle": "How It Works",
       "title": "How Learning Works on Our Platform",
-      "description": "Learn skills, languages, and professional courses in the language you're most comfortable with. Our platform is designed to make learning simple, flexible, and accessible for everyone — anytime, anywhere.",
+      "description": "Personalised tutoring designed around your pace, goals and needs.",
       "step1_title": "Choose Your Skill",
       "step1_description": "Pick from languages, creative skills, professional courses, wellness, and more — all in one place.",
       "step2_title": "Select Your Language",
@@ -384,16 +384,17 @@
           "text": "Edunyte is designed around students — your pace, your goals, your future. We connect learners with expert educators who focus on understanding, not just syllabus completion. Whether you’re improving grades, preparing for exams, or building skills, Edunyte ensures learning feels clear, supportive, and effective with personalized learning paths and verified teachers."
         },
         "values": {
-  "name": "Our Values",
-  "badge": "Values",
-  "title": "Our Core Values",
-  "list": {
-  "1": "Student-First Learning – At the heart of everything we do is a simple but powerful belief: every learner matters. We prioritize each student as an individual, recognizing that no two learning journeys are the same. Our approach is built around personalized attention, adaptive teaching methods, and a nurturing environment where every child feels seen, heard, and genuinely supported — because when students feel valued, they gain the confidence to explore, grow, and reach their fullest potential.",
-  "2": "Teacher Empowerment – Empowered teachers create empowered students. We are deeply committed to providing our educators with the tools, training, and professional support they need to thrive. We cultivate a culture built on respect, collaboration, and trust — where teachers are not just instructors but innovators and mentors. By investing in the growth and well-being of our educators, we ensure they walk into every classroom energized and fully equipped to make a lasting difference.",
-  "3": "Trust & Transparency – Trust is the foundation of every meaningful relationship, and we work hard to earn it every day. We are committed to clear, honest, and open communication at every level — sharing progress openly, explaining decisions clearly, and holding ourselves fully accountable. There are no hidden agendas here, only a genuine dedication to integrity and the belief that when people feel informed and respected, stronger partnerships and better outcomes naturally follow.",
-  "4": "Growth Mindset – We believe the capacity to grow and improve is the most powerful trait a person can develop, and we work every day to nurture that belief in everyone around us. For students, this means embracing challenges and understanding that effort matters more than perfection. For teachers and staff, it means continuously learning and refining their craft. We celebrate progress at every stage and foster an environment where curiosity thrives and every setback becomes a stepping stone toward excellence."
-}
-}
+          "name": "Our Values",
+          "badge": "Values",
+          "title": "Our Core Values",
+          "text": "Integrity, innovation, and inclusivity are at the heart of everything we do. We believe education should be accessible, high-quality, and borderless.",
+          "list": {
+            "1": "Student-First Learning – At the heart of everything we do is a simple but powerful belief: every learner matters. We prioritize each student as an individual, recognizing that no two learning journeys are the same. Our approach is built around personalized attention, adaptive teaching methods, and a nurturing environment where every child feels seen, heard, and genuinely supported — because when students feel valued, they gain the confidence to explore, grow, and reach their fullest potential.",
+            "2": "Teacher Empowerment – Empowered teachers create empowered students. We are deeply committed to providing our educators with the tools, training, and professional support they need to thrive. We cultivate a culture built on respect, collaboration, and trust — where teachers are not just instructors but innovators and mentors. By investing in the growth and well-being of our educators, we ensure they walk into every classroom energized and fully equipped to make a lasting difference.",
+            "3": "Trust & Transparency – Trust is the foundation of every meaningful relationship, and we work hard to earn it every day. We are committed to clear, honest, and open communication at every level — sharing progress openly, explaining decisions clearly, and holding ourselves fully accountable. There are no hidden agendas here, only a genuine dedication to integrity and the belief that when people feel informed and respected, stronger partnerships and better outcomes naturally follow.",
+            "4": "Growth Mindset – We believe the capacity to grow and improve is the most powerful trait a person can develop, and we work every day to nurture that belief in everyone around us. For students, this means embracing challenges and understanding that effort matters more than perfection. For teachers and staff, it means continuously learning and refining their craft. We celebrate progress at every stage and foster an environment where curiosity thrives and every setback becomes a stepping stone toward excellence."
+          }
+        }
       },
       "join_link": "Join as a {{role}}"
     },

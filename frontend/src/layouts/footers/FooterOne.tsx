@@ -49,13 +49,9 @@ const FooterOne = ({ style, style_2 }: any) => {
                         <h4 className="footer__widget-title mb-20" style={{ fontSize: '15px', letterSpacing: '1px' }}>{t('footer.get_in_touch')}</h4>
                         <div className="footer__contact-content">
                            <ul className="list-wrap small opacity-70">
-                              <li className="mb-2 d-flex gap-2">
-                                 <i className="fas fa-map-marker-alt text-primary mt-1"></i>
-                                 <span>{t('footer.address')}</span>
-                              </li>
                               <li className="d-flex gap-2">
-                                 <i className="fas fa-phone-alt text-primary mt-1"></i>
-                                 <span>{t('footer.phone')}</span>
+                                 <i className="fas fa-envelope text-primary mt-1"></i>
+                                 <span>info@edunyte.com</span>
                               </li>
                            </ul>
                         </div>

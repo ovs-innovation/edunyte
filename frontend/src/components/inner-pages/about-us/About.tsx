@@ -8,7 +8,7 @@ const About = () => {
 
     const tabData = {
         teachers: {
-            image: "assets/images/Teach.jpg",
+            image: "/assets/img/others/about_teach.png",
             badge: t('about_page.platform.tabs.teachers.badge', 'Expert Faculty'),
             badgeColor: "#5751E1",
             title: t('about_page.platform.tabs.teachers.title', 'Empowering Educators'),
@@ -26,7 +26,7 @@ const About = () => {
             badge: t('about_page.platform.tabs.values.badge', 'Core Values'),
             badgeColor: "#009688",
             title: t('about_page.platform.tabs.values.title', 'Our Guiding Principles'),
-            text: t('about_page.platform.tabs.values.list.1', 'Integrity, innovation, and inclusivity are at the heart of everything we do. We believe education should be accessible, high-quality, and borderless.')
+            text: t('about_page.platform.tabs.values.text', 'Integrity, innovation, and inclusivity are at the heart of everything we do. We believe education should be accessible, high-quality, and borderless.')
         }
     };
 

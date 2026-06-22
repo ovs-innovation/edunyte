@@ -24,14 +24,14 @@ const Hero = () => {
                         </div>
 
                         <h1 style={{ fontSize: 'clamp(3.5rem, 6vw, 4.5rem)', fontWeight: 900, lineHeight: 1.1, marginBottom: '24px' }}>
-  {t('home.one.hero.title', 'Unlock **your** **potential**  with the best tutors')
-    .split(' ')
-    .map((word: string, i: number) =>
-      word.startsWith('**') && word.endsWith('**')
-        ? <span key={i} className="text-gradient"> {word.replace(/\*\*/g, '')} </span>
-        : word + ' '
-    )}
-</h1>
+                            {t('home.one.hero.title', 'Unlock **your** **potential** with the best tutors')
+                                .split(/(\*\*.*?\*\*)/g)
+                                .map((part: string, i: number) =>
+                                    part.startsWith('**') && part.endsWith('**')
+                                        ? <span key={i} className="text-gradient">{part.slice(2, -2)}</span>
+                                        : part
+                                )}
+                        </h1>
                         <p style={{ fontSize: '1.25rem', marginBottom: '40px', maxWidth: '550px', lineHeight: 1.6 }}>
                             {t('home.one.hero.description', 'Prepare to achieve your goals with private lessons from professional tutors.')}
                         </p>
@@ -39,11 +39,11 @@ const Hero = () => {
                         {/* Standardized Buttons */}
                         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '48px' }}>
                             <Link to="/instructors" className="btn-neon-primary">
-                                {t('home.one.hero.find_tutor', 'Find A Tutor')} <i className="fas fa-arrow-right"></i>
+                                {t('home.one.hero.find_tutor', 'Find a Tutor')} <i className="fas fa-arrow-right"></i>
                             </Link>
 
                             <Link to="/courses" className="btn-neon-primary">
-                                Explore Courses <i className="fas fa-arrow-right"></i>
+                                {t('home.one.hero.explore_courses', 'Explore Courses')} <i className="fas fa-arrow-right"></i>
                             </Link>
                         </div>
 

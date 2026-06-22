@@ -1,4 +1,10 @@
-const statsData = [
+interface StatItem {
+    title: string;
+    subtitle: string;
+    isRating?: boolean;
+}
+
+const statsData: StatItem[] = [
     { title: '50+', subtitle: 'Experienced tutors' },
     { title: '500+', subtitle: '5-star tutor reviews' },
     { title: '50+', subtitle: 'Subjects taught' },

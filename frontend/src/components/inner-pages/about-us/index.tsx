@@ -26,7 +26,6 @@ const AboutUs = () => {
                features={['Trusted by 10,000+ students', 'Live 1-on-1 sessions', 'Multi-language support']}
             />
             <About />
-            <Feature style={true} />
             <Newsletter />
             <Testimonial />
          </main>
