@@ -25,8 +25,8 @@ const About = () => {
             image: "/assets/img/banner/h3_hero_img.png",
             badge: t('about_page.platform.tabs.values.badge', 'Core Values'),
             badgeColor: "#009688",
-            title: t('about_page.platform.tabs.values.title', 'Our Guiding Principles'),
-            text: t('about_page.platform.tabs.values.text', 'Integrity, innovation, and inclusivity are at the heart of everything we do. We believe education should be accessible, high-quality, and borderless.')
+            title: t('about_page.platform.tabs.values.title', 'Our Core Values'),
+            text: t('about_page.platform.tabs.values.text', 'Our core values guide everything we do, helping us create meaningful learning experiences and connect students with expert tutors worldwide.')
         }
     };
 
