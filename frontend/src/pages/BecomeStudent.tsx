@@ -23,7 +23,7 @@ const BecomeStudent = () => {
                         <div className="row align-items-center g-5">
                             <div className="col-lg-6 order-0 order-lg-1">
                                 <div className="student-hero-content ps-xl-5">
-                                    <span className="sub-title mb-20 text-primary fw-bold">FUTURE LEADERS</span>
+                                    <span className="sub-title mb-20 text-primary fw-bold">FUTURE LEADER</span>
                                     <h2 className="title mb-30 fw-900" style={{ fontSize: 'clamp(2.5rem, 5vw, 3.5rem)', lineHeight: 1.1 }}>Unlock Your <span className="text-grad">True Potential</span></h2>
                                     <p className="mb-40 opacity-70" style={{ fontSize: '1.2rem', lineHeight: 1.8 }}>
                                         Experience learning that adapts to you. Connect with elite mentors, access world-class resources, and join a community that celebrates your growth. Your journey to mastery starts here.
