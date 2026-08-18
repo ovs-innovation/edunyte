@@ -90,7 +90,7 @@ const FooterThree = () => {
                   <div className="col-md-5">
                      <div className="footer__bottom-menu">
                         <ul className="list-wrap">
-                           <li><Link to="/contact">Term of Use</Link></li>
+                           <li><Link to="/terms-and-conditions">Terms & Conditions</Link></li>
                            <li><Link to="/contact">Privacy Policy</Link></li>
                         </ul>
                      </div>

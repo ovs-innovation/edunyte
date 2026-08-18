@@ -59,6 +59,7 @@ const WorkAtFutureLearn = React.lazy(() => import('../pages/WorkAtFutureLearn'))
 const QuizletPlus = React.lazy(() => import('../pages/QuizletPlus'));
 const BecomeTeacher = React.lazy(() => import('../pages/BecomeTeacher'));
 const BecomeStudent = React.lazy(() => import('../pages/BecomeStudent'));
+const TermsAndConditions = React.lazy(() => import('../pages/TermsAndConditions'));
 // const BecomePartner = React.lazy(() => import('../pages/BecomePartner'));
 
 const AppNavigation = () => {
@@ -124,6 +125,8 @@ const AppNavigation = () => {
         <Route path="/quizlet-plus" element={<QuizletPlus />} />
         <Route path="/become-teacher" element={<BecomeTeacher />} />
         <Route path="/become-student" element={<BecomeStudent />} />
+        <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+        <Route path="/terms" element={<TermsAndConditions />} />
         {/* <Route path="/become-partner" element={<BecomePartner />} /> */}
         <Route path="*" element={<NotFound />} />
       </Routes>
