@@ -355,7 +355,7 @@ export const getMyCourses = async (req, res, next) => {
     }
 
     const teacherCourses = await TeacherCourse.find(query)
-      .populate("courseId", "name description category image status")
+      .populate("courseId", "name description category image status slug")
       .populate("languageIds", "name code nativeName")
       .sort({ createdAt: -1 });
 
@@ -364,6 +364,11 @@ export const getMyCourses = async (req, res, next) => {
 
       tcObj.bio = getLanguageValue(tcObj.bio);
       tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
+      if (tcObj.courseId && typeof tcObj.courseId === "object") {
+        tcObj.courseId.name = getLanguageValue(tcObj.courseId.name);
+        tcObj.courseId.description = getLanguageValue(tcObj.courseId.description);
+        tcObj.courseId.slug = getLanguageValue(tcObj.courseId.slug);
+      }
       attachLanguagesView(tcObj);
       return tcObj;
     });
@@ -581,7 +586,7 @@ export const getTeacherCourseRequests = async (req, res, next) => {
 
     const teacherCourses = await TeacherCourse.find(query)
       .populate("teacherId", "name email status")
-      .populate("courseId", "name description category image status")
+      .populate("courseId", "name description category image status slug")
       .populate("languageIds", "name code nativeName")
       .populate("reviewedBy", "name email")
       .sort({ createdAt: -1 });
@@ -591,6 +596,11 @@ export const getTeacherCourseRequests = async (req, res, next) => {
 
       tcObj.bio = getLanguageValue(tcObj.bio);
       tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
+      if (tcObj.courseId && typeof tcObj.courseId === "object") {
+        tcObj.courseId.name = getLanguageValue(tcObj.courseId.name);
+        tcObj.courseId.description = getLanguageValue(tcObj.courseId.description);
+        tcObj.courseId.slug = getLanguageValue(tcObj.courseId.slug);
+      }
       attachLanguagesView(tcObj);
       return tcObj;
     });
@@ -814,7 +824,7 @@ export const getCourseTeachers = async (req, res, next) => {
       status: "approved",
     })
       .populate("teacherId", "name email")
-      .populate("courseId", "name description")
+      .populate("courseId", "name description slug")
       .populate("languageIds", "name code nativeName")
       // Sort by cheapest in USD base
       .sort({ "pricing.basePriceUSD": 1 });
@@ -824,6 +834,11 @@ export const getCourseTeachers = async (req, res, next) => {
 
       tcObj.bio = getLanguageValue(tcObj.bio);
       tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
+      if (tcObj.courseId && typeof tcObj.courseId === "object") {
+        tcObj.courseId.name = getLanguageValue(tcObj.courseId.name);
+        tcObj.courseId.description = getLanguageValue(tcObj.courseId.description);
+        tcObj.courseId.slug = getLanguageValue(tcObj.courseId.slug);
+      }
       return tcObj;
     });
 
@@ -859,7 +874,7 @@ export const getCourseTeachersBySlug = async (req, res, next) => {
       status: "approved",
     })
       .populate("teacherId", "name email")
-      .populate("courseId", "name description")
+      .populate("courseId", "name description slug")
       .populate("languageIds", "name code nativeName")
       // Sort by cheapest in USD base
       .sort({ "pricing.basePriceUSD": 1 });
@@ -879,6 +894,11 @@ export const getCourseTeachersBySlug = async (req, res, next) => {
   
         tcObj.bio = getLanguageValue(tcObj.bio);
         tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
+        if (tcObj.courseId && typeof tcObj.courseId === "object") {
+          tcObj.courseId.name = getLanguageValue(tcObj.courseId.name);
+          tcObj.courseId.description = getLanguageValue(tcObj.courseId.description);
+          tcObj.courseId.slug = getLanguageValue(tcObj.courseId.slug);
+        }
 
         if (tcObj.languageIds && Array.isArray(tcObj.languageIds)) {
           tcObj.languageIds = tcObj.languageIds.map((lang) => ({

@@ -87,7 +87,7 @@ const bookingSchema = new mongoose.Schema(
     },
 
     payment: {
-      stripePaymentIntentId: { type: String, required: true, index: true },
+      stripePaymentIntentId: { type: String, required: true },
       status: { type: String, enum: ["pending", "paid", "failed", "refunded"], default: "paid", index: true },
     },
 

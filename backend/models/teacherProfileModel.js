@@ -124,7 +124,6 @@ teacherProfileSchema.pre("save", function (next) {
   next();
 });
 
-teacherProfileSchema.index({ userId: 1 });
 teacherProfileSchema.index({ kycStatus: 1 });
 
 export default mongoose.model("TeacherProfile", teacherProfileSchema);

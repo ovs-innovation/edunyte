@@ -75,6 +75,4 @@ const studentProfileSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-studentProfileSchema.index({ userId: 1 });
-
 export default mongoose.model("StudentProfile", studentProfileSchema);

@@ -6,8 +6,17 @@ import { useCurrency } from '../../../hooks/useCurrency';
 
 import { TranslatedContent } from '../../common/TranslatedContent';
 
+const getLocalizedText = (value: any, lang: string = 'en'): string => {
+    if (!value) return '';
+    if (typeof value === 'string') return value;
+    if (typeof value === 'object' && value !== null) {
+        return value[lang] || value.en || Object.values(value).find((v) => typeof v === 'string') || '';
+    }
+    return String(value);
+};
+
 const Tutors = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { formatPrice } = useCurrency();
     const [teachers, setTeachers] = useState<TeacherCourse[]>([]);
     const [loading, setLoading] = useState(true);
@@ -58,6 +67,8 @@ const Tutors = () => {
 
     if (teachers.length === 0) return null;
 
+    const currentLang = i18n.language || 'en';
+
     return (
         <section className="glow-bg" style={{ padding: '80px 0' }}>
             <div className="container">
@@ -83,11 +94,15 @@ const Tutors = () => {
                         const price = typeof teacher.price === 'number' ? teacher.price : (teacher.pricing?.basePriceUSD || 25);
                         const photo = teacher.teacherProfile?.photo;
                         
-                        const courseName = typeof teacher.courseId === 'object' ? (teacher.courseId as any).name : '';
+                        const rawCourse = typeof teacher.courseId === 'object' ? (teacher.courseId as any) : null;
+                        const courseName = rawCourse ? getLocalizedText(rawCourse.name, currentLang) : '';
+                        const courseSlug = rawCourse ? (getLocalizedText(rawCourse.slug, currentLang) || rawCourse._id) : teacher.courseId;
+
                         const fallbackBio = courseName 
                             ? t('common.experienced_educator_specializing_in', { course: courseName }) 
-                            : t('common.experienced_educator');
-                        const bio = teacher.teacherProfile?.bio || fallbackBio;
+                            : t('common.experienced_educator', 'Experienced educator');
+                        const rawBio = teacher.teacherProfile?.bio;
+                        const bio = (rawBio ? getLocalizedText(rawBio, currentLang) : '') || fallbackBio;
 
                         return (
                             <div key={teacher._id} className="col-lg-4 col-md-6">
@@ -136,7 +151,7 @@ const Tutors = () => {
 
                                     <div className="d-flex gap-2">
                                         <Link 
-                                            to={`/course/${typeof teacher.courseId === 'object' ? (teacher.courseId as any).slug || teacher.courseId._id : teacher.courseId}`} 
+                                            to={`/course/${courseSlug}`} 
                                             className="btn-neon-primary w-100 py-3 text-center small fw-bold"
                                             style={{ textDecoration: 'none' }}
                                         >
