@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { PermissionGate } from '@/components/PermissionGate';
 import { Button } from '@/components/ui/button';
-import { Plus, Download, Filter } from 'lucide-react';
+import { Plus, Download, Filter, Video, Radio, Layers } from 'lucide-react';
 import { CoursesAPI, ApiCourse, CategoriesAPI, ApiCategory } from '@/lib/api';
 import { getLanguageValue, normalizeLanguageValue } from '@/lib/languageHelper';
 import { useToast } from '@/hooks/use-toast';
@@ -23,6 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -43,6 +44,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { CloudinaryImageUploader } from '@/components/ui/cloudinary-image-uploader';
+import { ManageLecturesDialog } from '@/components/courses/ManageLecturesDialog';
+import { AdminLiveBookingsView } from '@/components/courses/AdminLiveBookingsView';
 import { useConfirmDialog } from '@/hooks/use-confirm-dialog';
 import { useRole } from '@/contexts/RoleContext';
 
@@ -70,6 +73,10 @@ const CourseManagementPage = () => {
   const isAdmin = currentRole === 'admin' || currentRole === 'super_admin';
   const { toast } = useToast();
   const { confirm, ConfirmDialog } = useConfirmDialog();
+
+  const [selectedCourseForLectures, setSelectedCourseForLectures] = useState<ApiCourse | null>(null);
+  const [lecturesDialogOpen, setLecturesDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'courses' | 'live-sessions'>('courses');
 
   const [formData, setFormData] = useState({
     name: '',
@@ -246,128 +253,171 @@ const CourseManagementPage = () => {
           </div>
         </div>
 
-        {/* Table */}
-        <div className="rounded-xl border border-border bg-card overflow-hidden animate-slide-up">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-border hover:bg-transparent">
-                <TableHead className="text-muted-foreground">Course</TableHead>
-                <TableHead className="text-muted-foreground">Category</TableHead>
-                <TableHead className="text-muted-foreground">Status</TableHead>
-                <TableHead className="text-muted-foreground">Created</TableHead>
-                <TableHead className="text-muted-foreground text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading && (
-                <>
-                  {[1, 2, 3].map((i) => (
-                    <TableRow key={i}>
+        {/* Navigation Tabs between Courses & Live Booking Sessions */}
+        <div className="flex items-center justify-between border-b border-border pb-1">
+          <Tabs value={activeTab} onValueChange={(val: any) => setActiveTab(val)}>
+            <TabsList className="bg-muted/60 p-1">
+              <TabsTrigger value="courses" className="gap-2 text-xs font-semibold">
+                <Layers className="h-4 w-4 text-primary" />
+                Courses & Lectures ({courses.length})
+              </TabsTrigger>
+              <TabsTrigger value="live-sessions" className="gap-2 text-xs font-semibold">
+                <Radio className="h-4 w-4 text-emerald-500" />
+                Live Sessions & Google Meet
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+
+        {activeTab === 'live-sessions' ? (
+          <AdminLiveBookingsView />
+        ) : (
+          /* Table */
+          <div className="rounded-xl border border-border bg-card overflow-hidden animate-slide-up">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-border hover:bg-transparent">
+                  <TableHead className="text-muted-foreground">Course</TableHead>
+                  <TableHead className="text-muted-foreground">Category</TableHead>
+                  <TableHead className="text-muted-foreground">Status</TableHead>
+                  <TableHead className="text-muted-foreground">Created</TableHead>
+                  <TableHead className="text-muted-foreground text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {loading && (
+                  <>
+                    {[1, 2, 3].map((i) => (
+                      <TableRow key={i}>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <Skeleton className="h-16 w-16 rounded-lg" />
+                            <div className="space-y-2">
+                              <Skeleton className="h-4 w-32" />
+                              <Skeleton className="h-3 w-48" />
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                      </TableRow>
+                    ))}
+                  </>
+                )}
+                {!loading && courses.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center text-muted-foreground">
+                      No courses found
+                    </TableCell>
+                  </TableRow>
+                )}
+                {!loading &&
+                  courses.map((course) => (
+                    <TableRow key={course._id} className="border-border transition-colors hover:bg-muted/30">
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <Skeleton className="h-16 w-16 rounded-lg" />
-                          <div className="space-y-2">
-                            <Skeleton className="h-4 w-32" />
-                            <Skeleton className="h-3 w-48" />
+                          {course.image && (
+                            <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
+                              <img
+                                src={course.image}
+                                alt={getLanguageValue(course.name)}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none';
+                                }}
+                              />
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-foreground">{getLanguageValue(course.name)}</p>
+                            {course.description && (
+                              <p className="text-sm text-muted-foreground line-clamp-1">{getLanguageValue(course.description)}</p>
+                            )}
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                      <TableCell><Skeleton className="h-4 w-16" /></TableCell>
-                      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                      <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                      <TableCell>
+                        {course.category ? (
+                          <Badge variant="outline">{course.category}</Badge>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            'border capitalize',
+                            course.status === 'active'
+                              ? 'bg-success/20 text-success border-success/30'
+                              : course.status === 'pending'
+                              ? 'bg-warning/20 text-warning border-warning/30'
+                              : 'bg-muted text-muted-foreground border-muted'
+                          )}
+                        >
+                          {course.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {course.createdAt ? new Date(course.createdAt).toLocaleDateString() : '-'}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              setSelectedCourseForLectures(course);
+                              setLecturesDialogOpen(true);
+                            }}
+                            className="h-8 gap-1.5 px-3 text-xs font-bold bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-slate-950 shadow-sm shadow-cyan-500/20 border border-cyan-300/40 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                          >
+                            <Video className="h-3.5 w-3.5 stroke-[2.5]" />
+                            Upload Lectures
+                          </Button>
+
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setSelectedCourseForLectures(course);
+                                  setLecturesDialogOpen(true);
+                                }}
+                              >
+                                <Video className="h-4 w-4 mr-2 text-cyan-400" />
+                                Upload & Manage Lectures
+                              </DropdownMenuItem>
+                              <PermissionGate permission="courses.edit">
+                                <DropdownMenuItem onClick={() => handleOpenDialog(course)}>
+                                  <Pencil className="h-4 w-4 mr-2" />
+                                  Edit
+                                </DropdownMenuItem>
+                              </PermissionGate>
+                              <PermissionGate permission="courses.delete">
+                                <DropdownMenuItem
+                                  onClick={() => handleDelete(course._id)}
+                                  className="text-destructive"
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </PermissionGate>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </TableCell>
                     </TableRow>
                   ))}
-                </>
-              )}
-              {!loading && courses.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground">
-                    No courses found
-                  </TableCell>
-                </TableRow>
-              )}
-              {!loading &&
-                courses.map((course) => (
-                  <TableRow key={course._id} className="border-border transition-colors hover:bg-muted/30">
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        {course.image && (
-                          <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
-                            <img
-                              src={course.image}
-                              alt={getLanguageValue(course.name)}
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                              }}
-                            />
-                          </div>
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-foreground">{getLanguageValue(course.name)}</p>
-                          {course.description && (
-                            <p className="text-sm text-muted-foreground line-clamp-1">{getLanguageValue(course.description)}</p>
-                          )}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {course.category ? (
-                        <Badge variant="outline">{course.category}</Badge>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant="outline"
-                        className={cn(
-                          'border capitalize',
-                          course.status === 'active'
-                            ? 'bg-success/20 text-success border-success/30'
-                            : course.status === 'pending'
-                            ? 'bg-warning/20 text-warning border-warning/30'
-                            : 'bg-muted text-muted-foreground border-muted'
-                        )}
-                      >
-                        {course.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {course.createdAt ? new Date(course.createdAt).toLocaleDateString() : '-'}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <PermissionGate permission="courses.edit">
-                            <DropdownMenuItem onClick={() => handleOpenDialog(course)}>
-                              <Pencil className="h-4 w-4 mr-2" />
-                              Edit
-                            </DropdownMenuItem>
-                          </PermissionGate>
-                          <PermissionGate permission="courses.delete">
-                            <DropdownMenuItem
-                              onClick={() => handleDelete(course._id)}
-                              className="text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete
-                            </DropdownMenuItem>
-                          </PermissionGate>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </div>
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </div>
 
       {/* Create/Edit Dialog */}
@@ -489,6 +539,12 @@ const CourseManagementPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <ManageLecturesDialog
+        course={selectedCourseForLectures}
+        open={lecturesDialogOpen}
+        onOpenChange={setLecturesDialogOpen}
+        onLecturesUpdated={loadCourses}
+      />
       <ConfirmDialog />
     </AdminLayout>
   );

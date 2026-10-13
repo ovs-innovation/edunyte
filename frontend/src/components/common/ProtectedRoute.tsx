@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 
 interface ProtectedRouteProps {
@@ -8,13 +8,21 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
    const { isAuthenticated, isLoading } = useAuth()
+   const location = useLocation()
 
    if (isLoading) {
-      return <div>Loading...</div>
+      return (
+         <div className="d-flex align-items-center justify-content-center" style={{ minHeight: '60vh' }}>
+            <div className="spinner-border text-primary" role="status">
+               <span className="visually-hidden">Loading...</span>
+            </div>
+         </div>
+      )
    }
 
    if (!isAuthenticated) {
-      return <Navigate to="/login" replace />
+      const redirectPath = encodeURIComponent(location.pathname + location.search)
+      return <Navigate to={`/login?redirect=${redirectPath}`} state={{ from: location }} replace />
    }
 
    return <>{children}</>

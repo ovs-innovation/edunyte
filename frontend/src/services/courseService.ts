@@ -1,3 +1,5 @@
+import { getStoredToken } from './authService'
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'
 
 export interface Course {
@@ -241,4 +243,46 @@ export const fetchCourseAvailability = async (
   }))
   return { ...data, availabilities }
 }
+
+export interface Lecture {
+  _id: string
+  courseId: string
+  title: string | { en: string }
+  description?: string | { en: string }
+  section: string
+  type: 'recorded' | 'live'
+  videoUrl?: string
+  videoDuration?: number
+  liveMeeting?: {
+    provider: string
+    meetingUrl: string
+    meetingId?: string
+    scheduledAt?: string | null
+    duration?: number
+    status: string
+  }
+  order: number
+  isPreview: boolean
+  status: string
+  createdAt?: string
+}
+
+export const fetchCourseLectures = async (
+  courseIdentifier: string
+): Promise<{ lectures: Lecture[]; count: number }> => {
+  const token = getStoredToken()
+  const headers: Record<string, string> = {}
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+  }
+
+  const response = await fetch(`${API_BASE_URL}/public/courses/${courseIdentifier}/lectures`, {
+    headers,
+  })
+  if (!response.ok) {
+    throw new Error('Failed to fetch lectures')
+  }
+  return await response.json()
+}
+
 

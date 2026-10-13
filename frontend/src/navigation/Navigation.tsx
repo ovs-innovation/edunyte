@@ -75,8 +75,8 @@ const AppNavigation = () => {
         <Route path="/home-seven" element={<HomeSeven />} />
         <Route path="/home-eight" element={<HomeEight />} />
         <Route path="/courses" element={<Course />} />
-        <Route path="/course/:slug" element={<CourseDetails />} />
-        <Route path="/lesson" element={<Lesson />} />
+        <Route path="/course/:slug" element={<ProtectedRoute><CourseDetails /></ProtectedRoute>} />
+        <Route path="/lesson" element={<ProtectedRoute><Lesson /></ProtectedRoute>} />
         <Route path="/about-us" element={<About />} />
         <Route path="/instructors" element={<Instructor />} />
         <Route path="/instructor-details" element={<InstructorDetails />} />

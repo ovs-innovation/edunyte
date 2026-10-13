@@ -143,7 +143,7 @@ const StudentDashboardArea = () => {
 
   const handleShareLink = async (booking: Booking) => {
     setOpenDropdownId(null);
-    const meetingUrl = booking.meeting?.joinUrlStudent;
+    const meetingUrl = booking.meetingUrl || booking.meeting?.joinUrlStudent;
 
     if (!meetingUrl) {
       toast.error(t('student_dashboard.toast.no_link'));
@@ -346,9 +346,9 @@ const StudentDashboardArea = () => {
                         </div>
                       </div>
                       <div className="d-flex gap-2">
-                        {nextLesson.meeting?.joinUrlStudent && (
+                        {(nextLesson.meetingUrl || nextLesson.meeting?.joinUrlStudent) && (
                           <a
-                            href={nextLesson.meeting.joinUrlStudent}
+                            href={nextLesson.meetingUrl || nextLesson.meeting?.joinUrlStudent}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="btn btn-primary"
@@ -378,7 +378,7 @@ const StudentDashboardArea = () => {
                           </button>
                           {openDropdownId === `${nextLesson._id}_next` && (
                             <div className="dropdown-menu show" style={{ position: 'absolute', right: 0, top: '100%', marginTop: '5px', zIndex: 1000, minWidth: '180px', boxShadow: '0 5px 15px rgba(0,0,0,0.1)', padding: '8px 0', border: 'none', borderRadius: '8px' }}>
-                              {nextLesson.meeting?.joinUrlStudent && (
+                              {(nextLesson.meetingUrl || nextLesson.meeting?.joinUrlStudent) && (
                                 <button
                                   className="dropdown-item d-flex align-items-center gap-2 px-3 py-2"
                                   onClick={() => handleShareLink(nextLesson)}
@@ -589,9 +589,9 @@ const StudentDashboardArea = () => {
                                     </div>
                                     <div className="col-md-4 text-md-end">
                                       <div className="d-flex gap-2 justify-content-end align-items-center">
-                                        {booking.meeting?.joinUrlStudent && (
+                                        {(booking.meetingUrl || booking.meeting?.joinUrlStudent) && (
                                           <a
-                                            href={booking.meeting.joinUrlStudent}
+                                            href={booking.meetingUrl || booking.meeting?.joinUrlStudent}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="btn btn-primary btn-sm w-100 w-md-auto"
@@ -619,7 +619,7 @@ const StudentDashboardArea = () => {
                                           </button>
                                           {openDropdownId === `${booking._id}_list` && (
                                             <div className="dropdown-menu show" style={{ position: 'absolute', right: 0, top: '100%', marginTop: '5px', zIndex: 1000, minWidth: '180px', boxShadow: '0 5px 15px rgba(0,0,0,0.1)', padding: '8px 0', border: 'none', borderRadius: '8px' }}>
-                                              {booking.meeting?.joinUrlStudent && (
+                                              {(booking.meetingUrl || booking.meeting?.joinUrlStudent) && (
                                                 <button
                                                   className="dropdown-item d-flex align-items-center gap-2 px-3 py-2"
                                                   onClick={() => handleShareLink(booking)}

@@ -344,12 +344,53 @@ export const updateBookingStatus = async (req, res, next) => {
 };
 
 /**
- * Update meeting details (Teacher only)
+ * Get all bookings across the platform (Admin)
+ */
+export const getAllAdminBookings = async (req, res, next) => {
+  try {
+    const { status, teacherId, studentId, courseId, startDate, endDate } = req.query;
+
+    const query = {};
+    if (status && status !== "all") {
+      query.status = status;
+    }
+    if (teacherId && mongoose.Types.ObjectId.isValid(teacherId)) {
+      query.teacherId = teacherId;
+    }
+    if (studentId && mongoose.Types.ObjectId.isValid(studentId)) {
+      query.studentId = studentId;
+    }
+    if (courseId && mongoose.Types.ObjectId.isValid(courseId)) {
+      query.courseId = courseId;
+    }
+    if (startDate || endDate) {
+      query.sessionDate = {};
+      if (startDate) query.sessionDate.$gte = new Date(startDate);
+      if (endDate) query.sessionDate.$lte = new Date(endDate);
+    }
+
+    const bookings = await Booking.find(query)
+      .populate("studentId", "name email profilePicture")
+      .populate("teacherId", "name email profilePicture")
+      .populate("courseId", "name description")
+      .populate("languageId", "name code")
+      .populate("teacherCourseId", "pricing timezone")
+      .sort({ sessionDate: -1, startTime: -1 });
+
+    res.json({ bookings, count: bookings.length });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * Update meeting details (Teacher or Admin)
  */
 export const updateMeetingDetails = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const teacherId = req.user.id;
+    const userId = req.user.id;
+    const userRole = req.user.role;
     const { meetingType, meetingUrl, meetingId, meetingPassword } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -360,12 +401,23 @@ export const updateMeetingDetails = async (req, res, next) => {
     if (!booking) {
       return res.status(404).json({ message: "Booking not found" });
     }
-    if (booking.teacherId.toString() !== teacherId) {
-      return res.status(403).json({ message: "Only the teacher can update meeting details" });
+
+    const isTeacher = booking.teacherId.toString() === userId;
+    const isAdmin = userRole === "admin" || userRole === "super_admin";
+
+    if (!isTeacher && !isAdmin) {
+      return res.status(403).json({ message: "Only the teacher or admin can update meeting details" });
     }
 
     if (meetingType !== undefined) booking.meetingType = meetingType;
-    if (meetingUrl !== undefined) booking.meetingUrl = meetingUrl;
+    if (meetingUrl !== undefined) {
+      booking.meetingUrl = meetingUrl;
+      if (!booking.meeting) {
+        booking.meeting = {};
+      }
+      booking.meeting.joinUrlStudent = meetingUrl;
+      booking.meeting.joinUrlTeacher = meetingUrl;
+    }
     if (meetingId !== undefined) booking.meetingId = meetingId;
     if (meetingPassword !== undefined) booking.meetingPassword = meetingPassword;
 
@@ -373,6 +425,8 @@ export const updateMeetingDetails = async (req, res, next) => {
     await booking.populate([
       { path: "studentId", select: "name email" },
       { path: "teacherId", select: "name email" },
+      { path: "courseId", select: "name description" },
+      { path: "languageId", select: "name code" },
     ]);
 
     res.json({ booking, message: "Meeting details updated successfully" });

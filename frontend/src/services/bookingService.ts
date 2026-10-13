@@ -24,6 +24,9 @@ export interface Booking {
     joinUrlStudent: string
     joinUrlTeacher: string
   }
+  meetingUrl?: string
+  meetingType?: string
+  meetingId?: string
   paymentStatus: string
   status?: string
   createdAt: string

@@ -110,12 +110,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setToken(authResponse.token)
       setUser(authResponse.user)
       
-      if (authResponse.user.role === 'teacher') {
-        navigate('/instructor-dashboard', { replace: true })
+      const searchParams = new URLSearchParams(window.location.search);
+      const redirectUrl = searchParams.get('redirect');
+
+      if (redirectUrl && redirectUrl.startsWith('/')) {
+        navigate(decodeURIComponent(redirectUrl), { replace: true });
+      } else if (authResponse.user.role === 'teacher') {
+        navigate('/instructor-dashboard', { replace: true });
       } else if (authResponse.user.role === 'student') {
-        navigate('/my-dashboard', { replace: true })
+        navigate('/my-dashboard', { replace: true });
       } else {
-        navigate('/', { replace: true })
+        navigate('/', { replace: true });
       }
     } catch (error) {
       throw error
@@ -138,12 +143,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setToken(authResponse.token)
         setUser(authResponse.user)
 
-        if (authResponse.user.role === 'teacher') {
-          navigate('/instructor-dashboard', { replace: true })
+        const searchParams = new URLSearchParams(window.location.search);
+        const redirectUrl = searchParams.get('redirect');
+
+        if (redirectUrl && redirectUrl.startsWith('/')) {
+          navigate(decodeURIComponent(redirectUrl), { replace: true });
+        } else if (authResponse.user.role === 'teacher') {
+          navigate('/instructor-dashboard', { replace: true });
         } else if (authResponse.user.role === 'student') {
-          navigate('/my-dashboard', { replace: true })
+          navigate('/my-dashboard', { replace: true });
         } else {
-          navigate('/', { replace: true })
+          navigate('/', { replace: true });
         }
       }
     } catch (error) {

@@ -1,6 +1,6 @@
 import { Permission, Role } from "./rbac";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8085/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8096/api";
 export const TOKEN_KEY = "admin-auth-token";
 export const ROLE_KEY = "admin-role";
 
@@ -769,5 +769,198 @@ export const BookingAPI = {
       method: "PATCH",
       body: JSON.stringify(payload),
     }),
+
+  // Admin APIs for live sessions / bookings
+  getAdminLiveBookings: (params?: {
+    status?: "scheduled" | "completed" | "cancelled" | "no_show";
+    startDate?: string;
+    endDate?: string;
+    teacherId?: string;
+    studentId?: string;
+    courseId?: string;
+  }) => {
+    const query = new URLSearchParams();
+    if (params?.status) query.append("status", params.status);
+    if (params?.startDate) query.append("startDate", params.startDate);
+    if (params?.endDate) query.append("endDate", params.endDate);
+    if (params?.teacherId) query.append("teacherId", params.teacherId);
+    if (params?.studentId) query.append("studentId", params.studentId);
+    if (params?.courseId) query.append("courseId", params.courseId);
+    const queryString = query.toString();
+    return apiFetch<{ bookings: ApiBooking[]; count: number }>(
+      `/admin/courses/live-bookings${queryString ? `?${queryString}` : ""}`
+    );
+  },
+  adminUpdateMeetingDetails: (id: string, payload: {
+    meetingType?: "zoom" | "google_meet" | "teams" | "custom";
+    meetingUrl?: string;
+    meetingId?: string;
+    meetingPassword?: string;
+  }) =>
+    apiFetch<{ booking: ApiBooking; message: string }>(`/admin/courses/live-bookings/${id}/meeting`, {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    }),
 };
+
+// ==================== Lecture Management APIs ====================
+
+export interface ApiLiveMeeting {
+  provider: "google_meet" | "zoom" | "teams" | "custom";
+  meetingUrl: string;
+  meetingId?: string;
+  scheduledAt?: string | null;
+  duration?: number;
+  status: "scheduled" | "live" | "completed" | "cancelled";
+}
+
+export interface ApiLecture {
+  _id: string;
+  courseId: string;
+  title: string | { en: string };
+  description?: string | { en: string };
+  section: string;
+  type: "recorded" | "live";
+  videoUrl?: string;
+  videoPublicId?: string;
+  videoDuration?: number; // in minutes
+  liveMeeting?: ApiLiveMeeting;
+  order: number;
+  isPreview: boolean;
+  status: "active" | "draft" | "archived";
+  createdBy?: ApiUser | string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export const LecturesAPI = {
+  listByCourse: (courseId: string, params?: { type?: string; status?: string }) => {
+    const query = new URLSearchParams();
+    if (params?.type) query.append("type", params.type);
+    if (params?.status) query.append("status", params.status);
+    const queryString = query.toString();
+    return apiFetch<{ lectures: ApiLecture[]; count: number }>(
+      `/admin/courses/${courseId}/lectures${queryString ? `?${queryString}` : ""}`
+    );
+  },
+  get: (id: string) => apiFetch<{ lecture: ApiLecture }>(`/admin/courses/lectures/${id}`),
+  create: (courseId: string, payload: Partial<ApiLecture>) =>
+    apiFetch<{ lecture: ApiLecture; message: string }>(`/admin/courses/${courseId}/lectures`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  update: (id: string, payload: Partial<ApiLecture>) =>
+    apiFetch<{ lecture: ApiLecture; message: string }>(`/admin/courses/lectures/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    }),
+  delete: (id: string) =>
+    apiFetch<{ message: string }>(`/admin/courses/lectures/${id}`, {
+      method: "DELETE",
+    }),
+  reorder: (lectures: Array<{ id: string; order: number }>) =>
+    apiFetch<{ message: string }>("/admin/courses/lectures/reorder", {
+      method: "PATCH",
+      body: JSON.stringify({ lectures }),
+    }),
+  uploadVideo: (courseId: string, file: File, onProgress?: (percentage: number) => void) => {
+    return new Promise<{ videoUrl: string; videoPublicId: string; videoDuration: number; message: string }>(
+      (resolve, reject) => {
+        const cloudName = import.meta.env.VITE_APP_CLOUD_NAME || "di4pzesyi";
+        const uploadPreset = import.meta.env.VITE_APP_CLOUDINARY_UPLOAD_PRESET || "VOLTOMATIC_CLOUDINARY_UPLOAD_PRESET";
+
+        const uploadViaBackend = () => {
+          const token = getToken();
+          const formData = new FormData();
+          formData.append("video", file);
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", `${API_URL}/admin/courses/${courseId}/lectures/upload-video`);
+          if (token) {
+            xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+          }
+
+          if (xhr.upload && onProgress) {
+            xhr.upload.onprogress = (e) => {
+              if (e.lengthComputable) {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                onProgress(percent);
+              }
+            };
+          }
+
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              try {
+                const data = JSON.parse(xhr.responseText);
+                resolve(data);
+              } catch (err) {
+                reject(err);
+              }
+            } else {
+              try {
+                const errorData = JSON.parse(xhr.responseText);
+                reject(new Error(errorData.message || errorData.error?.message || `Upload failed with status ${xhr.status}`));
+              } catch {
+                reject(new Error(`Upload failed with status ${xhr.status}`));
+              }
+            }
+          };
+
+          xhr.onerror = () => reject(new Error("Network error during video upload"));
+          xhr.send(formData);
+        };
+
+        // Try direct Cloudinary CDN upload first with verified upload preset
+        if (cloudName && uploadPreset) {
+          const formData = new FormData();
+          formData.append("file", file);
+          formData.append("upload_preset", uploadPreset);
+          formData.append("folder", "edunyte/course_lectures");
+
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`);
+
+          if (xhr.upload && onProgress) {
+            xhr.upload.onprogress = (e) => {
+              if (e.lengthComputable) {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                onProgress(percent);
+              }
+            };
+          }
+
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              try {
+                const data = JSON.parse(xhr.responseText);
+                const durationMinutes = data.duration ? Math.round((data.duration / 60) * 10) / 10 : 0;
+                resolve({
+                  videoUrl: data.secure_url || data.url,
+                  videoPublicId: data.public_id,
+                  videoDuration: durationMinutes,
+                  message: "Video uploaded successfully",
+                });
+              } catch (err) {
+                reject(err);
+              }
+            } else {
+              console.warn("Direct Cloudinary upload failed, falling back to backend upload:", xhr.responseText);
+              uploadViaBackend();
+            }
+          };
+
+          xhr.onerror = () => {
+            console.warn("Direct Cloudinary upload network error, falling back to backend upload");
+            uploadViaBackend();
+          };
+
+          xhr.send(formData);
+        } else {
+          uploadViaBackend();
+        }
+      }
+    );
+  },
+};
+
 
