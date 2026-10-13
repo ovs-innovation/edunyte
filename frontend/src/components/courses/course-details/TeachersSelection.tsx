@@ -356,6 +356,36 @@ const TeachersSelection = () => {
     return '';
   };
 
+  const renderFormattedBio = (bioText: string, isExpanded: boolean = true) => {
+    if (!bioText) return null;
+
+    let text = bioText;
+    if (!isExpanded && bioText.length > 120) {
+      text = bioText.substring(0, 120);
+      const asterisks = (text.match(/\*\*/g) || []).length;
+      if (asterisks % 2 !== 0) {
+        text += '**';
+      }
+      text += '...';
+    }
+
+    const parts = text.split(/(\*\*[^*]+\*\*)/g);
+    return (
+      <>
+        {parts.map((part, idx) => {
+          if (part.startsWith('**') && part.endsWith('**')) {
+            return (
+              <strong key={idx} className="fw-bold" style={{ color: '#1a1a1a' }}>
+                {part.slice(2, -2)}
+              </strong>
+            );
+          }
+          return <span key={idx}>{part}</span>;
+        })}
+      </>
+    );
+  };
+
 
 
 
@@ -515,8 +545,16 @@ const TeachersSelection = () => {
   return (
     <>
       <style>{`
-        .teachers-selection-page .filters-bar .form-control:focus,
-        .teachers-selection-page .filters-bar .form-select:focus {
+        .teachers-filters-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+          gap: 12px;
+          width: 100%;
+          align-items: center;
+        }
+
+        .teachers-selection-page .form-control:focus,
+        .teachers-selection-page .form-select:focus {
           border-color: var(--neon-purple) !important;
           box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.1) !important;
           outline: none !important;
@@ -528,7 +566,13 @@ const TeachersSelection = () => {
             display: none !important;
           }
           .teachers-selection-page .price-buttons-mobile {
-            display: flex !important;
+            display: block !important;
+          }
+          .teachers-selection-page .teacher-card .teacher-content-col {
+            padding-right: 0 !important;
+          }
+          .teachers-selection-page .teacher-video-sidebar {
+            display: none !important;
           }
         }
 
@@ -540,81 +584,54 @@ const TeachersSelection = () => {
           .teachers-selection-page .price-buttons-mobile {
             display: none !important;
           }
+          .teachers-selection-page .teacher-card .teacher-content-col {
+            padding-right: 210px !important;
+          }
         }
 
         @media (max-width: 576px) {
           .teachers-selection-page .container {
-            padding: 12px 16px 16px 16px !important;
+            padding: 8px 10px 16px 10px !important;
           }
           .teachers-selection-page h1 {
-            font-size: 20px !important;
-            margin-bottom: 16px !important;
+            font-size: 19px !important;
+            margin-bottom: 12px !important;
             line-height: 1.3 !important;
           }
-          .teachers-selection-page .filters-bar {
-            flex-direction: column !important;
-            padding: 12px !important;
+          .teachers-filters-grid {
+            grid-template-columns: 1fr !important;
             gap: 10px !important;
-            border-radius: 8px !important;
-            margin-bottom: 16px !important;
           }
-          .teachers-selection-page .filter-item {
+          .teachers-filters-grid .filter-item {
             width: 100% !important;
             min-width: 100% !important;
-            flex: 1 1 100% !important;
           }
-          .teachers-selection-page .filter-item .form-select,
+          .teachers-selection-page .filter-item .form-select {
+            min-height: 44px !important;
+            font-size: 13.5px !important;
+            padding: 10px 14px !important;
+          }
           .teachers-selection-page .filter-item .form-control {
             min-height: 44px !important;
-            font-size: 14px !important;
-            padding: 10px 12px !important;
+            font-size: 13.5px !important;
+            padding: 10px 14px 10px 38px !important;
           }
           .teachers-selection-page .teacher-card {
-            padding: 16px !important;
-            margin-bottom: 16px !important;
+            padding: 14px !important;
+            margin-bottom: 14px !important;
+            border-radius: 16px !important;
           }
-          .teachers-selection-page .teacher-card .row.g-3 {
-            margin: 0 !important;
+          .teachers-selection-page .teacher-avatar {
+            width: 58px !important;
+            height: 58px !important;
           }
-          .teachers-selection-page .teacher-card .row.g-3 > div {
-            padding: 0 !important;
-            margin-bottom: 12px !important;
-          }
-          .teachers-selection-page .teacher-card .teacher-content-col {
-            padding-right: 0 !important;
-            padding-left: 0 !important;
-          }
-          .teachers-selection-page .teacher-card .border-top {
-            margin-top: 12px !important;
-            padding-top: 12px !important;
-          }
-          .teachers-selection-page .teacher-card .d-flex.justify-content-between {
-            flex-direction: column !important;
-            align-items: stretch !important;
-            gap: 12px !important;
-          }
-          .teachers-selection-page .teacher-card .d-flex.justify-content-between > div:first-child {
-            width: 100% !important;
-            justify-content: space-between !important;
-          }
-          .teachers-selection-page .teacher-card .d-flex.flex-column {
-            width: 100% !important;
-          }
-          .teachers-selection-page .teacher-card .availability-popup {
-            position: relative !important;
-            left: 0 !important;
-            right: 0 !important;
-            top: 0 !important;
-            margin-top: 12px !important;
-            margin-bottom: 0 !important;
+          .teachers-selection-page .teacher-avatar div {
+            font-size: 20px !important;
           }
           .teachers-selection-page .col-lg-8,
           .teachers-selection-page .col-lg-4 {
             padding-left: 0 !important;
             padding-right: 0 !important;
-          }
-          .teachers-selection-page .teacher-video-sidebar {
-            display: none !important;
           }
           .teachers-selection-page .language-dropdown-container > div[style*="position: absolute"],
           .teachers-selection-page .country-dropdown-container > div[style*="position: absolute"],
@@ -622,10 +639,12 @@ const TeachersSelection = () => {
             left: 0 !important;
             right: 0 !important;
             width: 100% !important;
+            max-height: 260px !important;
+            z-index: 1050 !important;
           }
         }
 
-        @media (min-width: 577px) and (max-width: 768px) {
+        @media (min-width: 577px) and (max-width: 991px) {
           .teachers-selection-page .container {
             padding: 12px 16px 20px 16px !important;
           }
@@ -633,48 +652,12 @@ const TeachersSelection = () => {
             font-size: 24px !important;
             margin-bottom: 16px !important;
           }
-          .teachers-selection-page .filters-bar {
-            flex-wrap: wrap !important;
-            gap: 10px !important;
-            padding: 14px !important;
-            margin-bottom: 16px !important;
-          }
-          .teachers-selection-page .filter-item {
-            flex: 1 1 calc(50% - 5px) !important;
-            min-width: calc(50% - 5px) !important;
-          }
-          .teachers-selection-page .filter-item:first-child {
-            flex: 1 1 100% !important;
-            min-width: 100% !important;
+          .teachers-filters-grid {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 12px !important;
           }
           .teachers-selection-page .teacher-card {
             padding: 18px !important;
-          }
-          .teachers-selection-page .teacher-card .teacher-content-col {
-            padding-right: 0 !important;
-          }
-          .teachers-selection-page .teacher-video-sidebar {
-            display: none !important;
-          }
-        }
-
-        @media (min-width: 769px) and (max-width: 992px) {
-          .teachers-selection-page .container {
-            padding: 14px 18px 20px 18px !important;
-          }
-          .teachers-selection-page .teacher-video-sidebar {
-            position: relative !important;
-            top: 0 !important;
-            margin-top: 20px !important;
-          }
-          .teachers-selection-page .teacher-card .teacher-content-col {
-            padding-right: 0 !important;
-          }
-        }
-
-        @media (min-width: 993px) {
-          .teachers-selection-page .container {
-            padding: 16px 20px 20px 20px !important;
           }
         }
       `}</style>
@@ -682,7 +665,7 @@ const TeachersSelection = () => {
         <div className="container" style={{ maxWidth: '1400px', padding: '16px 20px 20px 20px' }}>
           <div className="row mb-3">
             <div className="col-12">
-              <h1 className="h2 fw-bold mb-2" style={{ fontSize: '32px', color: '#1a1a1a', lineHeight: '1.2' }}>
+              <h1 className="h2 fw-bold mb-2" style={{ fontSize: '28px', color: '#1a1a1a', lineHeight: '1.2' }}>
                 {filteredTeachers.length} {t('common.available_teachers')} {t('common.to_help_you_succeed')}
               </h1>
             </div>
@@ -692,8 +675,8 @@ const TeachersSelection = () => {
             <div className="col-12">
               <div className="filters-section mb-4">
                 <div className="glass-panel p-3">
-                  <div className="d-flex flex-wrap gap-3 align-items-center">
-                <div className="filter-item course-dropdown-container" style={{ flex: '0 1 auto', minWidth: '200px', position: 'relative' }}>
+                  <div className="teachers-filters-grid">
+                <div className="filter-item course-dropdown-container" style={{ width: '100%', position: 'relative' }}>
                   <div
                     className="form-select"
                     onClick={() => {
@@ -811,7 +794,20 @@ const TeachersSelection = () => {
                     </div>
                   )}
                 </div>
-                <div className="filter-item search-input-container" style={{ position: 'relative', flex: '1 1 200px', minWidth: '200px' }}>
+                <div className="filter-item search-input-container" style={{ position: 'relative', width: '100%' }}>
+                  <i
+                    className="fas fa-search"
+                    style={{
+                      position: 'absolute',
+                      left: '14px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: '#999',
+                      pointerEvents: 'none',
+                      fontSize: '14px',
+                      zIndex: 2,
+                    }}
+                  />
                   <input
                     type="text"
                     className="form-control"
@@ -821,9 +817,10 @@ const TeachersSelection = () => {
                     style={{
                       borderRadius: '8px',
                       border: '1px solid #e0e0e0',
-                      padding: '10px 40px 10px 16px',
+                      padding: '10px 16px 10px 38px',
                       fontSize: '14px',
                       transition: 'all 0.2s',
+                      width: '100%',
                     }}
                     onFocus={(e) => {
                       e.target.style.borderColor = 'var(--neon-purple)';
@@ -834,20 +831,8 @@ const TeachersSelection = () => {
                       e.target.style.boxShadow = 'none';
                     }}
                   />
-                  <i
-                    className="fas fa-search"
-                    style={{
-                      position: 'absolute',
-                      right: '16px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      color: '#999',
-                      pointerEvents: 'none',
-                      fontSize: '14px',
-                    }}
-                  />
                 </div>
-                <div className="filter-item" style={{ flex: '0 1 auto', minWidth: '160px' }}>
+                <div className="filter-item price-filter-container" style={{ width: '100%' }}>
                   <select
                     className="form-select"
                     value={filters.priceRange}
@@ -873,7 +858,7 @@ const TeachersSelection = () => {
                     ))}
                   </select>
                 </div>
-                <div className="filter-item country-dropdown-container" style={{ flex: '0 1 auto', minWidth: '180px', position: 'relative' }}>
+                <div className="filter-item country-dropdown-container" style={{ width: '100%', position: 'relative' }}>
                   <div
                     className="form-select"
                     onClick={() => {
@@ -1015,7 +1000,7 @@ const TeachersSelection = () => {
                     </div>
                   )}
                 </div>
-                <div className="filter-item language-dropdown-container" style={{ flex: '0 1 auto', minWidth: '160px', position: 'relative' }}>
+                <div className="filter-item language-dropdown-container" style={{ width: '100%', position: 'relative' }}>
                   <div
                     className="form-select"
                     onClick={() => {
@@ -1237,7 +1222,7 @@ const TeachersSelection = () => {
                     </div>
                   )}
                 </div>
-                <div className="filter-item" style={{ flex: '0 1 auto', minWidth: '180px' }}>
+                <div className="filter-item sort-filter-container" style={{ width: '100%', position: 'relative' }}>
                   <select
                     className="form-select"
                     value={filters.sortBy}
@@ -1397,7 +1382,7 @@ const TeachersSelection = () => {
                               )}
                             </div>
                           </div>
-                          <div className="col teacher-content-col" style={{ paddingRight: '200px' }}>
+                          <div className="col teacher-content-col">
                             <div className="d-flex align-items-center gap-2 mb-2 flex-wrap">
                               <h5 className="mb-0 fw-bold" style={{ fontSize: '18px' }}>
                                 {teacherName}
@@ -1467,16 +1452,13 @@ const TeachersSelection = () => {
                             {teacher.bio && (
                               <div className="mb-2">
                                 <p className="small text-muted mb-1" style={{ lineHeight: '1.6' }}>
-                                  {expandedBios.has(teacher._id)
-                                    ? teacher.bio
-                                    : teacher.bio.length > 110
-                                      ? `${teacher.bio.substring(0, 110)}...`
-                                      : teacher.bio}
+                                  {renderFormattedBio(teacher.bio, expandedBios.has(teacher._id))}
                                 </p>
-                                {teacher.bio.length > 110 && (
+                                {teacher.bio.length > 120 && (
                                   <button
+                                    type="button"
                                     className="p-0 border-0 bg-transparent"
-                                    style={{ fontSize: '13px', textDecoration: 'none', color: '#0056b3', cursor: 'pointer', outline: 'none', boxShadow: 'none' }}
+                                    style={{ fontSize: '13px', textDecoration: 'none', color: '#0056b3', cursor: 'pointer', outline: 'none', boxShadow: 'none', fontWeight: '500' }}
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       toggleBio(teacher._id);
@@ -1487,66 +1469,108 @@ const TeachersSelection = () => {
                                 )}
                               </div>
                             )}
-                            {teacher.teacherProfile?.rating > 0 && (
-                              <div className="d-flex align-items-center gap-3 small flex-wrap">
-                                <div>
-                                  <i className="fas fa-star text-warning"></i>
-                                  <strong className="ms-1">{teacher.teacherProfile.rating.toFixed(1)}</strong>
-                                  <span className="text-muted ms-1">
-                                    ({teacher.teacherProfile.totalReviews} {t('common.reviews')})
-                                  </span>
-                                </div>
-                                {/* Mobile Price Display in Stats Row */}
-                                <div className="d-lg-none d-flex align-items-center gap-1 ms-auto">
-                                  <span className="fw-bold text-primary" style={{ fontSize: '16px' }}>
-                                    {getFormattedTeacherPrice(teacher)}
-                                  </span>
-                                </div>
+
+                            {/* Mobile Watch Video Pill if Video Exists */}
+                            {teacher.introductionVideo && (
+                              <div className="mt-2 mb-2 d-lg-none">
+                                <button
+                                  type="button"
+                                  className="btn btn-sm rounded-pill d-inline-flex align-items-center gap-2"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setVideoUrl(teacher.introductionVideo);
+                                    setVideoModalOpen(true);
+                                  }}
+                                  style={{
+                                    fontSize: '12.5px',
+                                    padding: '5px 14px',
+                                    backgroundColor: 'rgba(87, 81, 225, 0.08)',
+                                    color: 'var(--neon-purple)',
+                                    border: '1px solid rgba(87, 81, 225, 0.25)',
+                                    fontWeight: '600',
+                                  }}
+                                >
+                                  <i className="fas fa-play-circle" style={{ fontSize: '13px' }}></i>
+                                  <span>{t('common.watch_intro_video', 'Watch Intro Video')}</span>
+                                </button>
                               </div>
                             )}
+
+                            {/* Stats Row and Mobile Price */}
+                            <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 small mt-2">
+                              <div className="d-flex align-items-center gap-1">
+                                <i className="fas fa-star text-warning"></i>
+                                <strong className="ms-1">
+                                  {teacher.teacherProfile?.rating ? teacher.teacherProfile.rating.toFixed(1) : '5.0'}
+                                </strong>
+                                <span className="text-muted ms-1">
+                                  ({teacher.teacherProfile?.totalReviews || 0} {t('common.reviews')})
+                                </span>
+                              </div>
+                              {/* Mobile Price Display in Stats Row */}
+                              <div className="d-lg-none d-flex align-items-baseline gap-1">
+                                <span className="fw-bold text-primary" style={{ fontSize: '18px', fontWeight: '700' }}>
+                                  {getFormattedTeacherPrice(teacher)}
+                                </span>
+                                <span className="text-muted" style={{ fontSize: '12px' }}>
+                                  / {t('common.hour')}
+                                </span>
+                              </div>
+                            </div>
                           </div>
                         </div>
 
-                        <div className="mt-3 pt-3 border-top price-buttons-mobile d-flex align-items-center gap-3">
-                          <button
-                            className="btn btn-sm d-flex align-items-center justify-content-center"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleSendMessage(teacher);
-                            }}
+                        {/* Mobile Actions in Grid Display */}
+                        <div className="mt-3 pt-3 border-top price-buttons-mobile">
+                          <div
                             style={{
-                              backgroundColor: '#fff',
-                              borderColor: '#ddd',
-                              borderWidth: '1px',
-                              borderStyle: 'solid',
-                              width: '42px',
-                              height: '42px',
-                              borderRadius: '8px',
-                              color: '#1a1a1a',
-                              padding: 0,
-                              flexShrink: 0,
+                              display: 'grid',
+                              gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+                              gap: '10px',
+                              width: '100%',
                             }}
                           >
-                            <i className="far fa-comment-dots" style={{ fontSize: '18px' }}></i>
-                          </button>
-                          <button
-                            className="btn btn-sm flex-grow-1"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleBookTrial(teacher);
-                            }}
-                            style={{
-                              backgroundColor: 'var(--neon-purple)',
-                              borderColor: 'var(--neon-purple)',
-                              fontSize: '14px',
-                              height: '42px',
-                              borderRadius: '8px',
-                              fontWeight: '600',
-                              color: '#fff',
-                            }}
-                          >
-                            {t('common.book_trial_lesson')}
-                          </button>
+                            <button
+                              type="button"
+                              className="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2 shadow-sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleSendMessage(teacher);
+                              }}
+                              style={{
+                                backgroundColor: '#fff',
+                                borderColor: '#e2e8f0',
+                                borderWidth: '1px',
+                                minHeight: '44px',
+                                borderRadius: '12px',
+                                color: '#1a1a1a',
+                                fontSize: '13.5px',
+                                fontWeight: '600',
+                                padding: '8px 12px',
+                              }}
+                            >
+                              <i className="far fa-comment-dots" style={{ fontSize: '15px', color: 'var(--neon-purple)' }}></i>
+                              <span>{t('common.send_message')}</span>
+                            </button>
+                            <button
+                              type="button"
+                              className="btn-neon-primary d-flex align-items-center justify-content-center gap-2 shadow-sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleBookTrial(teacher);
+                              }}
+                              style={{
+                                minHeight: '44px',
+                                borderRadius: '12px',
+                                fontSize: '13.5px',
+                                fontWeight: '600',
+                                padding: '8px 14px',
+                              }}
+                            >
+                              <i className="fas fa-calendar-check" style={{ fontSize: '14px' }}></i>
+                              <span>{t('common.book_trial_lesson')}</span>
+                            </button>
+                          </div>
                         </div>
 
                       </div>

@@ -68,19 +68,46 @@ const CourseTop = ({ startOffset, endOffset, totalItems, courses, setCourses, ha
    };
 
    return (
-      <div className="courses-top-wrap courses-top-wrap">
-         <div className="row align-items-center">
+      <div className="courses-top-wrap">
+         <style>{`
+            @media (max-width: 576px) {
+               .courses-top-wrap {
+                  padding: 12px 14px !important;
+                  margin-bottom: 20px !important;
+               }
+               .courses-top-left {
+                  margin-bottom: 10px !important;
+                  text-align: center !important;
+               }
+               .courses-top-right {
+                  flex-direction: column !important;
+                  align-items: stretch !important;
+                  width: 100% !important;
+                  gap: 8px !important;
+               }
+               .courses-top-right-select {
+                  min-width: 100% !important;
+                  width: 100% !important;
+               }
+               .courses__nav-tabs {
+                  justify-content: center !important;
+                  margin-top: 10px !important;
+                  width: 100% !important;
+               }
+            }
+         `}</style>
+         <div className="row align-items-center g-3">
             <div className="col-md-5">
                <div className="courses-top-left">
-                  <p>{t('common.showing_results', { start: startOffset, end: endOffset, total: totalItems })}</p>
+                  <p className="mb-0 text-muted small">{t('common.showing_results', { start: startOffset, end: endOffset, total: totalItems })}</p>
                </div>
             </div>
             <div className="col-md-7">
-               <div className="d-flex justify-content-center justify-content-md-end align-items-center flex-wrap">
-                  <div className="courses-top-right m-0 ms-md-auto">
-                     <span className="sort-by">{t('common.sort_by')}:</span>
-                     <div className="courses-top-right-select" style={{ minWidth: '220px' }}>
-                        <select onChange={selectHandler} value={selected} name="orderby" className="orderby" style={{ width: '100%', paddingRight: '40px', paddingLeft: '15px' }}>
+               <div className="d-flex justify-content-center justify-content-md-end align-items-center flex-wrap gap-2">
+                  <div className="courses-top-right m-0 ms-md-auto d-flex align-items-center gap-2">
+                     <span className="sort-by text-nowrap small fw-semibold">{t('common.sort_by')}:</span>
+                     <div className="courses-top-right-select">
+                        <select onChange={selectHandler} value={selected} name="orderby" className="orderby form-select form-select-sm" style={{ paddingRight: '36px', paddingLeft: '12px', borderRadius: '8px' }}>
                            <option value="">{t('common.default_sorting')}</option>
                            <option value="popular">{t('common.sort_by_popularity')}</option>
                            <option value="price">{t('common.sort_by_price')}</option>
@@ -88,10 +115,10 @@ const CourseTop = ({ startOffset, endOffset, totalItems, courses, setCourses, ha
                         </select>
                      </div>
                   </div>
-                  <ul className="nav nav-tabs courses__nav-tabs" id="myTab" role="tablist">
+                  <ul className="nav nav-tabs courses__nav-tabs m-0 border-0" id="myTab" role="tablist">
                      {tab_title.map((tab, index) => (
                         <li key={index} onClick={() => handleTabClick(index)} className="nav-item" role="presentation">
-                           <button className={`nav-link ${activeTab === index ? "active" : ""}`}>{tab.icon}</button>
+                           <button className={`nav-link ${activeTab === index ? "active" : ""}`} style={{ borderRadius: '8px' }}>{tab.icon}</button>
                         </li>
                      ))}
                   </ul>

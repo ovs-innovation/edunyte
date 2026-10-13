@@ -113,17 +113,179 @@ const Curriculum: React.FC<CurriculumProps> = ({ slug: propSlug }) => {
   };
 
   return (
-    <div className="courses__curriculum-wrap my-4">
-      <div className="d-flex justify-content-between align-items-center mb-4">
+    <div className="courses__curriculum-wrap my-2 my-md-4">
+      <style>{`
+        .curriculum-lecture-item {
+          display: grid;
+          grid-template-columns: 44px 1fr auto;
+          grid-template-areas: "icon info actions";
+          align-items: center;
+          gap: 16px;
+          padding: 16px 20px;
+          background-color: #ffffff;
+          border-bottom: 1px solid #edf2f7;
+          transition: all 0.2s ease;
+        }
+
+        .curriculum-lecture-item.is-live {
+          background-color: rgba(40, 167, 69, 0.03);
+        }
+
+        .curriculum-lecture-item.has-video:hover {
+          background-color: #f8fafc;
+        }
+
+        .curriculum-lecture-item .lecture-icon-area {
+          grid-area: icon;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .curriculum-lecture-item .lecture-info-area {
+          grid-area: info;
+          min-width: 0;
+        }
+
+        .curriculum-lecture-item .lecture-actions-area {
+          grid-area: actions;
+        }
+
+        @media (max-width: 767px) {
+          .curriculum-lecture-item {
+            grid-template-columns: 44px 1fr;
+            grid-template-areas:
+              "icon info"
+              "actions actions";
+            gap: 12px 14px;
+            padding: 14px 14px;
+          }
+
+          .curriculum-lecture-item .lecture-actions-area {
+            width: 100%;
+            padding-top: 4px;
+          }
+
+          .curriculum-lecture-item .actions-grid-recorded {
+            display: grid;
+            grid-template-columns: 1fr;
+            width: 100%;
+          }
+
+          .curriculum-lecture-item .actions-grid-recorded button {
+            min-height: 42px;
+            font-size: 13.5px;
+            font-weight: 600;
+            width: 100%;
+            justify-content: center;
+          }
+
+          .curriculum-lecture-item .actions-grid-live {
+            display: grid;
+            grid-template-columns: 44px 1fr;
+            gap: 8px;
+            width: 100%;
+          }
+
+          .curriculum-lecture-item .actions-grid-live button {
+            min-height: 42px;
+            font-size: 13.5px;
+            font-weight: 600;
+          }
+        }
+
+        @media (min-width: 768px) {
+          .curriculum-lecture-item .actions-grid-recorded,
+          .curriculum-lecture-item .actions-grid-live {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          }
+        }
+
+        .cinema-modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          width: 100vw;
+          height: 100vh;
+          background-color: rgba(5, 10, 24, 0.92);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+          z-index: 999999;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 1.25rem;
+          box-sizing: border-box;
+        }
+
+        .cinema-modal-container {
+          width: 100%;
+          max-width: 1060px;
+          background: linear-gradient(180deg, #121a2f 0%, #0a0f1d 100%);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 20px;
+          overflow: hidden;
+          box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.85), 0 0 50px rgba(13, 110, 253, 0.18);
+          display: flex;
+          flex-direction: column;
+          position: relative;
+        }
+
+        .cinema-modal-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 14px 20px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+          background: rgba(255, 255, 255, 0.02);
+        }
+
+        .cinema-modal-footer {
+          padding: 12px 20px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 10px;
+          background: rgba(255, 255, 255, 0.02);
+          border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        @media (max-width: 576px) {
+          .cinema-modal-overlay {
+            padding: 8px !important;
+          }
+          .cinema-modal-container {
+            border-radius: 14px !important;
+          }
+          .cinema-modal-header {
+            padding: 10px 12px !important;
+          }
+          .cinema-modal-header h5 {
+            font-size: 14px !important;
+          }
+          .cinema-modal-footer {
+            padding: 10px 12px !important;
+            font-size: 11px !important;
+          }
+        }
+      `}</style>
+
+      {/* Header section with responsive flex */}
+      <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
         <div>
-          <h3 className="title mb-1" style={{ fontSize: "22px", fontWeight: "700" }}>
+          <h3 className="title mb-1" style={{ fontSize: "21px", fontWeight: "700" }}>
             Course Curriculum & Live Classes
           </h3>
           <p className="text-muted mb-0 small">
             Access recorded lessons and live scheduled interactive sessions.
           </p>
         </div>
-        <div className="d-flex gap-2">
+        <div className="d-flex flex-wrap gap-2">
           <span className="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill small">
             {lectures.filter((l) => l.type === "recorded").length} Recorded Lessons
           </span>
@@ -141,7 +303,7 @@ const Curriculum: React.FC<CurriculumProps> = ({ slug: propSlug }) => {
           <p className="mt-2 text-muted small">Loading course curriculum...</p>
         </div>
       ) : lectures.length === 0 ? (
-        <div className="card border-0 shadow-sm p-5 text-center bg-light rounded-4">
+        <div className="card border-0 shadow-sm p-4 p-md-5 text-center bg-light rounded-4">
           <div className="mb-3 text-muted">
             <i className="flaticon-book" style={{ fontSize: "40px" }}></i>
           </div>
@@ -162,11 +324,11 @@ const Curriculum: React.FC<CurriculumProps> = ({ slug: propSlug }) => {
                     className={`accordion-button ${isOpen ? "" : "collapsed"} bg-light text-dark fw-bold`}
                     type="button"
                     onClick={() => toggleSection(sectionName)}
-                    style={{ fontSize: "16px" }}
+                    style={{ fontSize: "15px", padding: "14px 16px" }}
                   >
-                    <div className="d-flex justify-content-between align-items-center w-100 me-3">
+                    <div className="d-flex justify-content-between align-items-center w-100 me-2 me-sm-3 flex-wrap gap-2">
                       <span>{sectionName}</span>
-                      <span className="badge bg-secondary bg-opacity-25 text-dark fw-normal rounded-pill px-2 py-1 small">
+                      <span className="badge bg-secondary bg-opacity-25 text-dark fw-normal rounded-pill px-2.5 py-1 small">
                         {sectionLectures.length} item{sectionLectures.length > 1 ? "s" : ""}
                       </span>
                     </div>
@@ -175,7 +337,7 @@ const Curriculum: React.FC<CurriculumProps> = ({ slug: propSlug }) => {
 
                 <div className={`accordion-collapse collapse ${isOpen ? "show" : ""}`}>
                   <div className="accordion-body p-0">
-                    <ul className="list-group list-group-flush">
+                    <ul className="list-group list-group-flush p-0 m-0">
                       {sectionLectures.map((item) => {
                         const isRecorded = item.type === "recorded";
                         const isLive = item.type === "live";
@@ -185,11 +347,8 @@ const Curriculum: React.FC<CurriculumProps> = ({ slug: propSlug }) => {
                         return (
                           <li
                             key={item._id}
-                            className={`list-group-item d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 py-3 px-4 transition ${
-                              hasVideo ? "hover-bg-light" : ""
-                            }`}
+                            className={`curriculum-lecture-item ${isLive ? "is-live" : ""} ${hasVideo ? "has-video" : ""}`}
                             style={{
-                              backgroundColor: isLive ? "rgba(40, 167, 69, 0.03)" : "transparent",
                               cursor: hasVideo ? "pointer" : "default",
                             }}
                             onClick={() => {
@@ -198,15 +357,15 @@ const Curriculum: React.FC<CurriculumProps> = ({ slug: propSlug }) => {
                               }
                             }}
                           >
-                            <div className="d-flex align-items-start gap-3">
-                              {/* Left Icon / Clickable Play Button */}
+                            {/* Grid Area: Icon */}
+                            <div className="lecture-icon-area">
                               {hasVideo ? (
                                 <button
                                   type="button"
-                                  className="btn p-0 border-0 rounded-circle d-flex align-items-center justify-content-center shrink-0 mt-1 shadow-sm transition"
+                                  className="btn p-0 border-0 rounded-circle d-flex align-items-center justify-content-center shadow-sm"
                                   style={{
-                                    width: "40px",
-                                    height: "40px",
+                                    width: "42px",
+                                    height: "42px",
                                     backgroundColor: "#0d6efd",
                                     color: "#ffffff",
                                   }}
@@ -220,96 +379,98 @@ const Curriculum: React.FC<CurriculumProps> = ({ slug: propSlug }) => {
                                 </button>
                               ) : (
                                 <div
-                                  className="rounded-circle d-flex align-items-center justify-content-center shrink-0 mt-1"
+                                  className="rounded-circle d-flex align-items-center justify-content-center"
                                   style={{
-                                    width: "40px",
-                                    height: "40px",
+                                    width: "42px",
+                                    height: "42px",
                                     backgroundColor: isLive ? "rgba(40, 167, 69, 0.12)" : "rgba(13, 110, 253, 0.1)",
                                     color: isLive ? "#28a745" : "#0d6efd",
                                   }}
                                 >
                                   {isLive ? (
-                                    <i className="fas fa-video" style={{ fontSize: "14px" }}></i>
+                                    <i className="fas fa-video" style={{ fontSize: "15px" }}></i>
                                   ) : (
                                     <i className="fas fa-play" style={{ fontSize: "12px" }}></i>
                                   )}
                                 </div>
                               )}
+                            </div>
 
-                              <div>
-                                <div className="d-flex flex-wrap align-items-center gap-2">
-                                  <span
-                                    className={`fw-semibold text-dark ${hasVideo ? "text-primary-hover" : ""}`}
-                                    style={{ fontSize: "15px" }}
-                                  >
-                                    {title}
+                            {/* Grid Area: Info */}
+                            <div className="lecture-info-area">
+                              <div className="d-flex flex-wrap align-items-center gap-1.5 mb-1">
+                                <span
+                                  className="fw-semibold text-dark me-1"
+                                  style={{ fontSize: "15px", lineHeight: "1.3" }}
+                                >
+                                  {title}
+                                </span>
+                                {isRecorded && (
+                                  <span className="badge bg-primary bg-opacity-10 text-primary border-0 small px-2 py-0.5">
+                                    Recorded
                                   </span>
-                                  {isRecorded && (
-                                    <span className="badge bg-primary bg-opacity-10 text-primary border-0 small px-2 py-1">
-                                      Recorded
-                                    </span>
-                                  )}
-                                  {isLive && (
-                                    <span className="badge bg-success bg-opacity-10 text-success border-0 small px-2 py-1">
-                                      Live Class (Google Meet)
-                                    </span>
-                                  )}
-                                  {item.isPreview && (
-                                    <span className="badge bg-warning bg-opacity-15 text-warning border-0 small px-2 py-1">
-                                      Free Preview
-                                    </span>
-                                  )}
-                                </div>
+                                )}
+                                {isLive && (
+                                  <span className="badge bg-success bg-opacity-10 text-success border-0 small px-2 py-0.5">
+                                    Live Class
+                                  </span>
+                                )}
+                                {item.isPreview && (
+                                  <span className="badge bg-warning bg-opacity-15 text-warning border-0 small px-2 py-0.5">
+                                    Free Preview
+                                  </span>
+                                )}
+                              </div>
 
-                                <div className="d-flex flex-wrap align-items-center gap-3 text-muted small mt-1">
-                                  {isRecorded && item.videoDuration ? (
-                                    <span>
-                                      <i className="far fa-clock me-1"></i>
-                                      {item.videoDuration} min
-                                    </span>
-                                  ) : null}
+                              <div className="d-flex flex-wrap align-items-center gap-3 text-muted small mt-1">
+                                {isRecorded && item.videoDuration ? (
+                                  <span>
+                                    <i className="far fa-clock me-1"></i>
+                                    {item.videoDuration} min
+                                  </span>
+                                ) : null}
 
-                                  {isLive && item.liveMeeting?.scheduledAt && (
-                                    <span className="text-success fw-medium">
-                                      <i className="far fa-calendar-alt me-1"></i>
-                                      {new Date(item.liveMeeting.scheduledAt).toLocaleString()}
-                                    </span>
-                                  )}
+                                {isLive && item.liveMeeting?.scheduledAt && (
+                                  <span className="text-success fw-medium">
+                                    <i className="far fa-calendar-alt me-1"></i>
+                                    {new Date(item.liveMeeting.scheduledAt).toLocaleString()}
+                                  </span>
+                                )}
 
-                                  {isLive && item.liveMeeting?.duration ? (
-                                    <span>
-                                      <i className="far fa-clock me-1"></i>
-                                      {item.liveMeeting.duration} min
-                                    </span>
-                                  ) : null}
-                                </div>
+                                {isLive && item.liveMeeting?.duration ? (
+                                  <span>
+                                    <i className="far fa-clock me-1"></i>
+                                    {item.liveMeeting.duration} min
+                                  </span>
+                                ) : null}
                               </div>
                             </div>
 
-                            {/* Actions on the right */}
-                            <div className="d-flex align-items-center gap-2 self-start self-md-center">
-                              {/* Watch Video Button for all recorded lectures with videoUrl */}
+                            {/* Grid Area: Actions (structured grid on mobile, flex on desktop) */}
+                            <div className="lecture-actions-area">
                               {hasVideo && (
-                                <button
-                                  type="button"
-                                  className={`btn btn-sm rounded-pill px-3 py-1.5 shadow-sm d-flex align-items-center gap-1.5 fw-semibold ${
-                                    item.isPreview ? "btn-outline-primary" : "btn-primary text-white"
-                                  }`}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleWatchLecture(item);
-                                  }}
-                                >
-                                  <i className="fas fa-play" style={{ fontSize: "11px" }}></i>
-                                  <span>{item.isPreview ? "Watch Preview" : "Watch Lecture"}</span>
-                                </button>
+                                <div className="actions-grid-recorded">
+                                  <button
+                                    type="button"
+                                    className={`btn rounded-pill px-3.5 py-2 shadow-sm d-flex align-items-center gap-2 fw-semibold ${
+                                      item.isPreview ? "btn-outline-primary" : "btn-primary text-white"
+                                    }`}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleWatchLecture(item);
+                                    }}
+                                  >
+                                    <i className="fas fa-play" style={{ fontSize: "11px" }}></i>
+                                    <span>{item.isPreview ? "Watch Preview" : "Watch Lecture"}</span>
+                                  </button>
+                                </div>
                               )}
 
                               {isLive && item.liveMeeting?.meetingUrl && (
-                                <>
+                                <div className="actions-grid-live">
                                   <button
                                     type="button"
-                                    className="btn btn-outline-success btn-sm rounded-pill px-2.5 py-1"
+                                    className="btn btn-outline-success rounded-pill px-3 py-2 d-flex align-items-center justify-content-center"
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       handleCopyMeet(item.liveMeeting!.meetingUrl);
@@ -320,15 +481,16 @@ const Curriculum: React.FC<CurriculumProps> = ({ slug: propSlug }) => {
                                   </button>
                                   <button
                                     type="button"
-                                    className="btn btn-success btn-sm rounded-pill px-3 py-1 text-white shadow-sm"
+                                    className="btn btn-success rounded-pill px-3.5 py-2 text-white shadow-sm d-flex align-items-center justify-content-center gap-1.5"
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       handleJoinMeet(item.liveMeeting!.meetingUrl);
                                     }}
                                   >
-                                    <i className="fas fa-external-link-alt me-1"></i> Join Meet
+                                    <i className="fas fa-external-link-alt"></i>
+                                    <span>Join Meet</span>
                                   </button>
-                                </>
+                                </div>
                               )}
                             </div>
                           </li>
@@ -349,81 +511,44 @@ const Curriculum: React.FC<CurriculumProps> = ({ slug: propSlug }) => {
         activeLecture.videoUrl &&
         createPortal(
           <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              width: "100vw",
-              height: "100vh",
-              backgroundColor: "rgba(5, 10, 24, 0.88)",
-              backdropFilter: "blur(14px)",
-              WebkitBackdropFilter: "blur(14px)",
-              zIndex: 999999,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "1.25rem",
-              boxSizing: "border-box",
-            }}
+            className="cinema-modal-overlay"
             onClick={() => setActiveLecture(null)}
           >
             <div
-              style={{
-                width: "100%",
-                maxWidth: "1060px",
-                background: "linear-gradient(180deg, #121a2f 0%, #0a0f1d 100%)",
-                border: "1px solid rgba(255, 255, 255, 0.12)",
-                borderRadius: "20px",
-                overflow: "hidden",
-                boxShadow:
-                  "0 25px 60px -15px rgba(0, 0, 0, 0.85), 0 0 50px rgba(13, 110, 253, 0.18)",
-                display: "flex",
-                flexDirection: "column",
-                position: "relative",
-              }}
+              className="cinema-modal-container"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header Bar */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "16px 22px",
-                  borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
-                  background: "rgba(255, 255, 255, 0.02)",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+              <div className="cinema-modal-header">
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", minWidth: 0 }}>
                   <span
                     style={{
                       background: activeLecture.isPreview
                         ? "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)"
                         : "linear-gradient(135deg, #0d6efd 0%, #0099ff 100%)",
                       color: "#ffffff",
-                      fontSize: "11px",
+                      fontSize: "10.5px",
                       fontWeight: 700,
                       letterSpacing: "0.5px",
                       textTransform: "uppercase",
-                      padding: "4px 10px",
+                      padding: "3px 9px",
                       borderRadius: "100px",
-                      boxShadow: activeLecture.isPreview
-                        ? "0 2px 10px rgba(245, 158, 11, 0.3)"
-                        : "0 2px 10px rgba(13, 110, 253, 0.3)",
                     }}
                   >
-                    {activeLecture.isPreview ? "Free Preview" : "Recorded Lecture"}
+                    {activeLecture.isPreview ? "Free Preview" : "Recorded"}
                   </span>
 
                   <h5
                     style={{
                       margin: 0,
                       color: "#ffffff",
-                      fontSize: "17px",
+                      fontSize: "16px",
                       fontWeight: 700,
                       letterSpacing: "-0.2px",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      maxWidth: "280px",
                     }}
                   >
                     {getLectureTitle(activeLecture)}
@@ -433,28 +558,17 @@ const Curriculum: React.FC<CurriculumProps> = ({ slug: propSlug }) => {
                     <span
                       style={{
                         color: "rgba(255, 255, 255, 0.6)",
-                        fontSize: "12px",
+                        fontSize: "11px",
                         display: "flex",
                         alignItems: "center",
                         gap: "4px",
                         background: "rgba(255, 255, 255, 0.06)",
-                        padding: "3px 8px",
+                        padding: "2px 7px",
                         borderRadius: "6px",
                       }}
                     >
-                      <i className="far fa-clock" style={{ fontSize: "11px" }}></i>
+                      <i className="far fa-clock" style={{ fontSize: "10px" }}></i>
                       {activeLecture.videoDuration} min
-                    </span>
-                  ) : null}
-
-                  {activeLecture.section ? (
-                    <span
-                      style={{
-                        color: "rgba(255, 255, 255, 0.45)",
-                        fontSize: "12px",
-                      }}
-                    >
-                      • {activeLecture.section}
                     </span>
                   ) : null}
                 </div>
@@ -464,8 +578,8 @@ const Curriculum: React.FC<CurriculumProps> = ({ slug: propSlug }) => {
                   type="button"
                   onClick={() => setActiveLecture(null)}
                   style={{
-                    width: "36px",
-                    height: "36px",
+                    width: "34px",
+                    height: "34px",
                     borderRadius: "50%",
                     border: "1px solid rgba(255, 255, 255, 0.15)",
                     background: "rgba(255, 255, 255, 0.08)",
@@ -477,18 +591,10 @@ const Curriculum: React.FC<CurriculumProps> = ({ slug: propSlug }) => {
                     transition: "all 0.15s ease",
                     flexShrink: 0,
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "rgba(255, 255, 255, 0.22)";
-                    e.currentTarget.style.transform = "scale(1.08)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "rgba(255, 255, 255, 0.08)";
-                    e.currentTarget.style.transform = "scale(1)";
-                  }}
                   title="Close (Esc)"
                   aria-label="Close video player"
                 >
-                  <i className="fas fa-times" style={{ fontSize: "15px" }}></i>
+                  <i className="fas fa-times" style={{ fontSize: "14px" }}></i>
                 </button>
               </div>
 
@@ -541,25 +647,14 @@ const Curriculum: React.FC<CurriculumProps> = ({ slug: propSlug }) => {
               </div>
 
               {/* Modal Footer & Tips */}
-              <div
-                style={{
-                  padding: "12px 22px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  flexWrap: "wrap",
-                  gap: "10px",
-                  background: "rgba(255, 255, 255, 0.02)",
-                  borderTop: "1px solid rgba(255, 255, 255, 0.06)",
-                }}
-              >
-                <div style={{ flex: 1, minWidth: "200px" }}>
+              <div className="cinema-modal-footer">
+                <div style={{ flex: 1, minWidth: "180px" }}>
                   {activeLecture.description ? (
                     <p
                       style={{
                         margin: 0,
                         color: "rgba(255, 255, 255, 0.7)",
-                        fontSize: "13px",
+                        fontSize: "12.5px",
                         lineHeight: 1.4,
                       }}
                     >
@@ -568,7 +663,7 @@ const Curriculum: React.FC<CurriculumProps> = ({ slug: propSlug }) => {
                         : (activeLecture.description as any)?.en || ""}
                     </p>
                   ) : (
-                    <span style={{ color: "rgba(255, 255, 255, 0.4)", fontSize: "12px" }}>
+                    <span style={{ color: "rgba(255, 255, 255, 0.4)", fontSize: "11.5px" }}>
                       High Definition Lecture Video (Hosted on Cloudinary)
                     </span>
                   )}
@@ -578,7 +673,7 @@ const Curriculum: React.FC<CurriculumProps> = ({ slug: propSlug }) => {
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "8px",
+                    gap: "6px",
                     color: "rgba(255, 255, 255, 0.4)",
                     fontSize: "11px",
                   }}
