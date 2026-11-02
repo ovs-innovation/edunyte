@@ -10,6 +10,7 @@ import {
   createRazorpayOrderController,
   verifyRazorpayPaymentController,
   getPaymentStatusController,
+  handleRazorpayWebhookController,
 } from "../controllers/razorpayController.js";
 
 const router = express.Router();
@@ -34,6 +35,10 @@ router.get("/status/:orderId", verifyToken, getPaymentStatusController);
 router.get("/status", verifyToken, getPaymentStatusController);
 router.get("/razorpay/status/:orderId", verifyToken, getPaymentStatusController);
 router.get("/razorpay/status", verifyToken, getPaymentStatusController);
+
+// D. Razorpay Webhooks (public server-to-server endpoint, signature verified)
+router.post("/webhook", handleRazorpayWebhookController);
+router.post("/razorpay/webhook", handleRazorpayWebhookController);
 
 // ==========================================
 // Stripe Endpoints
