@@ -25,41 +25,46 @@ import { useToast } from '@/hooks/use-toast';
 
 interface Payment {
   _id: string;
-  studentId: {
-    _id: string;
-    name: string;
-    email: string;
+  studentId?: {
+    _id?: string;
+    name?: string;
+    email?: string;
   };
-  teacherId: {
-    _id: string;
-    name: string;
-    email: string;
+  teacherId?: {
+    _id?: string;
+    name?: string;
+    email?: string;
   };
-  courseId: {
-    _id: string;
-    name: string | { en: string };
+  courseId?: {
+    _id?: string;
+    name?: string | { en: string };
   };
-  sessionDate: string;
-  duration: number;
-  studentCount?: number; // Number of students attending this lesson
-  pricingSnapshot: {
-    baseAmountUSD: number;
-    platformFeeUSD: number;
-    studentPaid: {
+  sessionDate?: string;
+  duration?: number;
+  studentCount?: number;
+  pricingSnapshot?: {
+    baseAmountUSD?: number;
+    platformFeeUSD?: number;
+    studentPaid?: {
       amount: number;
       currency: string;
     };
   };
-  payout: {
-    teacherAmountUSD: number;
-    teacherCurrency: string;
+  payout?: {
+    teacherAmountUSD?: number;
+    teacherCurrency?: string;
     status: 'pending' | 'paid' | 'failed';
   };
-  payment: {
-    stripePaymentIntentId: string;
-    status: 'pending' | 'paid' | 'failed' | 'refunded';
+  payment?: {
+    stripePaymentIntentId?: string;
+    status?: string;
+    rawStatus?: string;
   };
-  status: 'scheduled' | 'completed' | 'cancelled' | 'no_show';
+  gateway?: string;
+  paymentMethod?: string;
+  orderId?: string;
+  paymentId?: string;
+  status?: 'scheduled' | 'completed' | 'cancelled' | 'no_show';
   createdAt: string;
 }
 
@@ -115,8 +120,12 @@ const PaymentsPage = () => {
   };
 
   const calculateStats = (paymentsData: Payment[]) => {
-    const totalRevenue = paymentsData.reduce((sum, p) => sum + (p.pricingSnapshot?.studentPaid?.amount || 0), 0);
-    const totalPlatformFee = paymentsData.reduce((sum, p) => sum + (p.pricingSnapshot?.platformFeeUSD || 0), 0);
+    // Only count completed/paid/captured transactions for revenue
+    const paidPayments = paymentsData.filter(
+      p => p.payment?.status === 'paid' || p.payment?.status === 'captured' || p.payment?.rawStatus === 'captured'
+    );
+    const totalRevenue = paidPayments.reduce((sum, p) => sum + (p.pricingSnapshot?.studentPaid?.amount || 0), 0);
+    const totalPlatformFee = paidPayments.reduce((sum, p) => sum + (p.pricingSnapshot?.platformFeeUSD || 0), 0);
     const pendingPayouts = paymentsData
       .filter(p => p.payout?.status === 'pending')
       .reduce((sum, p) => sum + (p.payout?.teacherAmountUSD || 0), 0);
@@ -132,7 +141,14 @@ const PaymentsPage = () => {
 
     // Payment status filter
     if (paymentStatusFilter !== 'all') {
-      filtered = filtered.filter(p => p.payment?.status === paymentStatusFilter);
+      filtered = filtered.filter(p => {
+        const s = (p.payment?.status || '').toLowerCase();
+        const raw = (p.payment?.rawStatus || '').toLowerCase();
+        if (paymentStatusFilter === 'paid') {
+          return s === 'paid' || raw === 'captured' || s === 'captured';
+        }
+        return s === paymentStatusFilter || raw === paymentStatusFilter;
+      });
     }
 
     // Payout status filter
@@ -148,22 +164,54 @@ const PaymentsPage = () => {
         p.studentId?.email?.toLowerCase().includes(query) ||
         p.teacherId?.name?.toLowerCase().includes(query) ||
         p.teacherId?.email?.toLowerCase().includes(query) ||
-        p.payment?.stripePaymentIntentId?.toLowerCase().includes(query)
+        p.payment?.stripePaymentIntentId?.toLowerCase().includes(query) ||
+        p.paymentId?.toLowerCase().includes(query) ||
+        p.orderId?.toLowerCase().includes(query) ||
+        p.gateway?.toLowerCase().includes(query)
       );
     }
 
     setFilteredPayments(filtered);
   };
 
-  const getPaymentStatusBadge = (status: string) => {
-    const config = {
-      paid: { label: 'Paid', className: 'bg-success/20 text-success border-success/30' },
-      pending: { label: 'Pending', className: 'bg-warning/20 text-warning border-warning/30' },
+  const getPaymentStatusBadge = (status?: string, rawStatus?: string) => {
+    const displayStatus = (rawStatus || status || 'pending').toLowerCase();
+    const config: Record<string, { label: string; className: string }> = {
+      paid: { label: 'Paid', className: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' },
+      captured: { label: 'Captured', className: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' },
+      authorized: { label: 'Authorized', className: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
+      pending: { label: 'Pending', className: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
       failed: { label: 'Failed', className: 'bg-destructive/20 text-destructive border-destructive/30' },
-      refunded: { label: 'Refunded', className: 'bg-blue-500/20 text-blue-500 border-blue-500/30' },
+      refunded: { label: 'Refunded', className: 'bg-purple-500/20 text-purple-400 border-purple-500/30' },
     };
-    const { label, className } = config[status as keyof typeof config] || config.pending;
+    const { label, className } = config[displayStatus] || {
+      label: displayStatus ? displayStatus.charAt(0).toUpperCase() + displayStatus.slice(1) : 'Pending',
+      className: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+    };
     return <Badge variant="outline" className={className}>{label}</Badge>;
+  };
+
+  const getGatewayBadge = (gateway?: string, method?: string) => {
+    const gw = (gateway || '').toLowerCase();
+    if (gw === 'razorpay') {
+      return (
+        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-sky-500/15 text-sky-400 border border-sky-500/30">
+          Razorpay {method ? `(${method})` : ''}
+        </span>
+      );
+    }
+    if (gw === 'stripe') {
+      return (
+        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
+          Stripe
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground border border-border">
+        {gateway || 'Direct'}
+      </span>
+    );
   };
 
   const getPayoutStatusBadge = (status: string) => {
@@ -225,7 +273,7 @@ const PaymentsPage = () => {
               <div>
                 <p className="text-sm text-muted-foreground">Total Revenue</p>
                 <p className="text-2xl font-bold text-foreground">
-                  ${stats.totalRevenue.toFixed(2)}
+                  ₹{stats.totalRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
               </div>
             </div>
@@ -239,7 +287,7 @@ const PaymentsPage = () => {
               <div>
                 <p className="text-sm text-muted-foreground">Platform Fee</p>
                 <p className="text-2xl font-bold text-foreground">
-                  ${stats.totalPlatformFee.toFixed(2)}
+                  ₹{stats.totalPlatformFee.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
               </div>
             </div>
@@ -253,7 +301,7 @@ const PaymentsPage = () => {
               <div>
                 <p className="text-sm text-muted-foreground">Pending Payouts</p>
                 <p className="text-2xl font-bold text-foreground">
-                  ${stats.pendingPayouts.toFixed(2)}
+                  ₹{stats.pendingPayouts.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
               </div>
             </div>
@@ -267,7 +315,7 @@ const PaymentsPage = () => {
               <div>
                 <p className="text-sm text-muted-foreground">Paid Payouts</p>
                 <p className="text-2xl font-bold text-foreground">
-                  ${stats.completedPayouts.toFixed(2)}
+                  ₹{stats.completedPayouts.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
               </div>
             </div>
@@ -291,8 +339,9 @@ const PaymentsPage = () => {
                 <SelectValue placeholder="Payment Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Payments</SelectItem>
-                <SelectItem value="paid">Paid</SelectItem>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="paid">Paid / Captured</SelectItem>
+                <SelectItem value="authorized">Authorized</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="failed">Failed</SelectItem>
                 <SelectItem value="refunded">Refunded</SelectItem>
@@ -347,7 +396,7 @@ const PaymentsPage = () => {
                   filteredPayments.map((payment) => (
                     <TableRow key={payment._id}>
                       <TableCell className="font-medium">
-                        {formatDate(payment.sessionDate)}
+                        {formatDate(payment.sessionDate || payment.createdAt)}
                       </TableCell>
                       <TableCell>
                         <div>
@@ -391,16 +440,24 @@ const PaymentsPage = () => {
                       </TableCell>
                       <TableCell>
                         <div className="text-muted-foreground">
-                          ${(payment.pricingSnapshot?.platformFeeUSD || 0).toFixed(2)}
+                          ₹{(payment.pricingSnapshot?.platformFeeUSD ? payment.pricingSnapshot.platformFeeUSD * 83.33 : 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="font-medium">
-                          ${(payment.payout?.teacherAmountUSD || 0).toFixed(2)}
+                          ₹{(payment.payout?.teacherAmountUSD ? payment.payout.teacherAmountUSD * 83.33 : 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </div>
                       </TableCell>
                       <TableCell>
-                        {getPaymentStatusBadge(payment.payment?.status || 'pending')}
+                        <div className="space-y-1">
+                          <div>{getPaymentStatusBadge(payment.payment?.status, payment.payment?.rawStatus)}</div>
+                          <div>{getGatewayBadge(payment.gateway, payment.paymentMethod)}</div>
+                          {(payment.paymentId || payment.orderId || payment.payment?.stripePaymentIntentId) && (
+                            <div className="text-[10px] font-mono text-muted-foreground truncate max-w-[130px]" title={payment.paymentId || payment.orderId || payment.payment?.stripePaymentIntentId}>
+                              {payment.paymentId || payment.orderId || payment.payment?.stripePaymentIntentId}
+                            </div>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell>
                         {getPayoutStatusBadge(payment.payout?.status || 'pending')}

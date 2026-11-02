@@ -91,7 +91,7 @@ const InstructorEnrolledCourseContent = ({ style }: any) => {
                                              <li className="courses__item-tag">
                                                 <Link to="course">{item.tag}</Link>
                                              </li>
-                                             {item.price && <li className="price"><del>${item.old_price}.00</del>${item.price}.00</li>}
+                                             {item.price && <li className="price"><del>₹{item.old_price}.00</del>₹{item.price}.00</li>}
                                           </ul>
                                           <h5 className="title"><Link to="/course-details">{item.title}</Link></h5>
                                           <div className="courses__item-content-bottom">

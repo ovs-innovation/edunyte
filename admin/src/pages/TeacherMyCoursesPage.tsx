@@ -102,7 +102,7 @@ const TeacherMyCoursesPage = () => {
   const [formData, setFormData] = useState({
     languages: [] as LanguageWithProficiency[],
     price: '',
-    currency: 'USD',
+    currency: 'INR',
     introductionVideo: '',
     experience: '',
     bio: '',
@@ -672,7 +672,7 @@ const TeacherMyCoursesPage = () => {
             {/* Price and Currency */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Price (USD) *</Label>
+                <Label>Price (INR) *</Label>
                 <Input
                   type="number"
                   step="0.01"

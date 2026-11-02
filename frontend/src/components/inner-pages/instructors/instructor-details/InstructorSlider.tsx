@@ -78,7 +78,7 @@ const InstructorSlider = () => {
                               <i className="flaticon-arrow-right"></i>
                            </Link>
                         </div>
-                        <h5 className="price">${item.price}.00</h5>
+                        <h5 className="price">₹{item.price}.00</h5>
                      </div>
                   </div>
                </div>

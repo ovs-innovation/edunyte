@@ -67,7 +67,7 @@ const Course = () => {
                                        <span>{item.review}</span>
                                     </div>
                                     <h2 className="title"><Link to="/course-details">{item.title}</Link></h2>
-                                    <h2 className="price">${item.price}.00</h2>
+                                    <h2 className="price">₹{item.price}.00</h2>
                                  </div>
                                  <div className="courses__item-bottom-three courses__item-bottom-six">
                                     <ul className="list-wrap">

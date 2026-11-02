@@ -22,7 +22,7 @@ const InstructorWishlistContent = () => {
                               <li className="courses__item-tag">
                                  <Link to="/course">{item.tag}</Link>
                               </li>
-                              <li className="price"><del>${item.old_price}.00</del>${item.price}.00</li>
+                              <li className="price"><del>₹{item.old_price}.00</del>₹{item.price}.00</li>
                            </ul>
                            <h5 className="title"><Link to="/course-details">{item.title}</Link></h5>
                            <div className="courses__item-content-bottom">

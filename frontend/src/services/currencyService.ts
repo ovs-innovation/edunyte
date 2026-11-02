@@ -24,8 +24,8 @@ export interface CurrencyInfo {
 }
 
 export const SUPPORTED_CURRENCIES: CurrencyInfo[] = [
-  { code: 'USD', name: 'US Dollar', symbol: '$', locale: 'en-US' },
   { code: 'INR', name: 'Indian Rupee', symbol: '₹', locale: 'en-IN' },
+  { code: 'USD', name: 'US Dollar', symbol: '$', locale: 'en-US' },
   { code: 'EUR', name: 'Euro', symbol: '€', locale: 'en-EU' },
   { code: 'GBP', name: 'British Pound', symbol: '£', locale: 'en-GB' },
   { code: 'JPY', name: 'Japanese Yen', symbol: '¥', locale: 'ja-JP' },
@@ -36,7 +36,7 @@ export const SUPPORTED_CURRENCIES: CurrencyInfo[] = [
   { code: 'SAR', name: 'Saudi Riyal', symbol: '﷼', locale: 'ar-SA' },
 ];
 
-const DEFAULT_CURRENCY = 'USD';
+const DEFAULT_CURRENCY = 'INR';
 
 /**
  * Get selected currency from localStorage
@@ -45,7 +45,8 @@ export const getSelectedCurrency = (): string => {
   if (typeof window === 'undefined') return DEFAULT_CURRENCY;
   
   const stored = localStorage.getItem(CURRENCY_STORAGE_KEY);
-  if (stored && SUPPORTED_CURRENCIES.find(c => c.code === stored)) {
+  // Default to INR if stored is legacy 'USD' or unset
+  if (stored && stored !== 'USD' && SUPPORTED_CURRENCIES.find(c => c.code === stored)) {
     return stored;
   }
   return DEFAULT_CURRENCY;
@@ -175,19 +176,27 @@ export const getExchangeRates = async (forceRefresh = false): Promise<ExchangeRa
  * Convert price from USD (base) to target currency
  */
 export const convertPrice = async (usdAmount: number, targetCurrency: string): Promise<number> => {
+  if (!usdAmount || usdAmount === 0) return 0;
   if (targetCurrency === 'USD') {
     return usdAmount;
   }
   
-  const rates = await getExchangeRates();
-  const rate = rates.rates[targetCurrency];
-  
-  if (!rate) {
-    console.warn(`Exchange rate not found for ${targetCurrency}, returning original amount`);
-    return usdAmount;
+  try {
+    const rates = await getExchangeRates();
+    const rate = rates?.rates ? rates.rates[targetCurrency] : undefined;
+    if (rate) {
+      return parseFloat((usdAmount * rate).toFixed(2));
+    }
+  } catch (err) {
+    console.warn(`Failed to fetch dynamic exchange rate for ${targetCurrency}, using fallback`, err);
   }
   
-  return parseFloat((usdAmount * rate).toFixed(2));
+  // Safe default exchange rate for INR (~83.33 INR per USD)
+  if (targetCurrency === 'INR') {
+    return parseFloat((usdAmount * 83.33).toFixed(2));
+  }
+  
+  return usdAmount;
 };
 
 /**

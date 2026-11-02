@@ -68,35 +68,42 @@ export const createCheckoutPaymentIntent = async (req, res, next) => {
       studentCount: req.body.studentCount || 1, // Pass student count from frontend
     });
 
-    const stripeAmount = toStripeAmount(amounts.totalAmount, amounts.selectedCurrency);
+    let clientSecret = "";
+    try {
+      if (stripe && typeof stripe.paymentIntents?.create === "function") {
+        const stripeAmount = toStripeAmount(amounts.totalAmount, amounts.selectedCurrency);
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: stripeAmount,
+          currency: amounts.selectedCurrency.toLowerCase(),
+          automatic_payment_methods: { enabled: true },
+          metadata: {
+            teacherId: String(teacherId),
+            studentId: String(studentId),
+            courseId: String(courseId),
+            availabilityId: String(availabilityId),
+            teacherCourseId: String(teacherCourse._id),
+            languageId: String(teacherCourse.languageIds?.[0] || ""),
+            duration: String(d),
+            baseAmountUSD: String(amounts.lessonAmountUSD),
+            platformFeeUSD: String(amounts.platformFeeUSD),
+            studentCount: String(amounts.studentCount || 1),
+          },
+        });
+        clientSecret = paymentIntent.client_secret;
 
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: stripeAmount,
-      currency: amounts.selectedCurrency.toLowerCase(),
-      automatic_payment_methods: { enabled: true },
-      metadata: {
-        teacherId: String(teacherId),
-        studentId: String(studentId),
-        courseId: String(courseId),
-        availabilityId: String(availabilityId),
-        teacherCourseId: String(teacherCourse._id),
-        languageId: String(teacherCourse.languageIds?.[0] || ""),
-        duration: String(d),
-        baseAmountUSD: String(amounts.lessonAmountUSD),
-        platformFeeUSD: String(amounts.platformFeeUSD),
-        studentCount: String(amounts.studentCount || 1), // Add student count to metadata
-      },
-    });
-
-    if (process.env.NODE_ENV === "production") {
-      await Availability.updateOne(
-        { _id: availabilityId },
-        { $set: { "hold.stripePaymentIntentId": paymentIntent.id } }
-      );
+        if (process.env.NODE_ENV === "production") {
+          await Availability.updateOne(
+            { _id: availabilityId },
+            { $set: { "hold.stripePaymentIntentId": paymentIntent.id } }
+          );
+        }
+      }
+    } catch (stripeErr) {
+      console.warn("[Stripe Notice] Stripe intent skipped or below minimum (Razorpay will be used):", stripeErr.message);
     }
 
     res.json({
-      clientSecret: paymentIntent.client_secret,
+      clientSecret,
       pricing: amounts,
       hold: holdUntil ? { until: holdUntil.toISOString() } : null,
       teacher: {
@@ -369,5 +376,44 @@ export const createFreeBooking = async (req, res, next) => {
   }
 };
 
+/**
+ * Standalone Checkout Pricing Preview
+ * Calculates verified amounts without requiring Stripe
+ */
+export const getCheckoutPricingPreview = async (req, res, next) => {
+  try {
+    const { teacherId, courseId, duration, selectedCurrency, selectedSlot, studentCount } = req.body;
+    const availabilityId = selectedSlot?.availabilityId || selectedSlot?._id || req.body.availabilityId;
 
+    if (!mongoose.Types.ObjectId.isValid(teacherId) || !mongoose.Types.ObjectId.isValid(courseId) || !mongoose.Types.ObjectId.isValid(availabilityId)) {
+      return res.status(400).json({ message: "Invalid checkout parameters" });
+    }
 
+    const { course, availability, teacherCourse } = await resolveCheckoutContext({
+      teacherId,
+      courseId,
+      availabilityId,
+    });
+
+    const d = Number(duration);
+    const amounts = await calculateCheckoutAmounts({
+      teacherCourse,
+      duration: d,
+      selectedCurrency: selectedCurrency || "INR",
+      studentCount: Number(studentCount) || 1,
+    });
+
+    res.json({
+      success: true,
+      pricing: amounts,
+      teacher: {
+        name: typeof teacherCourse.teacherId === "object" ? teacherCourse.teacherId.name : "",
+      },
+      course: {
+        name: course?.name,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};

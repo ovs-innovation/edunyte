@@ -35,7 +35,7 @@ const Courses = () => {
                         <div className="courses__item-content-seven">
                            <ul className="courses__item-meta list-wrap">
                               <li className="price">
-                                 ${item.price}.00
+                                 ₹{item.price}.00
                               </li>
                               <li className="courses__wishlist">
                                  <a onClick={() => handleAddToWishlist(item)}><InjectableSvg src="/assets/img/icons/heart02.svg" alt="" className="injectable" /></a>

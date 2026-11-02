@@ -177,7 +177,7 @@ const TeacherAvailabilityPage = () => {
       const amount = baseAmountUSD * selectedTeacherCourse.pricing.exchangeRateAtCreation;
       return `${selectedTeacherCourse.pricing.teacherCurrency} ${amount.toFixed(2)}`;
     }
-    return `USD ${baseAmountUSD.toFixed(2)}`;
+    return `₹${(baseAmountUSD * 83.33).toFixed(2)}`;
   };
 
   const addMinutesToTime = (time: string, minutesToAdd: number) => {

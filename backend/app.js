@@ -28,8 +28,6 @@ import translationRoutes from "./routes/translationRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import { ensureDefaultRoles } from "./controllers/roleController.js";
 
-
-
 const app = express();
 dotenv.config();
 
@@ -51,7 +49,13 @@ app.set("trust proxy", 1);
 // Middleware
 // Stripe webhook requires the raw body to verify signatures.
 app.use("/api/payments/stripe/webhook", express.raw({ type: "application/json" }));
-app.use(express.json());
+app.use("/api/payment/stripe/webhook", express.raw({ type: "application/json" }));
+// Capture rawBody for webhook signature verifications
+app.use(express.json({
+  verify: (req, _res, buf) => {
+    req.rawBody = buf;
+  }
+}));
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/auth", authRoutes);
@@ -75,7 +79,11 @@ app.use("/api/public/courses", publicCourseRoutes);
 app.use("/api/bookings", studentBookingRoutes);
 app.use("/api/currency", currencyRoutes);
 app.use("/api/translate", translationRoutes);
+
+// Payment routes (supports both /api/payment and /api/payments)
+app.use("/api/payment", paymentRoutes);
 app.use("/api/payments", paymentRoutes);
+
 app.use(errorHandler);
 
 export default app;

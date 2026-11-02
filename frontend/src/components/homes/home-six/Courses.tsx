@@ -38,7 +38,7 @@ const Courses = () => {
                 <div className="courses__item-content-six">
                   <div className="courses__item-content-six-top">
                     <h2 className="title"><Link to="/course-details">{item.tag}</Link></h2>
-                    <h3 className="price">${item.price}.00</h3>
+                    <h3 className="price">₹{item.price}.00</h3>
                   </div>
                   <span>{item.title}</span>
                   <ul className="courses__item-meta-two list-wrap">

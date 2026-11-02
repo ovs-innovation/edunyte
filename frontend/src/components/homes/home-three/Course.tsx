@@ -32,7 +32,7 @@ const Course = () => {
                      <div className="courses__item-four shine__animate-item">
                         <div className="courses__item-thumb-three shine__animate-link">
                            <Link to="/course-details"><img src={item.thumb} alt="img" /></Link>
-                           <span className="courses__price">${item.price}.00</span>
+                           <span className="courses__price">₹{item.price}.00</span>
                         </div>
                         <div className="courses__item-content-three">
                            <ul className="courses__item-meta list-wrap">

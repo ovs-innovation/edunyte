@@ -33,7 +33,7 @@ const InstructorHistoryContent = () => {
                                     <p>{item.date}</p>
                                  </td>
                                  <td>
-                                    <p>${item.price}.99</p>
+                                    <p>₹{item.price}.99</p>
                                  </td>
                                  <td>
                                     <span className={`dashboard__quiz-result ${item.status_class}`}>{item.status}</span>

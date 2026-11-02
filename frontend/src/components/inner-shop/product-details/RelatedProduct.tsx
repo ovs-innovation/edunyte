@@ -80,7 +80,7 @@ const RelatedProduct = () => {
                            <Rating initialValue={item.rating} size={20} readonly={true} />
                            <span className="avg">({item.rating})</span>
                         </div>
-                        <h4 className="price">${item.price}.00{item.old_price && <del>${item.old_price}.00</del>}</h4>
+                        <h4 className="price">₹{item.price}.00{item.old_price && <del>₹{item.old_price}.00</del>}</h4>
                      </div>
                   </div>
                </SwiperSlide>

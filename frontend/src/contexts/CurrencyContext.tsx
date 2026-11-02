@@ -53,11 +53,11 @@ export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) 
     if (typeof window !== 'undefined') {
       // Prefer the new unified currency key (used by currencyService + currencyChanged event)
       const selected = getSelectedCurrency() as CurrencyCode
-      if (selected && CURRENCIES[selected]) return selected
+      if (selected && selected !== 'USD' && CURRENCIES[selected]) return selected
 
       // Backward compatibility: migrate legacy key once
       const legacy = window.localStorage.getItem(LEGACY_STORAGE_KEY) as CurrencyCode
-      if (legacy && CURRENCIES[legacy]) {
+      if (legacy && legacy !== 'USD' && CURRENCIES[legacy]) {
         try {
           setSelectedCurrency(legacy)
           window.localStorage.removeItem(LEGACY_STORAGE_KEY)

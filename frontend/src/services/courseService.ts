@@ -165,7 +165,7 @@ export const fetchCourseTeachers = async (
       ...t,
       // Keep existing UI working: treat `price` as USD base for display-only conversions.
       price: typeof t.price === 'number' ? t.price : basePriceUSD,
-      currency: typeof t.currency === 'string' ? t.currency : 'USD',
+      currency: typeof t.currency === 'string' && t.currency !== 'USD' ? t.currency : 'INR',
       availability: Array.isArray(t.availability)
         ? t.availability.map((av: any) => ({
             ...av,
@@ -175,7 +175,7 @@ export const fetchCourseTeachers = async (
                 : typeof av?.pricing?.baseAmountUSD === 'number'
                   ? av.pricing.baseAmountUSD
                   : undefined,
-            currency: typeof av.currency === 'string' ? av.currency : 'USD',
+            currency: typeof av.currency === 'string' && av.currency !== 'USD' ? av.currency : 'INR',
           }))
         : [],
     }

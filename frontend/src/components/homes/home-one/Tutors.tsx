@@ -17,8 +17,9 @@ const getLocalizedText = (value: any, lang: string = 'en'): string => {
 
 const Tutors = () => {
     const { t, i18n } = useTranslation();
-    const { formatPrice } = useCurrency();
+    const { formatPrice, convertAndFormatPrice } = useCurrency();
     const [teachers, setTeachers] = useState<TeacherCourse[]>([]);
+    const [displayPrices, setDisplayPrices] = useState<Record<string, string>>({});
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -53,6 +54,22 @@ const Tutors = () => {
 
         loadTopTutors();
     }, []);
+
+    useEffect(() => {
+        teachers.forEach(async (teacher) => {
+            const tId = typeof teacher.teacherId === 'object' ? teacher.teacherId._id : teacher.teacherId;
+            if (teacher.pricing?.teacherCurrency === 'INR' && typeof teacher.pricing?.teacherPrice === 'number') {
+                setDisplayPrices(prev => ({
+                    ...prev,
+                    [tId]: formatPrice(teacher.pricing!.teacherPrice, 'INR')
+                }));
+                return;
+            }
+            const priceUSD = typeof teacher.price === 'number' ? teacher.price : (teacher.pricing?.basePriceUSD || 25);
+            const formatted = await convertAndFormatPrice(priceUSD, 'INR');
+            setDisplayPrices(prev => ({ ...prev, [tId]: formatted }));
+        });
+    }, [teachers, convertAndFormatPrice, formatPrice]);
 
     if (loading) {
         return (
@@ -130,7 +147,7 @@ const Tutors = () => {
                                             </div>
                                         </div>
                                         <div className="text-end">
-                                            <div className="fw-900 text-primary h5 mb-0">{formatPrice(price)}</div>
+                                            <div className="fw-900 text-primary h5 mb-0">{displayPrices[typeof teacher.teacherId === 'object' ? teacher.teacherId._id : teacher.teacherId] || formatPrice(price, 'INR')}</div>
                                             <div className="small opacity-50">{t('home.one.tutors.per_lesson', '/lesson')}</div>
                                         </div>
                                     </div>
