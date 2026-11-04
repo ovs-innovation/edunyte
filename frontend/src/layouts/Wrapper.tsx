@@ -20,7 +20,15 @@ const Wrapper = ({ children }: WrapperProps) => {
         <>
             {children}
             <ScrollToTop />
-            <ToastContainer position="top-center" />
+            <ToastContainer
+                position="top-center"
+                autoClose={4500}
+                hideProgressBar={false}
+                newestOnTop={true}
+                closeOnClick
+                pauseOnHover
+                style={{ zIndex: 99999999999, top: "95px" }}
+            />
         </>
     );
 }

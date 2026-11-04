@@ -19,3 +19,22 @@
 @import "../../public/assets/css/instructor-recruitment.css";
 @import "../../public/assets/scss/main.scss";
 @import "./liquid-ui.css";
+
+.Toastify__toast-container {
+  z-index: 99999999999 !important;
+  top: 95px !important;
+}
+
+.Toastify__toast {
+  border-radius: 12px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+}
+
+@media (max-width: 768px) {
+  .Toastify__toast-container {
+    top: 80px !important;
+    width: 92% !important;
+    left: 4% !important;
+    transform: none !important;
+  }
+}

@@ -19,6 +19,7 @@ const RegistrationForm = ({ role }: { role?: string }) => {
    const { t } = useTranslation();
    const { register: registerUser } = useAuth();
    const [isLoading, setIsLoading] = useState(false);
+   const [regError, setRegError] = useState<string | null>(null);
 
    const schema = yup
       .object({
@@ -37,6 +38,7 @@ const RegistrationForm = ({ role }: { role?: string }) => {
 
    const onSubmit = async (data: FormData) => {
       setIsLoading(true);
+      setRegError(null);
       try {
          await registerUser({
             name: `${data.fname} ${data.lname}`,
@@ -51,7 +53,9 @@ const RegistrationForm = ({ role }: { role?: string }) => {
          );
          reset();
       } catch (error: any) {
-         toast.error(error.message || t("common.registration_failed"), { position: 'top-center' });
+         const message = error.message || t("common.registration_failed");
+         setRegError(message);
+         toast.error(message, { position: 'top-center' });
       } finally {
          setIsLoading(false);
       }
@@ -59,6 +63,31 @@ const RegistrationForm = ({ role }: { role?: string }) => {
 
    return (
       <form onSubmit={handleSubmit(onSubmit)} className="account__form">
+         {regError && (
+            <div
+               className="alert alert-danger d-flex align-items-center justify-content-between p-3 mb-3 border-0 shadow-sm"
+               role="alert"
+               style={{
+                  borderRadius: '12px',
+                  background: '#fef2f2',
+                  borderLeft: '4px solid #ef4444',
+                  color: '#991b1b',
+                  fontSize: '0.9rem'
+               }}
+            >
+               <div className="d-flex align-items-center gap-2">
+                  <i className="fas fa-exclamation-circle flex-shrink-0 text-danger" style={{ fontSize: '1.1rem' }}></i>
+                  <span className="fw-medium">{regError}</span>
+               </div>
+               <button
+                  type="button"
+                  className="btn-close shadow-none"
+                  style={{ fontSize: '0.75rem' }}
+                  onClick={() => setRegError(null)}
+                  aria-label="Close"
+               ></button>
+            </div>
+         )}
          <div className="row g-3">
             <div className="col-md-6">
                <div className="form-grp mb-2">

@@ -17,6 +17,7 @@ const LoginForm = ({ role }: { role?: string }) => {
    const { t } = useTranslation();
    const { login } = useAuth();
    const [isLoading, setIsLoading] = useState(false);
+   const [loginError, setLoginError] = useState<string | null>(null);
 
    const schema = yup
       .object({
@@ -29,6 +30,7 @@ const LoginForm = ({ role }: { role?: string }) => {
 
    const onSubmit = async (data: FormData) => {
       setIsLoading(true);
+      setLoginError(null);
       try {
          await login(data, role);
          toast.success(t("common.login_success"), { position: 'top-center' });
@@ -37,6 +39,7 @@ const LoginForm = ({ role }: { role?: string }) => {
          const errorMessage = error.message === 'OTP_REQUIRED'
             ? t('common.otp_sent')
             : error.message || t('common.login_failed');
+         setLoginError(errorMessage);
          toast.error(errorMessage, { position: 'top-center' });
       } finally {
          setIsLoading(false);
@@ -45,6 +48,31 @@ const LoginForm = ({ role }: { role?: string }) => {
 
    return (
       <form onSubmit={handleSubmit(onSubmit)} className="account__form">
+         {loginError && (
+            <div
+               className="alert alert-danger d-flex align-items-center justify-content-between p-3 mb-3 border-0 shadow-sm"
+               role="alert"
+               style={{
+                  borderRadius: '12px',
+                  background: '#fef2f2',
+                  borderLeft: '4px solid #ef4444',
+                  color: '#991b1b',
+                  fontSize: '0.9rem'
+               }}
+            >
+               <div className="d-flex align-items-center gap-2">
+                  <i className="fas fa-exclamation-circle flex-shrink-0 text-danger" style={{ fontSize: '1.1rem' }}></i>
+                  <span className="fw-medium">{loginError}</span>
+               </div>
+               <button
+                  type="button"
+                  className="btn-close shadow-none"
+                  style={{ fontSize: '0.75rem' }}
+                  onClick={() => setLoginError(null)}
+                  aria-label="Close"
+               ></button>
+            </div>
+         )}
          <div className="form-grp mb-15">
             <label htmlFor="email" className="fw-bold small opacity-50 mb-2">{t("common.email")}</label>
             <div className="position-relative">
