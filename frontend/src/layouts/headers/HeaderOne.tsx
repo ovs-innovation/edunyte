@@ -1,6 +1,6 @@
 // import HeaderTopOne from "./menu/HeaderTopOne"
 import NavMenu from "./menu/NavMenu"
-import React, { useState } from "react"
+import React, { useState, useRef, useEffect } from "react"
 import MobileSidebar from "./menu/MobileSidebar"
 import UseSticky from "../../hooks/UseSticky"
 import { Link } from "react-router-dom"
@@ -25,6 +25,20 @@ const HeaderOne = () => {
    const { t } = useTranslation();
    const { isAuthenticated, user, logout } = useAuth();
    const navigate = useNavigate();
+   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+   const userDropdownRef = useRef<HTMLDivElement>(null);
+
+   useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+         if (userDropdownRef.current && !userDropdownRef.current.contains(event.target as Node)) {
+            setUserDropdownOpen(false);
+         }
+      };
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+         document.removeEventListener("mousedown", handleClickOutside);
+      };
+   }, []);
 
    const handleUserClick = (e: React.MouseEvent) => {
       if (!isAuthenticated) {
@@ -115,51 +129,107 @@ const HeaderOne = () => {
                                     </li>
                                     <li className="header-btn login-btn">
                                        {isAuthenticated ? (
-                                          <div className="user-menu dropdown">
-                                             <a
-                                                href="#"
-                                                className="user-avatar dropdown-toggle"
-                                                id="userDropdown"
-                                                data-bs-toggle="dropdown"
-                                                aria-expanded="false"
-                                                style={{
-                                                   display: 'block',
-                                                   width: '45px',
-                                                   height: '45px',
-                                                   borderRadius: '50%',
-                                                   overflow: 'hidden',
-                                                   border: '2px solid var(--tg-theme-primary)',
-                                                   padding: '2px'
-                                                }}
-                                             >
-                                                {renderAvatar()}
-                                             </a>
-                                             <ul className="dropdown-menu dropdown-menu-end shadow border-0 p-2" aria-labelledby="userDropdown" style={{ borderRadius: '12px', minWidth: '200px' }}>
-                                                <li className="p-3 border-bottom mb-2">
-                                                   <span className="d-block fw-bold small text-dark">{user?.name}</span>
-                                                   <span className="d-block small text-muted">{user?.email}</span>
-                                                </li>
-                                                <li>
-                                                   <Link className="dropdown-item py-2 rounded-2" to={user?.role === 'teacher' ? "/instructor-dashboard" : "/my-dashboard"}>
-                                                      <i className="fas fa-th-large me-2"></i> {t("common.dashboard")}
-                                                   </Link>
-                                                </li>
-                                                <li>
-                                                   <Link className="dropdown-item py-2 rounded-2" to="/my-profile">
-                                                      <i className="fas fa-user me-2"></i> {t("common.profile")}
-                                                   </Link>
-                                                </li>
-                                                <li><hr className="dropdown-divider" /></li>
-                                                <li>
-                                                   <button
-                                                      className="dropdown-item py-2 rounded-2 text-danger"
-                                                      onClick={logout}
-                                                   >
-                                                      <i className="fas fa-sign-out-alt me-2"></i> {t("common.logout")}
-                                                   </button>
-                                                </li>
-                                             </ul>
-                                          </div>
+                                          <div className="user-menu dropdown position-relative" ref={userDropdownRef}>
+                                              <button
+                                                 type="button"
+                                                 className="user-avatar dropdown-toggle border-0 p-0"
+                                                 id="userDropdown"
+                                                 aria-expanded={userDropdownOpen}
+                                                 onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    setUserDropdownOpen(prev => !prev);
+                                                 }}
+                                                 style={{
+                                                    display: 'block',
+                                                    width: '45px',
+                                                    height: '45px',
+                                                    borderRadius: '50%',
+                                                    overflow: 'hidden',
+                                                    border: '2px solid var(--tg-theme-primary)',
+                                                    padding: '2px',
+                                                    background: 'transparent',
+                                                    cursor: 'pointer'
+                                                 }}
+                                                 title={user?.name || "User Account"}
+                                              >
+                                                 {renderAvatar()}
+                                              </button>
+                                              <ul
+                                                 className={`dropdown-menu dropdown-menu-end shadow border-0 p-2 ${userDropdownOpen ? 'show' : ''}`}
+                                                 aria-labelledby="userDropdown"
+                                                 style={{
+                                                    borderRadius: '12px',
+                                                    minWidth: '220px',
+                                                    display: userDropdownOpen ? 'block' : 'none',
+                                                    position: 'absolute',
+                                                    right: 0,
+                                                    top: 'calc(100% + 8px)',
+                                                    zIndex: 999999999,
+                                                    backgroundColor: '#ffffff',
+                                                    boxShadow: '0 10px 30px rgba(0,0,0,0.15)'
+                                                 }}
+                                              >
+                                                 <li className="p-3 border-bottom mb-2" style={{ backgroundColor: '#f8fafc', borderRadius: '8px' }}>
+                                                    <span className="d-block fw-bold small text-dark">{user?.name || 'User'}</span>
+                                                    <span className="d-block small text-muted text-truncate" style={{ maxWidth: '190px' }}>{user?.email}</span>
+                                                    {user?.role && (
+                                                       <span
+                                                          className={`badge mt-1 ${user.role === 'teacher' ? 'bg-info' : 'bg-primary'}`}
+                                                          style={{ fontSize: '10px', textTransform: 'capitalize' }}
+                                                       >
+                                                          {user.role === 'teacher' ? 'Instructor' : 'Student'}
+                                                       </span>
+                                                    )}
+                                                 </li>
+                                                 <li>
+                                                    <Link
+                                                       className="dropdown-item py-2 px-3 rounded-2 d-flex align-items-center"
+                                                       to={user?.role === 'teacher' ? "/instructor-dashboard" : "/my-dashboard"}
+                                                       onClick={() => setUserDropdownOpen(false)}
+                                                       style={{ fontWeight: 500 }}
+                                                    >
+                                                       <i className="fas fa-th-large me-2 text-primary" style={{ width: '18px' }}></i> {t("common.dashboard")}
+                                                    </Link>
+                                                 </li>
+                                                 <li>
+                                                    <Link
+                                                       className="dropdown-item py-2 px-3 rounded-2 d-flex align-items-center"
+                                                       to="/my-profile"
+                                                       onClick={() => setUserDropdownOpen(false)}
+                                                       style={{ fontWeight: 500 }}
+                                                    >
+                                                       <i className="fas fa-user me-2 text-primary" style={{ width: '18px' }}></i> {t("common.profile")}
+                                                    </Link>
+                                                 </li>
+                                                 {user?.role !== 'teacher' && (
+                                                    <li>
+                                                       <Link
+                                                          className="dropdown-item py-2 px-3 rounded-2 d-flex align-items-center"
+                                                          to="/my-lessions"
+                                                          onClick={() => setUserDropdownOpen(false)}
+                                                          style={{ fontWeight: 500 }}
+                                                       >
+                                                          <i className="fas fa-book-reader me-2 text-primary" style={{ width: '18px' }}></i> My Lessons
+                                                       </Link>
+                                                    </li>
+                                                 )}
+                                                 <li><hr className="dropdown-divider my-2" /></li>
+                                                 <li>
+                                                    <button
+                                                       type="button"
+                                                       className="dropdown-item py-2 px-3 rounded-2 text-danger d-flex align-items-center w-100 border-0 bg-transparent text-start"
+                                                       onClick={() => {
+                                                          setUserDropdownOpen(false);
+                                                          logout();
+                                                       }}
+                                                       style={{ fontWeight: 500 }}
+                                                    >
+                                                       <i className="fas fa-sign-out-alt me-2" style={{ width: '18px' }}></i> {t("common.logout")}
+                                                    </button>
+                                                 </li>
+                                              </ul>
+                                           </div>
                                        ) : (
                                           <Link to="/login">{t("common.login")}</Link>
                                        )}

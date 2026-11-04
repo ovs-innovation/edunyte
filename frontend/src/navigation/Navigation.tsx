@@ -107,6 +107,7 @@ const AppNavigation = () => {
         <Route path="/instructor-announcement" element={<InstructorAnnouncement />} />
         <Route path="/instructor-quiz" element={<InstructorQuiz />} />
         <Route path="/instructor-assignment" element={<InstructorAssignment />} />
+        <Route path="/instructor-dashboard" element={<ProtectedRoute><InstructorDashboard /></ProtectedRoute>} />
         <Route path="/instructor-setting" element={<InstructorSetting />} />
                <Route path="/my-dashboard" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
                <Route path="/my-profile" element={<ProtectedRoute><StudentProfile /></ProtectedRoute>} />
