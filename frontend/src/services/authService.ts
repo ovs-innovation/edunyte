@@ -36,11 +36,12 @@ export interface OTPResponse {
 
 // ================= LOGIN =================
 export const login = async (
-  credentials: LoginCredentials
+  credentials: LoginCredentials,
+  appType: string = 'student'
 ): Promise<AuthResponse | OTPResponse> => {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  const response = await fetch(`${API_BASE_URL}/auth/login?appType=student`, {
+  const response = await fetch(`${API_BASE_URL}/auth/login?appType=${encodeURIComponent(appType)}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

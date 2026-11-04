@@ -68,7 +68,7 @@ const LoginArea = ({ role }: { role?: string }) => {
                               <p className="opacity-60 small">{t("common.login_description")}</p>
                            </div>
 
-                           <LoginForm />
+                           <LoginForm role={role} />
 
                            <div className="account__switch text-center mt-20 pt-20 border-top">
                               <p className="m-0 text-muted small">

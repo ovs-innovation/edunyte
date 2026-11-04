@@ -32,7 +32,7 @@ interface AuthContextType {
   token: string | null
   isLoading: boolean
   isAuthenticated: boolean
-  login: (credentials: LoginCredentials) => Promise<void>
+  login: (credentials: LoginCredentials, role?: string) => Promise<void>
   register: (userData: RegisterData) => Promise<void>
   googleLogin: (credential: string, role?: string, isAccessToken?: boolean) => Promise<void>
 //   firebaseLogin: (token: string, role?: string) => Promise<void>
@@ -96,34 +96,36 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initAuth()
   }, [])
 
-  const login = useCallback(async (credentials: LoginCredentials) => {
+  const login = useCallback(async (credentials: LoginCredentials, role?: string) => {
     try {
-      const response = await loginAPI(credentials)
+      const appType = role === 'instructor' ? 'instructor' : 'student';
+      const response = await loginAPI(credentials, appType);
 
       if ('requiresOTP' in response && response.requiresOTP) {
-        throw new Error('OTP_REQUIRED')
+        throw new Error('OTP_REQUIRED');
       }
 
-      const authResponse = response as AuthResponse
-      setStoredToken(authResponse.token)
-      setStoredUser(authResponse.user)
-      setToken(authResponse.token)
-      setUser(authResponse.user)
-      
+      const authResponse = response as AuthResponse;
+      setStoredToken(authResponse.token);
+      setStoredUser(authResponse.user);
+      setToken(authResponse.token);
+      setUser(authResponse.user);
+
       const searchParams = new URLSearchParams(window.location.search);
       const redirectUrl = searchParams.get('redirect');
 
       if (redirectUrl && redirectUrl.startsWith('/')) {
         navigate(decodeURIComponent(redirectUrl), { replace: true });
       } else if (authResponse.user.role === 'teacher') {
-        navigate('/instructor-dashboard', { replace: true });
+        const adminUrl = import.meta.env.VITE_ADMIN_URL || 'http://localhost:8080';
+        window.location.href = `${adminUrl}/teacher-dashboard?token=${encodeURIComponent(authResponse.token)}`;
       } else if (authResponse.user.role === 'student') {
         navigate('/my-dashboard', { replace: true });
       } else {
         navigate('/', { replace: true });
       }
     } catch (error) {
-      throw error
+      throw error;
     }
   }, [navigate])
 
@@ -149,7 +151,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (redirectUrl && redirectUrl.startsWith('/')) {
           navigate(decodeURIComponent(redirectUrl), { replace: true });
         } else if (authResponse.user.role === 'teacher') {
-          navigate('/instructor-dashboard', { replace: true });
+          const adminUrl = import.meta.env.VITE_ADMIN_URL || 'http://localhost:8080';
+          window.location.href = `${adminUrl}/teacher-dashboard?token=${encodeURIComponent(authResponse.token)}`;
         } else if (authResponse.user.role === 'student') {
           navigate('/my-dashboard', { replace: true });
         } else {

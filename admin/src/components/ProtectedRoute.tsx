@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { AuthAPI, clearToken, TOKEN_KEY } from "@/lib/api";
+import { AuthAPI, clearToken, setToken, TOKEN_KEY } from "@/lib/api";
 import { useRole } from "@/contexts/RoleContext";
 
 interface Props {
@@ -15,6 +15,17 @@ const ProtectedRoute = ({ children }: Props) => {
 
   useEffect(() => {
     const verify = async () => {
+      // Support SSO / cross-portal login token from URL query parameters
+      const searchParams = new URLSearchParams(window.location.search);
+      const queryToken = searchParams.get("token") || searchParams.get("authToken");
+      if (queryToken) {
+        setToken(queryToken, true);
+        searchParams.delete("token");
+        searchParams.delete("authToken");
+        const cleanQuery = searchParams.toString() ? `?${searchParams.toString()}` : "";
+        window.history.replaceState({}, document.title, window.location.pathname + cleanQuery);
+      }
+
       const token = localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
       if (!token) {
         navigate("/login", { replace: true, state: { from: location.pathname } });

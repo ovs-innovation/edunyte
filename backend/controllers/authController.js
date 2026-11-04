@@ -265,10 +265,18 @@ export const login = async (req, res, next) => {
         message: "Students cannot login to admin panel. Please use the student app." 
       });
     }
-    
-    if (appType === "student" && ["super_admin", "admin", "teacher"].includes(user.role)) {
+
+    // Only administrative roles are restricted to the admin panel.
+    // Teachers / Instructors can authenticate from the instructor login page.
+    if (appType === "student" && ["super_admin", "admin"].includes(user.role)) {
       return res.status(403).json({ 
         message: "Please use the admin panel to login." 
+      });
+    }
+
+    if (appType === "instructor" && user.role === "student") {
+      return res.status(403).json({
+        message: "This account is a student account. Please use the student login."
       });
     }
     

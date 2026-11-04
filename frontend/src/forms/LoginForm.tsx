@@ -13,7 +13,7 @@ interface FormData {
    password: string;
 }
 
-const LoginForm = () => {
+const LoginForm = ({ role }: { role?: string }) => {
    const { t } = useTranslation();
    const { login } = useAuth();
    const [isLoading, setIsLoading] = useState(false);
@@ -30,7 +30,7 @@ const LoginForm = () => {
    const onSubmit = async (data: FormData) => {
       setIsLoading(true);
       try {
-         await login(data);
+         await login(data, role);
          toast.success(t("common.login_success"), { position: 'top-center' });
          reset();
       } catch (error: any) {

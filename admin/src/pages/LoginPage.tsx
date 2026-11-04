@@ -27,6 +27,34 @@ const LoginPage = () => {
   const [newPassword, setNewPassword] = useState('');
   const { setCurrentRole, setPermissions } = useRole();
 
+  // Support SSO query token on login page
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token') || params.get('authToken');
+    if (token) {
+      setToken(token, true);
+      AuthAPI.me()
+        .then((data) => {
+          if (data.user?.role) {
+            setCurrentRole(data.user.role);
+            setPermissions((data.user.permissions || []) as any);
+            const storage = localStorage;
+            if (data.user.email) storage.setItem('user-email', data.user.email);
+            if (data.user.name) storage.setItem('user-name', data.user.name || data.user.email);
+            if (data.user.id) storage.setItem('user-id', data.user.id);
+            if (data.user.role === 'teacher') {
+              navigate('/teacher-dashboard', { replace: true });
+            } else {
+              navigate('/', { replace: true });
+            }
+          }
+        })
+        .catch(() => {
+          clearToken();
+        });
+    }
+  }, [navigate, setCurrentRole, setPermissions]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
