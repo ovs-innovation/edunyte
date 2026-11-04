@@ -134,6 +134,28 @@ export const updateProfile = async (data: any) => {
   return resData;
 };
 
+export const uploadStudentPhoto = async (file: File) => {
+  const token = getStoredToken();
+  const formData = new FormData();
+  formData.append("photo", file);
+
+  const response = await fetch(`${API_BASE_URL}/student-profiles/upload-photo`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  const resData = await response.json();
+
+  if (!response.ok) {
+    throw new Error(resData.message || "Failed to upload photo");
+  }
+
+  return resData;
+};
+
 // ================= VALIDATE TOKEN =================
 export const validateToken = async () => {
   const token = getStoredToken();

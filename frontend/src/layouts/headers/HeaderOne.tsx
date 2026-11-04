@@ -53,6 +53,14 @@ const HeaderOne = () => {
       // if (user?.photo || user?.avatar || user?.image) {
       //    return user.photo || user.avatar || user.image;
       // }
+      const photo = user?.photo || user?.profile?.photo || user?.avatar || user?.image;
+      if (photo && typeof photo === 'string') {
+         if (photo.startsWith('/uploads/')) {
+            const origin = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8096/api').replace(/\/api\/?$/, '');
+            return `${origin}${photo}`;
+         }
+         return photo;
+      }
       return null;
    };
 

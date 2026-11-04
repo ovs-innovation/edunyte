@@ -181,7 +181,25 @@ export const googleLogin = async (req, res, next) => {
 
     const perms = await resolvePermissions(user.role);
     const token = generateToken(user);
-    res.json({ token, user: formatUser(user, perms) });
+    const formattedUser = formatUser(user, perms);
+
+    if (user.role === "student") {
+      const StudentProfile = (await import("../models/studentProfileModel.js")).default;
+      const sp = await StudentProfile.findOne({ userId: user._id });
+      if (sp) {
+        if (sp.photo) formattedUser.photo = sp.photo;
+        formattedUser.profile = sp.toObject();
+      }
+    } else if (user.role === "teacher") {
+      const TeacherProfile = (await import("../models/teacherProfileModel.js")).default;
+      const tp = await TeacherProfile.findOne({ userId: user._id });
+      if (tp) {
+        if (tp.photo || tp.profilePicture) formattedUser.photo = tp.photo || tp.profilePicture;
+        formattedUser.profile = tp.toObject();
+      }
+    }
+
+    res.json({ token, user: formattedUser });
   } catch (err) {
     console.error("Google Login Error:", err);
     res.status(401).json({ message: "Google authentication failed" });
@@ -321,7 +339,25 @@ export const login = async (req, res, next) => {
 
     const perms = await resolvePermissions(user.role);
     const token = generateToken(user);
-    res.json({ token, user: formatUser(user, perms) });
+    const formattedUser = formatUser(user, perms);
+
+    if (user.role === "student") {
+      const StudentProfile = (await import("../models/studentProfileModel.js")).default;
+      const sp = await StudentProfile.findOne({ userId: user._id });
+      if (sp) {
+        if (sp.photo) formattedUser.photo = sp.photo;
+        formattedUser.profile = sp.toObject();
+      }
+    } else if (user.role === "teacher") {
+      const TeacherProfile = (await import("../models/teacherProfileModel.js")).default;
+      const tp = await TeacherProfile.findOne({ userId: user._id });
+      if (tp) {
+        if (tp.photo || tp.profilePicture) formattedUser.photo = tp.photo || tp.profilePicture;
+        formattedUser.profile = tp.toObject();
+      }
+    }
+
+    res.json({ token, user: formattedUser });
   } catch (err) {
     next(err);
   }

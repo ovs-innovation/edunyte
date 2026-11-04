@@ -16,9 +16,8 @@ const DashboardBannerTwo = ({ totalLessons = 0, completedLessons = 0 }: Dashboar
   const { t } = useTranslation()
   const [uploading, setUploading] = useState(false)
 
-  console.log("user", user)
-
   const getStudentName = () => {
+    if (user?.name) return user.name;
     if (user?.firstName && user?.lastName) {
       return `${user.firstName} ${user.lastName}`
     }
@@ -26,7 +25,14 @@ const DashboardBannerTwo = ({ totalLessons = 0, completedLessons = 0 }: Dashboar
   }
 
   const getProfilePicture = () => {
-    if (user?.photo) return user.photo;
+    const photo = user?.photo || user?.profile?.photo || user?.avatar || user?.image;
+    if (photo && typeof photo === 'string') {
+      if (photo.startsWith('/uploads/')) {
+        const origin = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8096/api').replace(/\/api\/?$/, '');
+        return `${origin}${photo}`;
+      }
+      return photo;
+    }
     return "/assets/img/courses/details_instructors02.jpg"
   }
 
@@ -34,34 +40,58 @@ const DashboardBannerTwo = ({ totalLessons = 0, completedLessons = 0 }: Dashboar
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Cloudinary generic upload
-    const cloudName = import.meta.env.VITE_APP_CLOUD_NAME
-    const uploadPreset = import.meta.env.VITE_APP_CLOUDINARY_UPLOAD_PRESET
+    if (!file.type.startsWith("image/")) {
+      alert("Please select a valid image file (PNG, JPG, JPEG, WEBP).");
+      return;
+    }
 
-    if (!cloudName || !uploadPreset) {
-      console.error("Cloudinary config missing");
+    if (file.size > 10 * 1024 * 1024) {
+      alert("Image size should be less than 10MB.");
       return;
     }
 
     setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", uploadPreset);
-    formData.append("folder", "student-profiles");
 
     try {
-      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-        method: "POST",
-        body: formData,
-      });
-      const data = await response.json();
-      if (data.secure_url) {
-        await updateUserProfile({ photo: data.secure_url });
+      const { uploadStudentPhoto } = await import("../../services/authService");
+      const res = await uploadStudentPhoto(file);
+      if (res.photo) {
+        await updateUserProfile({ photo: res.photo });
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Upload failed", err);
+
+      // Fallback: If backend endpoint fails, attempt Cloudinary if credentials are provided
+      const cloudName = import.meta.env.VITE_APP_CLOUD_NAME;
+      const uploadPreset = import.meta.env.VITE_APP_CLOUDINARY_UPLOAD_PRESET;
+      let fallbackSuccess = false;
+
+      if (cloudName && uploadPreset) {
+        try {
+          const formData = new FormData();
+          formData.append("file", file);
+          formData.append("upload_preset", uploadPreset);
+          formData.append("folder", "student-profiles");
+          const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+            method: "POST",
+            body: formData,
+          });
+          const data = await response.json();
+          if (data.secure_url) {
+            await updateUserProfile({ photo: data.secure_url });
+            fallbackSuccess = true;
+          }
+        } catch (cErr) {
+          console.error("Cloudinary fallback failed", cErr);
+        }
+      }
+
+      if (!fallbackSuccess) {
+        alert(err.message || "Failed to upload photo. Please try again.");
+      }
     } finally {
       setUploading(false);
+      e.target.value = "";
     }
   };
 
@@ -78,7 +108,15 @@ const DashboardBannerTwo = ({ totalLessons = 0, completedLessons = 0 }: Dashboar
       <div className="dashboard__instructor-info">
         <div className="dashboard__instructor-info-left">
           <div className="thumb" style={{ position: 'relative' }}>
-            <img src={getProfilePicture()} alt={getStudentName()} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img
+              src={getProfilePicture()}
+              alt={getStudentName()}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = "/assets/img/courses/details_instructors02.jpg";
+              }}
+            />
             <label
               htmlFor="profile-upload"
               style={{
@@ -136,4 +174,3 @@ const DashboardBannerTwo = ({ totalLessons = 0, completedLessons = 0 }: Dashboar
 }
 
 export default DashboardBannerTwo
-

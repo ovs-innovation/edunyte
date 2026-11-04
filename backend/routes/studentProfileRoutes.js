@@ -2,6 +2,7 @@ import express from "express";
 import {
   getMyProfile,
   updateMyProfile,
+  uploadMyPhoto,
   getStudentProfile,
   listStudentProfiles,
   updateStudentProfile,
@@ -12,6 +13,7 @@ import {
 } from "../controllers/studentProfileController.js";
 import { verifyToken } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/permissionMiddleware.js";
+import upload from "../utils/multerConfig.js";
 
 const router = express.Router();
 
@@ -19,6 +21,7 @@ router.get("/wishlist", verifyToken, getWishlist);
 router.post("/wishlist", verifyToken, toggleWishlist);
 router.get("/me", verifyToken, getMyProfile);
 router.patch("/me", verifyToken, updateMyProfile);
+router.post("/upload-photo", verifyToken, upload.single("photo"), uploadMyPhoto);
 router.get("/:userId", verifyToken, requirePermission("students.view"), getStudentProfile);
 router.get("/", verifyToken, requirePermission("students.view"), listStudentProfiles);
 router.patch("/:userId", verifyToken, requirePermission("students.edit"), updateStudentProfile);

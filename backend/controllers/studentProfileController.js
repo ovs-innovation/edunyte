@@ -12,6 +12,37 @@ export const getMyProfile = async (req, res, next) => {
 };
 
 // wrapper to update own profile
+export const uploadMyPhoto = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No image file provided" });
+    }
+
+    const userId = req.user.id;
+    const relativePath = `/uploads/profiles/${req.file.filename}`;
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    const fullUrl = `${baseUrl}${relativePath}`;
+
+    let profile = await StudentProfile.findOne({ userId });
+    if (!profile) {
+      profile = await StudentProfile.create({ userId });
+    }
+
+    profile.photo = fullUrl;
+    await profile.save();
+    await profile.populate("userId", "name email status");
+
+    res.json({
+      success: true,
+      message: "Photo uploaded successfully",
+      photo: fullUrl,
+      profile,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const updateMyProfile = async (req, res, next) => {
   req.params.userId = req.user.id;
   return updateStudentProfile(req, res, next);

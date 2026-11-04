@@ -235,14 +235,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const updateUserProfile = useCallback(async (data: any) => {
       try {
           const { updateProfile } = await import('../services/authService');
-          const updatedUser = await updateProfile(data);
-          setStoredUser(updatedUser);
-          setUser(updatedUser);
+          const resData = await updateProfile(data);
+          const updatedProfile = resData.profile || resData;
+          const newPhoto = data.photo || updatedProfile.photo || (user as any)?.photo;
+          const mergedUser = {
+              ...(user || {}),
+              ...resData,
+              photo: newPhoto,
+              profile: {
+                  ...((user as any)?.profile || {}),
+                  ...updatedProfile,
+                  photo: newPhoto,
+              }
+          };
+          setStoredUser(mergedUser);
+          setUser(mergedUser);
       } catch (err) {
           console.error("Failed to update profile", err);
           throw err;
       }
-  }, []);
+  }, [user]);
 
   return (
     <AuthContext.Provider
