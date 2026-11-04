@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Eye, EyeOff, Lock, Mail, Shield, KeyRound } from 'lucide-react';
 import { toast } from 'sonner';
-import { AuthAPI, setToken } from '@/lib/api';
+import { AuthAPI, setToken, clearToken } from '@/lib/api';
 import { useRole } from '@/contexts/RoleContext';
 
 const LoginPage = () => {
