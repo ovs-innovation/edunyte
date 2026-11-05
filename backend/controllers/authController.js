@@ -363,6 +363,146 @@ export const login = async (req, res, next) => {
   }
 };
 
+export const sendLoginOTP = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const { appType } = req.query;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    const user = await User.findOne({ email: normalizedEmail });
+
+    if (!user) {
+      return res.status(404).json({ message: "No account found with this email. Please register first." });
+    }
+
+    if (user.status === "inactive") {
+      return res.status(403).json({ message: "Your account is inactive. Please contact support." });
+    }
+
+    if (user.status === "pending") {
+      return res.status(403).json({ message: "Registration pending approval by administrator." });
+    }
+
+    if (appType === "admin" && user.role === "student") {
+      return res.status(403).json({ message: "Students cannot login to admin panel. Please use the student app." });
+    }
+
+    if (appType === "student" && ["super_admin", "admin"].includes(user.role)) {
+      return res.status(403).json({ message: "Please use the admin panel to login." });
+    }
+
+    if (appType === "instructor" && user.role === "student") {
+      return res.status(403).json({ message: "This account is a student account. Please use the student login." });
+    }
+
+    const otpCode = crypto.randomInt(100000, 999999).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    await OTP.deleteMany({ email: normalizedEmail, purpose: "login" });
+    await OTP.create({ email: normalizedEmail, otp: otpCode, purpose: "login", expiresAt });
+
+    await sendOTPEmail(normalizedEmail, otpCode, user.name);
+
+    res.json({
+      success: true,
+      message: `A 6-digit verification code has been sent to ${normalizedEmail}.`,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const verifyLoginOTP = async (req, res, next) => {
+  try {
+    const { email, otp } = req.body;
+    const { appType } = req.query;
+
+    if (!email || !otp) {
+      return res.status(400).json({ message: "Email and OTP code are required" });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    const user = await User.findOne({ email: normalizedEmail });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.status === "inactive" || user.status === "pending") {
+      return res.status(403).json({ message: "Account is not active" });
+    }
+
+    if (appType === "admin" && user.role === "student") {
+      return res.status(403).json({ message: "Students cannot login to admin panel. Please use the student app." });
+    }
+
+    if (appType === "student" && ["super_admin", "admin"].includes(user.role)) {
+      return res.status(403).json({ message: "Please use the admin panel to login." });
+    }
+
+    if (appType === "instructor" && user.role === "student") {
+      return res.status(403).json({ message: "This account is a student account. Please use the student login." });
+    }
+
+    const otpRecord = await OTP.findOne({ email: normalizedEmail, otp: otp.trim(), purpose: "login" });
+
+    if (!otpRecord) {
+      return res.status(401).json({ message: "Invalid verification code. Please check your email and try again." });
+    }
+
+    if (otpRecord.expiresAt < new Date()) {
+      await OTP.deleteOne({ _id: otpRecord._id });
+      return res.status(401).json({ message: "Verification code has expired. Please request a new one." });
+    }
+
+    await OTP.deleteOne({ _id: otpRecord._id });
+
+    user.lastLogin = new Date();
+    await user.save();
+
+    if (user.role === "student") {
+      const StudentProfile = (await import("../models/studentProfileModel.js")).default;
+      let studentProfile = await StudentProfile.findOne({ userId: user._id });
+      if (!studentProfile) {
+        studentProfile = await StudentProfile.create({ userId: user._id });
+      }
+      const timezone = req.body.timezone || req.headers['x-timezone'] || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+      if (timezone) {
+        studentProfile.timezone = timezone;
+        await studentProfile.save();
+      }
+    }
+
+    const perms = await resolvePermissions(user.role);
+    const token = generateToken(user);
+    const formattedUser = formatUser(user, perms);
+
+    if (user.role === "student") {
+      const StudentProfile = (await import("../models/studentProfileModel.js")).default;
+      const sp = await StudentProfile.findOne({ userId: user._id });
+      if (sp) {
+        if (sp.photo) formattedUser.photo = sp.photo;
+        formattedUser.profile = sp.toObject();
+      }
+    } else if (user.role === "teacher") {
+      const TeacherProfile = (await import("../models/teacherProfileModel.js")).default;
+      const tp = await TeacherProfile.findOne({ userId: user._id });
+      if (tp) {
+        if (tp.photo || tp.profilePicture) formattedUser.photo = tp.photo || tp.profilePicture;
+        formattedUser.profile = tp.toObject();
+      }
+    }
+
+    res.json({ token, user: formattedUser });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;

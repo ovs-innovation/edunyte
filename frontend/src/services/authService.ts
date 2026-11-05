@@ -62,6 +62,57 @@ export const login = async (
   return data;
 };
 
+// ================= EMAIL OTP LOGIN =================
+export const sendLoginOTP = async (
+  email: string,
+  appType: string = 'student'
+): Promise<{ success: boolean; message: string }> => {
+  const response = await fetch(`${API_BASE_URL}/auth/send-login-otp?appType=${encodeURIComponent(appType)}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to send OTP");
+  }
+
+  return data;
+};
+
+export const verifyLoginOTP = async (
+  email: string,
+  otp: string,
+  appType: string = 'student'
+): Promise<AuthResponse> => {
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  const response = await fetch(`${API_BASE_URL}/auth/verify-login-otp?appType=${encodeURIComponent(appType)}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Timezone": timezone,
+    },
+    body: JSON.stringify({
+      email,
+      otp,
+      timezone,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Verification failed");
+  }
+
+  return data;
+};
+
 // ================= REGISTER =================
 export const register = async (
   userData: RegisterData
