@@ -17,6 +17,7 @@ import {
   RAZORPAY_KEY_ID,
 } from "../services/razorpayService.js";
 import { getRazorpayClient } from "../config/razorpay.js";
+import { calculateStudentProgress } from "./studentProfileController.js";
 
 /**
  * Supported subscription plans and test series catalogs (fallback / catalog pricing)
@@ -725,6 +726,7 @@ export const verifyRazorpayPaymentController = async (req, res, next) => {
           paymentId: razorpayPaymentId,
           session,
         });
+        calculateStudentProgress(order.userId).catch((err) => console.error("Error updating student progress:", err));
         activatedService = {
           type: "lesson",
           bookingId: bookingRecord._id,

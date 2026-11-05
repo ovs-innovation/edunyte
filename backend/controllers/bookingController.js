@@ -11,6 +11,7 @@ import {
   roundMoney2,
 } from "../utils/pricingHelper.js";
 import { toUTCDate } from "../utils/timezoneHelper.js";
+import { calculateStudentProgress } from "./studentProfileController.js";
 
 /**
  * Booking Controller
@@ -158,6 +159,7 @@ export const createBooking = async (req, res, next) => {
     // Update availability status
     availability.status = "booked";
     availability.bookingId = booking._id;
+    calculateStudentProgress(studentId).catch((err) => console.error("Error updating student progress:", err));
     await availability.save();
 
     await booking.populate([
@@ -330,6 +332,7 @@ export const updateBookingStatus = async (req, res, next) => {
     }
 
     await booking.save();
+    calculateStudentProgress(booking.studentId).catch((err) => console.error("Error updating student progress:", err));
     await booking.populate([
       { path: "studentId", select: "name email" },
       { path: "teacherId", select: "name email" },
@@ -422,6 +425,7 @@ export const updateMeetingDetails = async (req, res, next) => {
     if (meetingPassword !== undefined) booking.meetingPassword = meetingPassword;
 
     await booking.save();
+    calculateStudentProgress(booking.studentId).catch((err) => console.error("Error updating student progress:", err));
     await booking.populate([
       { path: "studentId", select: "name email" },
       { path: "teacherId", select: "name email" },
@@ -542,6 +546,7 @@ export const rescheduleBooking = async (req, res, next) => {
     };
     
     await booking.save();
+    calculateStudentProgress(booking.studentId).catch((err) => console.error("Error updating student progress:", err));
     
     await booking.populate([
       { path: "studentId", select: "name email" },

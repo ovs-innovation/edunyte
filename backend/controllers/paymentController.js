@@ -4,6 +4,7 @@ import Booking from "../models/bookingModel.js";
 import { resolveCheckoutContext, calculateCheckoutAmounts } from "../services/pricingService.js";
 import { getStripe, toStripeAmount, STRIPE_WEBHOOK_SECRET } from "../services/stripeService.js";
 import { createZoomMeeting } from "../services/zoomService.js";
+import { calculateStudentProgress } from "./studentProfileController.js";
 
 export const createCheckoutPaymentIntent = async (req, res, next) => {
   try {
@@ -249,6 +250,7 @@ export const stripeWebhook = async (req, res, next) => {
 
     availability.bookingId = booking._id;
     await availability.save();
+    calculateStudentProgress(studentId).catch((err) => console.error("Error updating student progress:", err));
 
     return res.json({ received: true });
   } catch (err) {
@@ -365,6 +367,7 @@ export const createFreeBooking = async (req, res, next) => {
 
     availability.bookingId = booking._id;
     await availability.save();
+    calculateStudentProgress(studentId).catch((err) => console.error("Error updating student progress:", err));
 
     res.json({
       success: true,

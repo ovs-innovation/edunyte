@@ -673,10 +673,10 @@ const StudentDashboardArea = () => {
                                   <div className="row align-items-center">
                                     <div className="col-md-2 text-center mb-3 mb-md-0">
                                       <div className="text-muted small fw-semibold">
-                                        {new Date(booking.lesson.scheduledAt).toLocaleDateString('en-US', { month: 'short' }).toUpperCase()}
+                                        {new Date(booking.lesson?.scheduledAt || booking.sessionDate).toLocaleDateString('en-US', { month: 'short' }).toUpperCase()}
                                       </div>
                                       <div className="fw-bold text-muted" style={{ fontSize: '28px' }}>
-                                        {new Date(booking.lesson.scheduledAt).getDate()}
+                                        {new Date(booking.lesson?.scheduledAt || booking.sessionDate).getDate()}
                                       </div>
                                       <div className="small text-muted">{time}</div>
                                     </div>
