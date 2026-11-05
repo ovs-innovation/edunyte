@@ -4,7 +4,7 @@ import { StudentTable } from '@/components/students/StudentTable';
 import { PermissionGate } from '@/components/PermissionGate';
 import { Button } from '@/components/ui/button';
 import { Download, Filter } from 'lucide-react';
-import { StudentProfileAPI, ApiStudentProfile, UsersAPI, ApiUser } from '@/lib/api';
+import { StudentProfileAPI, ApiStudentProfile, ApiUser } from '@/lib/api';
 import { StudentProfileDialog } from '@/components/students/StudentProfileDialog';
 import { useToast } from '@/hooks/use-toast';
 
@@ -20,23 +20,30 @@ const StudentsPage = () => {
     setLoading(true);
     try {
       const data = await StudentProfileAPI.list();
-      // Fetch user details for each student
-      const studentsWithUsers = await Promise.all(
-        (data.profiles || []).map(async (profile) => {
-          const userId = typeof profile.userId === 'string' ? profile.userId : (profile.userId as any)._id || profile.userId.id;
-          try {
-            const userData = await UsersAPI.list();
-            const user = userData.users.find((u) => u.id === userId);
-            return {
-              ...profile,
-              userId: (user || profile.userId) as ApiUser,
-            };
-          } catch {
-            return { ...profile, userId: profile.userId as ApiUser };
-          }
-        })
-      );
-      setStudents(studentsWithUsers as Array<ApiStudentProfile & { userId: ApiUser }>);
+      const studentsWithUsers = (data.profiles || []).map((profile) => {
+        const u = profile.userId as any;
+        const normalizedUser: ApiUser = typeof u === 'object' && u !== null ? {
+          id: u.id || u._id || '',
+          name: u.name || '',
+          email: u.email || '',
+          role: u.role || 'student',
+          status: u.status || 'active',
+          permissions: u.permissions || [],
+        } : {
+          id: String(u || ''),
+          name: '',
+          email: '',
+          role: 'student',
+          status: 'active',
+          permissions: [],
+        };
+
+        return {
+          ...profile,
+          userId: normalizedUser,
+        };
+      });
+      setStudents(studentsWithUsers);
     } catch (err: any) {
       toast({ title: 'Failed to load students', description: err?.message, variant: 'destructive' });
     } finally {
@@ -52,7 +59,6 @@ const StudentsPage = () => {
     setStudents((prev) => {
       const exists = prev.find((s) => s._id === profile._id);
       if (exists) {
-        const userId = typeof profile.userId === 'string' ? profile.userId : profile.userId._id || profile.userId.id;
         const user = exists.userId;
         return prev.map((s) => (s._id === profile._id ? { ...profile, userId: user } : s));
       }
@@ -130,4 +136,3 @@ const StudentsPage = () => {
 };
 
 export default StudentsPage;
-

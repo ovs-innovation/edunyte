@@ -85,27 +85,18 @@ export const listStudentProfiles = async (req, res, next) => {
     
     let query = {};
     // If user is a teacher, filter by their students (who have booked them)
-    if (req.user.role === 'teacher') {
+    if (req.user && req.user.role === 'teacher') {
       const bookings = await Booking.find({ teacherId: req.user.id }).distinct('studentId');
       query.userId = { $in: bookings };
     }
 
     let profiles = await StudentProfile.find(query)
-      .populate("userId", "name email status")
-      .sort({ createdAt: -1 });
+      .populate("userId", "name email status role")
+      .sort({ createdAt: -1 })
+      .lean();
     
-    // Calculate progress for fetched students
-    for (const profile of profiles) {
-      if (profile.userId && profile.userId._id) {
-        await calculateStudentProgress(profile.userId._id);
-      }
-    }
-    
-    // Reload profiles with updated progress
-    profiles = await StudentProfile.find(query)
-      .populate("userId", "name email status")
-      .sort({ createdAt: -1 });
-    
+    profiles = profiles.filter((p) => p.userId);
+
     if (status) {
       profiles = profiles.filter((p) => p.userId?.status === status);
     }
@@ -120,7 +111,16 @@ export const listStudentProfiles = async (req, res, next) => {
           p.city?.toLowerCase().includes(searchLower)
       );
     }
-    res.json({ profiles, count: profiles.length });
+
+    const profilesData = profiles.map(profile => ({
+      ...profile,
+      userId: {
+        ...profile.userId,
+        id: profile.userId._id ? profile.userId._id.toString() : profile.userId.id,
+      },
+    }));
+
+    res.json({ profiles: profilesData, count: profilesData.length });
   } catch (err) {
     next(err);
   }
@@ -312,6 +312,7 @@ export const getCourseProgress = async (req, res, next) => {
     next(err);
   }
 };
+
 // Toggle Wishlist
 export const toggleWishlist = async (req, res, next) => {
   try {

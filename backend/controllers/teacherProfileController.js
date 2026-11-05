@@ -208,8 +208,12 @@ export const listTeacherProfiles = async (req, res, next) => {
       query.kycStatus = kycStatus;
     }
     let profiles = await TeacherProfile.find(query)
-      .populate("userId", "name email status")
-      .sort({ createdAt: -1 });
+      .populate("userId", "name email status role")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    profiles = profiles.filter((p) => p.userId);
+
     if (status) {
       profiles = profiles.filter((p) => p.userId?.status === status);
     }
@@ -221,12 +225,15 @@ export const listTeacherProfiles = async (req, res, next) => {
           p.userId?.email?.toLowerCase().includes(searchLower)
       );
     }
-    const profilesData = profiles.map(profile => {
-      const profileObj = profile.toObject();
-      profileObj.bio = getLanguageValue(profileObj.bio);
-      profileObj.aboutUs = getLanguageValue(profileObj.aboutUs);
-      return profileObj;
-    });
+    const profilesData = profiles.map(profile => ({
+      ...profile,
+      bio: getLanguageValue(profile.bio),
+      aboutUs: getLanguageValue(profile.aboutUs),
+      userId: {
+        ...profile.userId,
+        id: profile.userId._id ? profile.userId._id.toString() : profile.userId.id,
+      },
+    }));
     res.json({ profiles: profilesData, count: profilesData.length });
   } catch (err) {
     next(err);

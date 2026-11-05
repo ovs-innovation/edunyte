@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { MoreHorizontal, Pencil, Eye, CheckCircle2, XCircle, Clock } from 'lucide-react';
 import {
   DropdownMenu,
@@ -71,14 +72,35 @@ export function TeacherTable({ teachers, loading, onEdit, onView, onKycUpdate }:
           </TableRow>
         </TableHeader>
         <TableBody>
+          {loading && (
+            Array.from({ length: 4 }).map((_, i) => (
+              <TableRow key={i} className="border-border">
+                <TableCell>
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="h-10 w-10 rounded-full" />
+                    <div className="space-y-1">
+                      <Skeleton className="h-4 w-28" />
+                      <Skeleton className="h-3 w-36" />
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                <TableCell><Skeleton className="h-5 w-20 rounded-full" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-12" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                <TableCell className="text-right"><Skeleton className="h-8 w-8 rounded-md ms-auto" /></TableCell>
+              </TableRow>
+            ))
+          )}
           {!loading && teachers.length === 0 && (
             <TableRow>
-              <TableCell colSpan={7} className="text-center text-muted-foreground">
+              <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                 No teachers found
               </TableCell>
             </TableRow>
           )}
-          {teachers.map((teacher, index) => {
+          {!loading && teachers.map((teacher, index) => {
             const user = typeof teacher.userId === 'object' ? teacher.userId : null;
             return (
               <TableRow
@@ -154,7 +176,7 @@ export function TeacherTable({ teachers, loading, onEdit, onView, onKycUpdate }:
                           <DropdownMenuItem
                             className="gap-2 text-success focus:text-success"
                             onSelect={() => {
-                              onKycUpdate(user?.id || '', 'verified');
+                              onKycUpdate(user?.id || (user as any)?._id || '', 'verified');
                             }}
                           >
                             <CheckCircle2 className="h-4 w-4" /> Verify KYC
@@ -164,7 +186,7 @@ export function TeacherTable({ teachers, loading, onEdit, onView, onKycUpdate }:
                           <DropdownMenuItem
                             className="gap-2 text-destructive focus:text-destructive"
                             onSelect={() => {
-                              onKycUpdate(user?.id || '', 'rejected');
+                              onKycUpdate(user?.id || (user as any)?._id || '', 'rejected');
                             }}
                           >
                             <XCircle className="h-4 w-4" /> Reject KYC
@@ -182,4 +204,3 @@ export function TeacherTable({ teachers, loading, onEdit, onView, onKycUpdate }:
     </div>
   );
 }
-

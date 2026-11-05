@@ -10,7 +10,8 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MoreHorizontal, Pencil, Eye, Award } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { MoreHorizontal, Pencil, Eye } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,14 +55,36 @@ export function StudentTable({ students, loading, onEdit, onView }: Props) {
           </TableRow>
         </TableHeader>
         <TableBody>
+          {loading && (
+            Array.from({ length: 4 }).map((_, i) => (
+              <TableRow key={i} className="border-border">
+                <TableCell>
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="h-10 w-10 rounded-full" />
+                    <div className="space-y-1">
+                      <Skeleton className="h-4 w-28" />
+                      <Skeleton className="h-3 w-36" />
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                <TableCell><Skeleton className="h-5 w-10" /></TableCell>
+                <TableCell><Skeleton className="h-5 w-10" /></TableCell>
+                <TableCell><Skeleton className="h-5 w-10" /></TableCell>
+                <TableCell><Skeleton className="h-3 w-20" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-12" /></TableCell>
+                <TableCell className="text-right"><Skeleton className="h-8 w-8 rounded-md ms-auto" /></TableCell>
+              </TableRow>
+            ))
+          )}
           {!loading && students.length === 0 && (
             <TableRow>
-              <TableCell colSpan={8} className="text-center text-muted-foreground">
+              <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
                 No students found
               </TableCell>
             </TableRow>
           )}
-          {students.map((student, index) => {
+          {!loading && students.map((student, index) => {
             const user = typeof student.userId === 'object' ? student.userId : null;
             const progress = student.progress || {
               totalCourses: 0,
@@ -153,4 +176,3 @@ export function StudentTable({ students, loading, onEdit, onView }: Props) {
     </div>
   );
 }
-

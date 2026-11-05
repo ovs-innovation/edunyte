@@ -4,7 +4,7 @@ import { TeacherTable } from '@/components/teachers/TeacherTable';
 import { PermissionGate } from '@/components/PermissionGate';
 import { Button } from '@/components/ui/button';
 import { Download, Filter } from 'lucide-react';
-import { TeacherProfileAPI, ApiTeacherProfile, UsersAPI, ApiUser } from '@/lib/api';
+import { TeacherProfileAPI, ApiTeacherProfile, ApiUser } from '@/lib/api';
 import { TeacherProfileDialog } from '@/components/teachers/TeacherProfileDialog';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -34,22 +34,29 @@ const TeachersPage = () => {
     setLoading(true);
     try {
       const data = await TeacherProfileAPI.list();
-      // Fetch user details for each teacher
-      const teachersWithUsers = await Promise.all(
-        (data.profiles || []).map(async (profile) => {
-          const userId = typeof profile.userId === 'string' ? profile.userId : profile.userId._id || profile.userId.id;
-          try {
-            const userData = await UsersAPI.list();
-            const user = userData.users.find((u) => u.id === userId);
-            return {
-              ...profile,
-              userId: user || profile.userId,
-            };
-          } catch {
-            return { ...profile, userId: profile.userId };
-          }
-        })
-      );
+      const teachersWithUsers = (data.profiles || []).map((profile) => {
+        const u = profile.userId as any;
+        const normalizedUser: ApiUser = typeof u === 'object' && u !== null ? {
+          id: u.id || u._id || '',
+          name: u.name || '',
+          email: u.email || '',
+          role: u.role || 'teacher',
+          status: u.status || 'active',
+          permissions: u.permissions || [],
+        } : {
+          id: String(u || ''),
+          name: '',
+          email: '',
+          role: 'teacher',
+          status: 'active',
+          permissions: [],
+        };
+
+        return {
+          ...profile,
+          userId: normalizedUser,
+        };
+      });
       setTeachers(teachersWithUsers);
     } catch (err: any) {
       toast({ title: 'Failed to load teachers', description: err?.message, variant: 'destructive' });
@@ -66,7 +73,6 @@ const TeachersPage = () => {
     setTeachers((prev) => {
       const exists = prev.find((t) => t._id === profile._id);
       if (exists) {
-        const userId = typeof profile.userId === 'string' ? profile.userId : profile.userId._id || profile.userId.id;
         const user = exists.userId;
         return prev.map((t) => (t._id === profile._id ? { ...profile, userId: user } : t));
       }
@@ -226,4 +232,3 @@ const TeachersPage = () => {
 };
 
 export default TeachersPage;
-
