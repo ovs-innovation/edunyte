@@ -473,7 +473,7 @@ const StudentDashboardArea = () => {
                             className={`nav-link ${activeTab === 'cancelled' ? 'active' : ''}`}
                             onClick={() => setActiveTab('cancelled')}
                           >
-                            {t('student_dashboard.cancelled_tab')} ({stats.cancelled})
+                            {t('student_dashboard.cancelled_tab', t('dashboard.cancelled', 'Cancelled'))} ({stats.cancelled})
                           </button>
                         </li>
                       </ul>
@@ -520,7 +520,7 @@ const StudentDashboardArea = () => {
                           {activeTab === 'cancelled' && cancelledBookings.length === 0 && (
                             <div className="text-center py-5">
                               <i className="flaticon-close" style={{ fontSize: '48px', color: '#ddd' }}></i>
-                              <p className="text-muted mt-3">{t('student_dashboard.no_cancelled_lessons')}</p>
+                              <p className="text-muted mt-3">{t('student_dashboard.no_cancelled_lessons', 'No cancelled lessons found')}</p>
                             </div>
                           )}
 
@@ -789,7 +789,7 @@ const StudentDashboardArea = () => {
                                       </div>
                                     </div>
                                     <div className="col-md-3 text-md-end">
-                                      <span className="badge bg-danger">{t('student_dashboard.status_cancelled')}</span>
+                                      <span className="badge bg-danger">{t('student_dashboard.status_cancelled', 'Cancelled')}</span>
                                     </div>
                                   </div>
                                 </div>
