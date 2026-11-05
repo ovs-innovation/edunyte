@@ -24,6 +24,15 @@ const DashboardBannerTwo = ({ totalLessons = 0, completedLessons = 0 }: Dashboar
     return user?.email?.split('@')[0] || t('dashboard.student')
   }
 
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .filter(Boolean)
+      .map((part: string) => part[0]?.toUpperCase())
+      .slice(0, 2)
+      .join('') || 'S';
+  }
+
   const getProfilePicture = () => {
     const photo = user?.photo || user?.profile?.photo || user?.avatar || user?.image;
     if (photo && typeof photo === 'string') {
@@ -33,7 +42,7 @@ const DashboardBannerTwo = ({ totalLessons = 0, completedLessons = 0 }: Dashboar
       }
       return photo;
     }
-    return "/assets/img/courses/details_instructors02.jpg"
+    return null;
   }
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,15 +117,40 @@ const DashboardBannerTwo = ({ totalLessons = 0, completedLessons = 0 }: Dashboar
       <div className="dashboard__instructor-info">
         <div className="dashboard__instructor-info-left">
           <div className="thumb" style={{ position: 'relative' }}>
-            <img
-              src={getProfilePicture()}
-              alt={getStudentName()}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = "/assets/img/courses/details_instructors02.jpg";
+            {getProfilePicture() ? (
+              <img
+                src={getProfilePicture()!}
+                alt={getStudentName()}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const fallback = target.nextElementSibling as HTMLElement;
+                  if (fallback) fallback.style.display = 'flex';
+                }}
+              />
+            ) : null}
+            <div
+              className="default-avatar-placeholder"
+              style={{
+                display: getProfilePicture() ? 'none' : 'flex',
+                width: '100%',
+                height: '100%',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+                color: '#ffffff',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '36px',
+                fontWeight: 700,
+                letterSpacing: '1px',
+                border: '3px solid #ffffff',
+                boxShadow: '0 4px 14px rgba(99, 102, 241, 0.25)',
+                userSelect: 'none'
               }}
-            />
+            >
+              {getInitials(getStudentName())}
+            </div>
             <label
               htmlFor="profile-upload"
               style={{
