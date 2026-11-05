@@ -3,6 +3,7 @@ import { User, LogOut, Settings, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PermissionGate } from '@/components/PermissionGate';
 import { useRole } from '@/contexts/RoleContext';
+import { clearToken, ROLE_KEY } from '@/lib/api';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +30,24 @@ export function UserMenu() {
 
   const handleLogout = () => {
     toast.success('Logged out successfully');
+    const isTeacher = currentRole === 'teacher' || localStorage.getItem(ROLE_KEY) === 'teacher';
+
+    clearToken();
+    localStorage.removeItem('user-name');
+    localStorage.removeItem('user-email');
+    localStorage.removeItem('user-id');
+    localStorage.removeItem(ROLE_KEY);
+    localStorage.removeItem('user-permissions');
+    sessionStorage.clear();
+
+    if (isTeacher) {
+      const frontendUrl =
+        import.meta.env.VITE_FRONTEND_URL ||
+        (window.location.hostname === 'localhost' ? 'http://localhost:5174' : window.location.origin.replace(/:\d+$/, ':5174').replace('admin.', ''));
+      window.location.href = `${frontendUrl}/instructor/login?logout=true`;
+      return;
+    }
+
     navigate('/login');
   };
 
