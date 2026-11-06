@@ -150,11 +150,59 @@ export const getCourses = async (req, res, next) => {
       await ensureCourseSlug(c);
     }
 
+    // Fetch all approved teacher course mappings for these courses to determine actual starting prices
+    const courseIds = courses.map(c => c._id);
+    const TeacherCourse = (await import("../models/teacherCourseModel.js")).default;
+    const Settings = (await import("../models/settingsModel.js")).default;
+    const settings = await Settings.getSettings();
+    const globalFeePercent = Number(settings?.platformFeePercent ?? 4);
+
+    const approvedTeacherCourses = await TeacherCourse.find({
+      courseId: { $in: courseIds },
+      status: "approved",
+    });
+
+    const tcByCourse = new Map();
+    approvedTeacherCourses.forEach(tc => {
+      const cId = tc.courseId.toString();
+      if (!tcByCourse.has(cId)) tcByCourse.set(cId, []);
+      tcByCourse.get(cId).push(tc);
+    });
+
     const coursesData = courses.map(course => {
       const courseObj = course.toObject();
       courseObj.name = getLanguageValue(courseObj.name);
       courseObj.description = getLanguageValue(courseObj.description);
       courseObj.slug = getLanguageValue(courseObj.slug);
+
+      const teachers = tcByCourse.get(course._id.toString()) || [];
+      if (teachers.length > 0) {
+        const prices = teachers.map(tc => {
+          const rawPrice = Number(tc.pricing?.teacherPrice || 0);
+          let fee = 0;
+          if (tc.customPlatformFeeType === "fixed" && tc.customPlatformFeeAmount !== undefined && tc.customPlatformFeeAmount !== null) {
+            fee = Number(tc.customPlatformFeeAmount);
+          } else if (tc.customPlatformFeePercent !== undefined && tc.customPlatformFeePercent !== null) {
+            fee = (rawPrice * Number(tc.customPlatformFeePercent)) / 100;
+          } else {
+            fee = (rawPrice * globalFeePercent) / 100;
+          }
+          return Math.round((rawPrice + fee) * 100) / 100;
+        });
+        const minPrice = Math.min(...prices);
+        courseObj.price = minPrice;
+        courseObj.startingPrice = minPrice;
+        courseObj.hasTeachers = true;
+        courseObj.teachersCount = teachers.length;
+        courseObj.currency = teachers[0]?.pricing?.teacherCurrency || "INR";
+      } else {
+        courseObj.price = 0;
+        courseObj.startingPrice = 0;
+        courseObj.hasTeachers = false;
+        courseObj.teachersCount = 0;
+        courseObj.currency = "INR";
+      }
+
       return courseObj;
     });
 
@@ -188,6 +236,44 @@ export const getCourseById = async (req, res, next) => {
     courseObj.name = getLanguageValue(courseObj.name);
     courseObj.description = getLanguageValue(courseObj.description);
     courseObj.slug = getLanguageValue(courseObj.slug);
+
+    const TeacherCourse = (await import("../models/teacherCourseModel.js")).default;
+    const Settings = (await import("../models/settingsModel.js")).default;
+    const settings = await Settings.getSettings();
+    const globalFeePercent = Number(settings?.platformFeePercent ?? 4);
+
+    const approvedTeacherCourses = await TeacherCourse.find({
+      courseId: course._id,
+      status: "approved",
+    });
+
+    if (approvedTeacherCourses.length > 0) {
+      const prices = approvedTeacherCourses.map(tc => {
+        const rawPrice = Number(tc.pricing?.teacherPrice || 0);
+        let fee = 0;
+        if (tc.customPlatformFeeType === "fixed" && tc.customPlatformFeeAmount !== undefined && tc.customPlatformFeeAmount !== null) {
+          fee = Number(tc.customPlatformFeeAmount);
+        } else if (tc.customPlatformFeePercent !== undefined && tc.customPlatformFeePercent !== null) {
+          fee = (rawPrice * Number(tc.customPlatformFeePercent)) / 100;
+        } else {
+          fee = (rawPrice * globalFeePercent) / 100;
+        }
+        return Math.round((rawPrice + fee) * 100) / 100;
+      });
+      const minPrice = Math.min(...prices);
+      courseObj.price = minPrice;
+      courseObj.startingPrice = minPrice;
+      courseObj.hasTeachers = true;
+      courseObj.teachersCount = approvedTeacherCourses.length;
+      courseObj.currency = approvedTeacherCourses[0]?.pricing?.teacherCurrency || "INR";
+    } else {
+      courseObj.price = 0;
+      courseObj.startingPrice = 0;
+      courseObj.hasTeachers = false;
+      courseObj.teachersCount = 0;
+      courseObj.currency = "INR";
+    }
+
     res.json({ course: courseObj });
   } catch (err) {
     next(err);
@@ -242,6 +328,44 @@ export const updateCourse = async (req, res, next) => {
     courseObj.name = getLanguageValue(courseObj.name);
     courseObj.description = getLanguageValue(courseObj.description);
     courseObj.slug = getLanguageValue(courseObj.slug);
+
+    const TeacherCourse = (await import("../models/teacherCourseModel.js")).default;
+    const Settings = (await import("../models/settingsModel.js")).default;
+    const settings = await Settings.getSettings();
+    const globalFeePercent = Number(settings?.platformFeePercent ?? 4);
+
+    const approvedTeacherCourses = await TeacherCourse.find({
+      courseId: course._id,
+      status: "approved",
+    });
+
+    if (approvedTeacherCourses.length > 0) {
+      const prices = approvedTeacherCourses.map(tc => {
+        const rawPrice = Number(tc.pricing?.teacherPrice || 0);
+        let fee = 0;
+        if (tc.customPlatformFeeType === "fixed" && tc.customPlatformFeeAmount !== undefined && tc.customPlatformFeeAmount !== null) {
+          fee = Number(tc.customPlatformFeeAmount);
+        } else if (tc.customPlatformFeePercent !== undefined && tc.customPlatformFeePercent !== null) {
+          fee = (rawPrice * Number(tc.customPlatformFeePercent)) / 100;
+        } else {
+          fee = (rawPrice * globalFeePercent) / 100;
+        }
+        return Math.round((rawPrice + fee) * 100) / 100;
+      });
+      const minPrice = Math.min(...prices);
+      courseObj.price = minPrice;
+      courseObj.startingPrice = minPrice;
+      courseObj.hasTeachers = true;
+      courseObj.teachersCount = approvedTeacherCourses.length;
+      courseObj.currency = approvedTeacherCourses[0]?.pricing?.teacherCurrency || "INR";
+    } else {
+      courseObj.price = 0;
+      courseObj.startingPrice = 0;
+      courseObj.hasTeachers = false;
+      courseObj.teachersCount = 0;
+      courseObj.currency = "INR";
+    }
+
     res.json({ course: courseObj });
   } catch (err) {
     next(err);

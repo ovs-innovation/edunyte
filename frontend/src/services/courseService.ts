@@ -10,6 +10,11 @@ export interface Course {
   image?: string
   status: string
   slug?: string
+  price?: number
+  startingPrice?: number
+  hasTeachers?: boolean
+  teachersCount?: number
+  currency?: string
   createdBy?: {
     _id: string
     name: string

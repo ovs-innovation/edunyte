@@ -156,7 +156,15 @@ const CourseArea = () => {
                                              <Link to={`/course/${item.slug || item._id}`} className="btn-neon-primary py-2 px-4 small" style={{ fontSize: '0.85rem' }}>
                                                 {t('common.book_session')}
                                              </Link>
-                                             <div className="price fw-900 text-primary">{formatPriceDirect((item as any).price || 49)}</div>
+                                             <div className="price fw-900 text-primary">
+                                                {typeof item.price === 'number' && item.price > 0 ? (
+                                                   formatPriceDirect(item.price)
+                                                ) : item.hasTeachers === false ? (
+                                                   <span className="small text-muted fw-normal" style={{ fontSize: '0.8rem' }}>Coming Soon</span>
+                                                ) : (
+                                                   formatPriceDirect(item.price || 0)
+                                                )}
+                                             </div>
                                           </div>
                                        </div>
                                     </div>
@@ -203,7 +211,15 @@ const CourseArea = () => {
                                              <div className="d-flex align-items-center justify-content-between">
                                                 <div className="d-flex align-items-center gap-3">
                                                    <Link to={`/course/${item.slug || item._id}`} className="btn-neon-primary py-2 px-4">{t('common.book_session') || 'Book Now'}</Link>
-                                                   <span className="fw-900 text-primary">{formatPriceDirect((item as any).price || 49)}</span>
+                                                   <span className="fw-900 text-primary">
+                                                      {typeof item.price === 'number' && item.price > 0 ? (
+                                                         formatPriceDirect(item.price)
+                                                      ) : item.hasTeachers === false ? (
+                                                         <span className="small text-muted fw-normal" style={{ fontSize: '0.8rem' }}>Coming Soon</span>
+                                                      ) : (
+                                                         formatPriceDirect(item.price || 0)
+                                                      )}
+                                                   </span>
                                                 </div>
                                                 <div className="text-warning small">
                                                    <i className="fas fa-star"></i> 5.0 (120)
