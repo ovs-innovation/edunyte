@@ -112,7 +112,14 @@ export interface TeacherCourse {
     teacherPrice: number
     teacherCurrency: string
     exchangeRateAtCreation: number
+    totalPrice?: number
+    totalPriceUSD?: number
+    platformFee?: number
+    platformFeeUSD?: number
+    platformFeePercent?: number
+    platformFeeType?: 'percentage' | 'fixed'
   }
+  totalPrice?: number
   // Derived convenience fields for UI display (USD base only; never trust for checkout)
   price?: number
   currency?: string

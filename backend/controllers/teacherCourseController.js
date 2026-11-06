@@ -6,7 +6,63 @@ import mongoose from "mongoose";
 import { normalizeLanguageValue, getLanguageValue } from "../utils/languageHelper.js";
 import { getBaseCurrency } from "../utils/currencyHelper.js";
 import iso6391 from "iso-639-1";
-import { buildTeacherCoursePricing, computeSlotBaseAmountUSD } from "../utils/pricingHelper.js";
+import { buildTeacherCoursePricing, computeSlotBaseAmountUSD, getUsdToCurrencyRateOrThrow, roundMoney2 } from "../utils/pricingHelper.js";
+import Settings from "../models/settingsModel.js";
+
+/**
+ * Helper: Calculate and attach total public pricing (teacher price + admin platform fee)
+ * so students always see the correct final price on public course pages.
+ */
+const attachPublicPricing = async (tcObj, globalPlatformFeePercent) => {
+  const rawTeacherPrice = Number(tcObj.pricing?.teacherPrice || 0);
+  const rawBasePriceUSD = Number(tcObj.pricing?.basePriceUSD || 0);
+  const teacherCurrency = (tcObj.pricing?.teacherCurrency || "INR").toUpperCase();
+
+  let platformFee = 0;
+  let platformFeeUSD = 0;
+  let platformFeePercent = globalPlatformFeePercent;
+  const feeType = tcObj.customPlatformFeeType || "percentage";
+
+  if (feeType === "fixed" && tcObj.customPlatformFeeAmount !== undefined && tcObj.customPlatformFeeAmount !== null) {
+    const fixedAmount = Number(tcObj.customPlatformFeeAmount);
+    const feeCurrency = (tcObj.customPlatformFeeCurrency || teacherCurrency).toUpperCase();
+    try {
+      const { rate: feeCurrencyRate } = await getUsdToCurrencyRateOrThrow(feeCurrency);
+      platformFeeUSD = roundMoney2(fixedAmount / feeCurrencyRate);
+    } catch {
+      platformFeeUSD = roundMoney2(fixedAmount / 86.5);
+    }
+    platformFee = fixedAmount;
+    platformFeePercent = rawTeacherPrice > 0 ? roundMoney2((fixedAmount / rawTeacherPrice) * 100) : 0;
+  } else if (tcObj.customPlatformFeePercent !== undefined && tcObj.customPlatformFeePercent !== null) {
+    platformFeePercent = Number(tcObj.customPlatformFeePercent);
+    platformFee = roundMoney2((rawTeacherPrice * platformFeePercent) / 100);
+    platformFeeUSD = roundMoney2((rawBasePriceUSD * platformFeePercent) / 100);
+  } else {
+    platformFeePercent = globalPlatformFeePercent;
+    platformFee = roundMoney2((rawTeacherPrice * platformFeePercent) / 100);
+    platformFeeUSD = roundMoney2((rawBasePriceUSD * platformFeePercent) / 100);
+  }
+
+  const totalPrice = roundMoney2(rawTeacherPrice + platformFee);
+  const totalPriceUSD = roundMoney2(rawBasePriceUSD + platformFeeUSD);
+
+  tcObj.pricing = {
+    ...tcObj.pricing,
+    rawTeacherPrice,
+    teacherPrice: totalPrice, // The total public price shown to students (teacher rate + platform fee)
+    basePriceUSD: totalPriceUSD, // Total USD base for multi-currency conversion on frontend
+    platformFee,
+    platformFeeUSD,
+    platformFeePercent,
+    platformFeeType: feeType,
+    totalPrice,
+    totalPriceUSD,
+  };
+  tcObj.price = totalPriceUSD;
+  tcObj.totalPrice = totalPrice;
+  return tcObj;
+};
 
 /**
  * TeacherCourse Controller
@@ -705,7 +761,13 @@ export const rejectTeacherCourse = async (req, res, next) => {
 export const updateTeacherCourse = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { customPlatformFeePercent } = req.body;
+    const {
+      customPlatformFeePercent,
+      customPlatformFeeType,
+      customPlatformFeeAmount,
+      customPlatformFeeCurrency,
+      useGlobal,
+    } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid request ID" });
@@ -716,14 +778,34 @@ export const updateTeacherCourse = async (req, res, next) => {
       return res.status(404).json({ message: "Teacher course not found" });
     }
 
-    // Update custom platform fee if provided
-    if (customPlatformFeePercent !== undefined) {
+    // Reset to global platform fee
+    if (useGlobal) {
+      teacherCourse.customPlatformFeeType = "percentage";
+      teacherCourse.customPlatformFeePercent = undefined;
+      teacherCourse.customPlatformFeeAmount = undefined;
+      teacherCourse.customPlatformFeeCurrency = "INR";
+      console.log(`[TeacherCourse Update] Reset course ${id} to global platform fee`);
+    } else if (customPlatformFeeType === "fixed") {
+      // Fixed commission amount (e.g. ₹250)
+      const fixedAmount = parseFloat(customPlatformFeeAmount);
+      if (isNaN(fixedAmount) || fixedAmount < 0) {
+        return res.status(400).json({ message: "Fixed platform fee amount must be a non-negative number" });
+      }
+      teacherCourse.customPlatformFeeType = "fixed";
+      teacherCourse.customPlatformFeeAmount = fixedAmount;
+      teacherCourse.customPlatformFeeCurrency = (customPlatformFeeCurrency || teacherCourse.pricing?.teacherCurrency || "INR").toUpperCase();
+      teacherCourse.customPlatformFeePercent = undefined;
+      console.log(`[TeacherCourse Update] Setting custom fixed fee for ${id}: ${teacherCourse.customPlatformFeeCurrency} ${fixedAmount}`);
+    } else if (customPlatformFeePercent !== undefined && customPlatformFeePercent !== null) {
+      // Percentage commission (e.g. 10%)
       const feePercent = parseFloat(customPlatformFeePercent);
       if (isNaN(feePercent) || feePercent < 0 || feePercent > 100) {
-        return res.status(400).json({ message: "Platform fee must be between 0 and 100" });
+        return res.status(400).json({ message: "Platform fee percentage must be between 0 and 100" });
       }
-      console.log(`[TeacherCourse Update] Setting custom fee for ${id}: ${feePercent}%`);
+      teacherCourse.customPlatformFeeType = "percentage";
       teacherCourse.customPlatformFeePercent = feePercent;
+      teacherCourse.customPlatformFeeAmount = undefined;
+      console.log(`[TeacherCourse Update] Setting custom percentage fee for ${id}: ${feePercent}%`);
     }
 
     await teacherCourse.save();
@@ -829,18 +911,24 @@ export const getCourseTeachers = async (req, res, next) => {
       // Sort by cheapest in USD base
       .sort({ "pricing.basePriceUSD": 1 });
 
-    const teacherCoursesData = teacherCourses.map((tc) => {
-      const tcObj = tc.toObject();
+    const settings = await Settings.getSettings();
+    const globalPlatformFeePercent = Number(settings?.platformFeePercent ?? 4);
 
-      tcObj.bio = getLanguageValue(tcObj.bio);
-      tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
-      if (tcObj.courseId && typeof tcObj.courseId === "object") {
-        tcObj.courseId.name = getLanguageValue(tcObj.courseId.name);
-        tcObj.courseId.description = getLanguageValue(tcObj.courseId.description);
-        tcObj.courseId.slug = getLanguageValue(tcObj.courseId.slug);
-      }
-      return tcObj;
-    });
+    const teacherCoursesData = await Promise.all(
+      teacherCourses.map(async (tc) => {
+        const tcObj = tc.toObject();
+
+        tcObj.bio = getLanguageValue(tcObj.bio);
+        tcObj.aboutCourse = getLanguageValue(tcObj.aboutCourse);
+        if (tcObj.courseId && typeof tcObj.courseId === "object") {
+          tcObj.courseId.name = getLanguageValue(tcObj.courseId.name);
+          tcObj.courseId.description = getLanguageValue(tcObj.courseId.description);
+          tcObj.courseId.slug = getLanguageValue(tcObj.courseId.slug);
+        }
+        await attachPublicPricing(tcObj, globalPlatformFeePercent);
+        return tcObj;
+      })
+    );
 
     res.json({ teacherCourses: teacherCoursesData, count: teacherCoursesData.length });
   } catch (err) {
@@ -888,6 +976,9 @@ export const getCourseTeachersBySlug = async (req, res, next) => {
     const defaultEndDate = new Date();
     defaultEndDate.setDate(defaultEndDate.getDate() + 30); // Next 30 days
 
+    const settings = await Settings.getSettings();
+    const globalPlatformFeePercent = Number(settings?.platformFeePercent ?? 4);
+
     const teachersData = await Promise.all(
       teacherCourses.map(async (tc) => {
         const tcObj = tc.toObject();
@@ -908,6 +999,9 @@ export const getCourseTeachersBySlug = async (req, res, next) => {
             nativeName: getLanguageValue(lang.nativeName),
           }));
         }
+
+        // Attach dynamic total public price (teacher base rate + admin commission)
+        await attachPublicPricing(tcObj, globalPlatformFeePercent);
 
         const teacherProfile = await TeacherProfile.findOne({ userId: tc.teacherId });
         if (teacherProfile) {

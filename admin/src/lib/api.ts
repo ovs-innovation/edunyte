@@ -455,6 +455,10 @@ export interface ApiTeacherCourse {
   reviewedBy?: ApiUser | string;
   reviewedAt?: string;
   rejectionReason?: string;
+  customPlatformFeePercent?: number;
+  customPlatformFeeType?: "percentage" | "fixed";
+  customPlatformFeeAmount?: number;
+  customPlatformFeeCurrency?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -485,7 +489,16 @@ export const TeacherCoursesAPI = {
       method: "PATCH",
       body: JSON.stringify({ status: "rejected", rejectionReason }),
     }),
-  update: (id: string, payload: { customPlatformFeePercent?: number }) =>
+  update: (
+    id: string,
+    payload: {
+      customPlatformFeePercent?: number | null;
+      customPlatformFeeType?: "percentage" | "fixed";
+      customPlatformFeeAmount?: number | null;
+      customPlatformFeeCurrency?: string;
+      useGlobal?: boolean;
+    }
+  ) =>
     apiFetch<{ teacherCourse: ApiTeacherCourse; message: string }>(`/admin/teacher-course/${id}`, {
       method: "PATCH",
       body: JSON.stringify(payload),

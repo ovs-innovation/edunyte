@@ -76,7 +76,9 @@ const TeacherApprovalPage = () => {
   const [tempFeePercent, setTempFeePercent] = useState<number>(4);
   const [customFeeDialogOpen, setCustomFeeDialogOpen] = useState(false);
   const [selectedCourseForFee, setSelectedCourseForFee] = useState<ApiTeacherCourse | null>(null);
+  const [tempFeeType, setTempFeeType] = useState<'percentage' | 'fixed'>('percentage');
   const [tempCustomFeePercent, setTempCustomFeePercent] = useState<number>(4);
+  const [tempCustomFeeAmount, setTempCustomFeeAmount] = useState<number>(0);
   const { toast } = useToast();
   const { confirm, ConfirmDialog } = useConfirmDialog();
 
@@ -137,40 +139,101 @@ const TeacherApprovalPage = () => {
     }
   };
 
-  const getCourseFeePercent = (course: ApiTeacherCourse): number => {
-    // Check if course has a custom platform fee percentage
-    return (course as any).customPlatformFeePercent ?? platformFeePercent;
-  };
+  const getCourseFeeDetails = (course: ApiTeacherCourse) => {
+    const teacherPrice = course.pricing?.teacherPrice || 0;
+    const currency = course.pricing?.teacherCurrency || 'INR';
 
-  const calculatePlatformFee = (teacherPrice: number, customPercent?: number) => {
-    const feePercent = customPercent ?? platformFeePercent;
-    return (teacherPrice * feePercent) / 100;
-  };
+    if (course.customPlatformFeeType === 'fixed' && course.customPlatformFeeAmount !== undefined) {
+      const feeAmount = course.customPlatformFeeAmount;
+      return {
+        type: 'fixed' as const,
+        feeAmount,
+        totalPrice: teacherPrice + feeAmount,
+        currency,
+        badgeText: 'Custom ₹',
+      };
+    }
 
-  const calculateTotalPrice = (teacherPrice: number, customPercent?: number) => {
-    return teacherPrice + calculatePlatformFee(teacherPrice, customPercent);
+    if (course.customPlatformFeePercent !== undefined) {
+      const percent = course.customPlatformFeePercent;
+      const feeAmount = (teacherPrice * percent) / 100;
+      return {
+        type: 'percentage' as const,
+        percent,
+        feeAmount,
+        totalPrice: teacherPrice + feeAmount,
+        currency,
+        badgeText: 'Custom %',
+      };
+    }
+
+    const feeAmount = (teacherPrice * platformFeePercent) / 100;
+    return {
+      type: 'global' as const,
+      percent: platformFeePercent,
+      feeAmount,
+      totalPrice: teacherPrice + feeAmount,
+      currency,
+      badgeText: null,
+    };
   };
 
   const openCustomFeeDialog = (course: ApiTeacherCourse) => {
     setSelectedCourseForFee(course);
-    const currentFee = getCourseFeePercent(course);
-    setTempCustomFeePercent(currentFee);
+    if (course.customPlatformFeeType === 'fixed' && course.customPlatformFeeAmount !== undefined) {
+      setTempFeeType('fixed');
+      setTempCustomFeeAmount(course.customPlatformFeeAmount);
+      setTempCustomFeePercent(platformFeePercent);
+    } else if (course.customPlatformFeePercent !== undefined) {
+      setTempFeeType('percentage');
+      setTempCustomFeePercent(course.customPlatformFeePercent);
+      setTempCustomFeeAmount(0);
+    } else {
+      setTempFeeType('percentage');
+      setTempCustomFeePercent(platformFeePercent);
+      setTempCustomFeeAmount(0);
+    }
     setCustomFeeDialogOpen(true);
   };
 
   const handleUpdateCustomFee = async () => {
     if (!selectedCourseForFee) return;
     try {
-      // Update the teacher course with custom platform fee
-      await TeacherCoursesAPI.update(selectedCourseForFee._id, {
-        customPlatformFeePercent: tempCustomFeePercent
-      });
-      toast({ title: 'Custom platform fee updated successfully' });
+      if (tempFeeType === 'fixed') {
+        const currency = selectedCourseForFee.pricing?.teacherCurrency || 'INR';
+        await TeacherCoursesAPI.update(selectedCourseForFee._id, {
+          customPlatformFeeType: 'fixed',
+          customPlatformFeeAmount: tempCustomFeeAmount,
+          customPlatformFeeCurrency: currency,
+        });
+        toast({ title: `Custom fixed commission updated (${currency} ${tempCustomFeeAmount})` });
+      } else {
+        await TeacherCoursesAPI.update(selectedCourseForFee._id, {
+          customPlatformFeeType: 'percentage',
+          customPlatformFeePercent: tempCustomFeePercent,
+        });
+        toast({ title: `Custom platform fee percentage updated (${tempCustomFeePercent}%)` });
+      }
       setCustomFeeDialogOpen(false);
       setSelectedCourseForFee(null);
-      loadRequests(); // Reload to show updated data
+      loadRequests();
     } catch (err: any) {
       toast({ title: 'Failed to update custom fee', description: err?.message, variant: 'destructive' });
+    }
+  };
+
+  const handleResetToGlobalFee = async () => {
+    if (!selectedCourseForFee) return;
+    try {
+      await TeacherCoursesAPI.update(selectedCourseForFee._id, {
+        useGlobal: true,
+      });
+      toast({ title: `Reset to global default fee (${platformFeePercent}%)` });
+      setCustomFeeDialogOpen(false);
+      setSelectedCourseForFee(null);
+      loadRequests();
+    } catch (err: any) {
+      toast({ title: 'Failed to reset fee', description: err?.message, variant: 'destructive' });
     }
   };
 
@@ -460,41 +523,43 @@ const TeacherApprovalPage = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        <div className="space-y-1 flex-1">
-                          <div className="font-medium text-foreground">
-                            {request?.pricing?.teacherCurrency || 'USD'}{' '}
-                            {typeof request?.pricing?.teacherPrice === 'number'
-                              ? calculateTotalPrice(request.pricing.teacherPrice, getCourseFeePercent(request)).toFixed(2)
-                              : '0.00'}
+                      {(() => {
+                        const feeDetails = getCourseFeeDetails(request);
+                        return (
+                          <div className="flex items-center gap-2">
+                            <div className="space-y-1 flex-1">
+                              <div className="font-semibold text-foreground">
+                                {feeDetails.currency} {feeDetails.totalPrice.toFixed(2)}
+                              </div>
+                              {typeof request?.pricing?.teacherPrice === 'number' && (
+                                <>
+                                  <div className="text-xs text-muted-foreground">
+                                    Teacher: {feeDetails.currency} {request.pricing.teacherPrice.toFixed(2)}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    Fee ({feeDetails.type === 'fixed' ? 'Fixed' : `${feeDetails.percent}%`}): {feeDetails.currency}{' '}
+                                    {feeDetails.feeAmount.toFixed(2)}
+                                    {feeDetails.badgeText && (
+                                      <Badge variant="outline" className="ml-1 text-[10px] px-1 py-0">{feeDetails.badgeText}</Badge>
+                                    )}
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                            <PermissionGate permission="settings.edit">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 w-7 p-0"
+                                onClick={() => openCustomFeeDialog(request)}
+                                title="Edit platform fee for this course"
+                              >
+                                <Edit className="h-3.5 w-3.5" />
+                              </Button>
+                            </PermissionGate>
                           </div>
-                          {typeof request?.pricing?.teacherPrice === 'number' && (
-                            <>
-                              <div className="text-xs text-muted-foreground">
-                                Teacher: {request?.pricing?.teacherCurrency || 'USD'} {request.pricing.teacherPrice.toFixed(2)}
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                Fee ({getCourseFeePercent(request)}%): {request?.pricing?.teacherCurrency || 'USD'}{' '}
-                                {calculatePlatformFee(request.pricing.teacherPrice, getCourseFeePercent(request)).toFixed(2)}
-                                {(request as any).customPlatformFeePercent !== undefined && (
-                                  <Badge variant="outline" className="ml-1 text-[10px] px-1 py-0">Custom</Badge>
-                                )}
-                              </div>
-                            </>
-                          )}
-                        </div>
-                        <PermissionGate permission="settings.edit">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 w-7 p-0"
-                            onClick={() => openCustomFeeDialog(request)}
-                            title="Edit platform fee for this course"
-                          >
-                            <Edit className="h-3.5 w-3.5" />
-                          </Button>
-                        </PermissionGate>
-                      </div>
+                        );
+                      })()}
                     </TableCell>
                     <TableCell>
                       <Badge
@@ -637,55 +702,163 @@ const TeacherApprovalPage = () => {
 
       {/* Custom Platform Fee Edit Dialog */}
       <Dialog open={customFeeDialogOpen} onOpenChange={setCustomFeeDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[460px]">
           <DialogHeader>
             <DialogTitle>Edit Platform Fee for Course</DialogTitle>
             <DialogDescription>
-              Set a custom platform fee percentage for this specific teacher course, or use the global default ({platformFeePercent}%).
+              Set commission by percentage (%) or by fixed amount (₹ / Rupees) for this specific teacher course.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="customFeePercent">Platform Fee Percentage (%)</Label>
-              <Input
-                id="customFeePercent"
-                type="number"
-                min="0"
-                max="100"
-                step="0.1"
-                value={tempCustomFeePercent}
-                onChange={(e) => {
-                  const value = parseFloat(e.target.value);
-                  if (!isNaN(value) && value >= 0 && value <= 100) {
-                    setTempCustomFeePercent(value);
-                  }
-                }}
-                placeholder={`${platformFeePercent}`}
-              />
-              <p className="text-xs text-muted-foreground">
-                Global default: {platformFeePercent}% • Current custom: {selectedCourseForFee && getCourseFeePercent(selectedCourseForFee)}%
-              </p>
+
+          {selectedCourseForFee && (
+            <div className="space-y-4 py-2">
+              {/* Course Info Summary */}
+              <div className="rounded-lg border border-border bg-muted/40 p-3 text-xs space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Teacher:</span>
+                  <span className="font-medium text-foreground">{getTeacherName(selectedCourseForFee.teacherId)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Teacher Base Rate:</span>
+                  <span className="font-semibold text-foreground">
+                    {selectedCourseForFee.pricing?.teacherCurrency || 'INR'} {(selectedCourseForFee.pricing?.teacherPrice || 0).toFixed(2)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Commission Type Tabs/Buttons */}
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold">Commission Type</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    type="button"
+                    variant={tempFeeType === 'percentage' ? 'default' : 'outline'}
+                    size="sm"
+                    className="w-full text-xs"
+                    onClick={() => setTempFeeType('percentage')}
+                  >
+                    Percentage (%)
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={tempFeeType === 'fixed' ? 'default' : 'outline'}
+                    size="sm"
+                    className="w-full text-xs"
+                    onClick={() => setTempFeeType('fixed')}
+                  >
+                    Fixed Amount (₹ / Rupees)
+                  </Button>
+                </div>
+              </div>
+
+              {/* Conditional Input based on Fee Type */}
+              {tempFeeType === 'percentage' ? (
+                <div className="space-y-2">
+                  <Label htmlFor="customFeePercent">Platform Fee Percentage (%)</Label>
+                  <Input
+                    id="customFeePercent"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.5"
+                    value={tempCustomFeePercent}
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value);
+                      setTempCustomFeePercent(isNaN(value) ? 0 : Math.max(0, Math.min(100, value)));
+                    }}
+                    placeholder={`${platformFeePercent}`}
+                  />
+                  <div className="rounded-md bg-primary/5 border border-primary/15 p-2 text-xs space-y-1">
+                    <div className="flex justify-between text-muted-foreground">
+                      <span>Admin Commission ({tempCustomFeePercent}%):</span>
+                      <span className="font-semibold text-foreground">
+                        {selectedCourseForFee.pricing?.teacherCurrency || 'INR'}{' '}
+                        {(((selectedCourseForFee.pricing?.teacherPrice || 0) * tempCustomFeePercent) / 100).toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between border-t border-border/50 pt-1 font-medium">
+                      <span>Total Student Price:</span>
+                      <span className="text-primary font-bold">
+                        {selectedCourseForFee.pricing?.teacherCurrency || 'INR'}{' '}
+                        {((selectedCourseForFee.pricing?.teacherPrice || 0) * (1 + tempCustomFeePercent / 100)).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Global default: {platformFeePercent}%
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Label htmlFor="customFeeAmount">
+                    Fixed Commission Amount ({selectedCourseForFee.pricing?.teacherCurrency || 'INR'})
+                  </Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-semibold">
+                      ₹
+                    </span>
+                    <Input
+                      id="customFeeAmount"
+                      type="number"
+                      min="0"
+                      step="1"
+                      className="pl-8"
+                      value={tempCustomFeeAmount}
+                      onChange={(e) => {
+                        const value = parseFloat(e.target.value);
+                        setTempCustomFeeAmount(isNaN(value) ? 0 : Math.max(0, value));
+                      }}
+                      placeholder="e.g. 250"
+                    />
+                  </div>
+                  <div className="rounded-md bg-primary/5 border border-primary/15 p-2 text-xs space-y-1">
+                    <div className="flex justify-between text-muted-foreground">
+                      <span>Admin Commission (Fixed):</span>
+                      <span className="font-semibold text-foreground">
+                        {selectedCourseForFee.pricing?.teacherCurrency || 'INR'} {tempCustomFeeAmount.toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between border-t border-border/50 pt-1 font-medium">
+                      <span>Total Student Price:</span>
+                      <span className="text-primary font-bold">
+                        {selectedCourseForFee.pricing?.teacherCurrency || 'INR'}{' '}
+                        {((selectedCourseForFee.pricing?.teacherPrice || 0) + tempCustomFeeAmount).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Direct flat commission added to this course (e.g. ₹250).
+                  </p>
+                </div>
+              )}
             </div>
-          </div>
-          <DialogFooter className="gap-2">
+          )}
+
+          <DialogFooter className="gap-2 sm:justify-between">
             <Button
-              variant="outline"
-              onClick={() => {
-                setCustomFeeDialogOpen(false);
-                setSelectedCourseForFee(null);
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
+              type="button"
               variant="secondary"
-              onClick={() => setTempCustomFeePercent(platformFeePercent)}
+              size="sm"
+              onClick={handleResetToGlobalFee}
             >
               Use Global ({platformFeePercent}%)
             </Button>
-            <Button onClick={handleUpdateCustomFee}>
-              Save Custom Fee
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setCustomFeeDialogOpen(false);
+                  setSelectedCourseForFee(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button type="button" size="sm" onClick={handleUpdateCustomFee}>
+                Save Commission
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>

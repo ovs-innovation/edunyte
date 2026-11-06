@@ -274,12 +274,12 @@ const TeachersList = () => {
                     <div className="d-flex align-items-center justify-content-end">
                     <div className="h3 mb-0 fw-bold text-primary">
                       {formatPrice(
-                        (teacher.pricing?.teacherCurrency === 'INR' && typeof teacher.pricing?.teacherPrice === 'number')
-                          ? teacher.pricing.teacherPrice
+                        (teacher.pricing?.teacherCurrency === 'INR' && typeof (teacher.pricing?.totalPrice ?? teacher.pricing?.teacherPrice) === 'number')
+                          ? (teacher.pricing?.totalPrice ?? teacher.pricing?.teacherPrice)
                           : typeof teacher.price === 'number'
                             ? teacher.price * 83.33
-                            : typeof teacher?.pricing?.basePriceUSD === 'number'
-                              ? teacher.pricing.basePriceUSD * 83.33
+                            : typeof (teacher?.pricing?.totalPriceUSD ?? teacher?.pricing?.basePriceUSD) === 'number'
+                              ? (teacher.pricing.totalPriceUSD ?? teacher.pricing.basePriceUSD) * 83.33
                               : 0,
                         'INR'
                       )}

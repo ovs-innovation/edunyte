@@ -118,7 +118,18 @@ const TeachersSelection = () => {
       try {
         const entries = await Promise.all(
           teachers.map(async (teacher) => {
-            const usdAmount = typeof teacher.price === 'number' ? teacher.price : 0;
+            const hasExactMatch = teacher.pricing?.teacherCurrency === selectedCurrency && typeof (teacher.pricing?.totalPrice ?? teacher.pricing?.teacherPrice) === 'number';
+            if (hasExactMatch) {
+              const exactAmount = (teacher.pricing?.totalPrice ?? teacher.pricing?.teacherPrice)!;
+              return [
+                teacher._id,
+                {
+                  amount: exactAmount,
+                  formatted: formatPriceSelected(exactAmount, selectedCurrency),
+                },
+              ] as const;
+            }
+            const usdAmount = typeof teacher.price === 'number' ? teacher.price : (teacher.pricing?.totalPriceUSD ?? teacher.pricing?.basePriceUSD ?? 0);
             const converted = await convertPriceToSelected(usdAmount, selectedCurrency);
             return [
               teacher._id,
@@ -321,7 +332,10 @@ const TeachersSelection = () => {
   const getFormattedTeacherPrice = (teacher: TeacherCourse) => {
     const mapped = displayPrices[teacher._id]?.formatted;
     if (mapped) return mapped;
-    const usdAmount = typeof teacher.price === 'number' ? teacher.price : 0;
+    if (teacher.pricing?.teacherCurrency === selectedCurrency && typeof (teacher.pricing?.totalPrice ?? teacher.pricing?.teacherPrice) === 'number') {
+      return formatPriceSelected((teacher.pricing?.totalPrice ?? teacher.pricing?.teacherPrice)!, selectedCurrency);
+    }
+    const usdAmount = typeof teacher.price === 'number' ? teacher.price : (teacher.pricing?.totalPriceUSD ?? teacher.pricing?.basePriceUSD ?? 0);
     return formatPriceSelected(usdAmount, selectedCurrency);
   };
 

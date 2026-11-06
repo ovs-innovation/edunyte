@@ -47,30 +47,50 @@ export async function calculateCheckoutAmounts({
   const settings = await Settings.getSettings();
   const globalPlatformFeePercent = Number(settings?.platformFeePercent ?? 4);
   
-  // Check if teacher course has a custom platform fee percentage
-  const platformFeePercent = teacherCourse?.customPlatformFeePercent !== undefined 
-    ? Number(teacherCourse.customPlatformFeePercent)
-    : globalPlatformFeePercent;
-  
-  // Debug logging to verify which fee is being used
-  console.log('[Pricing] Teacher Course ID:', teacherCourse?._id);
-  console.log('[Pricing] Custom Platform Fee:', teacherCourse?.customPlatformFeePercent);
-  console.log('[Pricing] Global Platform Fee:', globalPlatformFeePercent);
-  console.log('[Pricing] Using Platform Fee:', platformFeePercent);
-  
-  const platformFeeUSD = (lessonAmountUSD * platformFeePercent) / 100;
+  let platformFeeUSD = 0;
+  let platformFeePercent = globalPlatformFeePercent;
+  const feeType = teacherCourse?.customPlatformFeeType || "percentage";
+
+  if (feeType === "fixed" && teacherCourse?.customPlatformFeeAmount !== undefined && teacherCourse?.customPlatformFeeAmount !== null) {
+    const fixedAmount = Number(teacherCourse.customPlatformFeeAmount);
+    const feeCurrency = (teacherCourse.customPlatformFeeCurrency || teacherCourse.pricing?.teacherCurrency || "INR").toUpperCase();
+    const { rate: feeCurrencyRate } = await getUsdToCurrencyRateOrThrow(feeCurrency);
+    platformFeeUSD = roundMoney2(fixedAmount / feeCurrencyRate);
+    platformFeePercent = lessonAmountUSD > 0 ? roundMoney2((platformFeeUSD / lessonAmountUSD) * 100) : 0;
+    console.log(`[Pricing] Using Custom Fixed Fee: ${feeCurrency} ${fixedAmount} (~$${platformFeeUSD} USD)`);
+  } else if (teacherCourse?.customPlatformFeePercent !== undefined && teacherCourse?.customPlatformFeePercent !== null) {
+    platformFeePercent = Number(teacherCourse.customPlatformFeePercent);
+    platformFeeUSD = (lessonAmountUSD * platformFeePercent) / 100;
+    console.log(`[Pricing] Using Custom Percentage Fee: ${platformFeePercent}%`);
+  } else {
+    platformFeePercent = globalPlatformFeePercent;
+    platformFeeUSD = (lessonAmountUSD * platformFeePercent) / 100;
+    console.log(`[Pricing] Using Global Platform Fee: ${globalPlatformFeePercent}%`);
+  }
+
   const totalAmountUSD = lessonAmountUSD + platformFeeUSD;
 
   const currency = (selectedCurrency || BASE).toString().trim().toUpperCase();
   const { rate } = await getUsdToCurrencyRateOrThrow(currency);
-  const totalAmount = roundMoney2(totalAmountUSD * rate);
   const lessonAmount = roundMoney2(lessonAmountUSD * rate);
-  const platformFee = roundMoney2(platformFeeUSD * rate);
+  
+  let platformFee = roundMoney2(platformFeeUSD * rate);
+  // If paying in the same currency as the fixed fee (e.g. INR), preserve exact fixed amount
+  if (feeType === "fixed") {
+    const feeCurrency = (teacherCourse?.customPlatformFeeCurrency || teacherCourse?.pricing?.teacherCurrency || "INR").toUpperCase();
+    if (feeCurrency === currency) {
+      platformFee = roundMoney2(Number(teacherCourse.customPlatformFeeAmount));
+    }
+  }
+  const totalAmount = roundMoney2(lessonAmount + platformFee);
 
   return {
     baseCurrency: BASE,
     selectedCurrency: currency,
     platformFeePercent,
+    platformFeeType: feeType,
+    platformFeeAmount: teacherCourse?.customPlatformFeeAmount,
+    platformFeeCurrency: teacherCourse?.customPlatformFeeCurrency,
     studentCount: numStudents, // Include in response
     lessonAmountUSD: roundMoney2(lessonAmountUSD),
     platformFeeUSD: roundMoney2(platformFeeUSD),

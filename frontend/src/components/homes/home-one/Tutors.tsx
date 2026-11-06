@@ -58,14 +58,15 @@ const Tutors = () => {
     useEffect(() => {
         teachers.forEach(async (teacher) => {
             const tId = typeof teacher.teacherId === 'object' ? teacher.teacherId._id : teacher.teacherId;
-            if (teacher.pricing?.teacherCurrency === 'INR' && typeof teacher.pricing?.teacherPrice === 'number') {
+            const finalPriceINR = teacher.pricing?.totalPrice ?? teacher.pricing?.teacherPrice;
+            if (teacher.pricing?.teacherCurrency === 'INR' && typeof finalPriceINR === 'number') {
                 setDisplayPrices(prev => ({
                     ...prev,
-                    [tId]: formatPrice(teacher.pricing!.teacherPrice, 'INR')
+                    [tId]: formatPrice(finalPriceINR, 'INR')
                 }));
                 return;
             }
-            const priceUSD = typeof teacher.price === 'number' ? teacher.price : (teacher.pricing?.basePriceUSD || 25);
+            const priceUSD = typeof teacher.price === 'number' ? teacher.price : (teacher.pricing?.totalPriceUSD ?? teacher.pricing?.basePriceUSD ?? 25);
             const formatted = await convertAndFormatPrice(priceUSD, 'INR');
             setDisplayPrices(prev => ({ ...prev, [tId]: formatted }));
         });
