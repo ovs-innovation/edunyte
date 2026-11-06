@@ -73,12 +73,12 @@ const TeacherApprovalPage = () => {
   const [settings, setSettings] = useState<ApiSettings | null>(null);
   const [platformFeePercent, setPlatformFeePercent] = useState<number>(4);
   const [feeDialogOpen, setFeeDialogOpen] = useState(false);
-  const [tempFeePercent, setTempFeePercent] = useState<number>(4);
+  const [tempFeePercent, setTempFeePercent] = useState<number | string>(4);
   const [customFeeDialogOpen, setCustomFeeDialogOpen] = useState(false);
   const [selectedCourseForFee, setSelectedCourseForFee] = useState<ApiTeacherCourse | null>(null);
-  const [tempFeeType, setTempFeeType] = useState<'percentage' | 'fixed'>('percentage');
-  const [tempCustomFeePercent, setTempCustomFeePercent] = useState<number>(4);
-  const [tempCustomFeeAmount, setTempCustomFeeAmount] = useState<number>(0);
+  const [tempFeeType, setTempFeeType] = useState<'percentage' | 'fixed'>('fixed');
+  const [tempCustomFeePercent, setTempCustomFeePercent] = useState<number | string>('');
+  const [tempCustomFeeAmount, setTempCustomFeeAmount] = useState<number | string>('');
   const { toast } = useToast();
   const { confirm, ConfirmDialog } = useConfirmDialog();
 
@@ -129,9 +129,10 @@ const TeacherApprovalPage = () => {
   const handleUpdatePlatformFee = async () => {
     if (!settings) return;
     try {
-      const data = await SettingsAPI.update({ platformFeePercent: tempFeePercent });
+      const feeVal = tempFeePercent === '' ? 0 : parseFloat(tempFeePercent.toString());
+      const data = await SettingsAPI.update({ platformFeePercent: isNaN(feeVal) ? 0 : feeVal });
       setSettings(data.settings);
-      setPlatformFeePercent(tempFeePercent);
+      setPlatformFeePercent(data.settings.platformFeePercent ?? 4);
       setFeeDialogOpen(false);
       toast({ title: 'Platform fee updated successfully' });
     } catch (err: any) {
@@ -182,16 +183,16 @@ const TeacherApprovalPage = () => {
     setSelectedCourseForFee(course);
     if (course.customPlatformFeeType === 'fixed' && course.customPlatformFeeAmount !== undefined) {
       setTempFeeType('fixed');
-      setTempCustomFeeAmount(course.customPlatformFeeAmount);
-      setTempCustomFeePercent(platformFeePercent);
+      setTempCustomFeeAmount(course.customPlatformFeeAmount > 0 ? course.customPlatformFeeAmount : '');
+      setTempCustomFeePercent('');
     } else if (course.customPlatformFeePercent !== undefined) {
       setTempFeeType('percentage');
-      setTempCustomFeePercent(course.customPlatformFeePercent);
-      setTempCustomFeeAmount(0);
+      setTempCustomFeePercent(course.customPlatformFeePercent > 0 ? course.customPlatformFeePercent : '');
+      setTempCustomFeeAmount('');
     } else {
-      setTempFeeType('percentage');
-      setTempCustomFeePercent(platformFeePercent);
-      setTempCustomFeeAmount(0);
+      setTempFeeType('fixed');
+      setTempCustomFeeAmount('');
+      setTempCustomFeePercent('');
     }
     setCustomFeeDialogOpen(true);
   };
@@ -201,18 +202,22 @@ const TeacherApprovalPage = () => {
     try {
       if (tempFeeType === 'fixed') {
         const currency = selectedCourseForFee.pricing?.teacherCurrency || 'INR';
+        const parsedVal = tempCustomFeeAmount === '' ? 0 : parseFloat(tempCustomFeeAmount.toString());
+        const fixedAmount = isNaN(parsedVal) ? 0 : parsedVal;
         await TeacherCoursesAPI.update(selectedCourseForFee._id, {
           customPlatformFeeType: 'fixed',
-          customPlatformFeeAmount: tempCustomFeeAmount,
+          customPlatformFeeAmount: fixedAmount,
           customPlatformFeeCurrency: currency,
         });
-        toast({ title: `Custom fixed commission updated (${currency} ${tempCustomFeeAmount})` });
+        toast({ title: `Custom fixed commission updated (${currency} ${fixedAmount})` });
       } else {
+        const parsedVal = tempCustomFeePercent === '' ? platformFeePercent : parseFloat(tempCustomFeePercent.toString());
+        const feePercent = isNaN(parsedVal) ? 0 : parsedVal;
         await TeacherCoursesAPI.update(selectedCourseForFee._id, {
           customPlatformFeeType: 'percentage',
-          customPlatformFeePercent: tempCustomFeePercent,
+          customPlatformFeePercent: feePercent,
         });
-        toast({ title: `Custom platform fee percentage updated (${tempCustomFeePercent}%)` });
+        toast({ title: `Custom platform fee percentage updated (${feePercent}%)` });
       }
       setCustomFeeDialogOpen(false);
       setSelectedCourseForFee(null);
@@ -671,12 +676,17 @@ const TeacherApprovalPage = () => {
                 step="0.1"
                 value={tempFeePercent}
                 onChange={(e) => {
-                  const value = parseFloat(e.target.value);
-                  if (!isNaN(value) && value >= 0 && value <= 100) {
-                    setTempFeePercent(value);
+                  const val = e.target.value;
+                  if (val === '') {
+                    setTempFeePercent('');
+                  } else {
+                    const value = parseFloat(val);
+                    if (!isNaN(value) && value >= 0 && value <= 100) {
+                      setTempFeePercent(val);
+                    }
                   }
                 }}
-                placeholder="4.0"
+                placeholder="e.g. 4.0"
               />
               <p className="text-xs text-muted-foreground">
                 The percentage fee charged on top of the teacher's price. Current: {platformFeePercent}%
@@ -763,24 +773,31 @@ const TeacherApprovalPage = () => {
                     step="0.5"
                     value={tempCustomFeePercent}
                     onChange={(e) => {
-                      const value = parseFloat(e.target.value);
-                      setTempCustomFeePercent(isNaN(value) ? 0 : Math.max(0, Math.min(100, value)));
+                      const val = e.target.value;
+                      if (val === '') {
+                        setTempCustomFeePercent('');
+                      } else {
+                        const num = parseFloat(val);
+                        if (!isNaN(num) && num >= 0 && num <= 100) {
+                          setTempCustomFeePercent(val);
+                        }
+                      }
                     }}
-                    placeholder={`${platformFeePercent}`}
+                    placeholder={`e.g. ${platformFeePercent}`}
                   />
                   <div className="rounded-md bg-primary/5 border border-primary/15 p-2 text-xs space-y-1">
                     <div className="flex justify-between text-muted-foreground">
-                      <span>Admin Commission ({tempCustomFeePercent}%):</span>
+                      <span>Admin Commission ({tempCustomFeePercent !== '' ? tempCustomFeePercent : 0}%):</span>
                       <span className="font-semibold text-foreground">
                         {selectedCourseForFee.pricing?.teacherCurrency || 'INR'}{' '}
-                        {(((selectedCourseForFee.pricing?.teacherPrice || 0) * tempCustomFeePercent) / 100).toFixed(2)}
+                        {(((selectedCourseForFee.pricing?.teacherPrice || 0) * (tempCustomFeePercent !== '' ? parseFloat(tempCustomFeePercent.toString()) || 0 : 0)) / 100).toFixed(2)}
                       </span>
                     </div>
                     <div className="flex justify-between border-t border-border/50 pt-1 font-medium">
                       <span>Total Student Price:</span>
                       <span className="text-primary font-bold">
                         {selectedCourseForFee.pricing?.teacherCurrency || 'INR'}{' '}
-                        {((selectedCourseForFee.pricing?.teacherPrice || 0) * (1 + tempCustomFeePercent / 100)).toFixed(2)}
+                        {((selectedCourseForFee.pricing?.teacherPrice || 0) * (1 + (tempCustomFeePercent !== '' ? parseFloat(tempCustomFeePercent.toString()) || 0 : 0) / 100)).toFixed(2)}
                       </span>
                     </div>
                   </div>
@@ -805,8 +822,15 @@ const TeacherApprovalPage = () => {
                       className="pl-8"
                       value={tempCustomFeeAmount}
                       onChange={(e) => {
-                        const value = parseFloat(e.target.value);
-                        setTempCustomFeeAmount(isNaN(value) ? 0 : Math.max(0, value));
+                        const val = e.target.value;
+                        if (val === '') {
+                          setTempCustomFeeAmount('');
+                        } else {
+                          const num = parseFloat(val);
+                          if (!isNaN(num) && num >= 0) {
+                            setTempCustomFeeAmount(val);
+                          }
+                        }
                       }}
                       placeholder="e.g. 250"
                     />
@@ -815,14 +839,14 @@ const TeacherApprovalPage = () => {
                     <div className="flex justify-between text-muted-foreground">
                       <span>Admin Commission (Fixed):</span>
                       <span className="font-semibold text-foreground">
-                        {selectedCourseForFee.pricing?.teacherCurrency || 'INR'} {tempCustomFeeAmount.toFixed(2)}
+                        {selectedCourseForFee.pricing?.teacherCurrency || 'INR'} {(tempCustomFeeAmount !== '' ? parseFloat(tempCustomFeeAmount.toString()) || 0 : 0).toFixed(2)}
                       </span>
                     </div>
                     <div className="flex justify-between border-t border-border/50 pt-1 font-medium">
                       <span>Total Student Price:</span>
                       <span className="text-primary font-bold">
                         {selectedCourseForFee.pricing?.teacherCurrency || 'INR'}{' '}
-                        {((selectedCourseForFee.pricing?.teacherPrice || 0) + tempCustomFeeAmount).toFixed(2)}
+                        {((selectedCourseForFee.pricing?.teacherPrice || 0) + (tempCustomFeeAmount !== '' ? parseFloat(tempCustomFeeAmount.toString()) || 0 : 0)).toFixed(2)}
                       </span>
                     </div>
                   </div>
