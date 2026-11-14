@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { getAdminUrl } from '../utils/urlHelper'
 import {
   login as loginAPI,
   register as registerAPI,
@@ -118,7 +119,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (redirectUrl && redirectUrl.startsWith('/')) {
         navigate(decodeURIComponent(redirectUrl), { replace: true });
       } else if (authResponse.user.role === 'teacher') {
-        const adminUrl = import.meta.env.VITE_ADMIN_URL || 'http://localhost:8080';
+        const adminUrl = getAdminUrl();
         window.location.href = `${adminUrl}/teacher-dashboard?token=${encodeURIComponent(authResponse.token)}`;
       } else if (authResponse.user.role === 'student') {
         navigate('/my-dashboard', { replace: true });
@@ -147,7 +148,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (redirectUrl && redirectUrl.startsWith('/')) {
         navigate(decodeURIComponent(redirectUrl), { replace: true });
       } else if (authResponse.user.role === 'teacher') {
-        const adminUrl = import.meta.env.VITE_ADMIN_URL || 'http://localhost:8080';
+        const adminUrl = getAdminUrl();
         window.location.href = `${adminUrl}/teacher-dashboard?token=${encodeURIComponent(authResponse.token)}`;
       } else if (authResponse.user.role === 'student') {
         navigate('/my-dashboard', { replace: true });
@@ -181,7 +182,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (redirectUrl && redirectUrl.startsWith('/')) {
           navigate(decodeURIComponent(redirectUrl), { replace: true });
         } else if (authResponse.user.role === 'teacher') {
-          const adminUrl = import.meta.env.VITE_ADMIN_URL || 'http://localhost:8080';
+          const adminUrl = getAdminUrl();
           window.location.href = `${adminUrl}/teacher-dashboard?token=${encodeURIComponent(authResponse.token)}`;
         } else if (authResponse.user.role === 'student') {
           navigate('/my-dashboard', { replace: true });

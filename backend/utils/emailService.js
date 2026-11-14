@@ -167,6 +167,13 @@ export const sendTeacherRegistrationNotificationToAdmin = async (teacherData) =>
 
 export const sendInstructorApprovalEmail = async (email, userName) => {
   try {
+    const defaultFrontendUrl =
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:5173"
+        : "https://edunyte.com";
+    const frontendUrl = (process.env.FRONTEND_URL || defaultFrontendUrl).replace(/\/+$/, "");
+    const loginUrl = `${frontendUrl}/instructor/login`;
+
     const mailOptions = {
       from: `"Edunyte Team" <${process.env.EMAIL_USER}>`,
       to: email,
@@ -178,7 +185,7 @@ export const sendInstructorApprovalEmail = async (email, userName) => {
           <p>Your instructor account on Edunyte has been approved by the administrators.</p>
           <p>You can now log in to the platform and start creating your courses or managing your profile.</p>
           <div style="margin-top: 30px;">
-            <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/login/instructor" style="background: #10b981; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login to your Account</a>
+            <a href="${loginUrl}" style="background: #10b981; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Login to your Account</a>
           </div>
           <p style="margin-top: 30px;">Welcome to the Edunyte community!</p>
           <p>Regards,<br/>Edunyte Team</p>

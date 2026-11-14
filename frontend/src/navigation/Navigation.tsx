@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 const Home = React.lazy(() => import('../pages/Home'));
 const HomeTwo = React.lazy(() => import('../pages/HomeTwo'));
 const HomeEight = React.lazy(() => import('../pages/HomeEight'));
@@ -94,6 +94,10 @@ const AppNavigation = () => {
         <Route path="/login" element={<Login role="student" />} />
         <Route path="/student/login" element={<Login role="student" />} />
         <Route path="/instructor/login" element={<Login role="instructor" />} />
+        <Route path="/login/instructor" element={<Navigate to="/instructor/login" replace />} />
+        <Route path="/login/student" element={<Navigate to="/student/login" replace />} />
+        <Route path="/register/instructor" element={<Navigate to="/instructor/registration" replace />} />
+        <Route path="/register/student" element={<Navigate to="/student/registration" replace />} />
         <Route path="/registration" element={<Registration role="student" />} />
         <Route path="/student/registration" element={<Registration role="student" />} />
         <Route path="/instructor/registration" element={<Registration role="instructor" />} />
