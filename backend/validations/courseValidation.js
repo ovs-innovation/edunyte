@@ -35,7 +35,7 @@ export const createCourseSchema = z.object({
   description: descriptionSchema,
   category: z.string().optional().default(""),
   image: imageSchema,
-  status: z.enum(["active", "inactive"]).optional().default("active"),
+  status: z.enum(["active", "inactive", "pending"]).optional().default("active"),
 });
 
 export const updateCourseSchema = z.object({
@@ -43,6 +43,6 @@ export const updateCourseSchema = z.object({
   description: descriptionSchema,
   category: z.string().optional(),
   image: imageSchema,
-  status: z.enum(["active", "inactive"]).optional(),
+  status: z.enum(["active", "inactive", "pending"]).optional(),
 });
 

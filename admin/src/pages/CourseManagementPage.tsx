@@ -152,7 +152,7 @@ const CourseManagementPage = () => {
       description: '',
       category: '',
       image: '',
-      status: 'active',
+      status: (isAdmin ? 'active' : 'pending') as 'active' | 'inactive' | 'pending',
     });
   };
 

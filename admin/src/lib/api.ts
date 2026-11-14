@@ -313,7 +313,7 @@ export const CoursesAPI = {
     description?: string | { en: string };
     category?: string;
     image?: string;
-    status?: "active" | "inactive";
+    status?: "active" | "inactive" | "pending";
   }) =>
     apiFetch<{ course: ApiCourse }>("/admin/courses", {
       method: "POST",
@@ -324,7 +324,7 @@ export const CoursesAPI = {
     description?: string | { en: string };
     category?: string;
     image?: string;
-    status?: "active" | "inactive";
+    status?: "active" | "inactive" | "pending";
   }) =>
     apiFetch<{ course: ApiCourse }>(`/admin/courses/${id}`, {
       method: "PATCH",
