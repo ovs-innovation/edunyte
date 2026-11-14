@@ -122,18 +122,18 @@ const CourseArea = () => {
                                  <div key={item._id} className="col-xl-4 col-md-6">
                                     <div className="glass-panel h-100 shadow-sm overflow-hidden border-0 bg-white hover-scale">
                                        <div className="position-relative">
-                                          <Link to={`/course/${item.slug || item._id}`}>
+                                          <Link to={`/course/${item.slug || item.courseId || item._id}${item.teacherId ? `?teacher=${item.teacherId}` : ""}`}>
                                              <img src={item.image || '/assets/img/courses/course_default.jpg'} alt={item.name} className="w-100" style={{ height: '220px', objectFit: 'cover' }} />
                                           </Link>
                                           <button
                                              onClick={(e) => {
                                                 e.preventDefault();
-                                                toggleWishlist(item._id);
+                                                toggleWishlist(item.teacherId || item.courseId || item._id);
                                              }}
                                              className="position-absolute top-0 end-0 m-3 shadow-sm border-0 d-flex align-items-center justify-content-center"
                                              style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(255,255,255,0.9)', zIndex: 10 }}
                                           >
-                                             <i className={isInWishlist(item._id) ? "fas fa-heart text-danger" : "far fa-heart"}></i>
+                                             <i className={isInWishlist(item.teacherId || item.courseId || item._id) ? "fas fa-heart text-danger" : "far fa-heart"}></i>
                                           </button>
                                           <div className="position-absolute bottom-0 start-0 m-3">
                                              <span className="badge bg-white text-dark px-3 py-2 rounded-pill small fw-bold shadow-sm">
@@ -148,12 +148,17 @@ const CourseArea = () => {
                                              <span className="text-muted">(120 Reviews)</span>
                                           </div>
                                           <h5 className="title mb-4 fw-900" style={{ fontSize: '1.2rem', minHeight: '3rem' }}>
-                                             <Link to={`/course/${item.slug || item._id}`} className="text-dark text-decoration-none">
+                                             <Link to={`/course/${item.slug || item.courseId || item._id}${item.teacherId ? `?teacher=${item.teacherId}` : ""}`} className="text-dark text-decoration-none">
                                                 <TranslatedContent>{item.name}</TranslatedContent>
                                              </Link>
+                                             {item.teacherName && (
+                                                <div className="text-muted fw-normal small mt-1" style={{ fontSize: "0.85rem" }}>
+                                                   by <span className="text-dark fw-semibold">{item.teacherName}</span>
+                                                </div>
+                                             )}
                                           </h5>
                                           <div className="d-flex align-items-center justify-content-between pt-3 border-top">
-                                             <Link to={`/course/${item.slug || item._id}`} className="btn-neon-primary py-2 px-4 small" style={{ fontSize: '0.85rem' }}>
+                                             <Link to={`/course/${item.slug || item.courseId || item._id}${item.teacherId ? `?teacher=${item.teacherId}` : ""}`} className="btn-neon-primary py-2 px-4 small" style={{ fontSize: '0.85rem' }}>
                                                 {t('common.book_session')}
                                              </Link>
                                              <div className="price fw-900 text-primary">
@@ -182,7 +187,7 @@ const CourseArea = () => {
                                     <div className="row align-items-center g-4">
                                        <div className="col-md-4">
                                           <div className="position-relative rounded-4 overflow-hidden">
-                                             <Link to={`/course/${item.slug || item._id}`}>
+                                             <Link to={`/course/${item.slug || item.courseId || item._id}${item.teacherId ? `?teacher=${item.teacherId}` : ''}`}>
                                                 <img src={item.image || '/assets/img/courses/course_default.jpg'} alt={item.name} className="w-100" style={{ height: '200px', objectFit: 'cover' }} />
                                              </Link>
                                           </div>
@@ -201,16 +206,21 @@ const CourseArea = () => {
                                                 </button>
                                              </div>
                                              <h4 className="fw-900 mb-3">
-                                                <Link to={`/course/${item.slug || item._id}`} className="text-dark text-decoration-none">
+                                                <Link to={`/course/${item.slug || item.courseId || item._id}${item.teacherId ? `?teacher=${item.teacherId}` : ""}`} className="text-dark text-decoration-none">
                                                    <TranslatedContent>{item.name}</TranslatedContent>
                                                 </Link>
                                              </h4>
+                                             {item.teacherName && (
+                                                <div className="text-muted fw-normal small mb-2" style={{ fontSize: "0.88rem" }}>
+                                                   by <span className="text-dark fw-semibold">{item.teacherName}</span>
+                                                </div>
+                                             )}
                                              <p className="opacity-60 small mb-4">
                                                 <TranslatedContent>{item.description}</TranslatedContent>
                                              </p>
                                              <div className="d-flex align-items-center justify-content-between">
                                                 <div className="d-flex align-items-center gap-3">
-                                                   <Link to={`/course/${item.slug || item._id}`} className="btn-neon-primary py-2 px-4">{t('common.book_session') || 'Book Now'}</Link>
+                                                   <Link to={`/course/${item.slug || item.courseId || item._id}${item.teacherId ? `?teacher=${item.teacherId}` : ""}`} className="btn-neon-primary py-2 px-4">{t('common.book_session') || 'Book Now'}</Link>
                                                    <span className="fw-900 text-primary">
                                                       {typeof item.price === 'number' && item.price > 0 ? (
                                                          formatPriceDirect(item.price)

@@ -15,6 +15,10 @@ export interface Course {
   hasTeachers?: boolean
   teachersCount?: number
   currency?: string
+  teacherName?: string
+  teacherId?: string
+  teacherCourseId?: string
+  courseId?: string
   createdBy?: {
     _id: string
     name: string

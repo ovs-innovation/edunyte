@@ -118,6 +118,7 @@ export const createCourse = async (req, res, next) => {
 export const getCourses = async (req, res, next) => {
   try {
     const { status, search, category } = req.query;
+    const isPublic = Boolean(req.isPublic || req.baseUrl?.includes("/public"));
     const query = {};
 
     if (status) {
@@ -131,16 +132,32 @@ export const getCourses = async (req, res, next) => {
       if (mongoose.Types.ObjectId.isValid(category)) {
         categoryDoc = await Category.findById(category);
       } else {
-        categoryDoc = await Category.findOne({ "slug.en": category });
+        categoryDoc = await Category.findOne({
+          $or: [
+            { "slug.en": category },
+            { slug: category },
+            { "name.en": { $regex: new RegExp(`^${category.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } },
+            { name: { $regex: new RegExp(`^${category.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } }
+          ]
+        });
       }
       
+      const categoryTerms = [category];
       if (categoryDoc) {
-        const categoryName = getLanguageValue(categoryDoc.name);
-        query.$or = [
-          { category: categoryName },
-          { "category.en": categoryName }
-        ];
+        const nameVal = getLanguageValue(categoryDoc.name);
+        const slugVal = getLanguageValue(categoryDoc.slug);
+        if (nameVal) categoryTerms.push(nameVal);
+        if (slugVal) categoryTerms.push(slugVal);
       }
+      
+      const escapedTerms = Array.from(new Set(categoryTerms.filter(Boolean)))
+        .map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+      const catRegex = new RegExp(`^(${escapedTerms.join("|")})$`, "i");
+      
+      query.$or = [
+        { category: { $regex: catRegex } },
+        { "category.en": { $regex: catRegex } }
+      ];
     }
 
     if (search) {
@@ -184,7 +201,7 @@ export const getCourses = async (req, res, next) => {
     const approvedTeacherCourses = await TeacherCourse.find({
       courseId: { $in: courseIds },
       status: "approved",
-    });
+    }).populate("teacherId", "name email");
 
     const tcByCourse = new Map();
     approvedTeacherCourses.forEach(tc => {
@@ -193,15 +210,17 @@ export const getCourses = async (req, res, next) => {
       tcByCourse.get(cId).push(tc);
     });
 
-    const coursesData = courses.map(course => {
+    const coursesData = [];
+    courses.forEach(course => {
       const courseObj = course.toObject();
       courseObj.name = getLanguageValue(courseObj.name);
       courseObj.description = getLanguageValue(courseObj.description);
       courseObj.slug = getLanguageValue(courseObj.slug);
 
       const teachers = tcByCourse.get(course._id.toString()) || [];
-      if (teachers.length > 0) {
-        const prices = teachers.map(tc => {
+
+      if (isPublic && teachers.length > 0) {
+        teachers.forEach(tc => {
           const rawPrice = Number(tc.pricing?.teacherPrice || 0);
           let fee = 0;
           if (tc.customPlatformFeeType === "fixed" && tc.customPlatformFeeAmount !== undefined && tc.customPlatformFeeAmount !== null) {
@@ -211,23 +230,53 @@ export const getCourses = async (req, res, next) => {
           } else {
             fee = (rawPrice * globalFeePercent) / 100;
           }
-          return Math.round((rawPrice + fee) * 100) / 100;
-        });
-        const minPrice = Math.min(...prices);
-        courseObj.price = minPrice;
-        courseObj.startingPrice = minPrice;
-        courseObj.hasTeachers = true;
-        courseObj.teachersCount = teachers.length;
-        courseObj.currency = teachers[0]?.pricing?.teacherCurrency || "INR";
-      } else {
-        courseObj.price = 0;
-        courseObj.startingPrice = 0;
-        courseObj.hasTeachers = false;
-        courseObj.teachersCount = 0;
-        courseObj.currency = "INR";
-      }
+          const totalPrice = Math.round((rawPrice + fee) * 100) / 100;
+          const teacherUser = tc.teacherId && typeof tc.teacherId === "object" ? tc.teacherId : null;
+          const teacherName = teacherUser?.name || "";
 
-      return courseObj;
+          coursesData.push({
+            ...courseObj,
+            _id: `${course._id}_${tc._id}`,
+            courseId: course._id.toString(),
+            teacherCourseId: tc._id.toString(),
+            teacherId: teacherUser?._id?.toString() || tc.teacherId?.toString(),
+            teacherName: teacherName,
+            price: totalPrice,
+            startingPrice: totalPrice,
+            hasTeachers: true,
+            teachersCount: 1,
+            currency: tc.pricing?.teacherCurrency || "INR",
+          });
+        });
+      } else {
+        if (teachers.length > 0) {
+          const prices = teachers.map(tc => {
+            const rawPrice = Number(tc.pricing?.teacherPrice || 0);
+            let fee = 0;
+            if (tc.customPlatformFeeType === "fixed" && tc.customPlatformFeeAmount !== undefined && tc.customPlatformFeeAmount !== null) {
+              fee = Number(tc.customPlatformFeeAmount);
+            } else if (tc.customPlatformFeePercent !== undefined && tc.customPlatformFeePercent !== null) {
+              fee = (rawPrice * Number(tc.customPlatformFeePercent)) / 100;
+            } else {
+              fee = (rawPrice * globalFeePercent) / 100;
+            }
+            return Math.round((rawPrice + fee) * 100) / 100;
+          });
+          const minPrice = Math.min(...prices);
+          courseObj.price = minPrice;
+          courseObj.startingPrice = minPrice;
+          courseObj.hasTeachers = true;
+          courseObj.teachersCount = teachers.length;
+          courseObj.currency = teachers[0]?.pricing?.teacherCurrency || "INR";
+        } else {
+          courseObj.price = 0;
+          courseObj.startingPrice = 0;
+          courseObj.hasTeachers = false;
+          courseObj.teachersCount = 0;
+          courseObj.currency = "INR";
+        }
+        coursesData.push(courseObj);
+      }
     });
 
     res.json({ courses: coursesData, count: coursesData.length });

@@ -97,7 +97,7 @@ const TeachersSelection = () => {
         setTeachers(response.teachers);
         setFilteredTeachers(response.teachers);
         if (response.teachers.length > 0) {
-          setSelectedTeacher(response.teachers[0]);
+          const urlTeacherId = new URLSearchParams(window.location.search).get('teacher'); const preselected = urlTeacherId ? response.teachers.find((t) => t.teacherId?._id === urlTeacherId || t._id === urlTeacherId || (typeof t.teacherId === 'string' && t.teacherId === urlTeacherId)) : null; setSelectedTeacher(preselected || response.teachers[0]);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : t('common.error_loading_data'));
