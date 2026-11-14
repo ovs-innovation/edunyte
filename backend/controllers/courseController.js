@@ -77,6 +77,30 @@ export const createCourse = async (req, res, next) => {
       status: courseStatus,
       createdBy,
     });
+
+    // Auto-create category in Category collection if new
+    if (category && typeof category === "string" && category.trim()) {
+      const trimmedCategory = category.trim();
+      try {
+        const Category = (await import("../models/categoryModel.js")).default;
+        const existingCat = await Category.findOne({
+          $or: [
+            { "name.en": { $regex: new RegExp(`^${trimmedCategory.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } },
+            { name: { $regex: new RegExp(`^${trimmedCategory.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } }
+          ]
+        });
+        if (!existingCat) {
+          await Category.create({
+            name: { en: trimmedCategory },
+            description: { en: trimmedCategory },
+            status: "active",
+            createdBy,
+          });
+        }
+      } catch (catErr) {
+        console.error("Auto-creating category in createCourse error:", catErr);
+      }
+    }
     await course.populate("createdBy", "name email");
     const courseObj = course.toObject();
     courseObj.name = getLanguageValue(courseObj.name);
@@ -318,7 +342,31 @@ export const updateCourse = async (req, res, next) => {
     }
 
     if (description !== undefined) course.description = normalizeLanguageValue(description);
-    if (category !== undefined) course.category = category;
+    if (category !== undefined) {
+      course.category = category;
+      if (category && typeof category === "string" && category.trim()) {
+        const trimmedCategory = category.trim();
+        try {
+          const Category = (await import("../models/categoryModel.js")).default;
+          const existingCat = await Category.findOne({
+            $or: [
+              { "name.en": { $regex: new RegExp(`^${trimmedCategory.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } },
+              { name: { $regex: new RegExp(`^${trimmedCategory.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } }
+            ]
+          });
+          if (!existingCat) {
+            await Category.create({
+              name: { en: trimmedCategory },
+              description: { en: trimmedCategory },
+              status: "active",
+              createdBy: req.user?.id || course.createdBy,
+            });
+          }
+        } catch (catErr) {
+          console.error("Auto-creating category in updateCourse error:", catErr);
+        }
+      }
+    }
     if (image !== undefined) course.image = image;
     if (status !== undefined) course.status = status;
 

@@ -85,6 +85,7 @@ const CourseManagementPage = () => {
     image: '',
     status: (isAdmin ? 'active' : 'pending') as 'active' | 'inactive' | 'pending',
   });
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
 
   const loadCourses = async () => {
     setLoading(true);
@@ -118,21 +119,25 @@ const CourseManagementPage = () => {
   const handleOpenDialog = (course?: ApiCourse) => {
     if (course) {
       setEditCourse(course);
+      const cat = course.category || '';
+      const existsInList = categories.some((c) => getLanguageValue(c.name).toLowerCase() === cat.toLowerCase());
+      setIsCustomCategory(Boolean(cat && !existsInList));
       setFormData({
         name: getLanguageValue(course.name),
         description: getLanguageValue(course.description),
-        category: course.category || '',
+        category: cat,
         image: course.image || '',
         status: course.status,
       });
     } else {
       setEditCourse(null);
+      setIsCustomCategory(false);
       setFormData({
         name: '',
         description: '',
         category: '',
         image: '',
-        status: 'active',
+        status: (isAdmin ? 'active' : 'pending') as 'active' | 'inactive' | 'pending',
       });
     }
     setDialogOpen(true);
@@ -141,6 +146,7 @@ const CourseManagementPage = () => {
   const handleCloseDialog = () => {
     setDialogOpen(false);
     setEditCourse(null);
+    setIsCustomCategory(false);
     setFormData({
       name: '',
       description: '',
@@ -154,6 +160,7 @@ const CourseManagementPage = () => {
     try {
       const payload = {
         ...formData,
+        category: formData.category?.trim() || '',
         name: normalizeLanguageValue(formData.name),
         description: normalizeLanguageValue(formData.description),
       };
@@ -166,6 +173,7 @@ const CourseManagementPage = () => {
       }
       handleCloseDialog();
       loadCourses();
+      loadCategories();
     } catch (err: any) {
       toast({ title: 'Operation failed', description: err?.message, variant: 'destructive' });
     }
@@ -459,28 +467,79 @@ const CourseManagementPage = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
-              <Select
-                value={formData.category}
-                onValueChange={(value) => setFormData({ ...formData, category: value })}
-                disabled={categoriesLoading}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a category..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => {
-                    const categoryName = getLanguageValue(category.name);
-                    return (
-                      <SelectItem key={category._id} value={categoryName}>
-                        {categoryName}
+              <div className="flex items-center justify-between">
+                <Label htmlFor="category">Category</Label>
+                <Button
+                  type="button"
+                  variant="link"
+                  size="sm"
+                  className="h-auto p-0 text-xs text-primary font-normal hover:underline"
+                  onClick={() => setIsCustomCategory(!isCustomCategory)}
+                >
+                  {isCustomCategory ? '← Choose from existing' : '+ Write new category'}
+                </Button>
+              </div>
+
+              {isCustomCategory ? (
+                <div className="space-y-1.5">
+                  <Input
+                    id="category"
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    placeholder="Type category name (e.g., Graphic Design, Web Development, etc.)..."
+                    autoFocus
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Type any category name. It will be added to this course and saved automatically.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-1.5">
+                  <Select
+                    value={formData.category}
+                    onValueChange={(value) => {
+                      if (value === '__add_new__') {
+                        setIsCustomCategory(true);
+                        setFormData({ ...formData, category: '' });
+                      } else {
+                        setFormData({ ...formData, category: value });
+                      }
+                    }}
+                    disabled={categoriesLoading}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a category..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__add_new__" className="text-primary font-medium">
+                        + Write / Add New Category...
                       </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
+                      {categories.map((category) => {
+                        const categoryName = getLanguageValue(category.name);
+                        return (
+                          <SelectItem key={category._id} value={categoryName}>
+                            {categoryName}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    Select from existing categories or{' '}
+                    <button
+                      type="button"
+                      onClick={() => setIsCustomCategory(true)}
+                      className="text-primary hover:underline font-medium inline"
+                    >
+                      write custom category
+                    </button>
+                    .
+                  </p>
+                </div>
+              )}
+
               {formData.category && (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 pt-1">
                   <Badge variant="outline">{formData.category}</Badge>
                   <Button
                     type="button"
@@ -493,13 +552,6 @@ const CourseManagementPage = () => {
                   </Button>
                 </div>
               )}
-              <p className="text-xs text-muted-foreground">
-                Select a category from the list. To add new categories, go to{' '}
-                <a href="/categories" className="text-primary hover:underline">
-                  Category Management
-                </a>
-                .
-              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="image">Course Image</Label>

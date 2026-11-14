@@ -452,9 +452,11 @@ export const updateCourseRequest = async (req, res, next) => {
       currency, // legacy
       timezone,
       introductionVideo,
-
       bio,
       aboutCourse,
+      courseName,
+      name,
+      category,
     } = req.body;
     const baseCurrency = getBaseCurrency();
 
@@ -478,9 +480,40 @@ export const updateCourseRequest = async (req, res, next) => {
       return res.status(403).json({ message: "You can only update your own course requests" });
     }
 
-    // Only allow updates if status is pending or rejected
-    if (teacherCourse.status === "approved") {
-      return res.status(400).json({ message: "Cannot update an approved course request. Please contact admin." });
+    // Update course name and category if provided
+    if (courseName || name || category !== undefined) {
+      const course = await Course.findById(teacherCourse.courseId);
+      if (course) {
+        if (courseName || name) {
+          course.name = normalizeLanguageValue(courseName || name);
+        }
+        if (category !== undefined) {
+          course.category = category;
+          if (category && typeof category === "string" && category.trim()) {
+            const trimmedCategory = category.trim();
+            try {
+              const Category = (await import("../models/categoryModel.js")).default;
+              const existingCat = await Category.findOne({
+                $or: [
+                  { "name.en": { $regex: new RegExp(`^${trimmedCategory.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } },
+                  { name: { $regex: new RegExp(`^${trimmedCategory.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") } }
+                ]
+              });
+              if (!existingCat) {
+                await Category.create({
+                  name: { en: trimmedCategory },
+                  description: { en: trimmedCategory },
+                  status: "active",
+                  createdBy: teacherId,
+                });
+              }
+            } catch (catErr) {
+              console.error("Auto-creating category in teacher update error:", catErr);
+            }
+          }
+        }
+        await course.save();
+      }
     }
 
     // Update fields

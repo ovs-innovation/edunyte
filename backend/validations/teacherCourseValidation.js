@@ -31,9 +31,12 @@ export const createTeacherCourseSchema = z.object({
     z.string().url("Invalid video URL"),
     z.literal("")
   ]).optional(),
-  experience: languageTextSchema,
-  bio: languageTextSchema,
-  aboutCourse: languageTextSchema,
+  courseName: z.string().optional(),
+  name: z.string().optional(),
+  category: z.string().optional(),
+  experience: languageTextSchema.optional(),
+  bio: languageTextSchema.optional(),
+  aboutCourse: languageTextSchema.optional(),
 }).refine((data) => {
   if (Array.isArray(data.languages) && data.languages.length > 0) return true;
   if (Array.isArray(data.languageIds) && data.languageIds.length > 0) return true;
@@ -69,9 +72,12 @@ export const updateTeacherCourseSchema = z.object({
     z.string().url("Invalid video URL"),
     z.literal("")
   ]).optional(),
-  experience: languageTextSchema,
-  bio: languageTextSchema,
-  aboutCourse: languageTextSchema,
+  courseName: z.string().optional(),
+  name: z.string().optional(),
+  category: z.string().optional(),
+  experience: languageTextSchema.optional(),
+  bio: languageTextSchema.optional(),
+  aboutCourse: languageTextSchema.optional(),
 });
 
 export const updateTeacherCourseStatusSchema = z.object({

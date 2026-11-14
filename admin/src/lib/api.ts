@@ -545,6 +545,8 @@ export const TeacherCourseJoinAPI = {
       name?: any;
       nativeName?: any;
     }>;
+    courseName?: string;
+    category?: string;
     teacherPrice?: number;
     teacherCurrency?: string;
     timezone?: string;

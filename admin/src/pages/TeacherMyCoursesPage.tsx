@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { BookOpen, CheckCircle2, XCircle, Clock, Plus, Video, ExternalLink, LogOut, Edit } from 'lucide-react';
-import { TeacherCourseJoinAPI, ApiTeacherCourse } from '@/lib/api';
+import { TeacherCourseJoinAPI, ApiTeacherCourse, CategoriesAPI, ApiCategory } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import { getLanguageValue } from '@/lib/languageHelper';
 import {
@@ -99,7 +99,11 @@ const TeacherMyCoursesPage = () => {
   const [languagesOpen, setLanguagesOpen] = useState(false);
   const [currencies] = useState(() => getCurrencies());
   const [currencyOpen, setCurrencyOpen] = useState(false);
+  const [categories, setCategories] = useState<ApiCategory[]>([]);
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
   const [formData, setFormData] = useState({
+    courseName: '',
+    category: '',
     languages: [] as LanguageWithProficiency[],
     price: '',
     currency: 'INR',
@@ -114,6 +118,15 @@ const TeacherMyCoursesPage = () => {
   const { toast } = useToast();
   const { confirm, ConfirmDialog } = useConfirmDialog();
 
+  const loadCategories = async () => {
+    try {
+      const data = await CategoriesAPI.list('active');
+      setCategories(data.categories || []);
+    } catch (err: any) {
+      console.error('Failed to load categories:', err);
+    }
+  };
+
   useEffect(() => {
     if (currentRole !== 'teacher') {
       navigate('/');
@@ -121,6 +134,7 @@ const TeacherMyCoursesPage = () => {
     }
     setLanguages(getLibraryLanguages());
     loadMyCourses();
+    loadCategories();
   }, [currentRole, filterStatus]);
 
   const loadMyCourses = async () => {
@@ -174,15 +188,6 @@ const TeacherMyCoursesPage = () => {
   };
 
   const handleEditCourse = (request: ApiTeacherCourse) => {
-    if (request.status === 'approved') {
-      toast({
-        title: 'Cannot Edit',
-        description: 'Approved course requests cannot be edited. Please contact admin.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
     setEditingId(request._id);
     const existingLanguages = Array.isArray((request as any).languages) ? (request as any).languages : [];
     const languagesWithProf: LanguageWithProficiency[] =
@@ -210,7 +215,14 @@ const TeacherMyCoursesPage = () => {
                 .filter(Boolean) as LanguageWithProficiency[]
             : [];
     
+    const course = typeof request.courseId === 'string' ? null : request.courseId;
+    const currentCategory = course?.category || '';
+    const existsInList = categories.some((c) => getLanguageValue(c.name).toLowerCase() === currentCategory.toLowerCase());
+    setIsCustomCategory(Boolean(currentCategory && !existsInList));
+
     setFormData({
+      courseName: getCourseName(request.courseId) || '',
+      category: currentCategory,
       languages: languagesWithProf,
       // Teacher input pricing (not student-converted)
       price: (typeof request?.pricing?.teacherPrice === 'number' ? request.pricing.teacherPrice : 0)?.toString() || '',
@@ -225,6 +237,15 @@ const TeacherMyCoursesPage = () => {
 
   const handleUpdateCourse = async () => {
     if (!editingId) return;
+
+    if (!formData.courseName || !formData.courseName.trim()) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please enter a course name',
+        variant: 'destructive',
+      });
+      return;
+    }
 
     if (formData.languages.length === 0) {
       toast({
@@ -256,6 +277,8 @@ const TeacherMyCoursesPage = () => {
       });
 
       await TeacherCourseJoinAPI.updateCourse(editingId, {
+        courseName: formData.courseName.trim(),
+        category: formData.category?.trim() || '',
         languageCodes: formData.languages.map((l) => l.code),
         languages: payloadLanguages,
         teacherPrice: parseFloat(formData.price),
@@ -267,11 +290,12 @@ const TeacherMyCoursesPage = () => {
       });
       toast({
         title: 'Success',
-        description: 'Course request updated successfully',
+        description: 'Course updated successfully',
       });
       setEditDialogOpen(false);
       setEditingId(null);
       loadMyCourses();
+      loadCategories();
     } catch (err: any) {
       toast({
         title: 'Failed to update course',
@@ -329,7 +353,8 @@ const TeacherMyCoursesPage = () => {
         title: 'Success', 
         description: 'Successfully exited from the course' 
       });
-      loadMyCourses(); // Reload the list
+      loadMyCourses();
+      loadCategories(); // Reload the list
     } catch (err: any) {
       toast({ 
         title: 'Failed to exit course', 
@@ -528,28 +553,26 @@ const TeacherMyCoursesPage = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          {request.status !== 'approved' && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleEditCourse(request)}
-                              disabled={editingId === request._id}
-                              className="text-primary hover:text-primary hover:bg-primary/10"
-                            >
-                              <Edit className="h-4 w-4 mr-1" />
-                              Edit
-                            </Button>
-                          )}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleExitCourse(request._id)}
-                          disabled={exitingId === request._id}
-                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                        >
-                          <LogOut className="h-4 w-4 mr-1" />
-                          {exitingId === request._id ? 'Exiting...' : 'Exit'}
-                        </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditCourse(request)}
+                            disabled={editingId === request._id}
+                            className="text-primary hover:text-primary hover:bg-primary/10"
+                          >
+                            <Edit className="h-4 w-4 mr-1" />
+                            Edit
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleExitCourse(request._id)}
+                            disabled={exitingId === request._id}
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          >
+                            <LogOut className="h-4 w-4 mr-1" />
+                            {exitingId === request._id ? 'Exiting...' : 'Exit'}
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -566,13 +589,99 @@ const TeacherMyCoursesPage = () => {
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit Course Request</DialogTitle>
+            <DialogTitle>Edit Course</DialogTitle>
             <DialogDescription>
-              Update your course request details. Note: Approved requests cannot be edited.
+              Update your course name, price, languages, and course details.
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
+            {/* Course Name */}
+            <div className="space-y-2">
+              <Label htmlFor="courseName">Course Name *</Label>
+              <Input
+                id="courseName"
+                value={formData.courseName}
+                onChange={(e) => setFormData({ ...formData, courseName: e.target.value })}
+                placeholder="Enter course name..."
+              />
+            </div>
+
+            {/* Category */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="category">Category</Label>
+                <Button
+                  type="button"
+                  variant="link"
+                  size="sm"
+                  className="h-auto p-0 text-xs text-primary font-normal hover:underline"
+                  onClick={() => setIsCustomCategory(!isCustomCategory)}
+                >
+                  {isCustomCategory ? '← Choose from existing' : '+ Write new category'}
+                </Button>
+              </div>
+
+              {isCustomCategory ? (
+                <div className="space-y-1.5">
+                  <Input
+                    id="category"
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    placeholder="Type category name (e.g., Graphic Design, Web Development, etc.)..."
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Type any category name. It will be updated and saved automatically.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-1.5">
+                  <Select
+                    value={formData.category}
+                    onValueChange={(value) => {
+                      if (value === '__add_new__') {
+                        setIsCustomCategory(true);
+                        setFormData({ ...formData, category: '' });
+                      } else {
+                        setFormData({ ...formData, category: value });
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a category..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__add_new__" className="text-primary font-medium">
+                        + Write / Add New Category...
+                      </SelectItem>
+                      {categories.map((category) => {
+                        const categoryName = getLanguageValue(category.name);
+                        return (
+                          <SelectItem key={category._id} value={categoryName}>
+                            {categoryName}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {formData.category && (
+                <div className="flex items-center gap-2 pt-1">
+                  <Badge variant="outline">{formData.category}</Badge>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setFormData({ ...formData, category: '' })}
+                    className="h-6 px-2 text-xs"
+                  >
+                    Clear
+                  </Button>
+                </div>
+              )}
+            </div>
             {/* Languages */}
             <div className="space-y-2">
               <Label>Languages *</Label>
