@@ -167,11 +167,7 @@ export const sendTeacherRegistrationNotificationToAdmin = async (teacherData) =>
 
 export const sendInstructorApprovalEmail = async (email, userName) => {
   try {
-    const defaultFrontendUrl =
-      process.env.NODE_ENV === "development"
-        ? "http://localhost:5173"
-        : "https://edunyte.com";
-    const frontendUrl = (process.env.FRONTEND_URL || defaultFrontendUrl).replace(/\/+$/, "");
+    const frontendUrl = (process.env.FRONTEND_URL || "https://edunyte.com").replace(/\/+$/, "");
     const loginUrl = `${frontendUrl}/instructor/login`;
 
     const mailOptions = {

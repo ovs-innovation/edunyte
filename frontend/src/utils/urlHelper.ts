@@ -13,3 +13,4 @@ export const getAdminUrl = (): string => {
   }
   return 'http://localhost:8080';
 };
+
