@@ -4,6 +4,7 @@ import {
   approveTeacherCourse,
   rejectTeacherCourse,
   updateTeacherCourse,
+  deleteTeacherCourseRequest,
 } from "../../controllers/teacherCourseController.js";
 import { verifyToken } from "../../middlewares/authMiddleware.js";
 import { requirePermission } from "../../middlewares/permissionMiddleware.js";
@@ -41,6 +42,13 @@ router.patch(
   "/:id",
   requirePermission("settings.edit"),
   updateTeacherCourse
+);
+
+// Delete teacher course request (Admin only)
+router.delete(
+  "/:id",
+  requirePermission("teacher_courses.delete"),
+  deleteTeacherCourseRequest
 );
 
 export default router;

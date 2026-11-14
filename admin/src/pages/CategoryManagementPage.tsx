@@ -158,7 +158,27 @@ const CategoryManagementPage = () => {
       toast({ title: 'Category deleted successfully' });
       loadCategories();
     } catch (err: any) {
-      toast({ title: 'Delete failed', description: err?.message, variant: 'destructive' });
+      const errMsg = err?.message || 'Delete failed';
+      if (errMsg.includes('course(s)')) {
+        const forceConfirmed = await confirm({
+          title: 'Category In Use',
+          description: `${errMsg} Would you like to unlink this category from those course(s) and delete it?`,
+          confirmText: 'Unlink and Delete',
+          cancelText: 'Cancel',
+          variant: 'destructive',
+        });
+        if (forceConfirmed) {
+          try {
+            await CategoriesAPI.delete(id, true);
+            toast({ title: 'Category deleted successfully' });
+            loadCategories();
+          } catch (forceErr: any) {
+            toast({ title: 'Delete failed', description: forceErr?.message, variant: 'destructive' });
+          }
+        }
+      } else {
+        toast({ title: 'Delete failed', description: errMsg, variant: 'destructive' });
+      }
     }
   };
 

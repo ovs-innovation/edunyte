@@ -653,6 +653,29 @@ export const exitCourse = async (req, res, next) => {
 };
 
 /**
+ * Admin: Delete a teacher course request
+ */
+export const deleteTeacherCourseRequest = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid request ID" });
+    }
+
+    const teacherCourse = await TeacherCourse.findById(id);
+    if (!teacherCourse) {
+      return res.status(404).json({ message: "Teacher course request not found" });
+    }
+
+    await TeacherCourse.findByIdAndDelete(id);
+    res.json({ success: true, message: "Teacher course request deleted successfully" });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
  * Admin: Get all teacher course requests
  */
 export const getTeacherCourseRequests = async (req, res, next) => {

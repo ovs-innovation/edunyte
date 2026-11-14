@@ -203,6 +203,8 @@ export const updateCategory = async (req, res, next) => {
 export const deleteCategory = async (req, res, next) => {
   try {
     const { id } = req.params;
+    const { force } = req.query;
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid category ID" });
     }
@@ -214,18 +216,30 @@ export const deleteCategory = async (req, res, next) => {
 
     const Course = (await import("../models/courseModel.js")).default;
     const categoryNameValue = getLanguageValue(category.name);
-    const coursesUsingCategory = await Course.countDocuments({
+    const categorySlugValue = getLanguageValue(category.slug);
+
+    const categoryFilter = {
       $or: [
         { category: categoryNameValue },
-        { "category.en": categoryNameValue }
+        { "category.en": categoryNameValue },
+        ...(categorySlugValue ? [{ category: categorySlugValue }] : [])
       ]
+    };
+
+    const activeCoursesCount = await Course.countDocuments({
+      ...categoryFilter,
+      status: "active"
     });
-    
-    if (coursesUsingCategory > 0) {
+
+    if (activeCoursesCount > 0 && force !== "true") {
       return res.status(400).json({ 
-        message: `Cannot delete category. It is being used by ${coursesUsingCategory} course(s).` 
+        message: `Cannot delete category. It is being used by ${activeCoursesCount} active course(s).`,
+        activeCoursesCount
       });
     }
+
+    // Unset category from any courses using it (inactive courses, or active when forced)
+    await Course.updateMany(categoryFilter, { $set: { category: "" } });
 
     await Category.findByIdAndDelete(id);
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { PermissionGate } from '@/components/PermissionGate';
 import { Button } from '@/components/ui/button';
-import { Download, Filter, CheckCircle2, XCircle, Video, ExternalLink, Edit, DollarSign, RefreshCw } from 'lucide-react';
+import { Download, Filter, CheckCircle2, XCircle, Video, ExternalLink, Edit, DollarSign, RefreshCw, Trash2 } from 'lucide-react';
 import { TeacherCoursesAPI, ApiTeacherCourse, CoursesAPI, LanguagesAPI, SettingsAPI, ApiSettings } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import { getLanguageValue } from '@/lib/languageHelper';
@@ -270,6 +270,24 @@ const TeacherApprovalPage = () => {
       loadRequests();
     } catch (err: any) {
       toast({ title: 'Rejection failed', description: err?.message, variant: 'destructive' });
+    }
+  };
+
+  const handleDeleteRequest = async (id: string) => {
+    const confirmed = await confirm({
+      title: 'Delete Teacher Course Request',
+      description: 'Are you sure you want to delete this teacher course request? This will remove this teacher mapping permanently.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      variant: 'destructive',
+    });
+    if (!confirmed) return;
+    try {
+      await TeacherCoursesAPI.delete(id);
+      toast({ title: 'Deleted', description: 'Teacher course request deleted successfully' });
+      loadRequests();
+    } catch (err: any) {
+      toast({ title: 'Delete failed', description: err?.message, variant: 'destructive' });
     }
   };
 
@@ -580,34 +598,44 @@ const TeacherApprovalPage = () => {
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
                         {request.status === 'pending' && (
-                          <>
-                            <PermissionGate permission="teacher_courses.approve">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="gap-2 text-success border-success hover:bg-success/10"
-                                onClick={() => handleApprove(request._id)}
-                              >
-                                <CheckCircle2 className="h-4 w-4" />
-                                Approve
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="gap-2 text-destructive border-destructive hover:bg-destructive/10"
-                                onClick={() => openRejectDialog(request)}
-                              >
-                                <XCircle className="h-4 w-4" />
-                                Reject
-                              </Button>
-                            </PermissionGate>
-                          </>
+                          <PermissionGate permission="teacher_courses.approve">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="gap-2 text-success border-success hover:bg-success/10"
+                              onClick={() => handleApprove(request._id)}
+                            >
+                              <CheckCircle2 className="h-4 w-4" />
+                              Approve
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="gap-2 text-destructive border-destructive hover:bg-destructive/10"
+                              onClick={() => openRejectDialog(request)}
+                            >
+                              <XCircle className="h-4 w-4" />
+                              Reject
+                            </Button>
+                          </PermissionGate>
                         )}
                         {request.status === 'rejected' && request.rejectionReason && (
-                          <span className="text-sm text-muted-foreground italic">
+                          <span className="text-sm text-muted-foreground italic mr-2">
                             {request.rejectionReason}
                           </span>
                         )}
+                        <PermissionGate permission="teacher_courses.delete">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10"
+                            onClick={() => handleDeleteRequest(request._id)}
+                            title="Delete this teacher course request"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Delete
+                          </Button>
+                        </PermissionGate>
                       </div>
                     </TableCell>
                   </TableRow>

@@ -376,8 +376,8 @@ export const CategoriesAPI = {
       method: "PATCH",
       body: JSON.stringify(payload),
     }),
-  delete: (id: string) =>
-    apiFetch<{ success: boolean; message: string }>(`/admin/categories/${id}`, {
+  delete: (id: string, force?: boolean) =>
+    apiFetch<{ success: boolean; message: string }>(`/admin/categories/${id}${force ? '?force=true' : ''}`, {
       method: "DELETE",
     }),
 };
@@ -502,6 +502,10 @@ export const TeacherCoursesAPI = {
     apiFetch<{ teacherCourse: ApiTeacherCourse; message: string }>(`/admin/teacher-course/${id}`, {
       method: "PATCH",
       body: JSON.stringify(payload),
+    }),
+  delete: (id: string) =>
+    apiFetch<{ success: boolean; message: string }>(`/admin/teacher-course/${id}`, {
+      method: "DELETE",
     }),
 };
 
