@@ -161,6 +161,14 @@ export const googleLogin = async (req, res, next) => {
       if (user.status === "inactive" || user.status === "pending") {
         return res.status(403).json({ message: "Account is not active" });
       }
+
+      const requestedRole = role || req.query.appType;
+      if (requestedRole === "student" && user.role === "teacher") {
+        return res.status(403).json({ message: "This account is registered as an instructor. Please use the Instructor Login." });
+      }
+      if ((requestedRole === "instructor" || requestedRole === "teacher") && user.role === "student") {
+        return res.status(403).json({ message: "This account is a student account. Please use the student login." });
+      }
     }
 
     user.lastLogin = new Date();
@@ -292,9 +300,21 @@ export const login = async (req, res, next) => {
       });
     }
 
+    if (appType === "student" && user.role === "teacher") {
+      return res.status(403).json({
+        message: "This account is registered as an instructor. Please use the Instructor Login."
+      });
+    }
+
     if (appType === "instructor" && user.role === "student") {
       return res.status(403).json({
         message: "This account is a student account. Please use the student login."
+      });
+    }
+
+    if (appType === "instructor" && ["super_admin", "admin"].includes(user.role)) {
+      return res.status(403).json({
+        message: "Please use the admin panel to login."
       });
     }
     
@@ -395,8 +415,16 @@ export const sendLoginOTP = async (req, res, next) => {
       return res.status(403).json({ message: "Please use the admin panel to login." });
     }
 
+    if (appType === "student" && user.role === "teacher") {
+      return res.status(403).json({ message: "This account is registered as an instructor. Please use the Instructor Login." });
+    }
+
     if (appType === "instructor" && user.role === "student") {
       return res.status(403).json({ message: "This account is a student account. Please use the student login." });
+    }
+
+    if (appType === "instructor" && ["super_admin", "admin"].includes(user.role)) {
+      return res.status(403).json({ message: "Please use the admin panel to login." });
     }
 
     const otpCode = crypto.randomInt(100000, 999999).toString();
@@ -444,8 +472,16 @@ export const verifyLoginOTP = async (req, res, next) => {
       return res.status(403).json({ message: "Please use the admin panel to login." });
     }
 
+    if (appType === "student" && user.role === "teacher") {
+      return res.status(403).json({ message: "This account is registered as an instructor. Please use the Instructor Login." });
+    }
+
     if (appType === "instructor" && user.role === "student") {
       return res.status(403).json({ message: "This account is a student account. Please use the student login." });
+    }
+
+    if (appType === "instructor" && ["super_admin", "admin"].includes(user.role)) {
+      return res.status(403).json({ message: "Please use the admin panel to login." });
     }
 
     const otpRecord = await OTP.findOne({ email: normalizedEmail, otp: otp.trim(), purpose: "login" });

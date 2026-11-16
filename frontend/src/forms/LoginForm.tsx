@@ -173,7 +173,23 @@ const LoginForm = ({ role }: { role?: string }) => {
             >
                <div className="d-flex align-items-center gap-2">
                   <i className="fas fa-exclamation-circle flex-shrink-0 text-danger" style={{ fontSize: '1.1rem' }}></i>
-                  <span className="fw-medium">{loginError}</span>
+                  <div>
+                     <span className="fw-medium">{loginError}</span>
+                     {loginError.includes('Instructor Login') && (
+                        <div className="mt-1">
+                           <Link to="/instructor/login" className="fw-bold text-primary text-decoration-underline" style={{ fontSize: '0.85rem' }}>
+                              Go to Instructor Login &rarr;
+                           </Link>
+                        </div>
+                     )}
+                     {loginError.toLowerCase().includes('student login') && (
+                        <div className="mt-1">
+                           <Link to="/student/login" className="fw-bold text-primary text-decoration-underline" style={{ fontSize: '0.85rem' }}>
+                              Go to Student Login &rarr;
+                           </Link>
+                        </div>
+                     )}
+                  </div>
                </div>
                <button
                   type="button"

@@ -108,6 +108,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       const authResponse = response as AuthResponse;
+
+      if (appType === 'student' && authResponse.user.role === 'teacher') {
+        throw new Error('This account is registered as an instructor. Please use the Instructor Login.');
+      }
+      if (appType === 'instructor' && authResponse.user.role === 'student') {
+        throw new Error('This account is a student account. Please use the student login.');
+      }
+
       setStoredToken(authResponse.token);
       setStoredUser(authResponse.user);
       setToken(authResponse.token);
@@ -136,6 +144,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const { verifyLoginOTP } = await import('../services/authService');
       const appType = role === 'instructor' ? 'instructor' : 'student';
       const authResponse = await verifyLoginOTP(email, otp, appType);
+
+      if (appType === 'student' && authResponse.user.role === 'teacher') {
+        throw new Error('This account is registered as an instructor. Please use the Instructor Login.');
+      }
+      if (appType === 'instructor' && authResponse.user.role === 'student') {
+        throw new Error('This account is a student account. Please use the student login.');
+      }
 
       setStoredToken(authResponse.token);
       setStoredUser(authResponse.user);
@@ -171,6 +186,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       if (authResponse.token && authResponse.user) {
+        const appType = role === 'instructor' ? 'instructor' : 'student';
+        if (appType === 'student' && authResponse.user.role === 'teacher') {
+          throw new Error('This account is registered as an instructor. Please use the Instructor Login.');
+        }
+        if (appType === 'instructor' && authResponse.user.role === 'student') {
+          throw new Error('This account is a student account. Please use the student login.');
+        }
+
         setStoredToken(authResponse.token)
         setStoredUser(authResponse.user)
         setToken(authResponse.token)
