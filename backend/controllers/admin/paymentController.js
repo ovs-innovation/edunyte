@@ -97,7 +97,8 @@ export const getAllPayments = async (req, res, next) => {
         },
         payout: booking?.payout || {
           teacherAmountUSD,
-          teacherCurrency: "USD",
+          teacherAmountINR: Math.round(teacherAmountUSD * 83.33 * 100) / 100,
+          teacherCurrency: "INR",
           status: pr.productReference?.metadata?.payoutStatus || "pending",
         },
         payment: {
@@ -237,7 +238,8 @@ export const updatePayoutStatus = async (req, res, next) => {
       if (!booking.payout) {
         booking.payout = {
           teacherAmountUSD: 0,
-          teacherCurrency: "USD",
+          teacherAmountINR: 0,
+          teacherCurrency: "INR",
           status: "pending",
         };
       }
@@ -267,15 +269,34 @@ export const updatePayoutStatus = async (req, res, next) => {
       let pendingPayout = 0;
 
       completedBookings.forEach((b) => {
-        if (b.payout && b.payout.teacherAmountUSD) {
-          totalEarnings += b.payout.teacherAmountUSD;
-          if (b.payout.status === "pending") {
-            pendingPayout += b.payout.teacherAmountUSD;
+        let teacherAmount = 0;
+        if (b.payout && typeof b.payout.teacherAmountINR === "number" && b.payout.teacherAmountINR > 0) {
+          teacherAmount = b.payout.teacherAmountINR;
+        } else if (b.pricingSnapshot?.studentPaid?.currency === "INR" && b.pricingSnapshot?.studentPaid?.amount > 0) {
+          const baseUSD = b.pricingSnapshot?.baseAmountUSD || 0;
+          const feeUSD = b.pricingSnapshot?.platformFeeUSD || 0;
+          const totalUSD = baseUSD + feeUSD;
+          if (totalUSD > 0) {
+            teacherAmount = Math.round((baseUSD / totalUSD) * b.pricingSnapshot.studentPaid.amount * 100) / 100;
+          } else {
+            teacherAmount = b.pricingSnapshot.studentPaid.amount;
           }
+        } else if (b.payout && b.payout.teacherAmountUSD) {
+          const rate = (b.pricingSnapshot?.exchangeRatesUsed?.INR && b.pricingSnapshot.exchangeRatesUsed.INR > 1) 
+            ? b.pricingSnapshot.exchangeRatesUsed.INR 
+            : 83.33;
+          teacherAmount = Math.round(b.payout.teacherAmountUSD * rate * 100) / 100;
+        }
+
+        totalEarnings += teacherAmount;
+        if (b.payout && b.payout.status === "pending") {
+          pendingPayout += teacherAmount;
         }
       });
 
-      const paidAmount = totalEarnings - pendingPayout;
+      const paidAmount = Math.max(0, Math.round((totalEarnings - pendingPayout) * 100) / 100);
+      totalEarnings = Math.round(totalEarnings * 100) / 100;
+      pendingPayout = Math.round(pendingPayout * 100) / 100;
 
       await TeacherProfile.findOneAndUpdate(
         { userId: teacherId },

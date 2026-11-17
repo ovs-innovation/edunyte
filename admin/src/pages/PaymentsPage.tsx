@@ -83,6 +83,7 @@ interface Payment {
   };
   payout?: {
     teacherAmountUSD?: number;
+    teacherAmountINR?: number;
     teacherCurrency?: string;
     status: 'pending' | 'paid' | 'failed';
   };
@@ -561,7 +562,7 @@ return (
                     </TableCell>
                     <TableCell>
                       <div className="font-medium">
-                        ₹{(payment.payout?.teacherAmountUSD ? payment.payout.teacherAmountUSD * 83.33 : 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        ₹{(payment.payout?.teacherAmountINR || (payment.payout?.teacherAmountUSD ? payment.payout.teacherAmountUSD * 83.33 : 0)).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -668,7 +669,7 @@ return (
                 <div className="text-right">
                   <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Payout Amount</span>
                   <p className="text-2xl font-bold text-emerald-400">
-                    ₹{((selectedPayoutPayment.payout?.teacherAmountUSD || 0) * 83.33).toLocaleString('en-IN', {
+                    ₹{(selectedPayoutPayment.payout?.teacherAmountINR || ((selectedPayoutPayment.payout?.teacherAmountUSD || 0) * 83.33)).toLocaleString('en-IN', {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}

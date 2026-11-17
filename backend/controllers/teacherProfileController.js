@@ -25,7 +25,7 @@ export const getTeacherProfile = async (req, res, next) => {
     const publishedCourses = await TeacherCourse.countDocuments({ teacherId: userId, status: "approved" });
     const uniqueStudents = await Booking.distinct("studentId", { teacherId: userId, paymentStatus: "paid" });
 
-    // Calculate earnings from completed bookings
+    // Calculate earnings from completed bookings in INR
     const completedBookings = await Booking.find({
       teacherId: userId,
       status: "completed",
@@ -36,15 +36,34 @@ export const getTeacherProfile = async (req, res, next) => {
     let pendingPayout = 0;
 
     completedBookings.forEach(booking => {
-      if (booking.payout && booking.payout.teacherAmountUSD) {
-        totalEarnings += booking.payout.teacherAmountUSD;
-        if (booking.payout.status === "pending") {
-          pendingPayout += booking.payout.teacherAmountUSD;
+      let teacherAmount = 0;
+      if (booking.payout && typeof booking.payout.teacherAmountINR === "number" && booking.payout.teacherAmountINR > 0) {
+        teacherAmount = booking.payout.teacherAmountINR;
+      } else if (booking.pricingSnapshot?.studentPaid?.currency === "INR" && booking.pricingSnapshot?.studentPaid?.amount > 0) {
+        const baseUSD = booking.pricingSnapshot?.baseAmountUSD || 0;
+        const feeUSD = booking.pricingSnapshot?.platformFeeUSD || 0;
+        const totalUSD = baseUSD + feeUSD;
+        if (totalUSD > 0) {
+          teacherAmount = Math.round((baseUSD / totalUSD) * booking.pricingSnapshot.studentPaid.amount * 100) / 100;
+        } else {
+          teacherAmount = booking.pricingSnapshot.studentPaid.amount;
         }
+      } else if (booking.payout && booking.payout.teacherAmountUSD) {
+        const rate = (booking.pricingSnapshot?.exchangeRatesUsed?.INR && booking.pricingSnapshot.exchangeRatesUsed.INR > 1) 
+          ? booking.pricingSnapshot.exchangeRatesUsed.INR 
+          : 83.33;
+        teacherAmount = Math.round(booking.payout.teacherAmountUSD * rate * 100) / 100;
+      }
+
+      totalEarnings += teacherAmount;
+      if (booking.payout && booking.payout.status === "pending") {
+        pendingPayout += teacherAmount;
       }
     });
 
-    const paidAmount = totalEarnings - pendingPayout;
+    const paidAmount = Math.max(0, Math.round((totalEarnings - pendingPayout) * 100) / 100);
+    totalEarnings = Math.round(totalEarnings * 100) / 100;
+    pendingPayout = Math.round(pendingPayout * 100) / 100;
 
     // Update profile with calculated stats
     profile.totalCourses = totalCourses;
@@ -82,7 +101,7 @@ export const getMyTeacherProfile = async (req, res, next) => {
     const publishedCourses = await TeacherCourse.countDocuments({ teacherId: userId, status: "approved" });
     const uniqueStudents = await Booking.distinct("studentId", { teacherId: userId, paymentStatus: "paid" });
 
-    // Calculate earnings from completed bookings
+    // Calculate earnings from completed bookings in INR
     const completedBookings = await Booking.find({
       teacherId: userId,
       status: "completed",
@@ -93,15 +112,34 @@ export const getMyTeacherProfile = async (req, res, next) => {
     let pendingPayout = 0;
 
     completedBookings.forEach(booking => {
-      if (booking.payout && booking.payout.teacherAmountUSD) {
-        totalEarnings += booking.payout.teacherAmountUSD;
-        if (booking.payout.status === "pending") {
-          pendingPayout += booking.payout.teacherAmountUSD;
+      let teacherAmount = 0;
+      if (booking.payout && typeof booking.payout.teacherAmountINR === "number" && booking.payout.teacherAmountINR > 0) {
+        teacherAmount = booking.payout.teacherAmountINR;
+      } else if (booking.pricingSnapshot?.studentPaid?.currency === "INR" && booking.pricingSnapshot?.studentPaid?.amount > 0) {
+        const baseUSD = booking.pricingSnapshot?.baseAmountUSD || 0;
+        const feeUSD = booking.pricingSnapshot?.platformFeeUSD || 0;
+        const totalUSD = baseUSD + feeUSD;
+        if (totalUSD > 0) {
+          teacherAmount = Math.round((baseUSD / totalUSD) * booking.pricingSnapshot.studentPaid.amount * 100) / 100;
+        } else {
+          teacherAmount = booking.pricingSnapshot.studentPaid.amount;
         }
+      } else if (booking.payout && booking.payout.teacherAmountUSD) {
+        const rate = (booking.pricingSnapshot?.exchangeRatesUsed?.INR && booking.pricingSnapshot.exchangeRatesUsed.INR > 1) 
+          ? booking.pricingSnapshot.exchangeRatesUsed.INR 
+          : 83.33;
+        teacherAmount = Math.round(booking.payout.teacherAmountUSD * rate * 100) / 100;
+      }
+
+      totalEarnings += teacherAmount;
+      if (booking.payout && booking.payout.status === "pending") {
+        pendingPayout += teacherAmount;
       }
     });
 
-    const paidAmount = totalEarnings - pendingPayout;
+    const paidAmount = Math.max(0, Math.round((totalEarnings - pendingPayout) * 100) / 100);
+    totalEarnings = Math.round(totalEarnings * 100) / 100;
+    pendingPayout = Math.round(pendingPayout * 100) / 100;
 
     // Update profile with calculated stats
     profile.totalCourses = totalCourses;

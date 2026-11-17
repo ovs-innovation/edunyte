@@ -447,6 +447,11 @@ const activateLessonBooking = async ({ order, paymentId, session }) => {
   }
 
   const teacherAmountUSD = Number(order.pricingSnapshot?.baseAmountUSD || 0);
+  const teacherAmountINR = Number(
+    order.pricingSnapshot?.breakdown?.lessonAmount ||
+    Math.round(teacherAmountUSD * (order.pricingSnapshot?.exchangeRateUsed || 83.33) * 100) / 100 ||
+    0
+  );
 
   const bookingData = {
     studentId: order.userId,
@@ -480,7 +485,8 @@ const activateLessonBooking = async ({ order, paymentId, session }) => {
     },
     payout: {
       teacherAmountUSD,
-      teacherCurrency: "USD",
+      teacherAmountINR,
+      teacherCurrency: "INR",
       status: "pending",
     },
     payment: {

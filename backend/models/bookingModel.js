@@ -82,7 +82,8 @@ const bookingSchema = new mongoose.Schema(
 
     payout: {
       teacherAmountUSD: { type: Number, required: true, min: 0 },
-      teacherCurrency: { type: String, required: true, uppercase: true, trim: true },
+      teacherAmountINR: { type: Number, default: 0, min: 0 },
+      teacherCurrency: { type: String, default: "INR", uppercase: true, trim: true },
       status: { type: String, enum: ["pending", "paid", "failed"], default: "pending", index: true },
     },
 
