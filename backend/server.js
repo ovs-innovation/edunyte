@@ -2,6 +2,7 @@ import http from "http";
 import app from "./app.js";
 import { initRedis } from "./config/redis.js";
 import { startExchangeRateJob } from "./jobs/exchangeRateJob.js";
+import { startSessionReminderJob } from "./jobs/sessionReminderJob.js";
 import { validateRazorpayConfig } from "./config/razorpay.js";
 
 const PORT = process.env.PORT || 5000;
@@ -16,6 +17,7 @@ const initializeServices = async () => {
 
     await initRedis();
     startExchangeRateJob();
+    startSessionReminderJob();
   } catch (error) {
     console.error("Failed to initialize services:", error);
     process.exit(1);

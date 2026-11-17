@@ -143,6 +143,15 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    reminderSent: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    reminderSentAt: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );
@@ -151,6 +160,7 @@ const bookingSchema = new mongoose.Schema(
 bookingSchema.index({ studentId: 1, status: 1, sessionDate: 1 });
 bookingSchema.index({ teacherId: 1, status: 1, sessionDate: 1 });
 bookingSchema.index({ sessionDate: 1, status: 1 });
+bookingSchema.index({ status: 1, reminderSent: 1, "lesson.scheduledAt": 1 });
 // Idempotency: one booking per Stripe PaymentIntent
 bookingSchema.index({ "payment.stripePaymentIntentId": 1 }, { unique: true, sparse: true });
 

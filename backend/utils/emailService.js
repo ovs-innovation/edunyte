@@ -197,3 +197,211 @@ export const sendInstructorApprovalEmail = async (email, userName) => {
     console.error("Error sending approval email:", error);
   }
 };
+
+const formatSessionTime = (date, tz) => {
+  try {
+    const d = date instanceof Date ? date : new Date(date);
+    return new Intl.DateTimeFormat("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: tz || "Asia/Kolkata",
+      timeZoneName: "short",
+    }).format(d);
+  } catch (err) {
+    return date ? new Date(date).toLocaleString() : "";
+  }
+};
+
+export const sendSessionReminderEmailToStudent = async ({
+  studentEmail,
+  studentName,
+  teacherName,
+  courseName,
+  sessionStartTime,
+  duration,
+  meetingUrl,
+  timezone,
+}) => {
+  try {
+    let frontendUrl = (process.env.FRONTEND_URL || "https://edunyte.com").trim().replace(/\/+$/, "");
+    if (!frontendUrl || frontendUrl.includes("localhost") || frontendUrl.includes("127.0.0.1")) {
+      frontendUrl = "https://edunyte.com";
+    }
+    const actionUrl = meetingUrl && meetingUrl.trim() !== "" ? meetingUrl : `${frontendUrl}/student-dashboard`;
+    const formattedTime = formatSessionTime(sessionStartTime, timezone);
+
+    const mailOptions = {
+      from: `"Edunyte Classes" <${process.env.EMAIL_USER}>`,
+      to: studentEmail,
+      subject: `🔔 Starting in 15 Min: Your Class for ${courseName}`,
+      html: `
+        <div style="margin:0;padding:32px 0;background:#0b1021;font-family:'Inter',Arial,sans-serif;color:#e2e8f0;">
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="max-width:580px;width:100%;background:#0e1426;border:1px solid #1f2a44;border-radius:18px;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,0.35);">
+            <tr>
+              <td style="padding:0;">
+                <div style="background:linear-gradient(135deg,#0284c7,#2563eb,#7c3aed);padding:28px 24px;text-align:center;color:#f8fafc;">
+                  <div style="margin:0 auto 10px auto;width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:28px;">
+                    ⏰
+                  </div>
+                  <div style="font-size:12px;letter-spacing:1.5px;text-transform:uppercase;opacity:0.95;font-weight:700;">Class Starting Soon (in 10-15 Min)</div>
+                  <div style="font-size:22px;font-weight:800;margin-top:6px;">Get Ready for Your Live Session!</div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:28px 26px 16px 26px;">
+                <p style="margin:0 0 12px 0;font-size:16px;font-weight:600;color:#f8fafc;">
+                  Hello ${studentName || "Student"},
+                </p>
+                <p style="margin:0 0 20px 0;font-size:15px;line-height:1.6;color:#cbd5e1;">
+                  Your live class for <strong style="color:#38bdf8;">${courseName}</strong> with instructor <strong style="color:#f8fafc;">${teacherName}</strong> is starting in approximately <strong>10–15 minutes</strong>.
+                </p>
+
+                <div style="background:#131c33;border:1px solid #233152;border-radius:14px;padding:20px;margin-bottom:24px;">
+                  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                    <tr>
+                      <td style="padding:6px 0;font-size:14px;color:#94a3b8;width:110px;">📚 Course:</td>
+                      <td style="padding:6px 0;font-size:14px;color:#f8fafc;font-weight:600;">${courseName}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:6px 0;font-size:14px;color:#94a3b8;">👨‍🏫 Instructor:</td>
+                      <td style="padding:6px 0;font-size:14px;color:#f8fafc;font-weight:600;">${teacherName}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:6px 0;font-size:14px;color:#94a3b8;">🗓️ Time:</td>
+                      <td style="padding:6px 0;font-size:14px;color:#38bdf8;font-weight:600;">${formattedTime}</td>
+                    </tr>
+                    ${duration ? `<tr><td style="padding:6px 0;font-size:14px;color:#94a3b8;">⏱️ Duration:</td><td style="padding:6px 0;font-size:14px;color:#f8fafc;">${duration} minutes</td></tr>` : ""}
+                  </table>
+                </div>
+
+                <div style="text-align:center;margin:25px 0 20px 0;">
+                  <a href="${actionUrl}" style="background:linear-gradient(135deg,#059669,#10b981);color:#ffffff;padding:15px 36px;text-decoration:none;border-radius:10px;font-weight:800;display:inline-block;font-size:16px;box-shadow:0 10px 25px rgba(16,185,129,0.4);letter-spacing:0.5px;">
+                    🚀 Join Class Now
+                  </a>
+                </div>
+
+                <p style="text-align:center;margin:0 0 20px 0;font-size:13px;color:#94a3b8;">
+                  You can also open the class from your <a href="${frontendUrl}/student-dashboard" style="color:#38bdf8;text-decoration:underline;">Student Dashboard</a>.
+                </p>
+
+                <div style="background:#0b1120;border-left:4px solid #38bdf8;padding:12px 16px;border-radius:6px;margin-top:15px;">
+                  <p style="margin:0;font-size:13px;color:#94a3b8;line-height:1.5;">
+                    💡 <strong>Tip:</strong> Join 2-3 minutes early to test your audio, microphone, and camera for the best learning experience.
+                  </p>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:16px 26px 20px 26px;border-top:1px solid #1f2a44;text-align:center;color:#64748b;font-size:12px;background:#0e1426;">
+                Edunyte Platform • Connected Learning<br/>
+                Need assistance? Contact us at <a href="mailto:support@edunyte.com" style="color:#38bdf8;">support@edunyte.com</a>
+              </td>
+            </tr>
+          </table>
+        </div>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log(`✅ Session reminder email sent to student: ${studentEmail}`);
+  } catch (error) {
+    console.error(`❌ Error sending student session reminder email to ${studentEmail}:`, error.message);
+  }
+};
+
+export const sendSessionReminderEmailToInstructor = async ({
+  teacherEmail,
+  teacherName,
+  studentName,
+  courseName,
+  sessionStartTime,
+  duration,
+  meetingUrl,
+  timezone,
+}) => {
+  try {
+    let frontendUrl = (process.env.FRONTEND_URL || "https://edunyte.com").trim().replace(/\/+$/, "");
+    if (!frontendUrl || frontendUrl.includes("localhost") || frontendUrl.includes("127.0.0.1")) {
+      frontendUrl = "https://edunyte.com";
+    }
+    const actionUrl = meetingUrl && meetingUrl.trim() !== "" ? meetingUrl : `${frontendUrl}/instructor-dashboard`;
+    const formattedTime = formatSessionTime(sessionStartTime, timezone);
+
+    const mailOptions = {
+      from: `"Edunyte Classes" <${process.env.EMAIL_USER}>`,
+      to: teacherEmail,
+      subject: `🔔 Starting in 15 Min: Teaching Session for ${courseName}`,
+      html: `
+        <div style="margin:0;padding:32px 0;background:#0b1021;font-family:'Inter',Arial,sans-serif;color:#e2e8f0;">
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="max-width:580px;width:100%;background:#0e1426;border:1px solid #1f2a44;border-radius:18px;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,0.35);">
+            <tr>
+              <td style="padding:0;">
+                <div style="background:linear-gradient(135deg,#7c3aed,#9333ea,#c026d3);padding:28px 24px;text-align:center;color:#f8fafc;">
+                  <div style="margin:0 auto 10px auto;width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:28px;">
+                    🎓
+                  </div>
+                  <div style="font-size:12px;letter-spacing:1.5px;text-transform:uppercase;opacity:0.95;font-weight:700;">Teaching Session Reminder (in 10-15 Min)</div>
+                  <div style="font-size:22px;font-weight:800;margin-top:6px;">Your Class is About to Begin!</div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:28px 26px 16px 26px;">
+                <p style="margin:0 0 12px 0;font-size:16px;font-weight:600;color:#f8fafc;">
+                  Hello ${teacherName || "Instructor"},
+                </p>
+                <p style="margin:0 0 20px 0;font-size:15px;line-height:1.6;color:#cbd5e1;">
+                  Your scheduled live session for <strong style="color:#c084fc;">${courseName}</strong> with student <strong style="color:#f8fafc;">${studentName}</strong> is starting in approximately <strong>10–15 minutes</strong>.
+                </p>
+
+                <div style="background:#131c33;border:1px solid #233152;border-radius:14px;padding:20px;margin-bottom:24px;">
+                  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                    <tr>
+                      <td style="padding:6px 0;font-size:14px;color:#94a3b8;width:110px;">📚 Course:</td>
+                      <td style="padding:6px 0;font-size:14px;color:#f8fafc;font-weight:600;">${courseName}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:6px 0;font-size:14px;color:#94a3b8;">👤 Student:</td>
+                      <td style="padding:6px 0;font-size:14px;color:#f8fafc;font-weight:600;">${studentName}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:6px 0;font-size:14px;color:#94a3b8;">🗓️ Time:</td>
+                      <td style="padding:6px 0;font-size:14px;color:#c084fc;font-weight:600;">${formattedTime}</td>
+                    </tr>
+                    ${duration ? `<tr><td style="padding:6px 0;font-size:14px;color:#94a3b8;">⏱️ Duration:</td><td style="padding:6px 0;font-size:14px;color:#f8fafc;">${duration} minutes</td></tr>` : ""}
+                  </table>
+                </div>
+
+                <div style="text-align:center;margin:25px 0 20px 0;">
+                  <a href="${actionUrl}" style="background:linear-gradient(135deg,#7c3aed,#9333ea);color:#ffffff;padding:15px 36px;text-decoration:none;border-radius:10px;font-weight:800;display:inline-block;font-size:16px;box-shadow:0 10px 25px rgba(147,51,234,0.4);letter-spacing:0.5px;">
+                    🚀 Start / Join Session
+                  </a>
+                </div>
+
+                <p style="text-align:center;margin:0 0 20px 0;font-size:13px;color:#94a3b8;">
+                  You can also manage your classes from your <a href="${frontendUrl}/instructor-dashboard" style="color:#c084fc;text-decoration:underline;">Instructor Dashboard</a>.
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:16px 26px 20px 26px;border-top:1px solid #1f2a44;text-align:center;color:#64748b;font-size:12px;background:#0e1426;">
+                Edunyte Platform • Connected Learning<br/>
+                Need assistance? Contact us at <a href="mailto:support@edunyte.com" style="color:#38bdf8;">support@edunyte.com</a>
+              </td>
+            </tr>
+          </table>
+        </div>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log(`✅ Session reminder email sent to instructor: ${teacherEmail}`);
+  } catch (error) {
+    console.error(`❌ Error sending instructor session reminder email to ${teacherEmail}:`, error.message);
+  }
+};

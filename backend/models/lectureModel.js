@@ -72,6 +72,15 @@ const lectureSchema = new mongoose.Schema(
         enum: ["scheduled", "live", "completed", "cancelled"],
         default: "scheduled",
       },
+      reminderSent: {
+        type: Boolean,
+        default: false,
+        index: true,
+      },
+      reminderSentAt: {
+        type: Date,
+        default: null,
+      },
     },
     order: {
       type: Number,

@@ -26,6 +26,7 @@ import studentBookingRoutes from "./routes/student/bookingRoutes.js";
 import currencyRoutes from "./routes/currencyRoutes.js";
 import translationRoutes from "./routes/translationRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 import { ensureDefaultRoles } from "./controllers/roleController.js";
 
 const app = express();
@@ -83,6 +84,9 @@ app.use("/api/translate", translationRoutes);
 // Payment routes (supports both /api/payment and /api/payments)
 app.use("/api/payment", paymentRoutes);
 app.use("/api/payments", paymentRoutes);
+
+// Notification routes
+app.use("/api/notifications", notificationRoutes);
 
 app.use(errorHandler);
 
