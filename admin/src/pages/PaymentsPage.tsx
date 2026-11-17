@@ -19,7 +19,38 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search, Download, DollarSign, TrendingUp, AlertCircle, CheckCircle } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Search,
+  Download,
+  DollarSign,
+  TrendingUp,
+  AlertCircle,
+  CheckCircle,
+  ChevronDown,
+  CreditCard,
+  Copy,
+  Check,
+  MoreHorizontal,
+  Clock,
+  XCircle,
+  Building,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 
@@ -64,6 +95,14 @@ interface Payment {
   paymentMethod?: string;
   orderId?: string;
   paymentId?: string;
+  bookingId?: string;
+  teacherPayoutInfo?: {
+    bankName?: string;
+    accountNumber?: string;
+    ifscCode?: string;
+    accountHolderName?: string;
+    upiId?: string;
+  };
   status?: 'scheduled' | 'completed' | 'cancelled' | 'no_show';
   createdAt: string;
 }
@@ -79,7 +118,81 @@ const PaymentsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [paymentStatusFilter, setPaymentStatusFilter] = useState<string>('all');
   const [payoutStatusFilter, setPayoutStatusFilter] = useState<string>('all');
+  const [updatingPayoutId, setUpdatingPayoutId] = useState<string | null>(null);
+  const [selectedPayoutPayment, setSelectedPayoutPayment] = useState<Payment | null>(null);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
   const { toast } = useToast();
+
+  const copyToClipboard = (text: string, field: string) => {
+    if (!text) return;
+    navigator.clipboard.writeText(text);
+    setCopiedField(field);
+    toast({ title: 'Copied to clipboard', description: text });
+    setTimeout(() => setCopiedField(null), 2000);
+  };
+
+  const handleUpdatePayoutStatus = async (paymentId: string, status: 'pending' | 'paid' | 'failed') => {
+    setUpdatingPayoutId(paymentId);
+    try {
+      const token = getToken();
+      const response = await fetch(`${API_URL}/admin/payments/${paymentId}/payout`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update payout status');
+      }
+
+      toast({
+        title: 'Payout Status Updated',
+        description: `Payout marked as ${status.toUpperCase()} successfully.`,
+      });
+
+      // Update in state
+      setPayments((prev) =>
+        prev.map((p) => {
+          if (p._id === paymentId || p.bookingId === paymentId) {
+            return {
+              ...p,
+              payout: {
+                ...(p.payout || { teacherAmountUSD: 0, teacherCurrency: 'USD' }),
+                status,
+              },
+            };
+          }
+          return p;
+        })
+      );
+
+      if (selectedPayoutPayment && (selectedPayoutPayment._id === paymentId || selectedPayoutPayment.bookingId === paymentId)) {
+        setSelectedPayoutPayment((prev) =>
+          prev
+            ? {
+                ...prev,
+                payout: {
+                  ...(prev.payout || { teacherAmountUSD: 0, teacherCurrency: 'USD' }),
+                  status,
+                },
+              }
+            : null
+        );
+      }
+    } catch (err: any) {
+      toast({
+        title: 'Update Failed',
+        description: err.message || 'Could not update payout status',
+        variant: 'destructive',
+      });
+    } finally {
+      setUpdatingPayoutId(null);
+    }
+  };
 
   const [stats, setStats] = useState({
     totalRevenue: 0,
@@ -377,18 +490,19 @@ const PaymentsPage = () => {
                   <TableHead>Teacher Payout</TableHead>
                   <TableHead>Payment Status</TableHead>
                   <TableHead>Payout Status</TableHead>
+                  <TableHead className="text-right">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={10} className="text-center py-8">
+                    <TableCell colSpan={11} className="text-center py-8">
                       <div className="text-muted-foreground">Loading payments...</div>
                     </TableCell>
                   </TableRow>
                 ) : filteredPayments.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={10} className="text-center py-8">
+                    <TableCell colSpan={11} className="text-center py-8">
                       <div className="text-muted-foreground">No payments found</div>
                     </TableCell>
                   </TableRow>
@@ -460,7 +574,62 @@ const PaymentsPage = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        {getPayoutStatusBadge(payment.payout?.status || 'pending')}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              disabled={updatingPayoutId === payment._id}
+                              className="h-auto px-2 py-1 font-normal flex items-center gap-1.5 hover:bg-muted/60 rounded-md border border-transparent hover:border-border transition-colors cursor-pointer"
+                            >
+                              {getPayoutStatusBadge(payment.payout?.status || 'pending')}
+                              <ChevronDown className="h-3 w-3 text-muted-foreground opacity-70" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48 bg-card border-border">
+                            <DropdownMenuLabel className="text-xs text-muted-foreground">Change Payout Status</DropdownMenuLabel>
+                            <DropdownMenuItem
+                              onClick={() => handleUpdatePayoutStatus(payment._id, 'paid')}
+                              className="text-emerald-500 focus:text-emerald-500 gap-2 cursor-pointer font-medium"
+                            >
+                              <CheckCircle className="h-4 w-4" />
+                              Mark as Paid
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleUpdatePayoutStatus(payment._id, 'pending')}
+                              className="text-amber-500 focus:text-amber-500 gap-2 cursor-pointer font-medium"
+                            >
+                              <Clock className="h-4 w-4" />
+                              Mark as Pending
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleUpdatePayoutStatus(payment._id, 'failed')}
+                              className="text-destructive focus:text-destructive gap-2 cursor-pointer font-medium"
+                            >
+                              <XCircle className="h-4 w-4" />
+                              Mark as Failed
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator className="bg-border" />
+                            <DropdownMenuItem
+                              onClick={() => setSelectedPayoutPayment(payment)}
+                              className="gap-2 cursor-pointer"
+                            >
+                              <CreditCard className="h-4 w-4 text-primary" />
+                              View Bank / UPI Info
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSelectedPayoutPayment(payment)}
+                          className="h-8 px-2.5 text-xs gap-1.5 border-border hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer"
+                        >
+                          <CreditCard className="h-3.5 w-3.5" />
+                          <span>Pay Teacher</span>
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))
@@ -470,6 +639,208 @@ const PaymentsPage = () => {
           </div>
         </Card>
       </div>
+
+      {/* Teacher Bank & Payout Details Dialog */}
+      <Dialog open={!!selectedPayoutPayment} onOpenChange={(open) => !open && setSelectedPayoutPayment(null)}>
+        <DialogContent className="sm:max-w-[520px] bg-card border-border">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl font-bold">
+              <CreditCard className="h-5 w-5 text-primary" />
+              Teacher Payout & Bank Details
+            </DialogTitle>
+            <DialogDescription>
+              Transfer the payout to the teacher's bank/UPI account, then update the payout status below.
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedPayoutPayment && (
+            <div className="space-y-4 py-2">
+              {/* Summary Card */}
+              <div className="rounded-xl border border-border bg-muted/40 p-4 space-y-3">
+                <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                  <div>
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Teacher</span>
+                    <p className="text-base font-semibold text-foreground">{selectedPayoutPayment.teacherId?.name || 'N/A'}</p>
+                    <p className="text-xs text-muted-foreground">{selectedPayoutPayment.teacherId?.email || 'N/A'}</p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Payout Amount</span>
+                    <p className="text-2xl font-bold text-emerald-400">
+                      ₹{((selectedPayoutPayment.payout?.teacherAmountUSD || 0) * 83.33).toLocaleString('en-IN', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </p>
+                    <div className="mt-1 flex justify-end">
+                      {getPayoutStatusBadge(selectedPayoutPayment.payout?.status || 'pending')}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                  <div>
+                    <span className="font-medium text-foreground">Course: </span>
+                    {getCourseName(selectedPayoutPayment.courseId)}
+                  </div>
+                  <div className="text-right">
+                    <span className="font-medium text-foreground">Date: </span>
+                    {formatDate(selectedPayoutPayment.sessionDate || selectedPayoutPayment.createdAt)}
+                  </div>
+                </div>
+              </div>
+
+              {/* Bank Details */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                  <Building className="h-3.5 w-3.5" />
+                  Bank / UPI Account Details
+                </h4>
+
+                {selectedPayoutPayment.teacherPayoutInfo &&
+                (selectedPayoutPayment.teacherPayoutInfo.bankName ||
+                  selectedPayoutPayment.teacherPayoutInfo.accountNumber ||
+                  selectedPayoutPayment.teacherPayoutInfo.ifscCode ||
+                  selectedPayoutPayment.teacherPayoutInfo.upiId ||
+                  selectedPayoutPayment.teacherPayoutInfo.accountHolderName) ? (
+                  <div className="rounded-lg border border-border bg-card p-3 space-y-2.5 text-sm">
+                    {/* Account Holder */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground text-xs">Account Holder:</span>
+                      <span className="font-medium text-foreground">
+                        {selectedPayoutPayment.teacherPayoutInfo.accountHolderName || selectedPayoutPayment.teacherId?.name || '—'}
+                      </span>
+                    </div>
+
+                    {/* Bank Name */}
+                    {selectedPayoutPayment.teacherPayoutInfo.bankName && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground text-xs">Bank Name:</span>
+                        <span className="font-medium text-foreground">{selectedPayoutPayment.teacherPayoutInfo.bankName}</span>
+                      </div>
+                    )}
+
+                    {/* Account Number */}
+                    {selectedPayoutPayment.teacherPayoutInfo.accountNumber && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground text-xs">Account Number:</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono font-semibold text-foreground">
+                            {selectedPayoutPayment.teacherPayoutInfo.accountNumber}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-muted-foreground hover:text-foreground cursor-pointer"
+                            onClick={() =>
+                              copyToClipboard(selectedPayoutPayment.teacherPayoutInfo?.accountNumber || '', 'acc')
+                            }
+                          >
+                            {copiedField === 'acc' ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* IFSC Code */}
+                    {selectedPayoutPayment.teacherPayoutInfo.ifscCode && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground text-xs">IFSC Code:</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono font-semibold text-foreground">
+                            {selectedPayoutPayment.teacherPayoutInfo.ifscCode}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-muted-foreground hover:text-foreground cursor-pointer"
+                            onClick={() =>
+                              copyToClipboard(selectedPayoutPayment.teacherPayoutInfo?.ifscCode || '', 'ifsc')
+                            }
+                          >
+                            {copiedField === 'ifsc' ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* UPI ID */}
+                    {selectedPayoutPayment.teacherPayoutInfo.upiId && (
+                      <div className="flex items-center justify-between border-t border-border/50 pt-2">
+                        <span className="text-muted-foreground text-xs">UPI ID:</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono font-semibold text-primary">
+                            {selectedPayoutPayment.teacherPayoutInfo.upiId}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-muted-foreground hover:text-foreground cursor-pointer"
+                            onClick={() =>
+                              copyToClipboard(selectedPayoutPayment.teacherPayoutInfo?.upiId || '', 'upi')
+                            }
+                          >
+                            {copiedField === 'upi' ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-300 flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 shrink-0 text-amber-400" />
+                    <span>The teacher has not added their bank or UPI details to their profile yet.</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-2 pt-2 border-t border-border">
+            <Button variant="ghost" size="sm" onClick={() => setSelectedPayoutPayment(null)}>
+              Close
+            </Button>
+
+            {selectedPayoutPayment && (
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                {selectedPayoutPayment.payout?.status === 'paid' ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={updatingPayoutId === selectedPayoutPayment._id}
+                    onClick={() => handleUpdatePayoutStatus(selectedPayoutPayment._id, 'pending')}
+                    className="border-amber-500/40 text-amber-400 hover:bg-amber-500/10 gap-1.5 cursor-pointer"
+                  >
+                    <Clock className="h-4 w-4" />
+                    Revert to Pending
+                  </Button>
+                ) : (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={updatingPayoutId === selectedPayoutPayment._id}
+                      onClick={() => handleUpdatePayoutStatus(selectedPayoutPayment._id, 'failed')}
+                      className="border-destructive/40 text-destructive hover:bg-destructive/10 gap-1.5 cursor-pointer"
+                    >
+                      <XCircle className="h-4 w-4" />
+                      Mark Failed
+                    </Button>
+                    <Button
+                      size="sm"
+                      disabled={updatingPayoutId === selectedPayoutPayment._id}
+                      onClick={() => handleUpdatePayoutStatus(selectedPayoutPayment._id, 'paid')}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 font-semibold cursor-pointer"
+                    >
+                      <CheckCircle className="h-4 w-4" />
+                      Mark as Paid
+                    </Button>
+                  </>
+                )}
+              </div>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 };

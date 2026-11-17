@@ -1,6 +1,7 @@
 import Booking from "../../models/bookingModel.js";
 import Payment from "../../models/paymentModel.js";
 import Order from "../../models/orderModel.js";
+import TeacherProfile from "../../models/teacherProfileModel.js";
 
 /**
  * Get all payments/transactions for admin panel.
@@ -47,6 +48,20 @@ export const getAllPayments = async (req, res, next) => {
         .map((p) => String(p.paymentId))
     );
 
+    // Fetch teacher profiles for payout info (bank details, UPI, etc.)
+    const rawTeacherIds = [
+      ...paymentRecords.map((p) => p.productReference?.teacherId?._id || p.productReference?.teacherId || p.bookingId?.teacherId?._id || p.bookingId?.teacherId),
+      ...bookings.map((b) => b.teacherId?._id || b.teacherId),
+    ].filter(Boolean);
+
+    const teacherUserIds = [...new Set(rawTeacherIds.map((id) => String(id)))];
+    const teacherProfiles = await TeacherProfile.find({ userId: { $in: teacherUserIds } })
+      .select("userId payoutInfo")
+      .lean();
+    const teacherProfileMap = new Map(
+      teacherProfiles.map((tp) => [String(tp.userId), tp.payoutInfo || {}])
+    );
+
     const formattedPayments = [];
 
     // Map each Payment record to the admin table shape
@@ -59,13 +74,16 @@ export const getAllPayments = async (req, res, next) => {
       const baseAmountUSD = booking?.pricingSnapshot?.baseAmountUSD || 0;
       const platformFeeUSD = booking?.pricingSnapshot?.platformFeeUSD || 0;
       const teacherAmountUSD = booking?.payout?.teacherAmountUSD || 0;
+      const teacherIdStr = String(teacher?._id || teacher || "");
 
       formattedPayments.push({
         _id: pr._id,
+        bookingId: booking?._id || null,
         sessionDate: booking?.sessionDate || pr.createdAt,
         createdAt: pr.createdAt,
         studentId: student,
         teacherId: teacher,
+        teacherPayoutInfo: teacherProfileMap.get(teacherIdStr) || null,
         courseId: course,
         duration: pr.productReference?.duration || booking?.duration || 50,
         studentCount: pr.productReference?.studentCount || booking?.studentCount || 1,
@@ -102,12 +120,15 @@ export const getAllPayments = async (req, res, next) => {
       if (!representedBookingIds.has(String(b._id))) {
         const paymentKey = b.payment?.stripePaymentIntentId || b.paymentId;
         if (!paymentKey || !representedPaymentIds.has(String(paymentKey))) {
+          const teacherIdStr = String(b.teacherId?._id || b.teacherId || "");
           formattedPayments.push({
             _id: b._id,
+            bookingId: b._id,
             sessionDate: b.sessionDate || b.createdAt,
             createdAt: b.createdAt,
             studentId: b.studentId,
             teacherId: b.teacherId,
+            teacherPayoutInfo: teacherProfileMap.get(teacherIdStr) || null,
             courseId: b.courseId,
             duration: b.duration,
             studentCount: b.studentCount || 1,
@@ -186,24 +207,85 @@ export const updatePayoutStatus = async (req, res, next) => {
     }
 
     let booking = await Booking.findById(id);
+    let paymentDoc = null;
 
     // If ID is a Payment record ID, find the linked booking
     if (!booking) {
-      const paymentDoc = await Payment.findById(id);
-      if (paymentDoc && paymentDoc.bookingId) {
-        booking = await Booking.findById(paymentDoc.bookingId);
+      paymentDoc = await Payment.findById(id);
+      if (paymentDoc) {
+        if (paymentDoc.bookingId) {
+          booking = await Booking.findById(paymentDoc.bookingId);
+        } else if (paymentDoc.paymentId || paymentDoc.orderId) {
+          booking = await Booking.findOne({
+            $or: [
+              { paymentId: paymentDoc.paymentId },
+              { "payment.stripePaymentIntentId": paymentDoc.paymentId },
+              { "payment.stripePaymentIntentId": paymentDoc.orderId },
+            ],
+          });
+        }
+      }
+    } else {
+      paymentDoc = await Payment.findOne({ bookingId: booking._id });
+    }
+
+    if (!booking && !paymentDoc) {
+      return res.status(404).json({ message: "Payment or Booking record not found" });
+    }
+
+    if (booking) {
+      if (!booking.payout) {
+        booking.payout = {
+          teacherAmountUSD: 0,
+          teacherCurrency: "USD",
+          status: "pending",
+        };
+      }
+      booking.payout.status = status;
+      await booking.save();
+
+      // Recalculate teacher profile earnings
+      if (booking.teacherId) {
+        const completedBookings = await Booking.find({
+          teacherId: booking.teacherId,
+          paymentStatus: "paid",
+        });
+
+        let totalEarnings = 0;
+        let pendingPayout = 0;
+
+        completedBookings.forEach((b) => {
+          if (b.payout && b.payout.teacherAmountUSD) {
+            totalEarnings += b.payout.teacherAmountUSD;
+            if (b.payout.status === "pending") {
+              pendingPayout += b.payout.teacherAmountUSD;
+            }
+          }
+        });
+
+        const paidAmount = totalEarnings - pendingPayout;
+
+        await TeacherProfile.findOneAndUpdate(
+          { userId: booking.teacherId },
+          { totalEarnings, pendingPayout, paidAmount }
+        );
       }
     }
 
-    if (!booking) {
-      return res.status(404).json({ message: "Booking not found" });
+    if (paymentDoc) {
+      if (!paymentDoc.statusHistory) paymentDoc.statusHistory = [];
+      paymentDoc.statusHistory.push({
+        status: `payout_${status}`,
+        timestamp: new Date(),
+        reason: `Admin updated payout status to ${status}`,
+      });
+      await paymentDoc.save();
     }
 
-    booking.payout.status = status;
-    await booking.save();
-
     res.json({
-      message: "Payout status updated successfully",
+      success: true,
+      message: `Payout status updated to ${status}`,
+      status,
       booking,
     });
   } catch (err) {
