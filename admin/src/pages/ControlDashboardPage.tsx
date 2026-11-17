@@ -189,20 +189,20 @@ const ControlDashboardPage = () => {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Header with Filters */}
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between animate-fade-in">
+        <div className="flex flex-col gap-3 sm:gap-4 lg:flex-row lg:items-center lg:justify-between animate-fade-in">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">Control Dashboard</h1>
-            <p className="mt-1 text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">Control Dashboard</h1>
+            <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-muted-foreground">
               Real-time analytics and platform insights
             </p>
           </div>
           
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto">
             <Select value={dateRange} onValueChange={setDateRange}>
-              <SelectTrigger className="w-[140px] bg-card border-border">
-                <Calendar className="mr-2 h-4 w-4" />
+              <SelectTrigger className="w-full sm:w-[140px] bg-card border-border h-9 text-xs sm:text-sm">
+                <Calendar className="mr-1.5 h-3.5 w-3.5 shrink-0" />
                 <SelectValue placeholder="Date range" />
               </SelectTrigger>
               <SelectContent>
@@ -215,8 +215,8 @@ const ControlDashboardPage = () => {
             </Select>
 
             <Select value={selectedCourse} onValueChange={setSelectedCourse}>
-              <SelectTrigger className="w-[160px] bg-card border-border">
-                <BookOpen className="mr-2 h-4 w-4" />
+              <SelectTrigger className="w-full sm:w-[160px] bg-card border-border h-9 text-xs sm:text-sm">
+                <BookOpen className="mr-1.5 h-3.5 w-3.5 shrink-0" />
                 <SelectValue placeholder="Course" />
               </SelectTrigger>
               <SelectContent>
@@ -230,8 +230,8 @@ const ControlDashboardPage = () => {
             </Select>
 
             <Select value={selectedInstructor} onValueChange={setSelectedInstructor}>
-              <SelectTrigger className="w-[160px] bg-card border-border">
-                <Users className="mr-2 h-4 w-4" />
+              <SelectTrigger className="w-full sm:w-[160px] bg-card border-border h-9 text-xs sm:text-sm col-span-2 sm:col-span-1">
+                <Users className="mr-1.5 h-3.5 w-3.5 shrink-0" />
                 <SelectValue placeholder="Instructor" />
               </SelectTrigger>
               <SelectContent>
@@ -244,13 +244,13 @@ const ControlDashboardPage = () => {
               </SelectContent>
             </Select>
 
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="border-border">
-                <Download className="mr-2 h-4 w-4" />
+            <div className="flex gap-2 w-full sm:w-auto col-span-2 sm:col-span-1">
+              <Button variant="outline" size="sm" className="flex-1 sm:flex-initial h-9 border-border text-xs">
+                <Download className="mr-1.5 h-3.5 w-3.5" />
                 PDF
               </Button>
-              <Button variant="outline" size="sm" className="border-border">
-                <Download className="mr-2 h-4 w-4" />
+              <Button variant="outline" size="sm" className="flex-1 sm:flex-initial h-9 border-border text-xs">
+                <Download className="mr-1.5 h-3.5 w-3.5" />
                 Excel
               </Button>
             </div>
@@ -259,9 +259,9 @@ const ControlDashboardPage = () => {
 
         {/* Stats Cards */}
         {loading ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             {[1, 2, 3, 4].map((i) => (
-              <Card key={i} className="border-border bg-card p-6">
+              <Card key={i} className="border-border bg-card p-4 sm:p-5">
                 <div className="animate-pulse space-y-3">
                   <div className="h-10 w-10 bg-muted rounded-lg"></div>
                   <div className="h-8 bg-muted rounded w-24"></div>
@@ -271,102 +271,102 @@ const ControlDashboardPage = () => {
             ))}
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Card className="border-border bg-card p-6 animate-slide-up hover:shadow-lg transition-shadow">
+          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+            <Card className="border-border bg-card p-4 sm:p-5 animate-slide-up hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between">
-                <div className="rounded-lg bg-primary/10 p-2.5">
-                  <Users className="h-5 w-5 text-primary" />
+                <div className="rounded-lg bg-primary/10 p-2 sm:p-2.5">
+                  <Users className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                 </div>
                 <Badge 
                   variant="outline" 
-                  className="border-emerald-500/30 bg-emerald-500/10 text-emerald-500"
+                  className="border-emerald-500/30 bg-emerald-500/10 text-emerald-500 text-xs"
                 >
                   <TrendingUp className="mr-1 h-3 w-3" />
                   Active
                 </Badge>
               </div>
-              <p className="mt-4 text-2xl font-bold text-foreground">{stats.activeUsers.toLocaleString()}</p>
-              <p className="text-sm text-muted-foreground">Active Users</p>
-              <p className="mt-1 text-xs text-muted-foreground/70">Currently active</p>
+              <p className="mt-3 sm:mt-4 text-xl sm:text-2xl font-bold text-foreground">{stats.activeUsers.toLocaleString()}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">Active Users</p>
+              <p className="mt-0.5 sm:mt-1 text-[11px] sm:text-xs text-muted-foreground/70">Currently active</p>
             </Card>
 
-            <Card className="border-border bg-card p-6 animate-slide-up hover:shadow-lg transition-shadow" style={{ animationDelay: '100ms' }}>
+            <Card className="border-border bg-card p-4 sm:p-5 animate-slide-up hover:shadow-lg transition-shadow" style={{ animationDelay: '100ms' }}>
               <div className="flex items-center justify-between">
-                <div className="rounded-lg bg-primary/10 p-2.5">
-                  <DollarSign className="h-5 w-5 text-primary" />
+                <div className="rounded-lg bg-primary/10 p-2 sm:p-2.5">
+                  <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                 </div>
                 <Badge 
                   variant="outline" 
                   className={stats.revenueChange >= 0 
-                    ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-500' 
-                    : 'border-red-500/30 bg-red-500/10 text-red-500'
+                    ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-500 text-xs' 
+                    : 'border-red-500/30 bg-red-500/10 text-red-500 text-xs'
                   }
                 >
                   {stats.revenueChange >= 0 ? <TrendingUp className="mr-1 h-3 w-3" /> : <TrendingDown className="mr-1 h-3 w-3" />}
                   {stats.revenueChange >= 0 ? '+' : ''}{stats.revenueChange}%
                 </Badge>
               </div>
-              <p className="mt-4 text-2xl font-bold text-foreground">₹{stats.totalRevenue.toLocaleString('en-IN')}</p>
-              <p className="text-sm text-muted-foreground">Total Revenue</p>
-              <p className="mt-1 text-xs text-muted-foreground/70">Last 30 days</p>
+              <p className="mt-3 sm:mt-4 text-xl sm:text-2xl font-bold text-foreground">₹{stats.totalRevenue.toLocaleString('en-IN')}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">Total Revenue</p>
+              <p className="mt-0.5 sm:mt-1 text-[11px] sm:text-xs text-muted-foreground/70">Last 30 days</p>
             </Card>
 
-            <Card className="border-border bg-card p-6 animate-slide-up hover:shadow-lg transition-shadow" style={{ animationDelay: '200ms' }}>
+            <Card className="border-border bg-card p-4 sm:p-5 animate-slide-up hover:shadow-lg transition-shadow" style={{ animationDelay: '200ms' }}>
               <div className="flex items-center justify-between">
-                <div className="rounded-lg bg-primary/10 p-2.5">
-                  <BookOpen className="h-5 w-5 text-primary" />
+                <div className="rounded-lg bg-primary/10 p-2 sm:p-2.5">
+                  <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                 </div>
                 <Badge 
                   variant="outline" 
-                  className="border-emerald-500/30 bg-emerald-500/10 text-emerald-500"
+                  className="border-emerald-500/30 bg-emerald-500/10 text-emerald-500 text-xs"
                 >
                   <TrendingUp className="mr-1 h-3 w-3" />
                   Active
                 </Badge>
               </div>
-              <p className="mt-4 text-2xl font-bold text-foreground">{stats.totalCourses.toLocaleString()}</p>
-              <p className="text-sm text-muted-foreground">Total Courses</p>
-              <p className="mt-1 text-xs text-muted-foreground/70">Published courses</p>
+              <p className="mt-3 sm:mt-4 text-xl sm:text-2xl font-bold text-foreground">{stats.totalCourses.toLocaleString()}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">Total Courses</p>
+              <p className="mt-0.5 sm:mt-1 text-[11px] sm:text-xs text-muted-foreground/70">Published courses</p>
             </Card>
 
-            <Card className="border-border bg-card p-6 animate-slide-up hover:shadow-lg transition-shadow" style={{ animationDelay: '300ms' }}>
+            <Card className="border-border bg-card p-4 sm:p-5 animate-slide-up hover:shadow-lg transition-shadow" style={{ animationDelay: '300ms' }}>
               <div className="flex items-center justify-between">
-                <div className="rounded-lg bg-primary/10 p-2.5">
-                  <GraduationCap className="h-5 w-5 text-primary" />
+                <div className="rounded-lg bg-primary/10 p-2 sm:p-2.5">
+                  <GraduationCap className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                 </div>
                 <Badge 
                   variant="outline" 
                   className={stats.enrollmentChange >= 0 
-                    ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-500' 
-                    : 'border-red-500/30 bg-red-500/10 text-red-500'
+                    ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-500 text-xs' 
+                    : 'border-red-500/30 bg-red-500/10 text-red-500 text-xs'
                   }
                 >
                   {stats.enrollmentChange >= 0 ? <TrendingUp className="mr-1 h-3 w-3" /> : <TrendingDown className="mr-1 h-3 w-3" />}
                   {stats.enrollmentChange >= 0 ? '+' : ''}{stats.enrollmentChange}%
                 </Badge>
               </div>
-              <p className="mt-4 text-2xl font-bold text-foreground">{stats.totalEnrollments.toLocaleString()}</p>
-              <p className="text-sm text-muted-foreground">Total Enrollments</p>
-              <p className="mt-1 text-xs text-muted-foreground/70">All time</p>
+              <p className="mt-3 sm:mt-4 text-xl sm:text-2xl font-bold text-foreground">{stats.totalEnrollments.toLocaleString()}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">Total Enrollments</p>
+              <p className="mt-0.5 sm:mt-1 text-[11px] sm:text-xs text-muted-foreground/70">All time</p>
             </Card>
           </div>
         )}
 
         {/* Charts Row 1 */}
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
           {/* Enrollment Trends */}
-          <Card className="border-border bg-card p-6 animate-slide-up" style={{ animationDelay: '400ms' }}>
-            <div className="mb-4 flex items-center justify-between">
+          <Card className="border-border bg-card p-4 sm:p-6 animate-slide-up overflow-hidden" style={{ animationDelay: '400ms' }}>
+            <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
-                <h3 className="font-semibold text-foreground">Enrollment Trends</h3>
-                <p className="text-sm text-muted-foreground">Monthly enrollment & revenue</p>
+                <h3 className="font-semibold text-foreground text-base sm:text-lg">Enrollment Trends</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">Monthly enrollment & revenue</p>
               </div>
-              <Badge variant="outline" className="border-primary/30 bg-primary/10 text-primary">
+              <Badge variant="outline" className="w-fit border-primary/30 bg-primary/10 text-primary text-xs">
                 <TrendingUp className="mr-1 h-3 w-3" /> +18.3%
               </Badge>
             </div>
-            <ChartContainer config={chartConfig} className="h-[280px] w-full">
-              <AreaChart data={enrollmentData}>
+            <ChartContainer config={chartConfig} className="aspect-auto h-[220px] sm:h-[280px] w-full max-w-full">
+              <AreaChart data={enrollmentData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="enrollmentGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
@@ -374,8 +374,8 @@ const ControlDashboardPage = () => {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="month" className="text-muted-foreground" />
-                <YAxis className="text-muted-foreground" />
+                <XAxis dataKey="month" className="text-muted-foreground text-xs" tickLine={false} axisLine={false} />
+                <YAxis className="text-muted-foreground text-xs" tickLine={false} axisLine={false} allowDecimals={false} />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Area 
                   type="monotone" 
@@ -389,42 +389,47 @@ const ControlDashboardPage = () => {
           </Card>
 
           {/* Website Traffic */}
-          <Card className="border-border bg-card p-6 animate-slide-up" style={{ animationDelay: '500ms' }}>
-            <div className="mb-4 flex items-center justify-between">
+          <Card className="border-border bg-card p-4 sm:p-6 animate-slide-up overflow-hidden" style={{ animationDelay: '500ms' }}>
+            <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
-                <h3 className="font-semibold text-foreground">Website Traffic</h3>
-                <p className="text-sm text-muted-foreground">Daily visitors & page views</p>
+                <h3 className="font-semibold text-foreground text-base sm:text-lg">Website Traffic</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">Daily visitors & page views</p>
               </div>
-              <div className="flex gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-primary" />
+              <div className="flex gap-3 text-xs sm:text-sm">
+                <div className="flex items-center gap-1.5">
+                  <div className="h-2.5 w-2.5 rounded-full bg-primary" />
                   <span className="text-muted-foreground">Visitors</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-chart-2" />
+                <div className="flex items-center gap-1.5">
+                  <div className="h-2.5 w-2.5 rounded-full bg-chart-2" />
                   <span className="text-muted-foreground">Page Views</span>
                 </div>
               </div>
             </div>
-            <ChartContainer config={chartConfig} className="h-[280px] w-full">
-              <LineChart data={trafficData}>
+            <ChartContainer config={chartConfig} className="aspect-auto h-[220px] sm:h-[280px] w-full max-w-full">
+              <LineChart data={trafficData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="day" className="text-muted-foreground" />
-                <YAxis className="text-muted-foreground" />
+                <XAxis dataKey="day" className="text-muted-foreground text-xs" tickLine={false} axisLine={false} />
+                <YAxis 
+                  className="text-muted-foreground text-xs" 
+                  tickLine={false} 
+                  axisLine={false}
+                  tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(v % 1000 === 0 ? 0 : 1)}k` : v}
+                />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Line 
                   type="monotone" 
                   dataKey="visitors" 
                   stroke="hsl(var(--primary))" 
                   strokeWidth={2}
-                  dot={{ fill: 'hsl(var(--primary))' }}
+                  dot={{ fill: 'hsl(var(--primary))', r: 3 }}
                 />
                 <Line 
                   type="monotone" 
                   dataKey="pageViews" 
                   stroke="hsl(var(--chart-2))" 
                   strokeWidth={2}
-                  dot={{ fill: 'hsl(var(--chart-2))' }}
+                  dot={{ fill: 'hsl(var(--chart-2))', r: 3 }}
                 />
               </LineChart>
             </ChartContainer>
@@ -432,18 +437,26 @@ const ControlDashboardPage = () => {
         </div>
 
         {/* Charts Row 2 */}
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
           {/* Course Performance */}
-          <Card className="border-border bg-card p-6 lg:col-span-2 animate-slide-up" style={{ animationDelay: '600ms' }}>
+          <Card className="border-border bg-card p-4 sm:p-6 lg:col-span-2 animate-slide-up overflow-hidden" style={{ animationDelay: '600ms' }}>
             <div className="mb-4">
-              <h3 className="font-semibold text-foreground">Course Performance</h3>
-              <p className="text-sm text-muted-foreground">Top performing courses by enrollment</p>
+              <h3 className="font-semibold text-foreground text-base sm:text-lg">Course Performance</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground">Top performing courses by enrollment</p>
             </div>
-            <ChartContainer config={chartConfig} className="h-[280px] w-full">
-              <BarChart data={coursePerformanceData} layout="vertical">
+            <ChartContainer config={chartConfig} className="aspect-auto h-[220px] sm:h-[280px] w-full max-w-full">
+              <BarChart data={coursePerformanceData} layout="vertical" margin={{ top: 5, right: 15, left: -10, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis type="number" className="text-muted-foreground" />
-                <YAxis dataKey="name" type="category" width={100} className="text-muted-foreground" />
+                <XAxis type="number" className="text-muted-foreground text-xs" tickLine={false} axisLine={false} />
+                <YAxis 
+                  dataKey="name" 
+                  type="category" 
+                  width={75} 
+                  className="text-muted-foreground text-xs" 
+                  tickLine={false} 
+                  axisLine={false}
+                  tickFormatter={(val: string) => (val && val.length > 10 ? `${val.slice(0, 10)}...` : val)}
+                />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Bar 
                   dataKey="students" 
@@ -455,19 +468,19 @@ const ControlDashboardPage = () => {
           </Card>
 
           {/* User Distribution */}
-          <Card className="border-border bg-card p-6 animate-slide-up" style={{ animationDelay: '700ms' }}>
+          <Card className="border-border bg-card p-4 sm:p-6 animate-slide-up overflow-hidden" style={{ animationDelay: '700ms' }}>
             <div className="mb-4">
-              <h3 className="font-semibold text-foreground">User Distribution</h3>
-              <p className="text-sm text-muted-foreground">By role type</p>
+              <h3 className="font-semibold text-foreground text-base sm:text-lg">User Distribution</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground">By role type</p>
             </div>
-            <ChartContainer config={chartConfig} className="h-[200px] w-full">
+            <ChartContainer config={chartConfig} className="aspect-auto h-[180px] sm:h-[200px] w-full max-w-full">
               <PieChart>
                 <Pie
                   data={userDistribution}
                   cx="50%"
                   cy="50%"
-                  innerRadius={50}
-                  outerRadius={80}
+                  innerRadius={45}
+                  outerRadius={70}
                   paddingAngle={5}
                   dataKey="value"
                 >
@@ -478,12 +491,12 @@ const ControlDashboardPage = () => {
                 <ChartTooltip content={<ChartTooltipContent />} />
               </PieChart>
             </ChartContainer>
-            <div className="mt-4 grid grid-cols-2 gap-2">
+            <div className="mt-3 sm:mt-4 grid grid-cols-2 gap-2">
               {userDistribution.map((item) => (
-                <div key={item.name} className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color }} />
-                  <span className="text-xs text-muted-foreground">{item.name}</span>
-                  <span className="text-xs font-medium text-foreground">{item.value.toLocaleString()}</span>
+                <div key={item.name} className="flex items-center gap-1.5 sm:gap-2">
+                  <div className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                  <span className="text-xs text-muted-foreground truncate">{item.name}</span>
+                  <span className="text-xs font-medium text-foreground ml-auto">{item.value.toLocaleString()}</span>
                 </div>
               ))}
             </div>
@@ -491,33 +504,33 @@ const ControlDashboardPage = () => {
         </div>
 
         {/* Recent Activity */}
-        <Card className="border-border bg-card p-6 animate-slide-up" style={{ animationDelay: '800ms' }}>
+        <Card className="border-border bg-card p-4 sm:p-6 animate-slide-up" style={{ animationDelay: '800ms' }}>
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-foreground">Real-time Activity</h3>
-              <p className="text-sm text-muted-foreground">Latest platform activities</p>
+              <h3 className="font-semibold text-foreground text-base sm:text-lg">Real-time Activity</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground">Latest platform activities</p>
             </div>
-            <div className="flex items-center gap-2">
-              <Activity className="h-4 w-4 text-emerald-500 animate-pulse" />
-              <span className="text-sm text-emerald-500">Live</span>
+            <div className="flex items-center gap-1.5">
+              <Activity className="h-3.5 w-3.5 text-emerald-500 animate-pulse" />
+              <span className="text-xs sm:text-sm font-medium text-emerald-500">Live</span>
             </div>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-2.5 sm:space-y-4">
             {recentActivity.map((activity) => (
               <div 
                 key={activity.id} 
-                className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-3 transition-colors hover:bg-muted/50"
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-lg border border-border bg-muted/30 p-2.5 sm:p-3 transition-colors hover:bg-muted/50"
               >
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                    <Users className="h-4 w-4 text-primary" />
+                <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                  <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                    <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{activity.user}</p>
-                    <p className="text-sm text-muted-foreground">{activity.action}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs sm:text-sm font-medium text-foreground truncate">{activity.user}</p>
+                    <p className="text-[11px] sm:text-sm text-muted-foreground truncate">{activity.action}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-muted-foreground shrink-0 self-end sm:self-auto">
                   <Clock className="h-3 w-3" />
                   {activity.time}
                 </div>

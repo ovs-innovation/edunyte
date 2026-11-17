@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { Button } from '@/components/ui/button';
-import { Plus, Calendar, Clock, Trash2, Edit, BookOpen, Languages } from 'lucide-react';
+import { Plus, Calendar, Clock, Trash2, Edit, BookOpen, Languages, ChevronLeft, ChevronRight } from 'lucide-react';
 import { AvailabilityAPI, TeacherCourseJoinAPI, ApiAvailability, ApiTeacherCourse, ApiCourse } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import { getLanguageValue } from '@/lib/languageHelper';
@@ -314,22 +314,30 @@ const TeacherAvailabilityPage = () => {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Header */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between animate-fade-in">
+        <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center sm:justify-between animate-fade-in">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">Manage Availability</h1>
-            <p className="mt-1 text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">Manage Availability</h1>
+            <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
               Set your available time slots for each course. Availability slots are shared across all languages for a course.
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" onClick={() => navigate('/teacher/my-courses')}>
-              <BookOpen className="h-4 w-4 mr-2" />
+          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+            <Button
+              variant="outline"
+              onClick={() => navigate('/teacher/my-courses')}
+              className="flex-1 sm:flex-initial h-9 px-3 sm:px-4 text-xs sm:text-sm"
+            >
+              <BookOpen className="h-4 w-4 mr-1.5 sm:mr-2" />
               My Courses
             </Button>
-            <Button onClick={() => handleOpenDialog()} disabled={!selectedCourseId}>
-              <Plus className="h-4 w-4 mr-2" />
+            <Button
+              onClick={() => handleOpenDialog()}
+              disabled={!selectedCourseId}
+              className="flex-1 sm:flex-initial h-9 px-3 sm:px-4 text-xs sm:text-sm gradient-primary text-primary-foreground whitespace-nowrap"
+            >
+              <Plus className="h-4 w-4 mr-1.5 sm:mr-2" />
               Add Time Slot
             </Button>
           </div>
@@ -338,13 +346,13 @@ const TeacherAvailabilityPage = () => {
         {/* Course Selector */}
         {!loading && courses.length > 0 && (
           <Card>
-            <CardHeader>
-              <CardTitle>Select Course</CardTitle>
-              <CardDescription>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-base sm:text-lg">Select Course</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
                 Availability slots are shared across all languages for the selected course
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
               <Select
                 value={selectedCourseId}
                 onValueChange={(value) => {
@@ -352,10 +360,10 @@ const TeacherAvailabilityPage = () => {
                   loadAvailability(value);
                 }}
               >
-                <SelectTrigger>
-                  <SelectValue />
+                <SelectTrigger className="w-full h-11 px-3 text-left [&>span]:flex [&>span]:items-center [&>span]:w-full [&>span]:min-w-0 [&>span]:line-clamp-none">
+                  <SelectValue placeholder="Select course" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="w-[var(--radix-select-trigger-width)] max-w-[calc(100vw-2rem)]">
                   {courses.map((course) => {
                     // Get all languages for this course from joined teacherCourses
                     const courseLanguages = teacherCourses
@@ -372,13 +380,15 @@ const TeacherAvailabilityPage = () => {
                     const uniqueLanguages = Array.from(new Set(courseLanguages));
 
                     return (
-                      <SelectItem key={course._id} value={course._id}>
-                        <div className="flex items-center gap-2">
-                          <BookOpen className="h-4 w-4" />
-                          <span className="font-medium">{getLanguageValue(course.name)}</span>
+                      <SelectItem key={course._id} value={course._id} className="py-2.5">
+                        <div className="flex items-center justify-between gap-2 w-full min-w-0">
+                          <div className="flex items-center gap-2 min-w-0 flex-1 mr-1">
+                            <BookOpen className="h-4 w-4 shrink-0 text-primary" />
+                            <span className="font-medium text-sm truncate">{getLanguageValue(course.name)}</span>
+                          </div>
                           {uniqueLanguages.length > 0 && (
-                            <Badge variant="outline" className="ml-2">
-                              {uniqueLanguages.length} language{uniqueLanguages.length > 1 ? 's' : ''}
+                            <Badge variant="secondary" className="shrink-0 text-[10px] sm:text-xs px-1.5 py-0.5 font-normal whitespace-nowrap">
+                              {uniqueLanguages.length} <span className="hidden sm:inline">{uniqueLanguages.length === 1 ? 'language' : 'languages'}</span><span className="sm:hidden">lang{uniqueLanguages.length > 1 ? 's' : ''}</span>
                             </Badge>
                           )}
                         </div>
@@ -390,10 +400,10 @@ const TeacherAvailabilityPage = () => {
               {selectedCourseId && (
                 <div className="mt-4 p-3 bg-muted/50 rounded-lg">
                   <div className="flex flex-col gap-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <BookOpen className="h-4 w-4 text-primary" />
-                      <span className="font-semibold text-foreground">Course:</span>
-                      <span className="text-muted-foreground">
+                    <div className="flex items-start sm:items-center gap-2">
+                      <BookOpen className="h-4 w-4 text-primary shrink-0 mt-0.5 sm:mt-0" />
+                      <span className="font-semibold text-foreground shrink-0">Course:</span>
+                      <span className="text-muted-foreground break-words flex-1 min-w-0">
                         {courses.find(c => c._id === selectedCourseId) ? getLanguageValue(courses.find(c => c._id === selectedCourseId)!.name) : 'Unknown'}
                       </span>
                     </div>
@@ -446,7 +456,7 @@ const TeacherAvailabilityPage = () => {
         {/* Availability View */}
         {!loading && selectedCourseId && (
           <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as 'calendar' | 'list')}>
-            <TabsList>
+            <TabsList className="w-full sm:w-auto grid grid-cols-2 sm:inline-flex">
               <TabsTrigger value="calendar">Calendar View</TabsTrigger>
               <TabsTrigger value="list">List View</TabsTrigger>
             </TabsList>
@@ -454,20 +464,27 @@ const TeacherAvailabilityPage = () => {
             <TabsContent value="calendar" className="space-y-4">
               {/* Week Navigation */}
               <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-2">
+                <CardContent className="p-2.5 sm:p-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 sm:mb-6">
+                    <span className="text-lg sm:text-xl font-bold text-center sm:text-left order-1 sm:order-2">
+                      {format(selectedDate, 'MMMM yyyy')}
+                    </span>
+                    <div className="flex items-center justify-between sm:justify-start gap-1 sm:gap-2 order-2 sm:order-1">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => setSelectedDate(addMonths(selectedDate, -1))}
+                        className="flex-1 sm:flex-initial h-8 px-2 sm:px-3 text-xs"
                       >
-                        Previous Month
+                        <ChevronLeft className="h-3.5 w-3.5 sm:mr-1 shrink-0" />
+                        <span className="hidden sm:inline">Previous Month</span>
+                        <span className="sm:hidden">Prev</span>
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => setSelectedDate(new Date())}
+                        className="flex-1 sm:flex-initial h-8 px-2 sm:px-3 text-xs"
                       >
                         Today
                       </Button>
@@ -475,26 +492,27 @@ const TeacherAvailabilityPage = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => setSelectedDate(addMonths(selectedDate, 1))}
+                        className="flex-1 sm:flex-initial h-8 px-2 sm:px-3 text-xs"
                       >
-                        Next Month
+                        <span className="hidden sm:inline">Next Month</span>
+                        <span className="sm:hidden">Next</span>
+                        <ChevronRight className="h-3.5 w-3.5 sm:ml-1 shrink-0" />
                       </Button>
                     </div>
-                    <span className="text-xl font-bold">
-                      {format(selectedDate, 'MMMM yyyy')}
-                    </span>
                   </div>
 
                   {/* Day Names Header */}
-                  <div className="grid grid-cols-7 gap-2 mb-2">
+                  <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-2">
                     {dayNames.map((day) => (
-                      <div key={day} className="text-center text-sm font-semibold text-muted-foreground uppercase">
-                        {day}
+                      <div key={day} className="text-center text-xs sm:text-sm font-semibold text-muted-foreground uppercase">
+                        <span className="hidden sm:inline">{day}</span>
+                        <span className="sm:hidden">{day.slice(0, 2)}</span>
                       </div>
                     ))}
                   </div>
 
                   {/* Month Grid */}
-                  <div className="grid grid-cols-7 gap-2">
+                  <div className="grid grid-cols-7 gap-1 sm:gap-2">
                     {calendarDates.map((date) => {
                       const slots = getSlotsForDate(date);
                       const isToday = isSameDay(date, new Date());
@@ -502,51 +520,97 @@ const TeacherAvailabilityPage = () => {
                       return (
                         <div
                           key={date.toISOString()}
+                          onClick={() => handleOpenDialog(date)}
                           className={cn(
-                            'border rounded-lg p-2 min-h-[100px] flex flex-col group',
+                            'border rounded-md sm:rounded-lg p-1 sm:p-2 min-h-[58px] sm:min-h-[100px] flex flex-col group cursor-pointer transition-all hover:border-primary active:scale-95',
                             isToday && 'border-primary shadow-sm bg-primary/5',
-                            !isCurrentMonth && 'opacity-40 bg-muted/20'
+                            !isCurrentMonth && 'opacity-35 bg-muted/20'
                           )}
                         >
-                          <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center justify-between mb-0.5 sm:mb-1">
                             <span className={cn(
-                              'text-sm font-medium h-6 w-6 flex items-center justify-center rounded-full',
+                              'text-xs sm:text-sm font-medium h-5 w-5 sm:h-6 sm:w-6 flex items-center justify-center rounded-full',
                               isToday && 'bg-primary text-primary-foreground',
                               !isCurrentMonth && 'text-muted-foreground'
                             )}>
                               {format(date, 'd')}
                             </span>
                             {slots.length > 0 && (
-                              <Badge variant="secondary" className="h-4 px-1 text-[10px]">
+                              <Badge variant="secondary" className="h-3.5 sm:h-4 px-1 text-[9px] sm:text-[10px] font-semibold">
                                 {slots.length}
                               </Badge>
                             )}
                           </div>
 
-                          <div className="flex-1 overflow-y-auto space-y-1 max-h-[80px] scrollbar-hide">
-                            {slots.map((slot) => (
-                              <div
-                                key={slot._id}
-                                className={cn(
-                                  'text-[10px] p-0.5 rounded border leading-tight truncate',
-                                  statusStyles[slot.status] || 'bg-muted'
-                                )}
-                              >
-                                {slot.startTime}
-                              </div>
-                            ))}
+                          {/* Slot display: dots on mobile, pills on tablet/desktop */}
+                          <div className="flex-1 overflow-hidden">
+                            {/* Mobile Dot Indicators */}
+                            <div className="sm:hidden flex flex-wrap justify-center gap-1 mt-1">
+                              {slots.slice(0, 3).map((slot) => (
+                                <span
+                                  key={slot._id}
+                                  className={cn(
+                                    'h-1.5 w-1.5 rounded-full shrink-0',
+                                    slot.status === 'booked' ? 'bg-primary' : 'bg-emerald-500'
+                                  )}
+                                  title={`${slot.startTime} (${slot.status})`}
+                                />
+                              ))}
+                              {slots.length > 3 && (
+                                <span className="text-[8px] text-muted-foreground leading-none">
+                                  +{slots.length - 3}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Desktop Slot Pills */}
+                            <div className="hidden sm:block space-y-1 max-h-[75px] overflow-y-auto scrollbar-hide">
+                              {slots.map((slot) => (
+                                <div
+                                  key={slot._id}
+                                  className={cn(
+                                    'text-[10px] p-0.5 rounded border leading-tight truncate',
+                                    statusStyles[slot.status] || 'bg-muted'
+                                  )}
+                                >
+                                  {slot.startTime}
+                                </div>
+                              ))}
+                            </div>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="w-full h-5 mt-1 text-[10px] opacity-0 group-hover:opacity-100 hover:bg-primary/10 transition-opacity"
-                            onClick={() => handleOpenDialog(date)}
-                          >
-                            <Plus className="h-2 w-2" />
-                          </Button>
+
+                          {/* Desktop plus button */}
+                          <div className="hidden sm:block">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="w-full h-5 mt-1 text-[10px] opacity-0 group-hover:opacity-100 hover:bg-primary/10 transition-opacity"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenDialog(date);
+                              }}
+                            >
+                              <Plus className="h-2 w-2" />
+                            </Button>
+                          </div>
                         </div>
                       );
                     })}
+                  </div>
+
+                  {/* Mobile Legend & Tap Hint */}
+                  <div className="sm:hidden flex flex-wrap items-center justify-between text-[11px] text-muted-foreground pt-3 border-t border-border mt-3 gap-2">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-1">
+                        <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                        <span>Available</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <span className="h-2 w-2 rounded-full bg-primary" />
+                        <span>Booked</span>
+                      </div>
+                    </div>
+                    <span className="opacity-75 italic">Tap date to add slot</span>
                   </div>
                 </CardContent>
               </Card>
@@ -565,33 +629,33 @@ const TeacherAvailabilityPage = () => {
                   </CardContent>
                 </Card>
               ) : (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 animate-slide-up">
+                <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3 animate-slide-up">
                   {availabilities
                     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
                     .map((slot) => (
                       <Card key={slot._id} className="hover:shadow-lg transition-shadow">
-                        <CardHeader>
-                          <div className="flex items-start justify-between">
+                        <CardHeader className="p-3.5 sm:p-6 pb-2 sm:pb-3">
+                          <div className="flex items-start justify-between gap-2">
                             <div>
-                              <CardTitle className="text-lg">
+                              <CardTitle className="text-base sm:text-lg">
                                 {format(new Date(slot.date), 'EEE, MMM d, yyyy')}
                               </CardTitle>
-                              <div className="flex items-center gap-2 mt-2">
-                                <Clock className="h-4 w-4 text-muted-foreground" />
-                                <span className="text-sm text-muted-foreground">
+                              <div className="flex items-center gap-1.5 sm:gap-2 mt-1 sm:mt-2">
+                                <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
+                                <span className="text-xs sm:text-sm text-muted-foreground">
                                   {slot.startTime} - {slot.endTime}
                                 </span>
                               </div>
                             </div>
                             <Badge
                               variant="outline"
-                              className={cn('border capitalize', statusStyles[slot.status] || 'bg-muted')}
+                              className={cn('border capitalize shrink-0 text-xs', statusStyles[slot.status] || 'bg-muted')}
                             >
                               {slot.status}
                             </Badge>
                           </div>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="p-3.5 sm:p-6 pt-0 sm:pt-0">
                           <div className="space-y-2">
                             <div className="flex items-center justify-between text-sm">
                               <span className="text-muted-foreground">Duration:</span>
@@ -612,7 +676,7 @@ const TeacherAvailabilityPage = () => {
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  className="flex-1"
+                                  className="w-full sm:flex-1"
                                   onClick={() => handleDelete(slot._id)}
                                 >
                                   <Trash2 className="h-4 w-4 mr-2" />
@@ -633,7 +697,7 @@ const TeacherAvailabilityPage = () => {
 
       {/* Add Availability Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="w-[95vw] sm:max-w-[500px] max-h-[90vh] overflow-y-auto p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle>Add Availability Slot</DialogTitle>
             <DialogDescription>
@@ -748,11 +812,11 @@ const TeacherAvailabilityPage = () => {
               </div>
             )}
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={handleCloseDialog}>
+          <DialogFooter className="flex-col-reverse sm:flex-row gap-2 sm:gap-0">
+            <Button variant="outline" onClick={handleCloseDialog} className="w-full sm:w-auto">
               Cancel
             </Button>
-            <Button onClick={handleSubmit} disabled={!formData.date || !formData.startTime}>
+            <Button onClick={handleSubmit} disabled={!formData.date || !formData.startTime} className="w-full sm:w-auto">
               Create Slot
             </Button>
           </DialogFooter>
