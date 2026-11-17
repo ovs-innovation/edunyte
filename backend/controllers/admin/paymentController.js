@@ -98,7 +98,7 @@ export const getAllPayments = async (req, res, next) => {
         payout: booking?.payout || {
           teacherAmountUSD,
           teacherCurrency: "USD",
-          status: "pending",
+          status: pr.productReference?.metadata?.payoutStatus || "pending",
         },
         payment: {
           stripePaymentIntentId: pr.paymentId || pr.orderId,
@@ -244,42 +244,43 @@ export const updatePayoutStatus = async (req, res, next) => {
       booking.payout.status = status;
       await booking.save();
 
-      // Recalculate teacher profile earnings
-      if (booking.teacherId) {
-        const completedBookings = await Booking.find({
-          teacherId: booking.teacherId,
-          paymentStatus: "paid",
-        });
-
-        let totalEarnings = 0;
-        let pendingPayout = 0;
-
-        completedBookings.forEach((b) => {
-          if (b.payout && b.payout.teacherAmountUSD) {
-            totalEarnings += b.payout.teacherAmountUSD;
-            if (b.payout.status === "pending") {
-              pendingPayout += b.payout.teacherAmountUSD;
-            }
-          }
-        });
-
-        const paidAmount = totalEarnings - pendingPayout;
-
-        await TeacherProfile.findOneAndUpdate(
-          { userId: booking.teacherId },
-          { totalEarnings, pendingPayout, paidAmount }
-        );
-      }
     }
 
     if (paymentDoc) {
-      if (!paymentDoc.statusHistory) paymentDoc.statusHistory = [];
-      paymentDoc.statusHistory.push({
-        status: `payout_${status}`,
-        timestamp: new Date(),
-        reason: `Admin updated payout status to ${status}`,
-      });
+      if (!paymentDoc.productReference) paymentDoc.productReference = {};
+      if (!paymentDoc.productReference.metadata) paymentDoc.productReference.metadata = {};
+      paymentDoc.productReference.metadata.payoutStatus = status;
+      paymentDoc.productReference.metadata.payoutUpdatedAt = new Date();
+      paymentDoc.markModified("productReference.metadata");
       await paymentDoc.save();
+    }
+
+    // Recalculate teacher profile earnings
+    const teacherId = booking?.teacherId || paymentDoc?.productReference?.teacherId;
+    if (teacherId) {
+      const completedBookings = await Booking.find({
+        teacherId,
+        paymentStatus: "paid",
+      });
+
+      let totalEarnings = 0;
+      let pendingPayout = 0;
+
+      completedBookings.forEach((b) => {
+        if (b.payout && b.payout.teacherAmountUSD) {
+          totalEarnings += b.payout.teacherAmountUSD;
+          if (b.payout.status === "pending") {
+            pendingPayout += b.payout.teacherAmountUSD;
+          }
+        }
+      });
+
+      const paidAmount = totalEarnings - pendingPayout;
+
+      await TeacherProfile.findOneAndUpdate(
+        { userId: teacherId },
+        { totalEarnings, pendingPayout, paidAmount }
+      );
     }
 
     res.json({

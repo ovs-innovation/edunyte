@@ -155,8 +155,8 @@ const PaymentsPage = () => {
       });
 
       // Update in state
-      setPayments((prev) =>
-        prev.map((p) => {
+      setPayments((prev) => {
+        const next = prev.map((p) => {
           if (p._id === paymentId || p.bookingId === paymentId) {
             return {
               ...p,
@@ -167,8 +167,10 @@ const PaymentsPage = () => {
             };
           }
           return p;
-        })
-      );
+        });
+        calculateStats(next);
+        return next;
+      });
 
       if (selectedPayoutPayment && (selectedPayoutPayment._id === paymentId || selectedPayoutPayment.bookingId === paymentId)) {
         setSelectedPayoutPayment((prev) =>
