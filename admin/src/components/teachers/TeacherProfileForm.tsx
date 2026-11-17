@@ -143,22 +143,22 @@ export function TeacherProfileForm({ profile, onSuccess, onCancel }: TeacherProf
     };
 
     return (
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
             {/* Main Form */}
-            <Card className="lg:col-span-2 border-border bg-card p-6 space-y-6">
+            <Card className="lg:col-span-2 border-border bg-card p-4 sm:p-6 space-y-4 sm:space-y-6">
                 {profile?.kycStatus === 'rejected' && (
-                    <div className="p-4 rounded-xl bg-destructive/5 border border-destructive/20 flex items-start gap-4 animate-in fade-in slide-in-from-top-2">
-                        <div className="bg-destructive/20 p-2 rounded-full text-destructive">
-                            <AlertCircle className="h-5 w-5" />
+                    <div className="p-3 sm:p-4 rounded-xl bg-destructive/5 border border-destructive/20 flex items-start gap-3 sm:gap-4 animate-in fade-in slide-in-from-top-2">
+                        <div className="bg-destructive/20 p-2 rounded-full text-destructive shrink-0 mt-0.5">
+                            <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5" />
                         </div>
                         <div className="flex-1">
-                            <h4 className="font-bold text-destructive mb-2">KYC Verification Rejected</h4>
-                            <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20">
-                                <p className="text-sm text-destructive font-bold italic leading-relaxed">
+                            <h4 className="font-bold text-sm sm:text-base text-destructive mb-1.5">KYC Verification Rejected</h4>
+                            <div className="p-2.5 sm:p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+                                <p className="text-xs sm:text-sm text-destructive font-bold italic leading-relaxed">
                                     "{profile?.rejectionReason || (profile as any)?.kycRejectionReason || (profile as any)?.reason || "Please update your profile information and ensure all details are accurate."}"
                                 </p>
                             </div>
-                            <p className="text-[11px] text-destructive/70 mt-2">
+                            <p className="text-[11px] text-destructive/70 mt-1.5">
                                 Please fix the issues above and click "Save Changes" to re-submit.
                             </p>
                         </div>
@@ -374,20 +374,20 @@ export function TeacherProfileForm({ profile, onSuccess, onCancel }: TeacherProf
                     </div>
                 </div>
 
-                <div className="flex justify-end gap-3 pt-4">
+                <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 sm:gap-3 pt-4">
                     {onCancel && (
-                        <Button variant="outline" onClick={onCancel} disabled={saving}>
+                        <Button variant="outline" onClick={onCancel} disabled={saving} className="w-full sm:w-auto">
                             Cancel
                         </Button>
                     )}
-                    <Button onClick={handleSave} disabled={saving} className="gradient-primary text-primary-foreground min-w-[120px]">
+                    <Button onClick={handleSave} disabled={saving} className="gradient-primary text-primary-foreground w-full sm:w-auto min-w-[120px]">
                         {saving ? 'Saving...' : 'Save Changes'}
                     </Button>
                 </div>
             </Card>
 
             {/* Stats Sidebar */}
-            <Card className="border-border bg-card p-6 h-fit space-y-4">
+            <Card className="border-border bg-card p-4 sm:p-6 h-fit space-y-4">
                 <h3 className="font-semibold text-foreground">Profile Stats</h3>
                 <div className="space-y-3">
                     <div className="flex justify-between text-sm">

@@ -14,13 +14,13 @@ export function RoleSwitcher() {
   const roles: Role[] = [currentRole || 'super_admin'];
 
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-border bg-card/50 px-3 py-2">
-      <div className="flex items-center gap-2 text-muted-foreground">
-        <Shield className="h-4 w-4" />
-        <span className="text-xs font-medium">Your Role:</span>
+    <div className="flex items-center gap-1.5 sm:gap-2.5 rounded-lg border border-border bg-card/50 px-2 sm:px-3 py-1 sm:py-1.5">
+      <div className="flex items-center gap-1.5 text-muted-foreground shrink-0">
+        <Shield className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+        <span className="hidden sm:inline text-xs font-medium">Your Role:</span>
       </div>
       <Select value={currentRole} onValueChange={(value) => setCurrentRole(value as Role)}>
-        <SelectTrigger className="h-8 w-[140px] border-0 bg-transparent text-sm">
+        <SelectTrigger className="h-7 sm:h-8 w-[95px] sm:w-[130px] border-0 bg-transparent text-xs sm:text-sm p-0 sm:px-2 focus:ring-0">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

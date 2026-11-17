@@ -56,26 +56,26 @@ const TeacherProfilePage = () => {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold text-foreground">My Profile</h1>
-          <p className="text-muted-foreground">Manage your teacher profile and account settings.</p>
+      <div className="space-y-4 sm:space-y-6">
+        <div className="flex flex-col gap-1 sm:gap-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">My Profile</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground">Manage your teacher profile and account settings.</p>
         </div>
 
         {/* KYC Status */}
-        <Card className="border-border bg-card p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className={cn("rounded-lg p-2", kycStatusConfig[kycStatus].color)}>
+        <Card className="border-border bg-card p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-start sm:items-center gap-3">
+              <div className={cn("rounded-lg p-2 shrink-0 mt-0.5 sm:mt-0", kycStatusConfig[kycStatus].color)}>
                 <KycIcon className="h-5 w-5" />
               </div>
               <div>
-                <p className="font-medium text-foreground">KYC Status: {kycStatusConfig[kycStatus].label}</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="font-medium text-sm sm:text-base text-foreground">KYC Status: {kycStatusConfig[kycStatus].label}</p>
+                <div className="text-xs sm:text-sm text-muted-foreground mt-0.5">
                   {kycStatus === 'verified'
-                    ? 'Your profile is verified and active.'
+                    ? <p>Your profile is verified and active.</p>
                     : kycStatus === 'pending'
-                      ? 'Your profile is under admin review. You can still create courses.'
+                      ? <p>Your profile is under admin review. You can still create courses.</p>
                       : (
                         <div className="flex flex-col gap-1">
                           {(profile?.rejectionReason || (profile as any)?.kycRejectionReason || (profile as any)?.reason) && (
@@ -84,10 +84,10 @@ const TeacherProfilePage = () => {
                           <p>Your KYC was rejected. Please update your details or contact admin.</p>
                         </div>
                       )}
-                </p>
+                </div>
               </div>
             </div>
-            <Badge variant="outline" className={cn("border", kycStatusConfig[kycStatus].color)}>
+            <Badge variant="outline" className={cn("self-start sm:self-center border text-xs", kycStatusConfig[kycStatus].color)}>
               {kycStatusConfig[kycStatus].label}
             </Badge>
           </div>
