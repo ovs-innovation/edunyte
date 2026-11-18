@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#0b0f19" />
     <title>Edunyte - Admin Panel</title>  
     <meta name="description" content="Modern admin panel with role-based access control, user management, and comprehensive dashboard." />
     <meta name="author" content="Edunyte" />
@@ -21,10 +22,43 @@
     <meta name="twitter:card" content="Edunyte is a platform for learning and teaching. This is the admin panel for the Edunyte platform." />
     <meta name="twitter:site" content="@Edunyte" />
     <meta name="twitter:image" content="https://res.cloudinary.com/dhqcwkpzp/image/upload/v1768856320/edunyte-light_hhozp1.png" />
+
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #0b0f19;
+        color: #f3f4f6;
+        -webkit-text-size-adjust: 100%;
+        -webkit-tap-highlight-color: transparent;
+      }
+    </style>
   </head>
 
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div id="initial-loader" style="min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0b0f19;color:#9ca3af;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+        <div style="width:36px;height:36px;border:3px solid #0ea5e9;border-top-color:transparent;border-radius:50%;animation:initial-spin 0.8s linear infinite;"></div>
+        <p style="margin-top:14px;font-size:14px;letter-spacing:0.02em;">Loading Edunyte Admin...</p>
+        <style>@keyframes initial-spin{to{transform:rotate(360deg)}}</style>
+      </div>
+    </div>
+
+    <script>
+      // Early error catcher for iOS / WebKit
+      window.addEventListener('error', function(e) {
+        var loader = document.getElementById('initial-loader');
+        if (loader) {
+          loader.innerHTML = '<div style="padding:24px;text-align:center;max-width:340px;">' +
+            '<div style="width:48px;height:48px;border-radius:50%;background:rgba(239,68,68,0.15);color:#ef4444;display:inline-flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:12px;">!</div>' +
+            '<h2 style="font-size:18px;color:#f3f4f6;margin:0 0 8px 0;font-weight:600;">Unable to load page</h2>' +
+            '<p style="color:#9ca3af;font-size:13px;line-height:1.5;margin:0 0 16px 0;">Please refresh the page to load the latest version.</p>' +
+            '<button onclick="window.location.reload(true)" style="background:#0ea5e9;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">Refresh Page</button>' +
+          '</div>';
+        }
+      });
+    </script>
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

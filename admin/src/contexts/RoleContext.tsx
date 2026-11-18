@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { useThemeColor } from '@/contexts/ThemeColorContext';
-import { AuthAPI, ROLE_KEY, TOKEN_KEY } from '@/lib/api';
+import { AuthAPI, SettingsAPI, ROLE_KEY, TOKEN_KEY } from '@/lib/api';
 import { safeLocalStorage, safeSessionStorage } from '@/lib/safeStorage';
 import { Role, Permission, hasPermission, hasAnyPermission, hasAllPermissions } from '@/lib/rbac';
 
@@ -43,7 +43,7 @@ export function RoleProvider({ children }: { children: ReactNode }) {
           setPermissions(data.user.permissions as Permission[]);
         }
         try {
-          const settingsData = await import('@/lib/api').then(m => m.SettingsAPI.get());
+          const settingsData = await SettingsAPI.get();
           const colorMap = {
             sky: 'sky', violet: 'violet', emerald: 'emerald', rose: 'rose', amber: 'amber', orange: 'orange',
             teal: 'teal', pink: 'pink', indigo: 'indigo', cyan: 'cyan', lime: 'lime', red: 'red'

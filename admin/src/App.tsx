@@ -13,7 +13,6 @@ import ProtectedRoute from "./components/ProtectedRoute";
 // Lazy-loaded pages to reduce initial bundle from 10MB to <300KB
 const DashboardRouter = lazy(() => import("./components/DashboardRouter"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
-const ControlDashboardPage = lazy(() => import("./pages/ControlDashboardPage"));
 const TeacherDashboardPage = lazy(() => import("./pages/TeacherDashboardPage"));
 const UsersPage = lazy(() => import("./pages/UsersPage"));
 const TeachersPage = lazy(() => import("./pages/TeachersPage"));
