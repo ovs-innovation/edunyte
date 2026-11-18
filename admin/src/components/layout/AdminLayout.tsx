@@ -15,7 +15,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-background">
+    <div className="flex h-screen h-[100dvh] w-full overflow-hidden bg-background">
       <AdminSidebar mobileOpen={mobileOpen} onMobileClose={() => setMobileOpen(false)} />
       <div className="flex flex-1 flex-col overflow-hidden w-full min-w-0">
         {/* Header */}

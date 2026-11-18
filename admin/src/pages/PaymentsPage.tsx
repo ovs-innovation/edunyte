@@ -53,6 +53,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { getToken } from '@/lib/api';
 
 interface Payment {
   _id: string;
@@ -110,7 +111,7 @@ interface Payment {
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8085/api';
 
-const getToken = () => localStorage.getItem('admin-auth-token') || sessionStorage.getItem('admin-auth-token');
+
 
 const PaymentsPage = () => {
   const [payments, setPayments] = useState<Payment[]>([]);

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { useThemeColor } from '@/contexts/ThemeColorContext';
 import { AuthAPI, ROLE_KEY, TOKEN_KEY } from '@/lib/api';
+import { safeLocalStorage, safeSessionStorage } from '@/lib/safeStorage';
 import { Role, Permission, hasPermission, hasAnyPermission, hasAllPermissions } from '@/lib/rbac';
 
 interface RoleContextType {
@@ -17,12 +18,12 @@ const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
 export function RoleProvider({ children }: { children: ReactNode }) {
   const { setThemeColor } = useThemeColor();
-  const [currentRole, setCurrentRoleState] = useState<Role>(() => (localStorage.getItem(ROLE_KEY) as Role) || '');
+  const [currentRole, setCurrentRoleState] = useState<Role>(() => (safeLocalStorage.getItem(ROLE_KEY) as Role) || '');
   const [permissions, setPermissionsState] = useState<Permission[]>([]);
 
   const setCurrentRole = (role: Role) => {
     setCurrentRoleState(role);
-    localStorage.setItem(ROLE_KEY, role);
+    safeLocalStorage.setItem(ROLE_KEY, role);
   };
 
   const setPermissions = (perms: Permission[]) => {
@@ -31,7 +32,7 @@ export function RoleProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const syncRole = async () => {
-      const token = localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
+      const token = safeLocalStorage.getItem(TOKEN_KEY) || safeSessionStorage.getItem(TOKEN_KEY);
       if (!token) return;
       try {
         const data = await AuthAPI.me();

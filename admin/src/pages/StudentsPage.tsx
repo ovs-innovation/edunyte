@@ -1,12 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { StudentTable } from '@/components/students/StudentTable';
 import { PermissionGate } from '@/components/PermissionGate';
 import { Button } from '@/components/ui/button';
 import { Download, Filter } from 'lucide-react';
 import { StudentProfileAPI, ApiStudentProfile, ApiUser } from '@/lib/api';
-import { StudentProfileDialog } from '@/components/students/StudentProfileDialog';
 import { useToast } from '@/hooks/use-toast';
+
+const StudentProfileDialog = lazy(() =>
+  import('@/components/students/StudentProfileDialog').then((m) => ({ default: m.StudentProfileDialog }))
+);
 
 const StudentsPage = () => {
   const [students, setStudents] = useState<Array<ApiStudentProfile & { userId: ApiUser }>>([]);
@@ -109,28 +112,34 @@ const StudentsPage = () => {
       </div>
 
       {/* View Dialog */}
-      <StudentProfileDialog
-        open={dialogOpen && !!viewProfile}
-        mode="view"
-        profile={viewProfile}
-        onClose={() => {
-          setDialogOpen(false);
-          setViewProfile(null);
-        }}
-        onSaved={handleSaved}
-      />
-
-      {/* Edit Dialog */}
-      <StudentProfileDialog
-        open={dialogOpen && !!editProfile}
-        mode="edit"
-        profile={editProfile}
-        onClose={() => {
-          setDialogOpen(false);
-          setEditProfile(null);
-        }}
-        onSaved={handleSaved}
-      />
+      {dialogOpen && (
+        <Suspense fallback={null}>
+          {viewProfile && (
+            <StudentProfileDialog
+              open={dialogOpen && !!viewProfile}
+              mode="view"
+              profile={viewProfile}
+              onClose={() => {
+                setDialogOpen(false);
+                setViewProfile(null);
+              }}
+              onSaved={handleSaved}
+            />
+          )}
+          {editProfile && (
+            <StudentProfileDialog
+              open={dialogOpen && !!editProfile}
+              mode="edit"
+              profile={editProfile}
+              onClose={() => {
+                setDialogOpen(false);
+                setEditProfile(null);
+              }}
+              onSaved={handleSaved}
+            />
+          )}
+        </Suspense>
+      )}
     </AdminLayout>
   );
 };

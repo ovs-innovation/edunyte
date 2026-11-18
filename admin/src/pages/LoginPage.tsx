@@ -10,6 +10,7 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { Eye, EyeOff, Lock, Mail, Shield, KeyRound } from 'lucide-react';
 import { toast } from 'sonner';
 import { AuthAPI, setToken, clearToken } from '@/lib/api';
+import { safeLocalStorage, safeSessionStorage } from '@/lib/safeStorage';
 import { useRole } from '@/contexts/RoleContext';
 
 const LoginPage = () => {
@@ -38,7 +39,7 @@ const LoginPage = () => {
           if (data.user?.role) {
             setCurrentRole(data.user.role);
             setPermissions((data.user.permissions || []) as any);
-            const storage = localStorage;
+            const storage = safeLocalStorage;
             if (data.user.email) storage.setItem('user-email', data.user.email);
             if (data.user.name) storage.setItem('user-name', data.user.name || data.user.email);
             if (data.user.id) storage.setItem('user-id', data.user.id);
@@ -101,7 +102,7 @@ const LoginPage = () => {
         setToken(data.token, remember);
         setCurrentRole(data.user.role);
         setPermissions((data.user.permissions || []) as any);
-        const storage = remember ? localStorage : sessionStorage;
+        const storage = remember ? safeLocalStorage : safeSessionStorage;
         storage.setItem('user-email', data.user.email);
         storage.setItem('user-name', data.user.name || data.user.email);
         storage.setItem('user-id', data.user.id);
@@ -125,7 +126,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen min-h-[100dvh] bg-background flex flex-col">
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>

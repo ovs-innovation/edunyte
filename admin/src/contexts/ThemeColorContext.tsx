@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { safeLocalStorage } from '@/lib/safeStorage';
 
 export type ThemeColor = 'sky' | 'violet' | 'emerald' | 'rose' | 'amber' | 'orange' | 'teal' | 'pink' | 'indigo' | 'cyan' | 'lime' | 'red';
 
@@ -26,7 +27,7 @@ const colorValues: Record<ThemeColor, { light: string; dark: string }> = {
 
 export const ThemeColorProvider = ({ children }: { children: ReactNode }) => {
   const [themeColor, setThemeColorState] = useState<ThemeColor>(() => {
-    const stored = localStorage.getItem('theme-color');
+    const stored = safeLocalStorage.getItem('theme-color');
     return (stored as ThemeColor) || 'sky';
   });
 
@@ -55,8 +56,8 @@ export const ThemeColorProvider = ({ children }: { children: ReactNode }) => {
 
   const setThemeColor = (color: ThemeColor) => {
     setThemeColorState(color);
-    localStorage.setItem('theme-color', color);
-    localStorage.setItem('button-color', color);
+    safeLocalStorage.setItem('theme-color', color);
+    safeLocalStorage.setItem('button-color', color);
     applyColors(color);
   };
 

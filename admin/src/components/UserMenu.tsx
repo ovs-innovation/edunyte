@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { PermissionGate } from '@/components/PermissionGate';
 import { useRole } from '@/contexts/RoleContext';
 import { clearToken, ROLE_KEY } from '@/lib/api';
+import { safeLocalStorage, safeSessionStorage } from '@/lib/safeStorage';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,8 +19,8 @@ export function UserMenu() {
   const navigate = useNavigate();
   const { currentRole } = useRole();
 
-  const name = localStorage.getItem('user-name') || sessionStorage.getItem('user-name') || '';
-  const email = localStorage.getItem('user-email') || sessionStorage.getItem('user-email') || '';
+  const name = safeLocalStorage.getItem('user-name') || safeSessionStorage.getItem('user-name') || '';
+  const email = safeLocalStorage.getItem('user-email') || safeSessionStorage.getItem('user-email') || '';
   const displayName = name || email || 'User';
   const initials = displayName
     .split(' ')
@@ -30,15 +31,15 @@ export function UserMenu() {
 
   const handleLogout = () => {
     toast.success('Logged out successfully');
-    const isTeacher = currentRole === 'teacher' || localStorage.getItem(ROLE_KEY) === 'teacher';
+    const isTeacher = currentRole === 'teacher' || safeLocalStorage.getItem(ROLE_KEY) === 'teacher';
 
     clearToken();
-    localStorage.removeItem('user-name');
-    localStorage.removeItem('user-email');
-    localStorage.removeItem('user-id');
-    localStorage.removeItem(ROLE_KEY);
-    localStorage.removeItem('user-permissions');
-    sessionStorage.clear();
+    safeLocalStorage.removeItem('user-name');
+    safeLocalStorage.removeItem('user-email');
+    safeLocalStorage.removeItem('user-id');
+    safeLocalStorage.removeItem(ROLE_KEY);
+    safeLocalStorage.removeItem('user-permissions');
+    safeSessionStorage.clear();
 
     if (isTeacher) {
       const frontendUrl =

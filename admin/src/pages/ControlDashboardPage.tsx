@@ -39,10 +39,11 @@ import {
   Line,
 } from 'recharts';
 import { useToast } from '@/hooks/use-toast';
+import { getToken } from '@/lib/api';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8085/api';
 
-const getToken = () => localStorage.getItem('admin-auth-token') || sessionStorage.getItem('admin-auth-token');
+
 
 // Mock data for traffic (as per user request to exclude)
 const trafficData = [

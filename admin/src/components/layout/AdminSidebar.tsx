@@ -1,4 +1,5 @@
 import { NavLink } from '@/components/NavLink';
+import { safeLocalStorage, safeSessionStorage } from '@/lib/safeStorage';
 import { useRole } from '@/contexts/RoleContext';
 import { PermissionGate } from '@/components/PermissionGate';
 import {
@@ -79,8 +80,8 @@ export function AdminSidebar({ mobileOpen = false, onMobileClose }: AdminSidebar
   const [courseManagementOpen, setCourseManagementOpen] = useState(true);
   const { currentRole } = useRole();
   const navItems = currentRole === 'teacher' ? teacherNavItems : adminNavItems;
-  const name = sessionStorage.getItem('user-name') || '';
-  const email = sessionStorage.getItem('user-email') || '';
+  const name = safeLocalStorage.getItem('user-name') || safeSessionStorage.getItem('user-name') || '';
+  const email = safeLocalStorage.getItem('user-email') || safeSessionStorage.getItem('user-email') || '';
   const displayName = name || email || 'User';
 
   return (

@@ -1,4 +1,5 @@
 import { Permission, Role } from "./rbac";
+import { safeLocalStorage, safeSessionStorage } from "./safeStorage";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8096/api";
 export const TOKEN_KEY = "admin-auth-token";
@@ -23,7 +24,7 @@ export interface ApiRole {
   createdAt?: string;
 }
 
-const getToken = () => localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
+export const getToken = () => safeLocalStorage.getItem(TOKEN_KEY) || safeSessionStorage.getItem(TOKEN_KEY);
 
 const getHeaders = () => {
   const token = getToken();
@@ -277,17 +278,17 @@ export const StudentProfileAPI = {
 
 export const setToken = (token: string, remember = true) => {
   if (remember) {
-    localStorage.setItem(TOKEN_KEY, token);
-    sessionStorage.removeItem(TOKEN_KEY);
+    safeLocalStorage.setItem(TOKEN_KEY, token);
+    safeSessionStorage.removeItem(TOKEN_KEY);
   } else {
-    sessionStorage.setItem(TOKEN_KEY, token);
-    localStorage.removeItem(TOKEN_KEY);
+    safeSessionStorage.setItem(TOKEN_KEY, token);
+    safeLocalStorage.removeItem(TOKEN_KEY);
   }
 };
 
 export const clearToken = () => {
-  localStorage.removeItem(TOKEN_KEY);
-  sessionStorage.removeItem(TOKEN_KEY);
+  safeLocalStorage.removeItem(TOKEN_KEY);
+  safeSessionStorage.removeItem(TOKEN_KEY);
 };
 
 // ==================== Course Management APIs ====================

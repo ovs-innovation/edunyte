@@ -1,6 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AuthAPI, clearToken, setToken, TOKEN_KEY } from "@/lib/api";
+import { safeLocalStorage, safeSessionStorage } from "@/lib/safeStorage";
 import { useRole } from "@/contexts/RoleContext";
 
 interface Props {
@@ -26,7 +27,7 @@ const ProtectedRoute = ({ children }: Props) => {
         window.history.replaceState({}, document.title, window.location.pathname + cleanQuery);
       }
 
-      const token = localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
+      const token = safeLocalStorage.getItem(TOKEN_KEY) || safeSessionStorage.getItem(TOKEN_KEY);
       if (!token) {
         navigate("/login", { replace: true, state: { from: location.pathname } });
         return;
@@ -48,7 +49,7 @@ const ProtectedRoute = ({ children }: Props) => {
           }
           setCurrentRole(data.user.role);
         }
-        const storage = localStorage.getItem(TOKEN_KEY) ? localStorage : sessionStorage;
+        const storage = safeLocalStorage.getItem(TOKEN_KEY) ? safeLocalStorage : safeSessionStorage;
         if (data.user?.email) {
           storage.setItem("user-email", data.user.email);
         }

@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { UsersAPI, AuthAPI, ApiUser } from '@/lib/api';
+import { safeLocalStorage } from '@/lib/safeStorage';
 import { useToast } from '@/hooks/use-toast';
 
 const ProfilePage = () => {
@@ -44,8 +45,8 @@ const ProfilePage = () => {
       });
       setUser(res.user);
       setPassword('');
-      localStorage.setItem('user-email', res.user.email);
-      localStorage.setItem('user-name', res.user.name || res.user.email);
+      safeLocalStorage.setItem('user-email', res.user.email);
+      safeLocalStorage.setItem('user-name', res.user.name || res.user.email);
       toast({ title: 'Profile updated' });
     } catch (err: any) {
       toast({ title: 'Update failed', description: err?.message, variant: 'destructive' });
